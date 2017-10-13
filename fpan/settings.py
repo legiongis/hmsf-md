@@ -57,6 +57,8 @@ PACKAGE_PATH = "path/to/location/of/cloned/fpan-data/repo"
 
 ALLOWED_HOSTS = []
 
+ROOT_URLCONF = 'fpan.urls'
+
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
 WSGI_APPLICATION = 'fpan.wsgi.application'
 STATIC_ROOT = '/var/www/media'
