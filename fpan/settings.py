@@ -51,6 +51,10 @@ DATABASES = {
 
 INSTALLED_APPS+=('fpan',)
 
+## the following two variables should be handled in settings_local.py
+SECRET_LOG = "path/to/directory/outside/of/version/control"
+PACKAGE_PATH = "path/to/location/of/cloned/fpan-data/repo"
+
 ALLOWED_HOSTS = []
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
