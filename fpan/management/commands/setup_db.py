@@ -44,43 +44,14 @@ class Command(BaseCommand):
         os.system('psql -h %(HOST)s -p %(PORT)s -U %(USER)s -d postgres -f "%(truncate_path)s"' % db_settings)
 
         management.call_command('migrate')
-
-        # self.import_graphs(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json'), overwrite_graphs=True)
-        # self.import_business_data(os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json'), overwrite=True)
-
-        # local_settings_available = os.path.isfile(os.path.join(settings.SYSTEM_SETTINGS_LOCAL_PATH))
-
-        # if local_settings_available == True:
-            # self.import_business_data(settings.SYSTEM_SETTINGS_LOCAL_PATH, overwrite=True)
-            
-        # packages.build_permissions(packages)
-
-
-        # dbinfo = settings.DATABASES['default']
-
-        # Postgres version
-        # conn = db.connect(host=dbinfo['HOST'], user=dbinfo['USER'],
-                        # password=dbinfo['PASSWORD'], port=int(dbinfo['PORT']))
-        # conn.autocommit = True
-        # cursor = conn.cursor()
-        # try:
-            # cursor.execute("DROP DATABASE " + "yay")
-        # except:
-            # pass
-        # cursor.execute("CREATE DATABASE " + "yay" + " WITH ENCODING 'UTF8'")
         
-        # management.call_command('makemigrations')
-        # management.call_command('migrate')
+        ## load system settings graph and the settings themselves
+        system_settings_graph = os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings_Model.json')
+        settings_file = settings.SYSTEM_SETTINGS_LOCAL_PATH
+        
+        management.call_command('packages',operation='import_graphs', source=system_settings_graph, overwrite_graphs=True)
+        management.call_command('packages',operation='import_business_data', source=settings_file, overwrite=True)
 
-        # print("making admin...")
-        
-        # default_user = User.objects.create_user('admin','','cspmaster')
-        # default_user.is_staff = True
-        # default_user.is_superuser = True
-        # default_user.save()
-        
-        
-        # print("admin superuser created. password = cspmaster.")
         
     def build_fpan_groups(self):
     
