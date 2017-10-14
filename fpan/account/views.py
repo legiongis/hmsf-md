@@ -9,6 +9,8 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
 from django.contrib.auth.models import User
+from arches.app.views.main import auth as arches_auth
+from arches.app.models.system_settings import settings
 
 def register(request):
     if request.method == "POST":
@@ -46,23 +48,31 @@ def activate(request, uidb64, token):
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
+        print(user)
         user.is_active = True
         user.save()
-        user = authenticate(username=user.username, password=user.password)
-        login(request, user)
+        arches_auth(request)
+
+        return render(request, 'login.htm', {
+            'app_name': settings.APP_NAME,
+            'auth_failed': 1,
+            'next': 'home'
+        })
+        # user = authenticate(username=user.username, password=user.password)
+        # login(request, user)
         # return redirect('home')
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+        #return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
         return HttpResponse('Activation link is invalid!')
 
 
 def check_duplicate_username(newusername):
-    incrementer = 1
-    print(incrementer)
-    print(newusername)
+    inputname = newusername
+    inc = 1
     while User.objects.filter(username=newusername).exists():
-        newusername = newusername + '{}'.format(incrementer)
-        incrementer = incrementer + 1
-        print(incrementer)
+        if len(inputname) < len(newusername):
+            offset = len(newusername) - len(inputname)
+            inc = int(newusername[-offset:]) + 1
+        newusername = inputname + '{}'.format(inc)
         print(newusername)
     return newusername
