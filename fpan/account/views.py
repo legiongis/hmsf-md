@@ -19,7 +19,7 @@ def register(request):
             lastname = form.cleaned_data.get('last_name')
             user = form.save(commit=False)
             user.is_active = False
-            user.username = firstname[0].lower() + middleinitial.lower() + lastname[0].lower()
+            user.username = check_duplicate_username(firstname[0].lower() + middleinitial.lower() + lastname.lower())
             user.save()
             current_site = get_current_site(request)
             message = render_to_string('email/account_activation_email.htm', {
@@ -48,8 +48,21 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
+        user = authenticate(username=user.username, password=user.password)
         login(request, user)
         # return redirect('home')
         return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
         return HttpResponse('Activation link is invalid!')
+
+
+def check_duplicate_username(newusername):
+    incrementer = 1
+    print(incrementer)
+    print(newusername)
+    while User.objects.filter(username=newusername).exists():
+        newusername = newusername + '{}'.format(incrementer)
+        incrementer = incrementer + 1
+        print(incrementer)
+        print(newusername)
+    return newusername
