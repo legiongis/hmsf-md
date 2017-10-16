@@ -3,6 +3,7 @@ fpan/tileserver
 fpan/uploadedfiles
 fpan/settings_local.py
 private_logs/
+fpan/static/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
