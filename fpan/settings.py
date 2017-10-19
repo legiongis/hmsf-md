@@ -3,7 +3,7 @@ Django settings for fpan project.
 """
 
 import os
-import arches
+#import arches
 import inspect
 
 try:
