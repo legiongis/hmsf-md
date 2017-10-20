@@ -54,18 +54,10 @@ def activate(request, uidb64, token):
         print(user)
         user.is_active = True
         user.save()
-        response = arches_auth(request)
-        print(response)
-        # return render(request, 'login.htm', {
-        #     'app_name': settings.APP_NAME,
-        #     'auth_failed': 1,
-        #     'next': 'home'
-        # })
-        # user = authenticate(username=user.username, password=user.password)
-        # login(request, user)
-        # return redirect('home')
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.' +
-                            '\n{}'.format(response))
+        user = authenticate(username=user.username, password=user.password)
+        return redirect('home')
+        # return HttpResponse('Thank you for your email confirmation. Now you can login your account.' +
+                            # '\n{}'.format(response))
     else:
         return HttpResponse('Activation link is invalid!')
 
