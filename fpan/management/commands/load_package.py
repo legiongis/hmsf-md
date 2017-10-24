@@ -29,14 +29,20 @@ class Command(BaseCommand):
             default=False,
             help='runs the setup_db command before beginning the load process. wipes everything.',
         )
+        parser.add_argument("-c", "--components",
+            nargs="*",
+            help="email addresses to which the server setup notification will be set (defaults are added below)")
         pass
 
     def handle(self, *args, **options):
 
         force = options['yes']
-        self.load_package(source=settings.PACKAGE_PATH,setup_db=options['setup_db'])
+        comp = options['components']
+        if not comp:
+            comp = 'all'
+        self.load_package(source=settings.PACKAGE_PATH,setup_db=options['setup_db'], components=comp)
 
-    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep'):
+    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', components=None):
 
         ## not in use, as this is now handled at the end of the new 
         ## manage.py setup_db command, which can be added to load_package
@@ -130,9 +136,9 @@ class Command(BaseCommand):
             for path in business_data:
                 if path.endswith('csv'):
                     config_file = path.replace('.csv', '.mapping')
-                    management.call_command('packages',operation='import_business_data', source=path, overwrite=True, bulk_load=True)
+                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append', bulk_load=True)
                 else:
-                    management.call_command('packages',operation='import_business_data', source=path, overwrite=True, bulk_load=True)
+                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append', bulk_load=True)
 
             for relation in relations:
                 management.call_command('packages',operation='import_business_data_relations', source=relation)
@@ -211,7 +217,7 @@ class Command(BaseCommand):
 
         if setup_db:
             management.call_command('setup_db',yes=True)
-                
+            
         package = settings.PACKAGE_PATH
         
         ## loading extensions not tested in fpan - 10/13/17
@@ -222,10 +228,13 @@ class Command(BaseCommand):
         # print "\n~~~~~~~~ LOAD DATATYPES"
         # load_datatypes(package)
         
-        print "\n~~~~~~~~ LOAD CONCEPTS & COLLECTIONS"
-        load_concepts(package)
-        print "\n~~~~~~~~ LOAD RESOURCE MODELS & BRANCHES"
-        load_graphs(package)
+        if 'concepts' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD CONCEPTS & COLLECTIONS"
+            load_concepts(package)
+            
+        if 'graphs' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD RESOURCE MODELS & BRANCHES"
+            load_graphs(package)
         
         ## loading resource to resource constraints not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD RESOURCE TO RESOURCE CONSTRAINTS"
@@ -235,8 +244,9 @@ class Command(BaseCommand):
         # print "\n~~~~~~~~ LOAD MAP LAYERS"
         # load_map_layers(package)
         
-        print "\n~~~~~~~~ LOAD RESOURCES & RESOURCE RELATIONS"
-        load_business_data(package)
+        if 'data' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD RESOURCES & RESOURCE RELATIONS"
+            load_business_data(package)
         
         ## loading resource views not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD RESOURCE VIEWS"
