@@ -8,7 +8,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from .tokens import account_activation_token
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
 
@@ -22,7 +22,11 @@ def register(request):
             lastname = form.cleaned_data.get('last_name')
             user = form.save(commit=False)
             user.is_active = False
-            user.username = check_duplicate_username(firstname[0].lower() + middleinitial.lower() + lastname.lower())
+            user.username = check_duplicate_username(
+                firstname[0].lower() 
+                + middleinitial.lower() 
+                + lastname.lower())
+
             user.save()
             current_site = get_current_site(request)
             message = render_to_string('email/account_activation_email.htm', {
@@ -53,19 +57,13 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         print(user)
         user.is_active = True
+        scout_group = Group.objects.get(name="Scout")
+        scout_group.user_set.add(user)
         user.save()
-        response = arches_auth(request)
-        print(response)
-        # return render(request, 'login.htm', {
-        #     'app_name': settings.APP_NAME,
-        #     'auth_failed': 1,
-        #     'next': 'home'
-        # })
-        # user = authenticate(username=user.username, password=user.password)
-        # login(request, user)
-        # return redirect('home')
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.' +
-                            '\n{}'.format(response))
+        user = authenticate(username=user.username, password=user.password)
+        return redirect('home')
+        # return HttpResponse('Thank you for your email confirmation. Now you can login your account.' +
+                            # '\n{}'.format(response))
     else:
         return HttpResponse('Activation link is invalid!')
 
