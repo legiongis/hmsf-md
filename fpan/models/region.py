@@ -2,11 +2,10 @@
 from django.contrib.gis.db import models
 
 class Region(models.Model):
-    region = models.CharField(max_length=254)
-    geom = models.MultiPolygonField(srid=4362)
+    name = models.CharField(max_length=254)
+    region_code = models.CharField(max_length=4)
+    geom = models.MultiPolygonField()
 
-# Auto-generated `LayerMapping` dictionary for Region model
-region_mapping = {
-    'region' : 'REGION',
-    'geom' : 'MULTIPOLYGON',
-}
+    # Returns the string representation of the model.
+    def __unicode__(self):              # __unicode__ on Python 2
+        return self.name

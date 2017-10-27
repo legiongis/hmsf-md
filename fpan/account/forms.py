@@ -2,12 +2,12 @@ from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from fpan.models.scout import ScoutProfile
+from fpan.models.scout import Scout
 
 
 class ScoutSignupForm(ModelForm):
     class Meta:
-        model = ScoutProfile
+        model = Scout
         fields = '__all__'
 
 class ScoutRegistrationForm(UserCreationForm):

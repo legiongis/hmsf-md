@@ -1,17 +1,8 @@
-#from django.db import models
 from django.contrib.gis.db import models
-# from django.contrib.postgres.fields import ArrayField
+from .region import Region
 from django.contrib.auth.models import User
 
-class ScoutProfile(models.Model):
-    REGION_CHOICES = (
-        ('NW', 'Northwest'),
-        ('NC', 'North Central'),
-        ('NE', 'Northeast'),
-        ('CR', 'Central'),
-        ('WC', 'West Central'),
-        ('SW', 'Southwest'),
-        ('SE', 'Southeast'),)
+class Scout(models.Model):
 
     SITE_INTEREST_CHOICES = (
         ('Prehistoric', 'Prehistoric'),
@@ -35,19 +26,9 @@ class ScoutProfile(models.Model):
             "What type of sites are you interested in?",
             max_length=30,
             choices=SITE_INTEREST_CHOICES)
-    region_choices = models.CharField(
-            "Which region(s) are you interested in monitoring sites in?",
-            max_length=2,
-            choices=REGION_CHOICES)
+    region_choices = models.ManyToManyField(Region)
+    # region_choices = models.CharField(
+    #         "Which region(s) are you interested in monitoring sites in?",
+    #         max_length=2,
+    #         choices=REGION_CHOICES)
     ethics_agreement = models.BooleanField()
-
-
-# class Region(models.Model):
-#     region = models.CharField(max_length=254)
-#     geom = models.MultiPolygonField(srid=4362)
-
-# # Auto-generated `LayerMapping` dictionary for Region model
-# region_mapping = {
-#     'region' : 'REGION',
-#     'geom' : 'MULTIPOLYGON',
-# }

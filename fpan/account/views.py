@@ -12,6 +12,7 @@ from django.contrib.auth.models import User, Group
 from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
 from arches.app.utils.JSONResponse import JSONResponse
+from fpan.models.region import Region
 
 
 def scout_signup(request):
@@ -119,3 +120,8 @@ def check_duplicate_username(newusername):
         newusername = inputname + '{}'.format(inc)
         print(newusername)
     return newusername
+
+
+def show_regions(request):
+    regions = Region.objects.all()
+    return JSONResponse(regions)
