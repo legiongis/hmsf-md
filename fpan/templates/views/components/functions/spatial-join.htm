@@ -1,0 +1,53 @@
+{% load i18n %}
+
+<div style="">
+  <div class="row widget-container">
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Name of Spatial Coordinates Node" %}</label>
+      </div>
+      <div class="col-xs-12">
+          <select data-placeholder="{% trans "select spatial coordinates node" %}"
+          data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: spatial_node_id, options: nodes, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
+      </div>
+    </div>
+  </div>
+  <div class="row widget-container">
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Local PostGIS Table Name" %}</label>
+      </div>
+      <div class="col-xs-12 crud-widget-container">
+        <input type="" placeholder="{% trans "enter name of table" %}" id="" class="form-control input-md widget-input" data-bind="textInput: table_name">
+      </div>
+      <div class="col-xs-12">
+        <p>Please note that there is no validation in this form, so you must make sure to type the table name correctly</p>
+      </div>
+    </div>
+  </div>
+  <div class="row widget-container">
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Field Name in Table" %}</label>
+      </div>
+      <div class="col-xs-12 crud-widget-container">
+        <input type="" placeholder="{% trans "enter name of table" %}" id="" class="form-control input-md widget-input" data-bind="textInput: field_name">
+      </div>
+      <div class="col-xs-12">
+        <p>Please note that there is no validation in this form, so you must make sure to type the field name correctly</p>
+      </div>
+    </div>
+  </div>
+  <div class="row widget-container">
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Target Node to Update" %}</label>
+      </div>
+      <div class="col-xs-12">
+          <select data-placeholder="{% trans "select spatial coordinates node" %}"
+          data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: target_node_id, options: nodes, optionsText: 'name', optionsValue: 'nodegroup_id', valueAllowUnset: true"></select>
+      </div>
+    </div>
+  </div>
+  
+</div>
