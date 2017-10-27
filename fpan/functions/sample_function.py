@@ -15,8 +15,18 @@ details = {
 }
 
 class SampleFunction(BaseFunction):
-
-    def save(self):
+    
+    # for property, value in vars(SampleFunction).iteritems():
+        # print property, ": ", value
+        
+    def save(self,tile,request):
+        if request:
+            request.data
+            # for property, value in vars(request).iteritems():
+                # print property, ": ", value
+            # print tile
+            # for property, value in vars(tile).iteritems():
+                # print property, ": ", value
         print 'calling save'
 
     def on_import(self):
