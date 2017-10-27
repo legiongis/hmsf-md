@@ -1,0 +1,58 @@
+[
+  {
+    "model": "fpan.region",
+    "pk": 1,
+    "fields": {
+      "region_name": "Northwest",
+      "geom": 
+    }
+  },
+  {
+    "model": "fpan.region",
+    "pk": 2,
+    "fields": {
+      "region_name": "North Central",
+      "geom": 
+    }
+  },
+  {
+    "model": "fpan.region",
+    "pk": 3,
+    "fields": {
+      "region_name": "Northeast",
+      "geom": 
+    }
+  },
+  {
+    "model": "fpan.region",
+    "pk": 4,
+    "fields": {
+      "region_name": "Central",
+      "geom": 
+    }
+  },
+  {
+    "model": "fpan.region",
+    "pk": 5,
+    "fields": {
+      "region_name": "West Central",
+      "geom": 
+    }
+  },
+  {
+    "model": "fpan.region",
+    "pk": 6,
+    "fields": {
+      "region_name": "Southwest",
+      "geom": 
+    }
+  },
+  {
+    "model": "fpan.region",
+    "pk": 7,
+    "fields": {
+      "region_name": "Southeast",
+      "geom": 
+    }
+  }
+]

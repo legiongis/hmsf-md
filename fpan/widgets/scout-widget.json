@@ -1,0 +1,7 @@
+{
+    "name": "scout-widget",
+    "component": "views/components/widgets/scout-widget",
+    "defaultconfig": {},
+    "helptext": null,
+    "datatype": "string"
+}
