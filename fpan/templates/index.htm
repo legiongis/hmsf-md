@@ -98,7 +98,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                         {% endif %}
                         {% if user.username == 'anonymous' %}
                         <li class="page-scroll">
-                            <a href="{% url 'register' %}">Register</a>
+                            <a href="#scout-signup">Scout Signup</a>
                         </li>
                         {% endif %}
                         <li class="page-scroll" style="display: flex; flex-direction: row">
@@ -356,6 +356,15 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         </div>
     </section>
     <!-- End News Section -->
+
+
+<!-- Scout Signup Section -->
+    <section id="scout-signup" class="scout-signup-section">
+        <div class="container">
+            {% include "account/signup.htm" %}
+        </div>
+    </section>
+    <!-- End Scout Signup Section -->
 
 
     <!-- Contact Section -->

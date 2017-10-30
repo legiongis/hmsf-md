@@ -1,0 +1,24 @@
+<h2>Register as a scout.</h2>
+  <form action="{% url 'scout_signup' %}" method="post">
+    {% csrf_token %}
+
+    {% for field in scout_signup %}
+    <p>
+        {{ field.label_tag }}<br>
+        {{ field }}
+
+        {% if field.help_text %}
+            <small style="display: none">{{ field.help_text }}</small>
+        {% endif %}
+
+        {% if field.errors %}
+            {% for error in field.errors %}
+                <span style="color:red" > {{ error }} </span>
+            {% endfor %}
+        {% endif %}
+
+    </p>
+    {% endfor %}
+
+    <button type="submit">Signup</button>
+  </form>

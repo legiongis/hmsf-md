@@ -1,11 +1,11 @@
-
+{% extends 'fpan/formbase.htm' %}
 
 {% block content %}
-  <h2>Register as a scout.</h2>
+  <h2>Complete scout registration.</h2>
   <form method="post">
     {% csrf_token %}
 
-    {% for field in form %}
+    {% for field in scout_form %}
     <p>
         {{ field.label_tag }}<br>
         {{ field }}
@@ -23,7 +23,7 @@
     </p>
     {% endfor %}
 
-    <button type="submit">Register</button>
+    <button type="submit">Signup</button>
   </form>
 
 {% endblock %}
