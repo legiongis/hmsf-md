@@ -1,11 +1,13 @@
-{% extends 'fpan/formbase.htm' %}
+{% extends '../formbase.htm' %}
 
 {% block content %}
   <h2>Complete scout registration.</h2>
   <form method="post">
     {% csrf_token %}
 
-    {% for field in scout_form %}
+    {{ scout_form.as_p }}
+
+    {% for field in scout_profile %}
     <p>
         {{ field.label_tag }}<br>
         {{ field }}

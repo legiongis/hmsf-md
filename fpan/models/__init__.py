@@ -1,2 +1,2 @@
 from .region import Region
-from .scout import Scout
+# from .scout import Scout

@@ -1,0 +1,19 @@
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<section class="about-section section-first" style="padding-top: 0px;">
+
+
+    <div id="about" class="about-image bg-grey">
+        <div class="container">
+            <div class="title-v1">
+                <h1>{% trans "What is Arches" %}</h1>
+                <p>{% trans "Arches is <strong>awesome</strong> technology designed to ease Cultural Heritage data management.<br> Use Arches to build an inventory of cultural heritage assets such as objects, research activities, areas, datasets, and people or  organizations." %}</p>
+            </div>
+            <div class="img-center">
+                <img class="img-responsive" src="{% static 'img/landing/disco.jpg' %}" alt="">
+            </div>
+        </div>
+    </div>
+
+</section>
