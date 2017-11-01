@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='home'),
     url(r'^scout/signup', views.scout_signup, name='scout_signup'),
+    url(r'^scout/profile', views.scout_profile, name='scout_profile'),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         views.activate, name='activate'),
     url(r'^', include('arches.urls')),

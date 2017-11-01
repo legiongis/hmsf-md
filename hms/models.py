@@ -47,6 +47,7 @@ class ScoutProfile(models.Model):
 def create_user_scout(sender, instance, created, **kwargs):
     if created:
         ScoutProfile.objects.create(user=instance)
+    instance.scoutprofile.save()
 
 @receiver(post_save, sender=Scout)
 def save_user_scout(sender, instance, **kwargs):

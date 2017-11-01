@@ -57,28 +57,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     {% include "fpan/partials/_header.htm" %}
     <!--=== End Header ===-->
 
-    <!-- Intro Section -->
-    {% include "fpan/partials/_intro-section.htm" %}
-    <!-- End Intro Section -->
-
-
-    <!--  About Section -->
-    {% include "fpan/partials/_about-section.htm" %}
-    <!--  About Section -->
-
-    <!-- Services Section -->
-    {% include "fpan/partials/_services-section.htm" %}
-    <!-- End Services Section -->
-
-    <!-- News Section -->
-    {% include "fpan/partials/_news-section.htm" %}
-    <!-- End News Section -->
-
-
-    <!-- Scout Signup Section -->  
-    {% include "fpan/forms/_scout.htm" %}
-    <!-- End Scout Signup Section -->
-
+    {% block content %}
+    {% endblock %}
 
     <!-- Contact Section -->
     {% include "fpan/partials/_copyright-section.htm" %}

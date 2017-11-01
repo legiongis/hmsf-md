@@ -1,31 +1,49 @@
-{% extends '../formbase.htm' %}
+{% extends "index.htm" %}
 
 {% block content %}
-  <h2>Complete scout registration.</h2>
-  <form method="post">
-    {% csrf_token %}
 
-    {{ scout_form.as_p }}
+<section class="scout-profile-section" style="padding-top: 100px;">
 
-    {% for field in scout_profile %}
-    <p>
-        {{ field.label_tag }}<br>
-        {{ field }}
+<div class="container">
 
-        {% if field.help_text %}
-            <small style="display: none">{{ field.help_text }}</small>
-        {% endif %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 
-        {% if field.errors %}
-            {% for error in field.errors %}
-                <span style="color:red" > {{ error }} </span>
-            {% endfor %}
-        {% endif %}
+    <h2>Complete scout registration.</h2>
+    <form method="post">
+        {% csrf_token %}
 
-    </p>
-    {% endfor %}
+        <!-- {{ scout_form.as_p }} -->
+        {{ user.username }}
 
-    <button type="submit">Signup</button>
-  </form>
+        {% for field in scout_profile %}
+        <p>
+            {{ field.label_tag }}<br>
+            {{ field }}
+
+            {% if field.help_text %}
+                <small style="display: none">{{ field.help_text }}</small>
+            {% endif %}
+
+            {% if field.errors %}
+                {% for error in field.errors %}
+                    <span style="color:red" > {{ error }} </span>
+                {% endfor %}
+            {% endif %}
+
+        </p>
+        {% endfor %}
+
+        <button type="submit">Signup</button>
+    </form>
+
+</div>
+
+</section>
 
 {% endblock %}

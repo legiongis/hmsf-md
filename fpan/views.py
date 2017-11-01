@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import user_passes_test
 from django.core.mail import EmailMessage
 from hms.forms import ScoutForm, ScoutProfileForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -8,16 +9,18 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from fpan.utils.tokens import account_activation_token
+from fpan.utils.accounts import check_anonymous
 from django.contrib.auth.models import User, Group
 from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
 from fpan.models.region import Region
-from hms.models import Scout
+from hms.models import Scout, ScoutProfile
+from django.contrib import messages
 
 
 def index(request):
     scout_form = ScoutForm()
-    return render(request, 'index.htm', {
+    return render(request, 'fpan/home.htm', {
         'main_script': 'index',
         'active_page': 'Home',
         'app_title': settings.APP_TITLE,
@@ -62,21 +65,22 @@ def scout_signup(request):
     return render(request, "fpan/forms/_scout.htm", {'form': form})
 
 
+@user_passes_test(check_anonymous)
 def scout_profile(request):
     if request.method == "POST":
-        scout_form = ScoutForm(request.POST, instance=request.user)
-        scout_profile_form = ScoutProfileForm(request.POST, instance=request.user.scoutprofile)
-        if scout_form.is_valid() and scout_profile_form.is_valid():
-            scout_form.save()
+        scout_profile_form = ScoutProfileForm(
+            request.POST,
+            instance=request.user.scout.scoutprofile)
+        if scout_profile_form.is_valid():
             scout_profile_form.save()
-            return redirect('home')
+            messages.add_message(request, messages.INFO, 'Your profile has been updated.')
+        else:
+            messages.add_message(request, messages.ERROR, 'Form was invalid.')
 
     else:
-        scout_form = ScoutForm(instance=request.user)
-        scout_profile_form = ScoutProfileForm(instance=request.user.scoutprofile)
+        scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
 
-    return render(request, "account/signup.htm", {
-        'scout_form': scout_form,
+    return render(request, "fpan/forms/_scout-profile.htm", {
         'scout_profile': scout_profile_form})
 
 
@@ -94,13 +98,9 @@ def activate(request, uidb64, token):
         scout_group.user_set.add(user)
         user.save()
         user = authenticate(username=user.username, password=user.password)
-        scout_form = ScoutForm(instance=request.user)
+        scout_form = ScoutForm(instance=user)
         scout_profile_form = ScoutProfileForm()
-        return render(request, "fpan/forms/_scout-profile.htm", {
-            'scout_form': scout_form,
-            'scout_profile': scout_profile_form})
-        # return HttpResponse('Thank you for your email confirmation. Now you can login your account.' +
-                            # '\n{}'.format(response))
+        return redirect("scout_profile")
     else:
         return HttpResponse('Activation link is invalid!')
 
@@ -117,6 +117,6 @@ def check_duplicate_username(newusername):
     return newusername
 
 
-# def show_regions(request):
-#     regions = Region.objects.all()
-#     return JSONResponse(regions)
+def show_regions(request):
+    regions = Region.objects.all()
+    return JSONResponse(regions)
