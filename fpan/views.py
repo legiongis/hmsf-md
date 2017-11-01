@@ -16,6 +16,7 @@ from arches.app.models.system_settings import settings
 from fpan.models.region import Region
 from hms.models import Scout, ScoutProfile
 from django.contrib import messages
+from arches.app.utils.JSONResponse import JSONResponse
 
 
 def index(request):
