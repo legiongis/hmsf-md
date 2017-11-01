@@ -1,0 +1,76 @@
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<nav class="one-page-header navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <div class="menu-container page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <a class="navbar-brand" style="padding-top: 5px;" href="#intro">
+                <img src="{% static 'img/landing/arches_logo_light.png' %}" style="height: 36px; width: 36px;" alt="Logo">
+            </a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <div class="menu-container">
+                <ul class="nav navbar-nav">
+                    <li class="page-scroll">
+                        <a href="#about">{% trans "About Arches" %}</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#services">{% trans "Capabilities" %}</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="#news">{% trans "News" %}</a>
+                    </li>
+                    <li class="page-scroll">
+                        <a href="{% url 'search_home' %}">{% trans "Search" %}</a>
+                    </li>
+                    {% if user|can_create_resource_instance %}
+                    <li class="page-scroll">
+                        <a href="{% url 'resource' %}">{% trans "Manage Data" %}</a>
+                    </li>
+                    {% endif %}
+                    {% if user|has_group:"Graph Editor" %}
+                    <li class="page-scroll">
+                        <a href="{% url 'graph' '' %}">{% trans "Design" %}</a>
+                    </li>
+                    {% endif %}
+                    {% if user.username == 'anonymous' %}
+                    <li class="page-scroll">
+                        <a href="#scout-signup">Scout Signup</a>
+                    </li>
+                    {% endif %}
+                    <li class="page-scroll" style="display: flex; flex-direction: row">
+                        {% if user.username == 'anonymous' %}
+                        <a id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
+                            {% trans "Login" %}
+                        </a>
+                        {% else %}
+                        <a id="auth-link" data-bind="click: function(){showAuthMenu(!showAuthMenu())}">
+                            {% trans "Welcome" %} {{ user.username }}
+                        </a>
+                        <span class="fa fa-chevron-circle-down auth-options" data-bind="click: function(){showAuthMenu(!showAuthMenu())}"></span>
+
+                        {% endif %}
+                    </li>
+                    <!-- ko if: showAuthMenu -->
+                    <ul class="auth-options">
+                        <li><a href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Logout' %}</a></li>
+                        <li><a href="{% url 'change_password' %}">{% trans 'Change Password' %}</a></li>
+                    </ul>
+                    <!-- /ko -->
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>

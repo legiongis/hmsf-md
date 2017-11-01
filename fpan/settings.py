@@ -49,7 +49,7 @@ DATABASES = {
     }
 }
 
-INSTALLED_APPS+=('fpan',)
+INSTALLED_APPS+=('fpan', 'hms',)
 
 ## the following two variables should be handled in settings_local.py
 SECRET_LOG = "path/to/directory/outside/of/version/control"
