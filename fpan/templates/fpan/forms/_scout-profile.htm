@@ -1,5 +1,7 @@
 {% extends "index.htm" %}
 
+{% load staticfiles %}
+
 {% block content %}
 
 <section class="scout-profile-section" style="padding-top: 100px;">
@@ -47,7 +49,21 @@
                     </div>
                 </div>
             </div>
+            
+            {% elif field.name == "region_choices" %}
+            <br>
+            <label for="{{ field.id_for_label }}"
+                   class="col-sm-3 control-label" 
+                   style="color: #555">{{ field.label }}</label>
+            <div class="col-sm-3">
+                {{ field }}
+            </div>
+            <div class="col-sm-4">
+                <img src="{% static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">
+            </div>
+
             {% else %}
+
             <label for="{{ field.id_for_label }}"
                    class="col-sm-3 control-label" 
                    style="color: #555">{{ field.label }}</label>
