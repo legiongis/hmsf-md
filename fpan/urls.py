@@ -3,7 +3,7 @@ from django.contrib.gis import admin
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='home'),
+    url(r'^$', views.index, name='fpan_home'),
     url(r'^regions/$', views.show_regions, name='show_regions'),
     url(r'^scout/signup', views.scout_signup, name='scout_signup'),
     url(r'^scout/profile', views.scout_profile, name='scout_profile'),

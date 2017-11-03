@@ -8,7 +8,7 @@ from django.dispatch import receiver
 
 # Create your models here.
 class Scout(User):
-    pass
+    middle_initial = models.CharField(max_length=1)
 
 
 class ScoutProfile(models.Model):
