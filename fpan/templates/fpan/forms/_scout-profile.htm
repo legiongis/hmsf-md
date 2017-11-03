@@ -14,32 +14,70 @@
     </ul>
     {% endif %}
 
-    <h2>Complete scout registration.</h2>
-    <form method="post">
+    <h3><strong>{{ user.first_name }} {{ user.scout.middle_initial }} {{ user.last_name }}</strong></h3>
+
+    {% if not scout_profile.ethics_agreement.value %}
+    <div class="row">
+        <h2 style="color:red">Complete scout registration.</h2>
+        <p style="color:red">Please make sure to read and accept the ethics agreement</p>
+    </div>
+    {% endif %}
+    
+    <form method="post" class="form-horizontal">
         {% csrf_token %}
-
-        <!-- {{ scout_form.as_p }} -->
-        {{ user.username }}
-
         {% for field in scout_profile %}
-        <p>
-            {{ field.label_tag }}<br>
-            {{ field }}
 
-            {% if field.help_text %}
-                <small style="display: none">{{ field.help_text }}</small>
+        <div class="form-group">
+
+            {% if field.name == "ethics_agreement" %}
+            <div class="col-sm-offset-2 col-sm-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        {{ field.label }}
+                    </div>
+                    <div class="panel-body">
+                        {% include 'fpan/ethics_agreement.htm' %}                     
+                        
+                        <label for="{{ field.id_for_label }}"
+                               class="control-label" 
+                               style="color: #555">
+                           {{ field }} I have read and will abide by the HMS Florida Code of Ethics and Program Agreement.
+                       </label>
+                       
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <label for="{{ field.id_for_label }}"
+                   class="col-sm-3 control-label" 
+                   style="color: #555">{{ field.label }}</label>
+            <div class="col-sm-8">
+
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="display: none">{{ field.help_text }}</small>
+                {% endif %}
+
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <span style="color:red" > {{ error }} </span>
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+
             {% endif %}
 
-            {% if field.errors %}
-                {% for error in field.errors %}
-                    <span style="color:red" > {{ error }} </span>
-                {% endfor %}
-            {% endif %}
-
-        </p>
+        </div>        
+        
         {% endfor %}
 
-        <button type="submit">Signup</button>
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9">
+                <button type="submit" class="btn btn-default">Update</button>
+            </div>
+        </div>
+
     </form>
 
 </div>
@@ -47,3 +85,5 @@
 </section>
 
 {% endblock %}
+
+<!-- fields = ('street_address', 'city', 'state', 'zip_code', 'phone', 'background', 'relevant_experience', 'interest_reason', 'site_interest_type', 'region_choices', 'ethics_agreement') -->

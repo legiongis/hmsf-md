@@ -21,10 +21,10 @@ from arches.app.utils.JSONResponse import JSONResponse
 
 def index(request):
     scout_form = ScoutForm()
-    return render(request, 'fpan/home.htm', {
+    return render(request, 'index.htm', {
         'main_script': 'index',
         'active_page': 'Home',
-        'app_title': settings.APP_TITLE,
+        'app_title': '{0} | HMS'.format(settings.APP_NAME),
         'copyright_text': settings.COPYRIGHT_TEXT,
         'copyright_year': settings.COPYRIGHT_YEAR,
         'scout_form': scout_form
