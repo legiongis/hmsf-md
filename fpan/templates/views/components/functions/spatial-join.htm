@@ -1,5 +1,25 @@
 {% load i18n %}
 
+<style>
+.sj-target {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    padding: 10px;
+    margin: 10px 0px;
+}
+.sj-target .widget-container {
+    padding: 0px 10px 10px;
+}
+.sj-target .remove-btn {
+    position: relative;
+    float: right;
+    margin-top: -5px;
+    text-align: right;
+    color: #777;
+}
+</style>
+
 <div style="">
   <div class="row widget-container">
     <div class="col-xs-12">
@@ -20,53 +40,37 @@
           <label class="col-xs-12 control-label widget-input-label"> {% trans "Name of Spatial Coordinates Node" %}</label>
       </div>
       <div class="col-xs-12">
-          <select data-placeholder="{% trans "select spatial coordinates node" %}"
+          <select data-placeholder="{% trans 'select spatial coordinates node' %}"
           data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: spatial_node_id, options: nodes, optionsText: 'name', optionsValue: 'nodeid', valueAllowUnset: true"></select>
       </div>
     </div>
   </div>
   <hr>
-  <div class="row widget-container">
-    <div class="form-group">
-      <div class="relative">
-          <label class="col-xs-12 control-label widget-input-label"> {% trans "PostGIS Table and Field Names, Input 1" %}</label>
+  <button id="" class="btn btn-mint btn-active-dark btn-labeled ion-plus-round" data-bind="click: addTarget">{% trans "Add Target" %}</button>
+  <div data-bind="foreach: inputs">
+  <div class="sj-target">
+      <span id="" class="remove-btn" data-bind="click: $parent.removeTarget">x</span>
+      <div class="row widget-container">
+        <div class="form-group">
+          <div class="relative">
+              <label class="col-xs-12 control-label widget-input-label"> {% trans "PostGIS Table and Field Name" %}</label>
+          </div>
+          <div class="col-xs-12 crud-widget-container">
+            <input type="" placeholder="{% trans 'table_name.field_name' %}" id="" class="form-control input-md widget-input" data-bind="textInput: $data.table_field">
+          </div>
+        </div>
       </div>
-      <div class="col-xs-12 crud-widget-container">
-        <input type="" placeholder="{% trans "table_name.field_name" %}" id="" class="form-control input-md widget-input" data-bind="textInput: table_field_one">
+      <div class="row widget-container">
+        <div class="form-group">
+          <div class="relative">
+              <label class="col-xs-12 control-label widget-input-label"> {% trans "Target Node to Update" %}</label>
+          </div>
+          <div class="col-xs-12">
+              <select data-placeholder="{% trans 'select target node to be updated' %}" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: $data.target_node_id, options: $parent.nodes, optionsText: 'name', optionsValue: 'nodeid'"></select>
+          </div>
+        </div>
       </div>
-    </div>
   </div>
-  <div class="row widget-container">
-    <div class="form-group">
-      <div class="relative">
-          <label class="col-xs-12 control-label widget-input-label"> {% trans "Target Node to Update, Input 1" %}</label>
-      </div>
-      <div class="col-xs-12">
-          <select data-placeholder="{% trans "select target node to be updated" %}"
-          data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: target_node_id_one, options: nodes, optionsText: 'name', optionsValue: 'nodeid', valueAllowUnset: true"></select>
-      </div>
-    </div>
   </div>
   <hr>
-  <div class="row widget-container">
-    <div class="form-group">
-      <div class="relative">
-          <label class="col-xs-12 control-label widget-input-label"> {% trans "PostGIS Table and Field Names, Input 2" %}</label>
-      </div>
-      <div class="col-xs-12 crud-widget-container">
-        <input type="" placeholder="{% trans "table_name.field_name" %}" id="" class="form-control input-md widget-input" data-bind="textInput: table_field_two">
-      </div>
-    </div>
-  </div>
-  <div class="row widget-container">
-    <div class="form-group">
-      <div class="relative">
-          <label class="col-xs-12 control-label widget-input-label"> {% trans "Target Node to Update, Input 2" %}</label>
-      </div>
-      <div class="col-xs-12">
-          <select data-placeholder="{% trans "select target node to be updated" %}"
-          data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: target_node_id_two, options: nodes, optionsText: 'name', optionsValue: 'nodeid', valueAllowUnset: true"></select>
-      </div>
-    </div>
-  </div>
 </div>

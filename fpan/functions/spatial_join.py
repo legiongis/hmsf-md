@@ -11,7 +11,9 @@ details = {
     'name': 'Spatial Join',
     'type': 'node',
     'description': 'perform attribute transfer based on comparison to local PostGIS table',
-    'defaultconfig': {"spatial_node_id":"","table_field_one":"","target_node_id_one":"","table_field_two":"","target_node_id_two":""},
+    # 'defaultconfig': {"spatial_node_id":"","table_field_one":"","target_node_id_one":"","table_field_two":"","target_node_id_two":""},
+    'defaultconfig': {"spatial_node_id":"", "inputs":[{"table_field":"","target_node_id":""}] },
+
     'classname': 'SpatialJoin',
     'component': 'views/components/functions/spatial-join'
 }
@@ -47,24 +49,24 @@ def attribute_from_postgis(table,field,geojson):
     '''.format(field,table,geojson_str)
     cur.execute(sql)
     rows = cur.fetchall()
-    
+
     ## transform all matches to a simple list of strings
     result = [i[0] for i in rows]
-    
-    ## remove crs property because for some reason it gets added to 
+
+    ## remove crs property because for some reason it gets added to
     ## the actual tile data and then it breaks mapbox :(
     del geojson['crs']
-    
+
     return result
-    
+
 def get_valueid_from_preflabel(preflabel):
     """this function will get the valueid for a concept's preflabel.
     you need only enter the preflabel, not the concept itself. the logic
     is naive, and will return none if there are more than one match for
     this prefLabel."""
     vs = models.Value.objects.filter(value=preflabel)
-    
-    
+
+
     if len(vs) == 0:
         print "no match for this preflabel:",preflabel
         return None
@@ -73,7 +75,7 @@ def get_valueid_from_preflabel(preflabel):
         if len(set(concept_ids)) > 1:
             print "too many values for this preflabel:", preflabel
             return None
-    
+
     return str(vs[0].valueid)
 
 class SpatialJoin(BaseFunction):
@@ -88,27 +90,26 @@ class SpatialJoin(BaseFunction):
             ## for now, setting the value to an empty list to handle this.
             tile.data[spatial_node_id] = []
             return
-        
+
         ## get geoms from the current tile
-        geoms = [i['geometry'] for i in tile.data[spatial_node_id]['features']]
-        
+        geoms = [feature['geometry'] for feature in tile.data[spatial_node_id]['features']]
+
         ## create and iterate list of input table/field/target sets
         ## the UI should produce "table_name.field_name" strings
-        table_field_targets = [
-            (self.config['table_field_one'],self.config['target_node_id_one']),
-            (self.config['table_field_two'],self.config['target_node_id_two'])
-        ]
+
+        table_field_targets = self.config['inputs']
+
         for table_field_target in table_field_targets:
-        
+
             ## skip if the table_name.field_name input is not valid
-            if not "." in table_field_target[0]:
+            if not "." in table_field_target['table_field']:
                 continue
-        
+
             ## parse input sets
-            table,field = table_field_target[0].split(".")[0],table_field_target[0].split(".")[1]
-            target_node_id = table_field_target[1]
+            table,field = table_field_target['table_field'].split(".")[0],table_field_target['table_field'].split(".")[1]
+            target_node_id = table_field_target['target_node_id']
             target_ng_id = models.Node.objects.filter(nodeid=target_node_id)[0].nodegroup_id
-        
+
             # process each geom and create a list of all values
             vals = []
             for geom in geoms:
@@ -131,8 +132,8 @@ class SpatialJoin(BaseFunction):
             ## just set the new value right here
             if str(target_ng_id) == str(tile.nodegroup_id):
                 print "  modifying the tile in place"
-                
-                ## set precedent for correlating new values with target node 
+
+                ## set precedent for correlating new values with target node
                 ## datatype. the following will work on a limited basis
                 if target_node_datatype == "concept-list":
                     tile.data[target_node_id] = attributes
@@ -140,10 +141,10 @@ class SpatialJoin(BaseFunction):
                     tile.data[target_node_id] = attributes[0]
                 else:
                     tile.data[target_node_id] = attributes[0]
-                    
+
                 tile.dirty = False
                 return
-            
+
             ## here is a start on changing a value in a tile in a different nodegroup
             ## it works, however, there must already be a tile to overwrite, this
             ## code won't create a new tile at the moment.
