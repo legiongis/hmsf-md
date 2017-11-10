@@ -9,7 +9,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from fpan.utils.tokens import account_activation_token
-from fpan.utils.accounts import check_anonymous
+from fpan.utils.accounts import check_anonymous, check_duplicate_username
 from django.contrib.auth.models import User, Group
 from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
@@ -81,7 +81,7 @@ def scout_profile(request):
     else:
         scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
 
-    return render(request, "fpan/forms/_scout-profile.htm", {
+    return render(request, "fpan/scout-profile.htm", {
         'scout_profile': scout_profile_form})
 
 
@@ -104,21 +104,6 @@ def activate(request, uidb64, token):
         return redirect("scout_profile")
     else:
         return HttpResponse('Activation link is invalid!')
-
-
-def check_duplicate_username(newusername):
-    chars = ["'", "-", "\"", "_", "."]
-    newusername = "".join(
-        [newusername.replace(x, "") for x in chars if x in newusername])
-    inputname = newusername
-    inc = 1
-    while User.objects.filter(username=newusername).exists():
-        if len(inputname) < len(newusername):
-            offset = len(newusername) - len(inputname)
-            inc = int(newusername[-offset:]) + 1
-        newusername = inputname + '{}'.format(inc)
-        print(newusername)
-    return newusername
 
 
 def show_regions(request):
