@@ -11,7 +11,6 @@ details = {
     'name': 'Spatial Join',
     'type': 'node',
     'description': 'perform attribute transfer based on comparison to local PostGIS table',
-    # 'defaultconfig': {"spatial_node_id":"","table_field_one":"","target_node_id_one":"","table_field_two":"","target_node_id_two":""},
     'defaultconfig': {"spatial_node_id":"", "inputs":[{"table_field":"","target_node_id":""}] },
 
     'classname': 'SpatialJoin',
@@ -65,7 +64,6 @@ def get_valueid_from_preflabel(preflabel):
     is naive, and will return none if there are more than one match for
     this prefLabel."""
     vs = models.Value.objects.filter(value=preflabel)
-
 
     if len(vs) == 0:
         print "no match for this preflabel:",preflabel
@@ -124,15 +122,12 @@ class SpatialJoin(BaseFunction):
             node = models.Node.objects.get(pk=target_node_id)
             target_node_datatype = node.datatype
             if target_node_datatype in ["concept","concept-list"]:
-                print "converting values to valueids"
                 vals = [get_valueid_from_preflabel(v) for v in attributes]
                 attributes = [v for v in vals if v]
 
             ## if the target node is inside of the currently edited node group,
             ## just set the new value right here
             if str(target_ng_id) == str(tile.nodegroup_id):
-                print "  modifying the tile in place"
-
                 ## set precedent for correlating new values with target node
                 ## datatype. the following will work on a limited basis
                 if target_node_datatype == "concept-list":
