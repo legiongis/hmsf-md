@@ -1,30 +1,78 @@
 <section id="scout-signup" class="scout-signup-section">
     <div class="container">
-        <div class="col-md-4 col-md-offset-4">
-            <h2>Register as a scout.</h2>
-            <form action="{% url 'scout_signup' %}" method="post">
-                {% csrf_token %}
+                
+        <form action="{% url 'scout_signup' %}" method="post">
+            {% csrf_token %}
+            <div class="row">    
+                <div class="col-md-8 col-md-offset-2">
+                    <h2>Register as a scout.</h2>
 
-                {% for field in scout_form %}
-                <div class="form-group">
-                    {{ field.label_tag }}
-                    {{ field }}
+                    {% for field in scout_form %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
 
-                    {% if field.help_text %}
-                        <small class="help-block">{{ field.help_text }}</small>
-                    {% endif %}
+                        {% if field.help_text %}
+                            <small class="help-block">{{ field.help_text }}</small>
+                        {% endif %}
 
-                    {% if field.errors %}
-                        {% for error in field.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <span style="color:red" > {{ error }} </span>
+                            {% endfor %}
+                        {% endif %}
 
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+            </div>
 
-                <button type="submit" class="btn btn-default">Signup</button>
-            </form>
-        </div>
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Ethics Agreement
+                        </div>
+                        <div class="panel-body">
+                            {% include 'fpan/ethics_agreement.htm' %}                     
+                        </div>
+                        <div class="panel-footer">
+                            <label for="ethics_agreement"
+                                   class="control-label" 
+                                   style="color: #555"
+                                   id="label-for-ethics">
+                                <input type="checkbox" 
+                                       id="ethics_agreement" 
+                                       onclick="ethics_check(this)">
+                                I have read and will abide by the HMS Florida Code of Ethics and Program Agreement.
+                           </label>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">    
+                <div class="col-md-8 col-md-offset-2">
+                    <button type="submit" class="btn btn-default" id="scout_submit" disabled>Signup</button>
+                </div>
+            </div>
+        </form>
     </div>
 </section>
+<br>
+
+<script type="text/javascript">
+
+    var submitBtn = document.getElementById("scout_submit");
+
+    function ethics_check(check) {
+        if(check.checked == true) {
+            submitBtn.disabled = false;
+            return
+        }
+        submitBtn.disabled = true;
+        document.getElementById("label-for-ethics").style.color = "red";
+    }
+    
+</script>

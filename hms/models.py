@@ -40,7 +40,7 @@ class ScoutProfile(models.Model):
     #         "Which region(s) are you interested in monitoring sites in?",
     #         max_length=2,
     #         choices=REGION_CHOICES)
-    ethics_agreement = models.BooleanField(default=False)
+    ethics_agreement = models.BooleanField(default=True)
 
 
 @receiver(post_save, sender=Scout)

@@ -107,6 +107,9 @@ def activate(request, uidb64, token):
 
 
 def check_duplicate_username(newusername):
+    chars = ["'", "-", "\"", "_", "."]
+    newusername = "".join(
+        [newusername.replace(x, "") for x in chars if x in newusername])
     inputname = newusername
     inc = 1
     while User.objects.filter(username=newusername).exists():
