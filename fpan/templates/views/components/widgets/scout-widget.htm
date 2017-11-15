@@ -10,10 +10,10 @@
         <!-- ko if: node -->
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
-        <div class="col-xs-12 resource-instance-wrapper">
-            <select data-bind="options: availableScouts,
+        <div class="col-xs-12">
+            <select class="form-control" data-bind="options: availableScouts,
                                value: selectedScout,
-                               optionsCaption: 'Choose...',
+                               optionsCaption: 'Choose a scout',
                                valueAllowUnset: true"></select>
         </div>
     </div>

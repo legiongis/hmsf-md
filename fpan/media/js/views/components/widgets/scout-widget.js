@@ -16,13 +16,14 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan'], functi
             self.availableScouts = ko.observableArray();
             self.selectedScout = ko.observable();
 
-            $.ajax(fpan.urls.scouts_dropdown, {
-                dataType: "json"
-            }).done(function(data) {
-                $.each(data, function() {
-                    self.availableScouts.push(this.username);
-                });
-            });
+            // $.ajax(fpan.urls.scouts_dropdown, {
+            //     dataType: "json"
+            // }).done(function(data) {
+            //     alert(data)
+            //     $.each(data, function() {
+            //         self.availableScouts.push();
+            //     });
+            // });
             
         },
         template: { require: 'text!templates/views/components/widgets/scout-widget.htm' }
