@@ -39,7 +39,7 @@ class ScoutProfile(models.Model):
     ethics_agreement = models.BooleanField(default=True)
 
     def __unicode__(self):
-        return self.user_username
+        return self.user.username
 
 
 @receiver(post_save, sender=Scout)
