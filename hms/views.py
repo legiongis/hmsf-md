@@ -1,14 +1,22 @@
 from django.shortcuts import render
 from arches.app.utils.JSONResponse import JSONResponse
 from .models import Scout, ScoutProfile
+import json
 # Create your views here.
 
 
 def scouts_dropdown(request):
-    results = ScoutProfile.objects.select_related('user__username').prefetch_related('region_choices__name') 
-    print(results.values('user__username', 'site_interest_type', 'region_choices__name')) 
-    # print(results[0].get_region_choices__name) 
-    return JSONResponse(results.values('user__username', 'site_interest_type', 'region_choices__name'))
+    results = ScoutProfile.objects.all()    
+    result_list = []
+    for scout in results:
+        result_list.append({
+            'id': scout.user_id,
+            'scout': scout.user.username,
+            'site_interest_type': scout.site_interest_type,
+            'region_choices': [region.name for region in scout.region_choices.all()],
+            })
+
+    return JSONResponse(result_list)
 
 def scout_profile(request, username):
     return JSONResponse(ScoutProfile.objects.filter(user__username=username))

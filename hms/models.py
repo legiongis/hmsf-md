@@ -41,6 +41,9 @@ class ScoutProfile(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    def regions(self):
+        return self.region_choices
+
 
 @receiver(post_save, sender=Scout)
 def create_user_scout(sender, instance, created, **kwargs):

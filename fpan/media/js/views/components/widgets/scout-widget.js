@@ -20,8 +20,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan'], functi
                 dataType: "json"
             }).done(function(data) {
                 $.each(data, function() {
-                    self.availableScouts.push(this.user_id);
-                    console.log(this);
+                    self.availableScouts.push(this.scout);
                 });
             });
             
