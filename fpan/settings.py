@@ -13,7 +13,7 @@ except ImportError:
 
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'static'),) + STATICFILES_DIRS
+STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
@@ -77,7 +77,7 @@ LOGGING = {   'disable_existing_loggers': False,
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 
-MEDIA_ROOT =  os.path.join(APP_ROOT)
+MEDIA_ROOT = os.path.join(APP_ROOT)
 
 TILE_CACHE_CONFIG = {
     "name": "Disk",
