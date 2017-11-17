@@ -15,7 +15,7 @@ def scouts_dropdown(request):
             'site_interest_type': scout.site_interest_type,
             'region_choices': [region.name for region in scout.region_choices.all()],
             })
-
+    print(request)
     return JSONResponse(result_list)
 
 def scout_profile(request, username):
