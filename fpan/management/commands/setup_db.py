@@ -24,7 +24,6 @@ class Command(BaseCommand):
 
         force = options['yes']
         self.setup_db(force)
-        self.build_fpan_groups()
         
     def setup_db(self,force=False):
         
@@ -51,7 +50,8 @@ class Command(BaseCommand):
         
         management.call_command('packages',operation='import_graphs', source=system_settings_graph, overwrite_graphs=True)
         management.call_command('packages',operation='import_business_data', source=settings_file, overwrite=True)
-
+        
+        self.build_fpan_groups()
         
     def build_fpan_groups(self):
     
