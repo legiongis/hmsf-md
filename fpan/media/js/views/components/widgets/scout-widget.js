@@ -14,13 +14,15 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan'], functi
             WidgetViewModel.apply(this, [params]);
             var self = this;
             self.availableScouts = ko.observableArray();
+            self.scoutId = ko.observable();
             self.selectedScout = ko.observable();
-
+            console.log(this.graph)
             $.ajax(fpan.urls.scouts_dropdown, {
                 dataType: "json"
             }).done(function(data) {
                 $.each(data, function() {
-                    self.availableScouts.push(this.username);
+                    self.availableScouts.push(this.scout);
+                    console.log(self)
                 });
             });
             

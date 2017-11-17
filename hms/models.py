@@ -18,9 +18,7 @@ SITE_INTEREST_CHOICES = (
     ('Underwater', 'Underwater'),
     ('Other', 'Other'),)
 
-class ScoutProfile(models.Model):
-    
-
+class ScoutProfile(models.Model): 
     user = models.OneToOneField(Scout, on_delete=models.CASCADE)
     street_address = models.CharField(max_length=30)
     city = models.CharField(max_length=30)
@@ -39,6 +37,12 @@ class ScoutProfile(models.Model):
             choices=SITE_INTEREST_CHOICES), default=list, blank=True)
     region_choices = models.ManyToManyField(Region)
     ethics_agreement = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return self.user.username
+
+    def regions(self):
+        return self.region_choices
 
 
 @receiver(post_save, sender=Scout)
