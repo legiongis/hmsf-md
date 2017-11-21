@@ -151,7 +151,7 @@ class Command(BaseCommand):
                 shutil.copy(f, dest_files_dir)
 
         def load_extensions(package_dir, ext_type, cmd):
-            extensions = glob.glob(os.path.join(package_dir, '*', 'extensions', ext_type, '*'))
+            extensions = glob.glob(os.path.join(package_dir, 'extensions', ext_type, '*'))
             root = settings.APP_ROOT if settings.APP_ROOT != None else os.path.join(settings.ROOT_DIR, 'app')
             component_dir = os.path.join(root, 'media', 'js', 'views', 'components', ext_type)
             module_dir = os.path.join(root, ext_type)
@@ -160,7 +160,6 @@ class Command(BaseCommand):
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
                 components = glob.glob(os.path.join(extension, '*.js'))
-
                 if len(templates) == 1 and len(components) == 1:
                     if os.path.exists(template_dir) == False:
                         os.mkdir(template_dir)
@@ -220,11 +219,15 @@ class Command(BaseCommand):
             
         package = settings.PACKAGE_PATH
         
-        ## loading extensions not tested in fpan - 10/13/17
-        # print "\n~~~~~~~~ LOAD WIDGETS"
-        # load_widgets(package)
-        # print "\n~~~~~~~~ LOAD FUNCTIONS"
-        # load_functions(package)
+        if 'widgets' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD WIDGETS"
+            load_widgets(package)
+            
+        if 'functions' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD FUNCTIONS"
+            load_functions(package)
+        
+        ## loading datatypes not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD DATATYPES"
         # load_datatypes(package)
         
