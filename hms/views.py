@@ -2,7 +2,6 @@ from django.shortcuts import render
 from arches.app.utils.JSONResponse import JSONResponse
 from .models import Scout, ScoutProfile
 import json
-# Create your views here.
 
 
 def scouts_dropdown(request):

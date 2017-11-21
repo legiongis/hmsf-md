@@ -95,8 +95,6 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         print(user)
         user.is_active = True
-        scout_group = Group.objects.get(name="Scout")
-        scout_group.user_set.add(user)
         user.save()
         user = authenticate(username=user.username, password=user.password)
         scout_form = ScoutForm(instance=user)
