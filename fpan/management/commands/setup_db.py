@@ -51,6 +51,11 @@ class Command(BaseCommand):
         management.call_command('packages',operation='import_graphs', source=system_settings_graph, overwrite_graphs=True)
         management.call_command('packages',operation='import_business_data', source=settings_file, overwrite=True)
         
+        ## load region objects into table, really, this should be in a migration
+        ## but it's here for now
+        print "\n~~~~~~~~~ LOADING REGIONS :) ~~~~~~~~~"
+        management.call_command('loaddata',os.path.join('fpan','fixtures','regions.json'))
+        
         self.build_fpan_groups()
         
     def build_fpan_groups(self):
