@@ -136,9 +136,9 @@ class Command(BaseCommand):
             for path in business_data:
                 if path.endswith('csv'):
                     config_file = path.replace('.csv', '.mapping')
-                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append', bulk_load=True)
+                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append')
                 else:
-                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append', bulk_load=True)
+                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append')
 
             for relation in relations:
                 management.call_command('packages',operation='import_business_data_relations', source=relation)
@@ -238,10 +238,7 @@ class Command(BaseCommand):
         if 'graphs' in components or components == 'all':
             print "\n~~~~~~~~ LOAD RESOURCE MODELS & BRANCHES"
             load_graphs(package)
-        
-        ## loading resource to resource constraints not tested in fpan - 10/13/17
-        # print "\n~~~~~~~~ LOAD RESOURCE TO RESOURCE CONSTRAINTS"
-        # load_resource_to_resource_constraints(package)
+            # load_resource_to_resource_constraints(package)
         
         ## loading map layers not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD MAP LAYERS"
