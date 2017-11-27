@@ -6,6 +6,8 @@ import psycopg2 as db
 import os, string, random, csv
 from arches.db.install import truncate_db
 from arches.management.commands.packages import Command as packages
+from hms.models import Scout,ScoutProfile
+from fpan.models import Region
 
 class Command(BaseCommand):
     help = 'drops and recreates the app database.'
@@ -23,6 +25,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         force = options['yes']
+        # self.make_mock_scouts()
         self.setup_db(force)
         
     def setup_db(self,force=False):
@@ -57,6 +60,7 @@ class Command(BaseCommand):
         management.call_command('loaddata',os.path.join('fpan','fixtures','regions.json'))
         
         self.build_fpan_groups()
+        self.make_mock_scouts()
         
     def build_fpan_groups(self):
     
@@ -76,7 +80,7 @@ class Command(BaseCommand):
             "FWC":["fwc_user"],
             "FL Forestry":["fl_forestry_user"],
             "FL Aquatic Preserve":["fl_aquatic_preserve_user"],
-            "Scout":["scout_user"]
+            "Scout":[]
         }
         
         print "  creating groups and default users...",
@@ -102,3 +106,32 @@ class Command(BaseCommand):
             write.writerow(("username","password"))
             for user_pw in outlist:
                 write.writerow(user_pw)
+                
+    def make_mock_scouts(self):
+        scouts = Scout.objects.all()
+        print "deleting existing scouts:",scouts
+        for s in scouts:
+            s.delete()
+            
+        cen_region = Region.objects.get(name="Central")
+        ec_region = Region.objects.get(name="East Central")
+        ne_region = Region.objects.get(name="Northeast")
+
+        ## make a couple of mock scouts for testing
+        frank = Scout.objects.create_user("frank","","frank")
+        frank.scoutprofile.region_choices.add(cen_region)
+        frank.scoutprofile.region_choices.add(ec_region)
+        frank.scoutprofile.site_interest_type = ["Prehistoric","Historic"]
+        frank.save()
+        print "scout created: Frank"
+        
+        joe = Scout.objects.create_user("joe","","joe")
+        joe.scoutprofile.region_choices.add(ne_region)
+        joe.scoutprofile.site_interest_type = ["Cemeteries"]
+        joe.save()
+        print "scout created: Joe"
+        
+        ## add to the Scout group
+        scoutgrp = Group.objects.get_or_create(name="Scout")[0]
+        for scout in Scout.objects.all():
+            scout.groups.add(scoutgrp)
