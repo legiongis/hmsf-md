@@ -2,10 +2,13 @@ from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from django.conf import settings
+from arches.app.models import models
 import psycopg2 as db
 import os
 import glob
 import shutil
+import json
+import uuid
 
 
 class Command(BaseCommand):
@@ -55,7 +58,7 @@ class Command(BaseCommand):
                 management.call_command('packages',operation='import_business_data', source=settings_file, overwrite='overwrite')
 
         def load_resource_to_resource_constraints(package_dir):
-            config_paths = glob.glob(os.path.join(package_dir, '*', 'package_config.json'))
+            config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
                 for relationship in configs['permitted_resource_relationships']:
@@ -222,10 +225,12 @@ class Command(BaseCommand):
         if 'widgets' in components or components == 'all':
             print "\n~~~~~~~~ LOAD WIDGETS"
             load_widgets(package)
+            print "done"
             
         if 'functions' in components or components == 'all':
             print "\n~~~~~~~~ LOAD FUNCTIONS"
             load_functions(package)
+            print "done"
         
         ## loading datatypes not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD DATATYPES"
@@ -238,7 +243,9 @@ class Command(BaseCommand):
         if 'graphs' in components or components == 'all':
             print "\n~~~~~~~~ LOAD RESOURCE MODELS & BRANCHES"
             load_graphs(package)
-            # load_resource_to_resource_constraints(package)
+            print "\n~~~~~~~~ ...and RESOURCE TO RESOURCE CONSTRAINTS"
+            load_resource_to_resource_constraints(package)
+            print "done"
         
         ## loading map layers not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD MAP LAYERS"
