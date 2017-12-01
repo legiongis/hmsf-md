@@ -50,7 +50,7 @@
                     {% endif %}                    
                     <li class="page-scroll" style="display: flex; flex-direction: row">
                         {% if user.username == 'anonymous' %}
-                        <a id="auth-link" href="{% url 'auth' %}?next={% url 'home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
+                        <a id="auth-link" href="{% url 'auth' %}?next={% url 'search_home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
                             {% trans "Login" %}
                         </a>
                         {% else %}

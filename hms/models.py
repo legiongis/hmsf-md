@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from fpan.models.region import Region
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -10,6 +10,10 @@ from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 class Scout(User):
     middle_initial = models.CharField(max_length=1)
+
+    class Meta:
+        verbose_name = "Scout"
+        verbose_name_plural = "Scouts"
 
 SITE_INTEREST_CHOICES = (
     ('Prehistoric', 'Prehistoric'),
@@ -49,6 +53,8 @@ class ScoutProfile(models.Model):
 def create_user_scout(sender, instance, created, **kwargs):
     if created:
         ScoutProfile.objects.create(user=instance)
+    group = Group.objects.get(name='Scout')
+    group.user_set.add(instance)
     instance.scoutprofile.save()
 
 @receiver(post_save, sender=Scout)
