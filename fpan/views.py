@@ -13,7 +13,7 @@ from fpan.utils.accounts import check_anonymous, check_duplicate_username
 from django.contrib.auth.models import User, Group
 from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
-from fpan.models.region import Region
+from fpan.models import Region
 from hms.models import Scout, ScoutProfile
 from django.contrib import messages
 from arches.app.utils.JSONResponse import JSONResponse
