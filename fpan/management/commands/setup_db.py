@@ -56,8 +56,9 @@ class Command(BaseCommand):
         
         ## load region objects into table, really, this should be in a migration
         ## but it's here for now
-        print "\n~~~~~~~~~ LOADING REGIONS :) ~~~~~~~~~"
+        print "\n~~~~~~~~~ LOADING REGIONS AND MANAGED AREAS :) ~~~~~~~~~"
         management.call_command('loaddata',os.path.join('fpan','fixtures','regions.json'))
+        management.call_command('loaddata',os.path.join('fpan','fixtures','managedareas.json'))
         
         self.build_fpan_groups()
         self.make_mock_scouts()
