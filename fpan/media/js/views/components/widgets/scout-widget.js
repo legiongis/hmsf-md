@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan'], function (ko, _, WidgetViewModel, $, fpan) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','bindings/chosen'], function (ko, _, WidgetViewModel, $, fpan, chosen) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -12,18 +12,23 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan'], functi
         viewModel: function(params) {
             params.configKeys = ['options','placeholder'];
             WidgetViewModel.apply(this, [params]);
+
             var self = this;
             self.availableScouts = ko.observableArray();
-            self.scoutId = ko.observable();
-            self.selectedScout = ko.observable();
-            console.log(this.graph)
-            $.ajax(fpan.urls.scouts_dropdown, {
+            self.selectedScout = params.value;
+            
+            $.ajax({
+                url: fpan.urls.scouts_dropdown,
+                data: {
+                    'resourceid': self.form.resourceid
+                },
                 dataType: "json"
             }).done(function(data) {
                 $.each(data, function() {
-                    self.availableScouts.push(this.scout);
-                    console.log(self)
+                    self.availableScouts.push(this);
                 });
+                // refresh the observable array, necessary because of async ajax
+                self.availableScouts.valueHasMutated();
             });
             
         },

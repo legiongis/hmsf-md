@@ -11,10 +11,8 @@
         <i data-bind="css: {'ion-asterisk widget-label-required': node.isrequired}"></i>
         <!-- /ko -->
         <div class="col-xs-12">
-            <select class="form-control" data-bind="options: availableScouts,
-                               value: selectedScout,
-                               optionsCaption: 'Choose a scout',
-                               valueAllowUnset: true"></select>
+            <select id="scout-dropdown" class="form-control" data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: selectedScout, options: availableScouts, optionsCaption: 'Choose a scout', optionsText: 'display_name', optionsValue: 'username', valueAllowUnset: true">
+            </select>
         </div>
     </div>
 </div>
