@@ -3,7 +3,7 @@ define(['knockout',
         'viewmodels/function',
         'bindings/chosen'],
 function (ko, koMapping, FunctionViewModel, chosen) {
-    return ko.components.register('views/components/functions/spatial-join', {
+    return ko.components.register('views/components/functions/spatial_join', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);
             var self = this;
@@ -58,7 +58,7 @@ function (ko, koMapping, FunctionViewModel, chosen) {
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {
-            require: 'text!templates/views/components/functions/spatial-join.htm'
+            require: 'text!templates/views/components/functions/spatial_join.htm'
         }
     });
 })
