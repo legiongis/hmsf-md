@@ -136,9 +136,9 @@ class Command(BaseCommand):
             for path in business_data:
                 if path.endswith('csv'):
                     config_file = path.replace('.csv', '.mapping')
-                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append', bulk_load=True)
+                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append')
                 else:
-                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append', bulk_load=True)
+                    management.call_command('packages',operation='import_business_data', source=path, overwrite='append')
 
             for relation in relations:
                 management.call_command('packages',operation='import_business_data_relations', source=relation)
@@ -151,7 +151,7 @@ class Command(BaseCommand):
                 shutil.copy(f, dest_files_dir)
 
         def load_extensions(package_dir, ext_type, cmd):
-            extensions = glob.glob(os.path.join(package_dir, '*', 'extensions', ext_type, '*'))
+            extensions = glob.glob(os.path.join(package_dir, 'extensions', ext_type, '*'))
             root = settings.APP_ROOT if settings.APP_ROOT != None else os.path.join(settings.ROOT_DIR, 'app')
             component_dir = os.path.join(root, 'media', 'js', 'views', 'components', ext_type)
             module_dir = os.path.join(root, ext_type)
@@ -160,7 +160,6 @@ class Command(BaseCommand):
             for extension in extensions:
                 templates = glob.glob(os.path.join(extension, '*.htm'))
                 components = glob.glob(os.path.join(extension, '*.js'))
-
                 if len(templates) == 1 and len(components) == 1:
                     if os.path.exists(template_dir) == False:
                         os.mkdir(template_dir)
@@ -220,11 +219,15 @@ class Command(BaseCommand):
             
         package = settings.PACKAGE_PATH
         
-        ## loading extensions not tested in fpan - 10/13/17
-        # print "\n~~~~~~~~ LOAD WIDGETS"
-        # load_widgets(package)
-        # print "\n~~~~~~~~ LOAD FUNCTIONS"
-        # load_functions(package)
+        if 'widgets' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD WIDGETS"
+            load_widgets(package)
+            
+        if 'functions' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD FUNCTIONS"
+            load_functions(package)
+        
+        ## loading datatypes not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD DATATYPES"
         # load_datatypes(package)
         
@@ -235,10 +238,7 @@ class Command(BaseCommand):
         if 'graphs' in components or components == 'all':
             print "\n~~~~~~~~ LOAD RESOURCE MODELS & BRANCHES"
             load_graphs(package)
-        
-        ## loading resource to resource constraints not tested in fpan - 10/13/17
-        # print "\n~~~~~~~~ LOAD RESOURCE TO RESOURCE CONSTRAINTS"
-        # load_resource_to_resource_constraints(package)
+            # load_resource_to_resource_constraints(package)
         
         ## loading map layers not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD MAP LAYERS"
