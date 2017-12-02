@@ -1,5 +1,8 @@
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
 <ol>
-    <li>I have read, comprehend, and affirm that I will abide by the code of ethics outlined by the Florida Anthropological Society: http://fasweb.org/wp-content/uploads/2016/04/FAS_Ethics.pdf</li>
+    <li>I have read, comprehend, and affirm that I will abide by the code of ethics outlined by the Florida Anthropological Society: <a href="{% static 'img/fpan/FAS_Ethics.pdf' %}">FAS_Ethics.pdf</a>.</li>
     <li>I understand the potentially confidential nature of assisting in providing archaeological site updates. I will keep archaeological site information confidential and will not disclose or discuss the location of these sites with the general public.</li> 
 
     <li>I deem it my responsibility to practice and demonstrate excellent stewardship of these archaeological sites. I will not willfully cause harm or loss to these sites.</li>
