@@ -50,8 +50,11 @@
                     {% endif %}                    
                     <li class="page-scroll" style="display: flex; flex-direction: row">
                         {% if user.username == 'anonymous' %}
-                        <a id="auth-link" href="{% url 'auth' %}?next={% url 'search_home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
-                            {% trans "Login" %}
+                        <a id="auth-link" href="{% if user.username != 'anonymous' %}{% url 'auth' login_type='logout' %}?next={% url 'fpan_home' %}{% else %}{% url 'auth' login_type='state' %}?next={% url 'search_home' %}{% endif %}">
+                            {% trans "State Login" %}
+                        </a>
+                        <a id="auth-link" href="{% if user.username != 'anonymous' %}{% url 'auth' login_type='logout' %}?next={% url 'fpan_home' %}{% else %}{% url 'auth' login_type='hms' %}?next={% url 'search_home' %}{% endif %}">
+                            {% trans "Scout Login" %}
                         </a>
                         {% else %}
                         <a id="auth-link" data-bind="click: function(){showAuthMenu(!showAuthMenu())}">
