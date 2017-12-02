@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.contrib.auth import login, authenticate
+from django.views.decorators.cache import never_cache
+from django.http import HttpResponse, Http404 
+from django.core.urlresolvers import reverse
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.core.mail import EmailMessage
 from hms.forms import ScoutForm, ScoutProfileForm
@@ -30,6 +32,95 @@ def index(request):
         'scout_form': scout_form
     })
 
+@never_cache
+def auth(request,login_type):
+
+    if not login_type in ['hms','state','logout']:
+        raise Http404("not found")
+        
+    if login_type == 'logout':
+        logout(request)
+        return redirect('fpan_home')
+
+    auth_attempt_success = None
+    
+    # POST request is taken to mean user is logging in
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user is not None and user.is_active:
+            login(request, user)
+            user.password = ''
+            auth_attempt_success = True
+        else:
+            auth_attempt_success = False
+
+    next = request.GET.get('next', reverse('home'))
+    if auth_attempt_success:
+        return redirect(next)
+    else:
+        if request.GET.get('logout', None) is not None:
+            print "should be logging out now..."
+            
+            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
+            return redirect('fpan_home')
+        else:
+            if login_type == "hms":
+                print "ok...."
+                login_template = 'login-hms.htm'
+            elif login_type == "state":
+                login_template = 'login-state.htm'
+            return render(request, login_template, {
+                'app_name': settings.APP_NAME,
+                'auth_failed': (auth_attempt_success is not None),
+                'next': next
+            })
+    
+@never_cache
+def authhms(request):
+    auth_attempt_success = None
+    # POST request is taken to mean user is logging in
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        if user is not None and user.is_active:
+            login(request, user)
+            user.password = ''
+            auth_attempt_success = True
+        else:
+            auth_attempt_success = False
+
+    next = request.GET.get('next', reverse('home'))
+    if auth_attempt_success:
+        return redirect(next)
+    else:
+        if request.GET.get('logout', None) is not None:
+            logout(request)
+            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
+            return redirect('auth')
+        else:
+            return render(request, 'hms-login.htm', {
+                'app_name': settings.APP_NAME,
+                'auth_failed': (auth_attempt_success is not None),
+                'next': next
+            })
+
+@never_cache
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, _('Your password has been updated'))
+            return redirect('change_password')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.htm', {
+        'form': form
+    })
 
 def scout_signup(request):
     print("scout signup")
