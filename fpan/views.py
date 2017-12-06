@@ -29,8 +29,58 @@ def index(request):
         'app_title': '{0} | HMS'.format(settings.APP_NAME),
         'copyright_text': settings.COPYRIGHT_TEXT,
         'copyright_year': settings.COPYRIGHT_YEAR,
-        'scout_form': scout_form
+        'scout_form': scout_form,
+        'page':'index'
     })
+    
+# @user_passes_test(check_anonymous)
+def hms_home(request):
+    if request.method == "POST":
+        scout_profile_form = ScoutProfileForm(
+            request.POST,
+            instance=request.user.scout.scoutprofile)
+        if scout_profile_form.is_valid():
+            scout_profile_form.save()
+            messages.add_message(request, messages.INFO, 'Your profile has been updated.')
+        else:
+            messages.add_message(request, messages.ERROR, 'Form was invalid.')
+        
+        return render(request, "home-hms.htm", {
+            'scout_profile': scout_profile_form,
+            'page':'home-hms'})
+        
+    else:
+        scout_profile_form = None
+        try:
+            scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
+        except Scout.DoesNotExist:
+            pass
+
+    return render(request, "home-hms.htm", {
+        'scout_profile': scout_profile_form,
+        'page':'home-hms'})
+        
+@user_passes_test(check_anonymous)
+def scout_profile(request):
+    if request.method == "POST":
+        scout_profile_form = ScoutProfileForm(
+            request.POST,
+            instance=request.user.scout.scoutprofile)
+        if scout_profile_form.is_valid():
+            scout_profile_form.save()
+            messages.add_message(request, messages.INFO, 'Your profile has been updated.')
+        else:
+            messages.add_message(request, messages.ERROR, 'Form was invalid.')
+
+    else:
+        scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
+
+    return render(request, "fpan/scout-profile.htm", {
+        'scout_profile': scout_profile_form})
+
+@user_passes_test(check_state_access)
+def state_home(request):
+    return render(request, 'home-state.htm', {'page':'home-state'})
 
 @never_cache
 def auth(request,login_type):

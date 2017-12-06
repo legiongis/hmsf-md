@@ -1,0 +1,21 @@
+{% extends "fpan_base.htm" %}
+
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+{% block content %}
+
+    <!--  Intro Section -->
+    <!--  End Intro Section -->
+
+    <!--  About Section -->
+    {% include "fpan/partials/_about-state.htm" %}
+    <!--  End About Section -->
+
+    <!-- News Section -->
+    {% include "fpan/partials/_news-section.htm" %}
+    <!-- End News Section -->
+    {% include "fpan/partials/_state-user-info.htm" %}
+
+{% endblock %}

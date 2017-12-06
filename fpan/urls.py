@@ -13,6 +13,8 @@ urlpatterns = [
     url(r'^regions/$', views.show_regions, name='show_regions'),
     url(r'^scout/signup', views.scout_signup, name='scout_signup'),
     url(r'^scout/profile', views.scout_profile, name='scout_profile'),
+    url(r'^hms/home', views.hms_home, name='hms_home'),
+    url(r'^state/home', views.state_home, name='state_home'),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         views.activate, name='activate'),
     url(r'^', include('arches.urls')),
