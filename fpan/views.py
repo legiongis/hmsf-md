@@ -52,60 +52,34 @@ def auth(request,login_type):
         if user is not None and user.is_active:
             login(request, user)
             user.password = ''
-            auth_attempt_success = True
-        else:
-            auth_attempt_success = False
-
-    next = request.GET.get('next', reverse('home'))
-    if auth_attempt_success:
-        return redirect(next)
-    else:
-        if request.GET.get('logout', None) is not None:
-            print "should be logging out now..."
-            
-            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
-            return redirect('fpan_home')
-        else:
             if login_type == "hms":
-                print "ok...."
-                login_template = 'login-hms.htm'
+                if check_scout_access(user):
+                    auth_attempt_success = True
+                else:
+                    auth_attempt_success = False
             elif login_type == "state":
-                login_template = 'login-state.htm'
-            return render(request, login_template, {
-                'app_name': settings.APP_NAME,
-                'auth_failed': (auth_attempt_success is not None),
-                'next': next
-            })
-    
-@never_cache
-def authhms(request):
-    auth_attempt_success = None
-    # POST request is taken to mean user is logging in
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-        if user is not None and user.is_active:
-            login(request, user)
-            user.password = ''
-            auth_attempt_success = True
+                if check_state_access(user):
+                    auth_attempt_success = True
+                else:
+                    auth_attempt_success = False
         else:
             auth_attempt_success = False
 
     next = request.GET.get('next', reverse('home'))
     if auth_attempt_success:
+        if login_type == "hms":
+            return redirect('hms_home')
+        if login_type == "state":
+            return redirect('state_home')
         return redirect(next)
     else:
-        if request.GET.get('logout', None) is not None:
-            logout(request)
-            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
-            return redirect('auth')
-        else:
-            return render(request, 'hms-login.htm', {
-                'app_name': settings.APP_NAME,
-                'auth_failed': (auth_attempt_success is not None),
-                'next': next
-            })
+        return render(request, 'login.htm', {
+            'app_name': settings.APP_NAME,
+            'auth_failed': (auth_attempt_success is not None),
+            'next': next,
+            'login_type':login_type,
+            'page':'login',
+        })
 
 @never_cache
 def change_password(request):
