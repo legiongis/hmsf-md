@@ -189,15 +189,13 @@ def activate(request, uidb64, token):
         user = Scout.objects.get(pk=uid)
     except(TypeError, ValueError, OverflowError, Scout.DoesNotExist):
         user = None
-        print("Scout does not exist")
     if user is not None and account_activation_token.check_token(user, token):
-        print(user)
         user.is_active = True
         user.save()
         user = authenticate(username=user.username, password=user.password)
         scout_form = ScoutForm(instance=user)
         scout_profile_form = ScoutProfileForm()
-        return redirect("scout_profile")
+        return redirect('auth',login_type='hms')
     else:
         return HttpResponse('Activation link is invalid!')
 
