@@ -1,0 +1,43 @@
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+<section class="about-section section-first" style="padding-top: 0px;">
+    <div class="row">
+        
+        
+        <div class="col-md-5">
+            <div class="col-xs-12 fpan-panel">
+                <div class="title-v1">
+                    <div class="col-md-12" style="padding-bottom:15px;">
+                        <h1><a href="http://fpan.us/index.php"><img src="{% static 'img/fpan/FPAN_logo_white.png' %}" style="width: 100%;max-width: 300px;"></a></h1>
+                    </div>
+                    <div class="col-md-12">
+                        <p>{% trans "The Florida Public Archaeology Network's mission is to promote and facilitate the conservation, study and public understanding of Florida's archaeological heritage through regional centers throughout the state, each of which has its own website. To learn more about a region and to visit their site, have a look at our region map." %}</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="col-xs-12 title-v1 fpan-panel">
+                <div class="col-xs-12">
+                
+                    <h2>Sign in to Begin Monitoring</h2>
+                    <h4>To sign up as a new Scout, please <a class="page-scroll" href="#scout-signup">fill out the signup form</a>.</h4>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <a id="auth-link" href="{% url 'auth' login_type='hms' %}">
+                        <img style="width:225px;" src="{% static 'img/fpan/HMS_website_small.png' %}" alt="Logo">
+                        <p><em>Heritage Monitoring Scout Login</em></p>
+                    </a>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <a id="auth-link" href="{% url 'auth' login_type='state' %}">
+                        <img style="width:225px;" src="{% static 'img/state/FL Color Seal - transparent.png' %}" alt="Logo">
+                        <p><em>State Land Manager Login</em></p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
