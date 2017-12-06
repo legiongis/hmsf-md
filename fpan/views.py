@@ -123,7 +123,6 @@ def change_password(request):
     })
 
 def scout_signup(request):
-    print("scout signup")
     if request.method == "POST":
         form = ScoutForm(request.POST)
         if form.is_valid():
@@ -146,35 +145,15 @@ def scout_signup(request):
                 'token': account_activation_token.make_token(user),
             })
             subject_line = 'Activate your account.'
-            from_email = 'admin@localhost.tld'
+            from_email = 'no-reply@legiongis.com'
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(subject_line, message, from_email, to=[to_email])
             email.send()            
-            return HttpResponse('Please confirm your email address.')
+            return render(request,'email/please-confirm.htm')
     else:
         form = ScoutForm()
 
-    return render(request, "fpan/forms/_scout.htm", {'form': form})
-
-
-@user_passes_test(check_anonymous)
-def scout_profile(request):
-    if request.method == "POST":
-        scout_profile_form = ScoutProfileForm(
-            request.POST,
-            instance=request.user.scout.scoutprofile)
-        if scout_profile_form.is_valid():
-            scout_profile_form.save()
-            messages.add_message(request, messages.INFO, 'Your profile has been updated.')
-        else:
-            messages.add_message(request, messages.ERROR, 'Form was invalid.')
-
-    else:
-        scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
-
-    return render(request, "fpan/scout-profile.htm", {
-        'scout_profile': scout_profile_form})
-
+    return render(request, 'index.htm', {'scout_form': form})
 
 def activate(request, uidb64, token):
     try:
