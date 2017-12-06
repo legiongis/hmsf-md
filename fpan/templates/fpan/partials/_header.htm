@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load template_tags %}
 {% load i18n %}
-<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="background-color:#30111b;">
     <div class="container">
 
         <div class="menu-container page-scroll">
@@ -22,51 +22,31 @@
             <div class="menu-container">
                 <ul class="nav navbar-nav">
                     <li class="page-scroll">
-                        <a href="#about">{% trans "About FPAN HMS" %}</a>
+                        <a href="{% url 'fpan_home' %}"><h3>{% trans "Home" %}</h3></a>
                     </li>
-                    <!-- <li class="page-scroll">
-                        <a href="#services">{% trans "Capabilities" %}</a>
-                    </li> -->
-                    <!-- <li class="page-scroll">
-                        <a href="#news">{% trans "News" %}</a>
-                    </li> -->
-                    {% if user.username == 'anonymous' %}
                     <li class="page-scroll">
-                        <a href="#scout-signup">Scout Signup</a>
+                        <a href="{% url 'hms_home' %}"><h3>{% trans "HMS Program" %}</h3></a>
+                    </li>
+                    {% if page == 'index' %}
+                    <li class="page-scroll">
+                        <a href="#scout-signup"><h3>Scout Signup!</h3></a>
                     </li>
                     {% endif %}
                     <li class="page-scroll">
-                        <a href="{% url 'search_home' %}">{% trans "Search" %}</a>
+                        <a href="{% url 'search_home' %}"><h3>{% trans "Explore the Database" %}</h3></a>
                     </li>
-                    {% if user|can_create_resource_instance %}
+                    {% if scout_profile %}
                     <li class="page-scroll">
-                        <a href="{% url 'resource' %}">{% trans "Manage Data" %}</a>
+                        <a href="#scout-profile"><h3>View Profile</h3></a>
                     </li>
                     {% endif %}
-                    {% if user|has_group:"Graph Editor" %}
-                    <li class="page-scroll">
-                        <a href="{% url 'graph' '' %}">{% trans "Design" %}</a>
-                    </li>
-                    {% endif %}                    
-                    <li class="page-scroll" style="display: flex; flex-direction: row">
-                        {% if user.username == 'anonymous' %}
-                        <a id="auth-link" href="{% url 'auth' %}?next={% url 'search_home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">
-                            {% trans "Login" %}
+                    {% if user.username != 'anonymous' %}
+                    <li>
+                        <a id="auth-link" href="{% url 'auth' login_type='logout' %}" alt="click to logout">
+                            <h3>{{ user.username }} - {% trans "logout" %}</h3>
                         </a>
-                        {% else %}
-                        <a id="auth-link" data-bind="click: function(){showAuthMenu(!showAuthMenu())}">
-                            {% trans "Welcome" %} {{ user.username }}
-                        </a>
-                        <span class="fa fa-chevron-circle-down auth-options" data-bind="click: function(){showAuthMenu(!showAuthMenu())}"></span>
-
-                        {% endif %}
                     </li>
-                    <!-- ko if: showAuthMenu -->
-                    <ul class="auth-options">
-                        <li><a href="{% url 'auth' %}?next={% url 'fpan_home' %}{% if user.username != 'anonymous' %}&logout=true{% endif %}">{% trans 'Logout' %}</a></li>
-                        <li><a href="{% url 'change_password' %}">{% trans 'Change Password' %}</a></li>
-                    </ul>
-                    <!-- /ko -->
+                    {% endif %}
                 </ul>
             </div>
         </div>

@@ -1,3 +1,95 @@
+body {
+    font-family: 'Kreon',sans-serif;
+    background: url('../img/fpan/ricepaper.png');
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Ropa Sans',sans-serif !important;
+}
+
+.brand-title {
+    background: url(/media/img/fpan/bedge_muted.png);
+}
+
+#mainnav-container, #mainnav {
+    background: #431825;
+    color:white;
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+#mainnav-menu>li>a:hover {
+    background-color:#5D2134 !important;
+    box-shadow:none !important;
+}
+
+#mainnav-menu>li>a {
+    background-color:#431825 !important;
+    box-shadow:none !important;
+}
+
+#mainnav-menu>li {
+    background-color:#431825;
+    box-shadow:none !important;
+}
+
+.popover-title {
+    background-color:#5D2134 !important;
+}
+
+.single-content {
+    background-color:#5D2134 !important;
+}
+
+.hover {
+    background-color:#5D2134;
+}
+
+.menu-title {
+    background-color:#5D2134;
+}
+
+.navbar-brand, .navbar-brand>img {
+    height: 45px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.active-sub>a {
+    background-color:#5D2134 !important;
+}
+
+.link-submenu-item {
+    background-color:#431825 !important;
+}
+
+.navbar-header:before {
+    background-color: transparent;
+}
+
+/*--------------------------------------*/
+/* classes for the top Arches menu */
+
+/*
+.ep-toolbar {
+    background: #5D2134;
+    color: #E7E7E8;
+}
+
+.ep-tools {
+    color: #E7E7E8;
+}
+
+.ep-graph-title-icon {
+    background: transparent;
+}
+*/
+/*--------------------------------------*/
+
+.main-container {
+    min-height:100vh;
+    padding-top: 75px;
+}
+
 .auth-options {
     margin-top: 17px;
 }
@@ -12,6 +104,16 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     margin-top: 20px;
 }
 
+.navbar-nav>li>a>h3 {
+    color: white;
+    font-weight:500;
+    margin:0px;
+}
+
+.navbar-default {
+    border: none;
+}
+
 .one-page-header .navbar-nav>li>a {
     color: #333;
 }
@@ -21,7 +123,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
         color: #eee;
     }
     .navbar-collapse {
-        width: 500px;
+        width: 800px;
     }
 }
 
@@ -55,11 +157,50 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     }
 }
 
-/*body.dark p, li, .auth-options li a {
-    color: #eee;
-    font-size: 12.5px;
-}*/
-
 .one-page-header .navbar-nav>li>a {
     color: #333;
+}
+
+.login-panel {
+    width:350px;
+    margin-right:auto;
+    margin-left:auto;
+}
+
+#id_region_choices, #id-site-type-choices {
+    list-style: none;
+    padding-top: 10px;
+}
+
+.messages {
+    list-style: none;
+}
+
+.form-control {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+textarea.form-control {
+    height: 125px;
+    overflow-x: hidden;
+}
+
+input[type='text'] {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+    border: solid 1px #CCC;
+}
+
+.copyright-section {
+    background: url('../img/fpan/ricepaper.png');
+}
+
+.copyright-section i.back-to-top {
+    top:-15px;
+    background: transparent;
+}
+    
+.fpan-panel {
+    background: url('../img/fpan/bedge_muted.png');
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+    border-top: solid 8px #431825;
 }

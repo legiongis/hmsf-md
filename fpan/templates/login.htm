@@ -15,75 +15,78 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
-{% extends "base.htm" %}
+{% extends "fpan_base.htm" %}
 {% load staticfiles %}
 {% load i18n %}
 
 {% block loading_mask %}
 {% endblock loading_mask %}
 
-{% block body %}
-
-<div id="container" class="cls-container">
-
-    <!-- BACKGROUND IMAGE -->
-    <!--===================================================-->
-    <div id="bg-overlay" class="bg-img img-login"></div>
 
 
-    <!-- HEADER -->
-    <div class="cls-header cls-header-lg">
-        <div class="cls-brand">
-            <a class="box-inline" href="{% url 'home' %}">
-                <!-- <img alt="Arches Admin" src="img/logo.png" class="brand-icon"> -->
-                <span class="brand-title">{{ app_settings.APP_NAME }} {% trans '<span class="text-thin"> Account Login !!!</span>' %}</span>
-            </a>
-        </div>
-    </div>
+{% block content %}
 
+{% if login_type == "hms" %}
+<link href="{% static 'css/hms-style.css' %}" rel="stylesheet">
+{% elif login_type == "state" %}
+<link href="{% static 'css/state-style.css' %}" rel="stylesheet">
+{% endif %}
 
-     <!-- LOGIN FORM -->
-    <div class="cls-content">
-        <div class="cls-content-sm panel login-panel" style="width: 350px;">
-            <div class="panel-body">
-                <h3 class="login-panel-header">{% trans "Sign In to your account" %}</h3>
-                <form id="login-form" 
-                      action='?next=/search?termFilter=[{"inverted":false,"type":"string","context":"","context_label":"","id":"hay","text":"hay","value":"hay"}]&no_filters=false&page=1' 
-                      method='POST' {% if auth_failed %} 
-                      autocomplete="off" {% endif %}>
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <div class="input-group">
-                            <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
-                            <input type="text" class="form-control input-lg" placeholder="Email or Username" name='username' autofocus>
+<!-- spacer for header -->
+<div class="row" style="height:50px;"></div>
+
+<div class="row">
+    <div class="col-xs-12 col-sm-6 col-sm-offset-3">
+        <div class="cls-content">
+            <div class="cls-content-sm login-panel fpan-panel" style="">
+                <div class="panel-body">
+                    {% if login_type == "hms" %}
+                    <h3 class="login-panel-header">{% trans "Sign in to your HMS account with your <strong>Scout ID</strong> and <strong>password</strong>." %}</h3>
+                    <h4><em><a href="{% url 'auth' login_type='state' %}">{% trans "Switch to State Land Manager Login" %}</a></em></h4>
+                    {% elif login_type == "state" %}
+                    <h3 class="login-panel-header">{% trans "Sign in to the FPAN database with your <strong>State Agency ID</strong> and <strong>password</strong>." %}</h3>
+                    <h4><em><a href="{% url 'auth' login_type='hms' %}">{% trans "Switch to Heritage Monitoring Scout Login" %}</em></a></h4>
+                    {% endif %}
+                    <form id="login-form" 
+                          action='' 
+                          method='POST' {% if auth_failed %} 
+                          autocomplete="off" {% endif %}>
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+                                <input type="text" class="form-control input-lg" placeholder="{% if login_type == 'hms' %}Scout ID{% elif login_type == 'state' %}State Agency ID{% endif %}" name='username' autofocus>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <div class="input-group-addon"><i class="ion-asterisk"></i></div>
-                            <input type="password" class="form-control input-lg" placeholder="Password" name='password'>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+                                <input type="password" class="form-control input-lg" placeholder="Password" name='password'>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="text-right">
-                            <a class="btn btn-link" href="{% url 'home' %}" style="color:#C93011;">{% trans "Exit" %}</a>
-                            <button class="btn btn-success text-uppercase" type="submit">{% trans "Sign In" %}</button>
+                        <div class="form-group">
+                            <div class="text-right">
+                                <button class="btn btn-success text-uppercase" type="submit">{% trans "Sign In" %}</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row" style="padding-top:10px;">
-                        <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
-                            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
-                            <h4>{% trans "Login failed" %}</h4>
-                            <span>{% trans "Invalid username and/or password." %}</span>
+                        <div class="row" style="padding-top:10px;">
+                            <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
+                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
+                                <h4>{% trans "Login failed" %}</h4>
+                                <span>{% trans "Invalid username and/or password. Make sure you are using the correct login portal for your account type." %}</span>
+                            </div>
                         </div>
+                    </form>
+                    <div class="row">
+                        <!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
+                        <!--  -->
                     </div>
-                </form>
-                <div class="row">
-                    <!-- <a href="arches_password_reminder.html" class="col-xs-5 btn btn-link mar-rgt" style="color:#515152;">{% trans "Forgot password ?" %}</a> -->
-                    <!--  -->
                 </div>
             </div>
+        </div>
     </div>
 </div>
+{% endblock content %}
 
-{% endblock body %}
+{% block footer %}
+{% endblock %}
