@@ -4,7 +4,10 @@ from django.http import HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 from django.core.mail import EmailMessage
+from django.utils.translation import ugettext as _
 from hms.forms import ScoutForm, ScoutProfileForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
@@ -142,8 +145,9 @@ def change_password(request):
             return redirect('change_password')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.htm', {
-        'form': form
+    return render(request, 'change-password.htm', {
+        'form': form,
+        'page':'change-password'
     })
 
 def scout_signup(request):
