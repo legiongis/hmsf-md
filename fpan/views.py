@@ -14,7 +14,7 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from fpan.utils.tokens import account_activation_token
-from fpan.utils.accounts import check_anonymous, check_duplicate_username
+from fpan.utils.accounts import check_anonymous, check_duplicate_username, check_state_access, check_scout_access
 from django.contrib.auth.models import User, Group
 from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
