@@ -20,6 +20,7 @@ FUNCTION_LOCATIONS.append('fpan.functions')
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '&cu1l36s)wxa@5yxefgdd-wkwpyw3tz2vru*ja@nh*r4*47^15'

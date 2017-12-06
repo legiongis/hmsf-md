@@ -8,9 +8,8 @@
 
     <!--  Intro Section -->
     <!--  End Intro Section -->
-
     <!--  About Section -->
-    {% include "fpan/partials/_welcome-section.htm" %}
+    {% include "fpan/partials/_about-hms.htm" %}
     <!--  End About Section -->
 
     <!-- Services Section -->
@@ -19,10 +18,9 @@
     <!-- News Section -->
     {% include "fpan/partials/_news-section.htm" %}
     <!-- End News Section -->
-
-
-    <!-- Scout Signup Section -->
-    {% include "fpan/forms/_scout.htm" %}
-    <!-- End Scout Signup Section -->
+    
+    {% if user_is_scout %}
+    {% include "fpan/scout-profile-form.htm" %}
+    {% endif %}
 
 {% endblock %}
