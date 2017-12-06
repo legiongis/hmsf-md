@@ -24,6 +24,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 {% block body %}
 
+<link href="https://fonts.googleapis.com/css?family=Ropa+Sans" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Kreon" rel="stylesheet">
+<link href="{% static 'css/index.css' %}" rel="stylesheet">
+{% if user_is_scout %}
+<link href="{% static 'css/hms-style.css' %}" rel="stylesheet">
+{% endif %}
+{% if user_is_state %}
+<link href="{% static 'css/state-style.css' %}" rel="stylesheet">
+{% endif %}
 
 
     <div class="wrapper">
@@ -35,12 +44,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                 <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
                     <div class="navbar-header">
-                        <a href="{% url 'home' %}" class="navbar-brand">
-                            <img src="{{ STATIC_URL }}img/arches_logo_light.png" alt="Nifty Logo" class="brand-icon">
-                            <div class="brand-title">
-                                <span class="brand-text">{{ app_name }}</span>
-                            </div>
+                        {% if user_is_scout %}
+                        <a href="{% url 'hms_home' %}" class="navbar-brand">
+                            <img src="{{ STATIC_URL }}img/fpan/HMS_website_small.png" alt="" class="">
                         </a>
+                        {% elif user_is_state %}
+                        <a href="{% url 'state_home' %}" class="navbar-brand">
+                            <img src="{{ STATIC_URL }}img/state/FL Color Seal - transparent.png" alt="" class="">
+                        </a>
+                        {% else %}
+                        <a href="{% url 'fpan_home' %}" class="navbar-brand">
+                            <img src="{{ STATIC_URL }}img/fpan/fpan_sun.png" alt="" class="">
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
 
