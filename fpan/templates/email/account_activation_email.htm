@@ -1,6 +1,9 @@
 {% autoescape off %}
-Hi {{ user.username }},
-Please click on the link to confirm your registration,
+Hi {{ user.username }}, welcome to the Heritage Monitoring Scouts program! We're excited to have you.
+
+To confirm your account, please follow this link. You'll be prompted to fill in some information about yourself. It's important that we know what regions you are interested in so we can assign you to your missions!
 
 http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+Thanks and welcome aboard!
 {% endautoescape %}
