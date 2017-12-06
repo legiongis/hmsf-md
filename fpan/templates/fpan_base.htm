@@ -35,20 +35,32 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link rel="shortcut icon" href="{% static 'img/fpan/favicon1.ico' %}" />
+    <link rel="shortcut icon" href="{% static 'img/favicon/favicon.ico' %}" />
+
+    <link rel="apple-touch-icon" sizes="144x144" href="{% static 'img/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'img/favicon/manifest.json' %}">
+    <link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
+
+
 
     <link rel='stylesheet' type='text/css' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600&amp;subset=cyrillic,latin'>
+    <link href="https://fonts.googleapis.com/css?family=Ropa+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Kreon" rel="stylesheet"> 
+    
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
 
     <link href="{% static 'css/unify.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
-
-    <style type="text/css">
-        body.dark p, li, .auth-options li a {
-            color: #555;
-        }
-    </style>
+    {% if user_is_scout %}
+    <link href="{% static 'css/hms-style.css' %}" rel="stylesheet">
+    {% endif %}
+    {% if user_is_state %}
+    <link href="{% static 'css/state-style.css' %}" rel="stylesheet">
+    {% endif %}
 
 </head>
 
@@ -57,19 +69,24 @@ The #page-top ID is part of the scrolling feature.
 The data-spy and data-target are part of the built-in Bootstrap scrollspy function.
 -->
 
-<body id="body" data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery">
-
+<body id="body" style=""  data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery">
+    <div id="intro"></div>
     <!--=== Header ===-->
     {% include "fpan/partials/_header.htm" %}
     <!--=== End Header ===-->
+    <div class="container main-container">
 
     {% block content %}
     {% endblock %}
 
     <!-- Contact Section -->
+    {% block footer %}
     {% include "fpan/partials/_copyright-section.htm" %}
+    {% endblock %}
     <!-- End Contact Section -->
 
+    </div>
+    
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.4.0/jquery-migrate.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
@@ -110,6 +127,8 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         ko.applyBindings(new ViewModel());
 
     </script>
+    
+    
 
 </body>
 
