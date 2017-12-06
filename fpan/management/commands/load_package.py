@@ -1,8 +1,12 @@
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User, Group
 from django.conf import settings
-from arches.app.models import models
+from guardian.shortcuts import assign_perm, get_perms
+from arches.app.models.models import Node,NodeGroup,Resource2ResourceConstraint
+from arches.app.models.graph import Graph
+from arches.app.models.card import Card
 import psycopg2 as db
 import os
 import glob
@@ -62,7 +66,7 @@ class Command(BaseCommand):
             if len(config_paths) > 0:
                 configs = json.load(open(config_paths[0]))
                 for relationship in configs['permitted_resource_relationships']:
-                    obj, created = models.Resource2ResourceConstraint.objects.update_or_create(
+                    obj, created = Resource2ResourceConstraint.objects.update_or_create(
                         resourceclassfrom_id=uuid.UUID(relationship['resourceclassfrom_id']),
                         resourceclassto_id=uuid.UUID(relationship['resourceclassto_id']),
                         resource2resourceid=uuid.UUID(relationship['resource2resourceid'])
@@ -187,6 +191,75 @@ class Command(BaseCommand):
 
         def load_datatypes(package_dir):
             load_extensions(package_dir,'datatypes', 'datatype')
+            
+        def get_cards(names,graph_instance):
+            
+            if names == "all":
+                cards = Card.objects.filter(graph=graph_instance)
+                return (cards,["all"])
+            msg = []
+            cards = []
+            for name in names:
+                try:
+                    card = Card.objects.get(name=name,graph=graph_instance)
+                    cards.append(card)
+                    msg.append(name)
+                except ObjectDoesNotExist:
+                    msg.append(name+" (invalid name)")
+            return (cards,msg)
+            
+        def load_permissions(package_dir):
+            """custom load function to add permissions as defined in a package-specific
+            manner"""
+            
+            perm_config_file = os.path.join(package_dir,'permissions_config.json')
+            if not os.path.isfile(perm_config_file):
+                print "no permissions_config.json file in package"
+                return
+                
+            with open(perm_config_file,'rb') as configs:
+                perm_configs = json.load(configs)
+                
+            valid_perms = [
+                'delete_nodegroup',
+                'no_access_to_nodegroup',
+                'read_nodegroup',
+                'write_nodegroup'
+            ]
+            perm_error = False
+            
+            for g_name,data in perm_configs.iteritems():
+                try:
+                    g = Graph.objects.get(name=g_name)
+                    if not g.isresource:
+                        print "graph: {} - Error: this is a Branch, not a Resource Model\n--".format(g_name)
+                        continue
+                    print "graph:",g_name
+                except ObjectDoesNotExist:
+                    print "graph: {} - Error: does not exist\n--".format(g_name)
+                    continue
+                for group_name, perms in data.iteritems():
+                    try:
+                        group = Group.objects.get(name=group_name)
+                        print "  group:",group_name
+                    except ObjectDoesNotExist:
+                        print "    group: {} - Error: does not exist\n--".format(group_name)
+                        continue
+                    for perm_type, card_names in perms.iteritems():
+                        if not perm_type in valid_perms:
+                            print "    permission: {} - Error: invalid permission type".format(perm_type)
+                            perm_error = True
+                            continue
+                        print "    permission:",perm_type
+                        cards,msg = get_cards(card_names,g)
+                        if len(cards) > 0:
+                            print "      cards: "+", ".join(msg)
+                        for c in cards:
+                            assign_perm(perm_type,group,c._nodegroup_cache)
+            
+            if perm_error:
+                print "valid permission types:",valid_perms
+            
 
         def handle_source(source):
 
@@ -246,6 +319,8 @@ class Command(BaseCommand):
             print "\n~~~~~~~~ ...and RESOURCE TO RESOURCE CONSTRAINTS"
             load_resource_to_resource_constraints(package)
             print "done"
+            print "\n~~~~~~~~ ...and APPLYING PERMISSIONS"
+            load_permissions(package)
         
         ## loading map layers not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD MAP LAYERS"
