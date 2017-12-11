@@ -1,4 +1,3 @@
-from django.conf import settings
 from .accounts import check_state_access,check_scout_access
     
 def user_type(request):
