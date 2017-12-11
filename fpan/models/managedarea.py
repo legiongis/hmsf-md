@@ -22,6 +22,7 @@ class ManagedArea(models.Model):
     name = models.CharField(max_length=254)
     agency = models.CharField(max_length=254,choices=AGENCY_CHOICES)
     category = models.CharField(max_length=254,choices=CATEGORY_CHOICES)
+    nickname = models.CharField(max_length=30,null=True,blank=True)
     geom = models.MultiPolygonField()
 
     # Returns the string representation of the model.
