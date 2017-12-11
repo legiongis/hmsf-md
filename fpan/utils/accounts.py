@@ -7,6 +7,8 @@ import string
 import os
 import csv
 
+STATE_GROUP_NAMES = ['FMSF','FL_BAR','FWC','FL_Forestry','FL_AquaticPreserve','StatePark']
+
 def check_anonymous(user):
     return user.username != 'anonymous'
 
@@ -28,8 +30,7 @@ def check_duplicate_username(newusername):
     return newusername
 
 def check_state_access(user):
-    state_groups = ['FMSF','FL_BAR','FWC','FL_Forestry','FL_AquaticPreserve','StatePark']
-    state_user = user.groups.filter(name__in=state_groups).exists()
+    state_user = user.groups.filter(name__in=STATE_GROUP_NAMES).exists()
     if user.is_superuser:
         state_user = True
     return state_user
