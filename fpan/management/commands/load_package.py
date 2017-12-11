@@ -7,6 +7,7 @@ from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models.models import Node,NodeGroup,Resource2ResourceConstraint
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
+from fpan.utils.accounts import load_fpan_state_auth
 from fpan.models import Region
 from hms.models import Scout
 import psycopg2 as db
@@ -365,6 +366,7 @@ class Command(BaseCommand):
         if 'auth' in components or components == 'all':
             print "\n~~~~~~~~ CONFIGURE AUTHENTICATION SYSTEM"
             load_auth_system(package)
+            load_fpan_state_auth(mock=True)
             print "done"
         
         if 'widgets' in components or components == 'all':
