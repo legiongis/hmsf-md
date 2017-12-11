@@ -7,6 +7,8 @@ from guardian.shortcuts import assign_perm, get_perms
 from arches.app.models.models import Node,NodeGroup,Resource2ResourceConstraint
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
+from fpan.models import Region
+from hms.models import Scout
 import psycopg2 as db
 import os
 import glob
@@ -60,6 +62,54 @@ class Command(BaseCommand):
             if os.path.exists(settings_file):
                 update_system_settings = True
                 management.call_command('packages',operation='import_business_data', source=settings_file, overwrite='overwrite')
+                
+        def load_auth_system(package_dir):
+            auth_config_file = os.path.join(package_dir,'auth_config.json')
+            if not os.path.isfile(auth_config_file):
+                print "no auth_config.json file in package"
+                return
+                
+            with open(auth_config_file,'rb') as configs:
+                auth_configs = json.load(configs)
+                
+            print "\nREMOVING UNECESSARY GROUPS\n-----------------------"
+            keep_groups = ["Graph Editor","Resource Editor","RDM Administrator","Guest","Crowdsource Editor"]
+            all_groups = Group.objects.exclude(name__in=keep_groups)
+            for g in all_groups:
+                print "  removing group: "+g.name
+                g.delete()
+            print "    done"
+            
+            print "\nclearing all existing users\n----------------------"
+            keep_users = ["admin","anonymous"]
+            all_users = User.objects.exclude(username__in=keep_users)
+            for u in all_users:
+                print "  removing user: "+u.username
+                u.delete()
+            print "    done"
+            
+            print "\ncreating new Scouts for HMS\n----------------------"
+            for group,users in auth_configs.iteritems():
+                newgroup = Group.objects.get_or_create(name=group)[0]
+                for user,info in users.iteritems():
+                    print "  creating user:",user
+                    if group == "Scout":
+                        newuser = Scout.objects.create_user(user,"",info['password'])
+                        newuser.first_name = info['first_name']
+                        newuser.last_name = info['last_name']
+                        newuser.middle_initial = info['middle_initial']
+                        newuser.scoutprofile.site_interest_type = info['site_interests']
+                        for region in info['regions']:
+                            print region
+                            obj = Region.objects.get(name=region)
+                            newuser.scoutprofile.region_choices.add(obj)
+                        cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
+                        newuser.groups.add(cs_grp)
+                    else:
+                        newuser = User.objects.create_user(user,"",info['password'])
+                        newuser.first_name = info['first_name']
+                        newuser.last_name = info['last_name']
+                    newuser.save()
 
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -310,6 +360,11 @@ class Command(BaseCommand):
         if 'fixtures' in components or components == 'all':
             print "\n~~~~~~~~ LOAD FIXTURES"
             load_fixtures(package)
+            print "done"
+                  
+        if 'auth' in components or components == 'all':
+            print "\n~~~~~~~~ CONFIGURE AUTHENTICATION SYSTEM"
+            load_auth_system(package)
             print "done"
         
         if 'widgets' in components or components == 'all':
