@@ -42,6 +42,43 @@ def check_scout_access(user):
     except Scout.DoesNotExist:
         is_scout = False
     return is_scout
+    
+def get_perm_details(request,doc_type):
+
+    if request.user.is_superuser:
+        return False
+        
+    elif check_state_access(request.user):
+    
+        ## figure out what state group the user belongs to
+        print request.user.groups
+        for sg in STATE_GROUP_NAMES:
+            if request.user.groups.filter(name=sg).exists():
+                state_group_name = sg
+                break
+        print state_group_name
+        ## return false for a few of the state agencies that get full access
+        if state_group_name in ["FMSF","FL_BAR"]:
+            return False
+        else:
+            details = settings.RESTRICED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['State']
+        ## get full agency name to match with node value otherwise
+        if state_group_name == "StatePark":
+            details['value'] = 'FL Dept. of Environmental Protection, Div. of Recreation and Parks'
+        elif state_group_name == "FL_AquaticPreserve":
+            details['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
+        elif state_group_name == "FL_Forestry":
+            details['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
+        else:
+            print "ERROR, this line should not be reached"
+            
+    elif check_scout_access(request.user):
+        details = settings.RESTRICED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['Scout']
+        details['value'] = request.user.username
+    else:
+        print "ERROR: this line should not be reached"
+        
+    return details
 
 def make_managed_area_nicknames():
     """this is a helper function that was written to make acceptable usernames

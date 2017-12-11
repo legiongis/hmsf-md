@@ -26,6 +26,24 @@ GROUPS_BY_RESTRICED_RESOURCE_MODEL_IDS = {
     'Guest':['f212980f-d534-11e7-8ca8-94659cf754d0']
 }
 
+## in FPAN app, all the of values are actually set elsewhere
+RESTRICED_RESOURCE_MODEL_IDS_BY_NODE_PERMS = {
+    'f212980f-d534-11e7-8ca8-94659cf754d0': {
+        'default': {
+            'node_name':'Assigned To',
+            'value':'__get_username'
+        },
+        'Scout': {
+            'node_name':'Assigned To',
+            'value':'derived_string'
+        },
+        'State': {
+            'node_name':'Managing Agency',
+            'value':'derived_string'
+        }
+    }
+}
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '&cu1l36s)wxa@5yxefgdd-wkwpyw3tz2vru*ja@nh*r4*47^15'
 
