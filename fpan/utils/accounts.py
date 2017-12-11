@@ -1,5 +1,11 @@
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.contrib.auth.models import User, Group
 from hms.models import Scout
+from fpan.models import ManagedArea
+import random
+import string
+import os
+import csv
 
 def check_anonymous(user):
     return user.username != 'anonymous'
@@ -117,6 +123,7 @@ def load_fpan_state_auth(mock=False):
     outlist = []
     cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
     
+    print "\ncreating one login per group for some state agencies\n----------------------"
     one_offs = ['FL_BAR','FMSF','FWC']
     
     for agency_name in one_offs:
@@ -144,6 +151,8 @@ def load_fpan_state_auth(mock=False):
         outlist.append((agency_name,pw))
         print "  1 user added to group"
     
+    print "\ncreating one login per unit and one group for other state agencies\n----------------------"
+    
     logins_per_unit_dict = {
         "FL Dept. of Environmental Protection, Div. of Recreation and Parks":"StatePark",
         "FL Dept. of Environmental Protection, Florida Coastal Office":"FL_AquaticPreserve",
@@ -152,7 +161,6 @@ def load_fpan_state_auth(mock=False):
     
     all = ManagedArea.objects.all()
     agencies = [i[0] for i in ManagedArea.objects.order_by().values_list('agency').distinct()]
-    print "making groups and users based on Managed Areas..."
     for a in agencies:
     
         if not a in logins_per_unit_dict.keys():
