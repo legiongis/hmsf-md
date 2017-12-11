@@ -259,7 +259,19 @@ class Command(BaseCommand):
             
             if perm_error:
                 print "valid permission types:",valid_perms
-            
+        
+        def load_fixtures(package_dir):
+            '''currently only configured to look for .json fixtures'''
+            fixture_dir = os.path.join(package_dir,'fixtures')
+            if not os.path.isdir(fixture_dir):
+                print "no fixture directory found"
+                return
+                
+            for f in os.listdir(fixture_dir):
+                if not f.endswith(".json"):
+                    continue
+                f_path = os.path.join(fixture_dir,f)
+                management.call_command('loaddata',f_path)
 
         def handle_source(source):
 
@@ -294,6 +306,11 @@ class Command(BaseCommand):
             management.call_command('setup_db',yes=True)
             
         package = settings.PACKAGE_PATH
+        
+        if 'fixtures' in components or components == 'all':
+            print "\n~~~~~~~~ LOAD FIXTURES"
+            load_fixtures(package)
+            print "done"
         
         if 'widgets' in components or components == 'all':
             print "\n~~~~~~~~ LOAD WIDGETS"
