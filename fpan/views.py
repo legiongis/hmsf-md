@@ -103,18 +103,19 @@ def auth(request,login_type):
         password = request.POST['password']
         user = authenticate(username=username, password=password)
         if user is not None and user.is_active:
-            login(request, user)
-            user.password = ''
             if login_type == "hms":
                 if check_scout_access(user):
+                    login(request, user)
                     auth_attempt_success = True
                 else:
                     auth_attempt_success = False
             elif login_type == "state":
                 if check_state_access(user):
+                    login(request, user)
                     auth_attempt_success = True
                 else:
                     auth_attempt_success = False
+            user.password = ''
         else:
             auth_attempt_success = False
 
