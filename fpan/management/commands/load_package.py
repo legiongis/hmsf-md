@@ -41,7 +41,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("-c", "--components",
             nargs="*",
-            help="email addresses to which the server setup notification will be set (defaults are added below)")
+            help="list of specific components that should be loaded instead of the whole package.")
         pass
 
     def handle(self, *args, **options):
@@ -244,7 +244,8 @@ class Command(BaseCommand):
             load_extensions(package_dir,'datatypes', 'datatype')
             
         def get_cards(names,graph_instance):
-            
+            """ this is a little helper function for the load_permissions method
+            and is a little out of place here"""
             if names == "all":
                 cards = Card.objects.filter(graph=graph_instance)
                 return (cards,["all"])
