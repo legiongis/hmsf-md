@@ -37,15 +37,13 @@ class Command(BaseCommand):
 
     def convert_shp(self):
     
-        shp = r"C:\arches\fpan\data\shp-ref\from_julie\AllPublicLandsFL.shp"
-        output = os.path.join('fpan','fixtures','managed_areas.json')
-        # print os.path.abspath(output)
-        # return
+        shp = r"C:\arches\fpan\data\shp-ref\from_julie\AllPublicLandsFL_edit.shp"
+        output = r"C:\arches\fpan\repo\fpan-data\fixtures\managedareas.json"
         ds = DataSource(shp)
         layer = ds[0]
         
         lookup = {
-            'FL Dept. of Environmental Protection, Div. of Recreation and Parks':'State Parks',
+            'FL Dept. of Environmental Protection, Div. of Recreation and Parks':'State Park',
             'FL Dept. of Agriculture and Consumer Services, Florida Forest Service':'State Forest',
             'FL Fish and Wildlife Conservation Commission':'Fish and Wildlife Conservation Commission',
             'FL Dept. of Environmental Protection, Florida Coastal Office':'Aquatic Preserve'
@@ -60,6 +58,7 @@ class Command(BaseCommand):
                 continue
             name = feat.get("MANAME")
             cat = lookup[agency]
+            nickname = feat.get("NICKNAME")
             ## case specific handling of geometries 11-27-17
             geotype = feat.geom.geom_type
             if geotype == "Polygon":
@@ -73,7 +72,8 @@ class Command(BaseCommand):
                     'agency':agency,
                     'category':cat,
                     'geom':geom,
-                    'name':name
+                    'name':name,
+                    'nickname':nickname
                 }
             }
             data.append(f)
