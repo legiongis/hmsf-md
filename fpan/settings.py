@@ -22,12 +22,12 @@ TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
-GROUPS_BY_RESTRICED_RESOURCE_MODEL_IDS = {
+GROUPS_BY_RESTRICTED_RESOURCE_MODEL_IDS = {
     'Guest':['f212980f-d534-11e7-8ca8-94659cf754d0']
 }
 
 ## in FPAN app, all the of values are actually set elsewhere
-RESTRICED_RESOURCE_MODEL_IDS_BY_NODE_PERMS = {
+RESTRICTED_RESOURCE_MODEL_IDS_BY_NODE_PERMS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
         'default': {
             'node_name':'Assigned To',

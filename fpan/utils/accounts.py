@@ -61,7 +61,7 @@ def get_perm_details(request,doc_type):
         if state_group_name in ["FMSF","FL_BAR"]:
             return False
         else:
-            details = settings.RESTRICED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['State']
+            details = settings.RESTRICTED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['State']
         ## get full agency name to match with node value otherwise
         if state_group_name == "StatePark":
             details['value'] = 'FL Dept. of Environmental Protection, Div. of Recreation and Parks'
@@ -73,7 +73,7 @@ def get_perm_details(request,doc_type):
             print "ERROR, this line should not be reached"
             
     elif check_scout_access(request.user):
-        details = settings.RESTRICED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['Scout']
+        details = settings.RESTRICTED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['Scout']
         details['value'] = request.user.username
     else:
         print "ERROR: this line should not be reached"
