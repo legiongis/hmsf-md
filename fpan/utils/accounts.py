@@ -43,20 +43,19 @@ def check_scout_access(user):
         is_scout = False
     return is_scout
     
-def get_perm_details(request,doc_type):
+def get_perm_details(user,doc_type):
 
-    if request.user.is_superuser:
-        return False
+    if user.is_superuser:
+        return {}
         
-    elif check_state_access(request.user):
+    elif check_state_access(user):
     
         ## figure out what state group the user belongs to
-        print request.user.groups
         for sg in STATE_GROUP_NAMES:
-            if request.user.groups.filter(name=sg).exists():
+            if user.groups.filter(name=sg).exists():
                 state_group_name = sg
                 break
-        print state_group_name
+
         ## return false for a few of the state agencies that get full access
         if state_group_name in ["FMSF","FL_BAR"]:
             return False
@@ -72,9 +71,9 @@ def get_perm_details(request,doc_type):
         else:
             print "ERROR, this line should not be reached"
             
-    elif check_scout_access(request.user):
+    elif check_scout_access(user):
         details = settings.RESTRICTED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['Scout']
-        details['value'] = request.user.username
+        details['value'] = user.username
     else:
         print "ERROR: this line should not be reached"
         
