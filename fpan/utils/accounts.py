@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from arches.app.models.resource import Resource
 from hms.models import Scout
 from fpan.models import ManagedArea
 import random
@@ -78,6 +79,16 @@ def get_perm_details(user,doc_type):
         print "ERROR: this line should not be reached"
         
     return details
+    
+def user_can_edit_resource_instance(user,resourceid=None):
+    if not resourceid:
+        return True
+    res = Resource.objects.get(pk=resourceid)
+    perms = get_perm_details(user,str(res.graph.pk))
+    if perms:
+        if not perms['value'] in res.get_node_values(perms['node_name']):
+            return False
+    return True
 
 def make_managed_area_nicknames():
     """this is a helper function that was written to make acceptable usernames
@@ -230,4 +241,3 @@ def load_fpan_state_auth(mock=False):
         write.writerow(("username","password"))
         for user_pw in outlist:
             write.writerow(user_pw)
-            
