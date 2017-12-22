@@ -11,10 +11,21 @@ h1, h2, h3, h4, h5, h6 {
     background: url(/media/img/fpan/bedge_muted.png);
 }
 
+.arches-menu-icon {
+    color: white;
+}
+
+#mainnav-container {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+}
+
 #mainnav-container, #mainnav {
     background: #431825;
     color:white;
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+#mainnav-menu a {
+    color: white;
 }
 
 #mainnav-menu>li>a:hover {
@@ -25,6 +36,7 @@ h1, h2, h3, h4, h5, h6 {
 #mainnav-menu>li>a {
     background-color:#431825 !important;
     box-shadow:none !important;
+    color: white;
 }
 
 #mainnav-menu>li {
@@ -38,6 +50,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .single-content {
     background-color:#5D2134 !important;
+    font-family: 'Kreon',sans-serif;
 }
 
 .hover {
@@ -46,6 +59,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .menu-title {
     background-color:#5D2134;
+    font-family: 'Kreon',sans-serif;
 }
 
 .navbar-brand, .navbar-brand>img {
@@ -60,6 +74,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .link-submenu-item {
     background-color:#431825 !important;
+}
+
+.link-submenu {
+    font-family: 'Kreon',sans-serif;
+    color: white;
 }
 
 .navbar-header:before {
@@ -180,6 +199,18 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
 
+.select2-container {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.select2-container-multi {
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.select2-choice {
+    border: solid 1px #CCC;
+}
+
 textarea.form-control {
     height: 125px;
     overflow-x: hidden;
@@ -203,4 +234,21 @@ input[type='text'] {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
     border-top: solid 8px #431825;
+}
+
+#login-failed-alert {
+    background-color: transparent;
+    border: none;
+}
+
+.state-logos-list {
+    display:inline-flex;
+}
+
+.state-logos-list li {
+    margin: 0px 20px;
+}
+
+.state-logos-list li img {
+    height: 100px;
 }

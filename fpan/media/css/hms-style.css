@@ -3,11 +3,51 @@ body, .copyright-section {
 }
 
 #mainnav-container, #mainnav {
-    background: #499990;
-    background: url('../img/fpan/ricepaper-hms.png');
-    color:#E7E7E8;
+    background: #5ec5b9;
+    /* background: url('../img/fpan/ricepaper-hms.png'); */
+}
+
+#mainnav-menu>li {
+    background-color:#5ec5b9 !important;
+}
+
+#mainnav-menu>li>a {
+    background-color:#5ec5b9 !important;
+}
+
+#mainnav-menu>li>a:hover {
+    background-color:#F26422 !important;
+}
+
+.link-submenu-item {
+    background-color:#F26422 !important;
+}
+
+.menu-title {
+    background-color:#F26422;
+}
+
+.popover-title {
+    background-color:#F26422 !important;
+}
+
+.single-content {
+    background-color:#F26422 !important;
+}
+
+.hover {
+    background-color:#F26422;
 }
 
 .fpan-panel {
     border-top: solid 8px #F26422;
+}
+
+.btn-success {
+    background-color:#f26422;
+    border:none;
+}
+
+a {
+    color: #f26422;
 }
