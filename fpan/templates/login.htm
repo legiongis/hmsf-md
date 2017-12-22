@@ -40,6 +40,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="cls-content">
             <div class="cls-content-sm login-panel fpan-panel" style="">
                 <div class="panel-body">
+                    <img src="{% static 'img/state/dhr logo.png' %}" style="width:100%">
                     {% if login_type == "hms" %}
                     <h3 class="login-panel-header">{% trans "Sign in to your HMS account with your <strong>Scout ID</strong> and <strong>password</strong>." %}</h3>
                     {% elif login_type == "state" %}
@@ -72,7 +73,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
                                 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
                                 <h4>{% trans "Login failed" %}</h4>
-                                <span>{% trans "Invalid username and/or password. Make sure you are using the correct login portal for your account type." %} <em>{% if login_type == "hms" %}<a href="{% url 'auth' login_type='hms' %}">{% trans "Go to state portal" %}</a>{% elif login_type == "state" %}<a href="{% url 'auth' login_type='state' %}">{% trans "Go to HMS portal" %}</a>{% endif %}</em>.</span>
+                                <span>{% trans "Invalid username and/or password. Make sure you are using the correct login portal for your account type." %} <em>{% if login_type == "hms" %}<a href="{% url 'auth' login_type='state' %}">{% trans "Go to state portal" %}</a>{% elif login_type == "state" %}<a href="{% url 'auth' login_type='hms' %}">{% trans "Go to HMS portal" %}</a>{% endif %}</em>.</span>
                             </div>
                         </div>
                     </form>
@@ -85,7 +86,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         </div>
     </div>
 </div>
+<div class="row">
+    
+<div>
 {% endblock content %}
 
 {% block footer %}
+{% if login_type == "state" %}
+{% include "fpan/partials/_state-footer.htm" %}
+{% endif %}
 {% endblock %}
