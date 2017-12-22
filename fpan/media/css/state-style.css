@@ -1,17 +1,62 @@
-body, .copyright-section {
-    background: url('../img/fpan/ricepaper-state.png');
-}
 
-#mainnav-container, #mainnav {
-    background: #778c61;
-    background: url('../img/fpan/ricepaper-state.png');
-    color:#EEEEEE;
-}
+/* #mainnav-container, #mainnav { */
+    /* background: #778c61; */
+    /* background: url('../img/fpan/ricepaper-state.png'); */
+/* } */
 
 .fpan-panel {
     border-top: solid 8px #0D6152;
 }
 
-.ep-toolbar {
-    background: #F4C25C;
+body, .copyright-section {
+    background: url('../img/fpan/ricepaper-state.png');
+}
+
+#mainnav-container, #mainnav {
+    background: url('../img/fpan/ricepaper-state.png');
+}
+
+#mainnav-menu>li {
+    background: url('../img/fpan/ricepaper-state.png') !important;
+}
+
+#mainnav-menu>li>a {
+    background: url('../img/fpan/ricepaper-state.png') !important;
+}
+
+#mainnav-menu>li>a:hover {
+    background:#0d6152 !important;
+}
+
+.link-submenu-item {
+    background:#0d6152 !important;
+}
+
+.menu-title {
+    background:#0d6152;
+}
+
+.popover-title {
+    background:#0d6152 !important;
+}
+
+.single-content {
+    background:#0d6152 !important;
+}
+
+.hover {
+    background:#0d6152;
+}
+
+a {
+    color: #f26422;
+}
+
+.btn-success {
+    background-color:#0d6152;
+    border:none;
+}
+
+a {
+    color: #0d6152;
 }
