@@ -1,7 +1,7 @@
+{% extends "base-error-response.htm" %}
 
-{% block content %}
-<h1>This is 404</h1>
-{% if exception %}
-    {{ exception }}
-{% endif %}
-{% endblock content %}
+{% block error_response %}
+    
+<h2>Page or resource not found</h2>
+
+{% endblock error_response %}

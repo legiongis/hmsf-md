@@ -5,6 +5,7 @@ from arches.app.views import main
 from . import views
 from django.views.defaults import page_not_found
 
+handler500 = views.server_error
 
 urlpatterns = [
     url(r'^$', views.index, name='fpan_home'),
