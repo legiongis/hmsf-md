@@ -224,7 +224,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- disable the ability to create new resources -->
                                         <!-- this database is not for resource creation -->
-                                        {% if request.user == "fenton hardy" %}
+                                        {% if request.user.username == "admin" %}
                                         <li{% if "views/resource" in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
                                                 <i class="fa fa-building-o"></i>
