@@ -40,10 +40,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         <div class="cls-content">
             <div class="cls-content-sm login-panel fpan-panel" style="">
                 <div class="panel-body">
-                    <img src="{% static 'img/state/dhr logo.png' %}" style="width:100%">
                     {% if login_type == "hms" %}
+                    <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:100%">
                     <h3 class="login-panel-header">{% trans "Sign in to your HMS account with your <strong>Scout ID</strong> and <strong>password</strong>." %}</h3>
                     {% elif login_type == "state" %}
+                    <img src="{% static 'img/state/dhr logo.png' %}" style="width:100%">
                     <h3 class="login-panel-header">{% trans "Sign in to record site condition assessments with your <strong>State Agency ID</strong> and <strong>password</strong>." %}</h3>
                     {% endif %}
                     <p><em>{% trans "ID and password are both case-sensitive." %}</em></p>
