@@ -1,3 +1,9 @@
+@font-face {
+  font-family: 'Helsing-Regular';
+  src: url("../fonts/2AF806_0_0.eot"); 
+  src: url("../fonts/2AF806_0_0.eot?#iefix") format("embedded-opentype"), url("../fonts/2AF806_0_0.woff") format("woff"), url("../fonts/2AF806_0_0.ttf") format("truetype");
+}
+
 body {
     font-family: 'Kreon',sans-serif;
     background: url('../img/fpan/ricepaper.png');
@@ -259,4 +265,9 @@ input[type='text'] {
 
 .title-v1 {
     margin-bottom: 0px;
+}
+
+.custom-error-page h1 {
+    font-family: "Helsing-Regular", "Georgia", serif !important;
+    font-size: 39px;
 }

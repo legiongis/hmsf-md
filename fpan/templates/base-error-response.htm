@@ -3,12 +3,14 @@
 {% block content %}
 
 <div class="jumbotron">
-
-    {% block error_response %}
-    {% endblock error_response %}
+    <div class="custom-error-page">
+        
+        {% block error_response %}
+        {% endblock error_response %}
 
     <input class="btn" type="button" value="Back to Previous Page" onClick="javascript:history.go(-1);">
     
+    </div>
 </div>
 
 {% endblock content %}
