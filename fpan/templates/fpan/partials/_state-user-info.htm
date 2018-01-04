@@ -1,10 +1,23 @@
 {% load staticfiles %}
 {% load template_tags %}
 {% load i18n %}
-<section id="" class="scout-profile-section fpan-panel" style="padding: 50px;">
+<section id="" class="scout-profile-section fpan-panel" style="padding: 25px;">
     <div class="row">
         <div class="col-xs-12">
             <h3>{% trans "Welcome," %} {{user.username}}.</h3>
+            {% if request.user|has_group:"StatePark" %}
+            <p>{% trans "As a State Park user you have access to <strong>all</strong> Archaeological Sites on State Park land." %}</p>
+            {% elif request.user|has_group:"FWC" %}
+            <p>{% trans "As a Fish and Wildlife Commission user you have access to <strong>all</strong> Archaeological Sites on Fish and Wildlife land." %}</p>
+            {% elif request.user|has_group:"FL_BAR" %}
+            <p>{% trans "As a Florida Bureau of Archaeology user you have access to <strong>all</strong> Archaeological Sites." %}</p>
+            {% elif request.user|has_group:"FMSF" %}
+            <p>{% trans "As a Florida Master Site File user you have access to <strong>all</strong> Archaeological Sites." %}</p>
+            {% elif request.user|has_group:"FL_Forestry" %}
+            <p>{% trans "As a Florida Forestry user you have access to <strong>all</strong> Archaeological Sites on State Forest land." %}</p>
+            {% elif request.user|has_group:"FL_AquaticPreserve" %}
+            <p>{% trans "As a Florida Aquatic Preserve user you have access to <strong>all</strong> Archaeological Sites on any Aquatic Preserves." %}</p>
+            {% endif %}
         </div>
     </div>
 </section>

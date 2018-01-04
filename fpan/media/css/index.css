@@ -105,7 +105,7 @@ h1, h2, h3, h4, h5, h6 {
 /*--------------------------------------*/
 
 .main-container {
-    min-height:100vh;
+    min-height:calc(100vh-40px);
     padding-top: 75px;
 }
 
@@ -221,9 +221,9 @@ input[type='text'] {
     border: solid 1px #CCC;
 }
 
-.copyright-section {
-    background: url('../img/fpan/ricepaper.png');
-}
+/* .copyright-section { */
+    /* background: url('../img/fpan/ricepaper.png'); */
+/* } */
 
 .copyright-section i.back-to-top {
     top:-15px;
@@ -251,4 +251,12 @@ input[type='text'] {
 
 .state-logos-list li img {
     height: 100px;
+}
+
+.footer {
+    text-align: center;
+}
+
+.title-v1 {
+    margin-bottom: 0px;
 }

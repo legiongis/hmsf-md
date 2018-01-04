@@ -15,6 +15,18 @@
                 <div class="col-sm-8">           
                     {{ scout_profile.street_address }}
                 </div>
+                
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.street_address.help_text %}
+                        <small style="display: none">{{ scout_profile.street_address.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.street_address.errors %}
+                        {% for error in scout_profile.street_address.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>  
 
             <div class="form-group">
@@ -25,7 +37,18 @@
                 </label>
                 <div class="col-sm-8">
                     {{ scout_profile.city }}
-                </div>           
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.city.help_text %}
+                        <small style="display: none">{{ scout_profile.city.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.city.errors %}
+                        {% for error in scout_profile.city.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
@@ -36,7 +59,18 @@
                 </label>
                 <div class="col-sm-8">
                     {{ scout_profile.state }}
-                </div>          
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.state.help_text %}
+                        <small style="display: none">{{ scout_profile.state.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.state.errors %}
+                        {% for error in scout_profile.state.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
@@ -47,7 +81,18 @@
                 </label>
                 <div class="col-sm-8">
                     {{ scout_profile.zip_code }}
-                </div>         
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.zip_code.help_text %}
+                        <small style="display: none">{{ scout_profile.zip_code.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.zip_code.errors %}
+                        {% for error in scout_profile.zip_code.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
@@ -58,7 +103,18 @@
                 </label>
                 <div class="col-sm-8">
                     {{ scout_profile.phone }}
-                </div>            
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.phone.help_text %}
+                        <small style="display: none">{{ scout_profile.phone.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.phone.errors %}
+                        {% for error in scout_profile.phone.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
@@ -69,7 +125,18 @@
                 </label>
                 <div class="col-sm-8">
                     {{ scout_profile.background }}
-                </div>            
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.background.help_text %}
+                        <small style="display: none">{{ scout_profile.background.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.background.errors %}
+                        {% for error in scout_profile.background.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
@@ -80,7 +147,18 @@
                 </label>
                 <div class="col-sm-8">
                     {{ scout_profile.relevant_experience }}
-                </div>            
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.relevant_experience.help_text %}
+                        <small style="display: none">{{ scout_profile.relevant_experience.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.relevant_experience.errors %}
+                        {% for error in scout_profile.relevant_experience.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
@@ -91,7 +169,18 @@
                 </label>
                 <div class="col-sm-8">
                     {{ scout_profile.interest_reason }}
-                </div>            
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.interest_reason.help_text %}
+                        <small style="display: none">{{ scout_profile.interest_reason.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.interest_reason.errors %}
+                        {% for error in scout_profile.interest_reason.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
             
             <div class="form-group">

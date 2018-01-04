@@ -1,28 +1,17 @@
-<section id="contact" class="contacts-section">
-    <div class="copyright-section">
-        <p>{{copyright_year}} &copy; {{copyright_text}} </p>
-        <ul class="social-icons">
-            <li>
-                <a href="http://fpan.us/connect.php" data-original-title="Facebook" class="social_facebook rounded-x" style=""></a>
-            </li>
-            <li>
-                <a href="http://fpan.us/connect.php" data-original-title="Twitter" class="social_twitter rounded-x" style=""></a>
-            </li>
-            <li>
-                <a href="https://www.youtube.com/user/FloridaArchaeology" data-original-title="YouTube" class="social_youtube rounded-x" style=""></a>
-            </li>
-            <!--
-            <li>
-                <a href="#" data-original-title="Google Plus" class="social_googleplus rounded-x"></a>
-            </li>
-            <li>
-                <a href="#" data-original-title="Pinterest" class="social_pintrest rounded-x"></a>
-            </li>
-            <li>
-                <a href="#" data-original-title="Linkedin" class="social_linkedin rounded-x"></a>
-            </li>
-            -->
-        </ul>
-        <span class="page-scroll"><a href="#intro"><i class="fa fa-angle-double-up back-to-top"></i></a></span>
+<section id="footer" class="footer">
+    <div class="row" style="margin: 10px 0px;">
+        <div class="col-xs-12">
+            <span>&copy; 2018 | powered by <a href="http://archesproject.org">Arches v4</a> | source code &mdash; <a href="https://github.com/legiongis/arches/tree/fpan_master">arches</a>, <a href="https://github.com/legiongis/fpan">fpan</a>, <a href="https://github.com/legiongis/fpan-data">fpan-data</a> | admin contact &mdash; <a id="email-contact"></a></span>
+        </div>
     </div>
 </section>
+<script>
+    var c1 = "admin";
+    var c2 = "@";
+    var c3 = "legiongis.com";
+    var email = c1+c2+c3
+    $(document).ready(function() {
+        document.getElementById('email-contact').textContent = email;
+        document.getElementById('email-contact').href = "mailto:"+email;
+    });
+</script>
