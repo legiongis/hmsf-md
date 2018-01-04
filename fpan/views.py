@@ -143,7 +143,10 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(request, _('Your password has been updated'))
-            return redirect('change_password')
+            if check_state_access(user):
+                return redirect('state_home')
+            if check_scout_access(user):
+                return redirect('hms_home')
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'change-password.htm', {

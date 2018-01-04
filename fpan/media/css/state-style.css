@@ -5,7 +5,7 @@
 /* } */
 
 .fpan-panel {
-    border-top: solid 8px #0D6152;
+    border-top: solid 8px #273675;
 }
 
 body, .copyright-section {
@@ -25,38 +25,34 @@ body, .copyright-section {
 }
 
 #mainnav-menu>li>a:hover {
-    background:#0d6152 !important;
+    background:#273675 !important;
 }
 
 .link-submenu-item {
-    background:#0d6152 !important;
+    background:#273675 !important;
 }
 
 .menu-title {
-    background:#0d6152;
+    background:#273675;
 }
 
 .popover-title {
-    background:#0d6152 !important;
+    background:#273675 !important;
 }
 
 .single-content {
-    background:#0d6152 !important;
+    background:#273675 !important;
 }
 
 .hover {
-    background:#0d6152;
-}
-
-a {
-    color: #f26422;
+    background:#273675;
 }
 
 .btn-success {
-    background-color:#0d6152;
+    background-color:#273675;
     border:none;
 }
 
 a {
-    color: #0d6152;
+    color: #273675;
 }

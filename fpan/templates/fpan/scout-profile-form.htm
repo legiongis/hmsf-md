@@ -1,4 +1,4 @@
-<section id="scout-profile" class="scout-profile-section fpan-panel" style="padding: 50px;">
+<section id="scout-profile" class="scout-profile-section fpan-panel" style="padding: 40px;">
 
     <h3>
     {% if user.first_name %}
@@ -7,6 +7,10 @@
     {{ user.username }}
     {% endif %}
     </h3>
+    
+    <h5>
+    At any time you may update your Scout Profile below, or <a href="{% url 'auth' login_type='password' %}">change your password</a>.
+    </h5>
 
     {% if messages %}
     <ul class="messages">
@@ -15,34 +19,7 @@
         {% endfor %}
     </ul>
     {% endif %}
-
-    {% include "fpan/forms/_scout-profile.htm" %}
     
-    <form method="post" class="form-horizontal">
-        {% csrf_token %}
-        {% for field in scout_profile %}
-
-        <div class="form-group">
-
-            <div class="col-sm-8">
-
-                {% if field.help_text %}
-                    <small style="display: none">{{ field.help_text }}</small>
-                {% endif %}
-
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                        <span style="color:red" > {{ error }} </span>
-                    {% endfor %}
-                {% endif %}
-
-            </div>
-
-        </div>        
-        
-        {% endfor %}
-
-    </form>
-
+    {% include "fpan/forms/_scout-profile.htm" %}
 
 </section>
