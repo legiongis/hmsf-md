@@ -12,7 +12,7 @@ from hms.forms import ScoutForm, ScoutProfileForm
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, get_template
 from fpan.utils.tokens import account_activation_token
 from fpan.utils.accounts import check_anonymous, check_duplicate_username, check_state_access, check_scout_access
 from django.contrib.auth.models import User, Group
@@ -207,3 +207,10 @@ def activate(request, uidb64, token):
 def show_regions(request):
     regions = Region.objects.all()
     return JSONResponse(regions)
+
+
+def server_error(request, template_name='500.html'):
+    from django.template import RequestContext
+    from django.http import HttpResponseServerError
+    t = get_template(template_name)
+    return HttpResponseServerError(t.render(RequestContext(request)))
