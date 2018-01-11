@@ -6,21 +6,12 @@
 
 {% block content %}
 
-    <!--  Intro Section -->
-    <!--  End Intro Section -->
-    <!--  About Section -->
     {% include "fpan/partials/_about-hms.htm" %}
-    <!--  End About Section -->
 
-    <!-- Services Section -->
-    <!-- End Services Section -->
-
-    <!-- News Section -->
     {# include "fpan/partials/_news-section.htm" #}
-    <!-- End News Section -->
     
     {% if user_is_scout %}
-    {% include "fpan/scout-profile-form.htm" %}
+        {% include "fpan/scout-profile-form.htm" %}
     {% endif %}
 
 {% endblock %}
