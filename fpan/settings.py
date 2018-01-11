@@ -60,9 +60,10 @@ DATABASES = {
         "CONN_MAX_AGE": 0,
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "HOST": "localhost",
+        "USER": "postgres",
+        "PASSWORD": "postgis",
         "NAME": "fpan",
         "OPTIONS": {},
-        "PASSWORD": "postgis",
         "PORT": "5432",
         "POSTGIS_TEMPLATE": "template_postgis_20",
         "TEST": {
@@ -71,12 +72,11 @@ DATABASES = {
             "MIRROR": None,
             "NAME": None
         },
-        "TIME_ZONE": None,
-        "USER": "postgres"
+        "TIME_ZONE": None
     }
 }
 
-INSTALLED_APPS+=('fpan', 'hms',)
+INSTALLED_APPS+=('fpan', 'hms')
 
 ## the following two variables should be handled in settings_local.py
 SECRET_LOG = "path/to/directory/outside/of/version/control"
