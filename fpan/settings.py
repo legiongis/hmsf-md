@@ -17,9 +17,12 @@ STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
+
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
+
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
 GROUPS_BY_RESTRICTED_RESOURCE_MODEL_IDS = {
