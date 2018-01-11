@@ -28,13 +28,13 @@ With your virtual environment activated, enter a new directory and
 
     this should contain all of your normal environment-specific variables, like database credentials, as well as two new variables:
    
-       SECRET_LOG = "path/to/logdir/outside/of/version/control"
-       PACKAGE_PATH = "full/path/to/the/location/of/fpan-data"
+       SECRET_LOG = "path/to/some/dir/outside/of/version/control"
+       PACKAGE_PATH = "full/local/path/to/the/location/of/fpan-data/repo"
        
 - enter the project directory and load the package (make sure elasticsearch is running)
     
         cd fpan
-        python manage.py load_package
+        python manage.py load_package -db
         
 - once loading is complete, you should be able to run the django dev server and view the database in a browser at `localhost:8000`
         
