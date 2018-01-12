@@ -11,7 +11,7 @@ import csv
 STATE_GROUP_NAMES = ['FMSF','FL_BAR','FWC','FL_Forestry','FL_AquaticPreserve','StatePark']
 
 def check_anonymous(user):
-    return user.username != 'anonymous'
+    return user.username == 'anonymous'
 
 def check_duplicate_username(newusername):
     chars = ["'", "-", "\"", "_", "."]
@@ -78,6 +78,9 @@ def get_perm_details(user,doc_type):
     elif check_scout_access(user):
         term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['Scout']['term_filter']
         term_filter['value'] = user.username
+        
+    elif check_anonymous(user):
+        term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['default']['level']
 
     return term_filter
     

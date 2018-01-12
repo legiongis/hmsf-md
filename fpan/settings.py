@@ -35,19 +35,19 @@ RESOURCE_MODEL_USER_RESTRICTIONS = {
         'default': {
             'level': 'no_access',
             'term_filter': {
-                #'node_name':'insert name of node',
-                #'value':'insert string value to test'
+                # 'node_name':'<insert name of node>',
+                # 'value':'<insert string value to test>'
             }
         },
         'Scout': {
-            'level':'filtered',
+            'level':'term_filter',
             'term_filter': {
                 'node_name':'Assigned To',
                 'value':'derived_string'
             }
         },
         'State': {
-            'level':'filtered',
+            'level':'term_filter',
             'term_filter': {
                 'node_name':'Managing Agency',
                 'value':'derived_string'
