@@ -29,20 +29,29 @@ GROUPS_BY_RESTRICTED_RESOURCE_MODEL_IDS = {
     'Guest':['f212980f-d534-11e7-8ca8-94659cf754d0']
 }
 
-## in FPAN app, all the of values are actually set elsewhere
-RESTRICTED_RESOURCE_MODEL_IDS_BY_NODE_PERMS = {
+## in fpan app, the Scout and State filtered access values are set elsewhere
+RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
         'default': {
-            'node_name':'Assigned To',
-            'value':'__get_username'
+            'level': 'no_access',
+            'term_filter': {
+                #'node_name':'insert name of node',
+                #'value':'insert string value to test'
+            }
         },
         'Scout': {
-            'node_name':'Assigned To',
-            'value':'derived_string'
+            'level':'filtered',
+            'term_filter': {
+                'node_name':'Assigned To',
+                'value':'derived_string'
+            }
         },
         'State': {
-            'node_name':'Managing Agency',
-            'value':'derived_string'
+            'level':'filtered',
+            'term_filter': {
+                'node_name':'Managing Agency',
+                'value':'derived_string'
+            }
         }
     }
 }

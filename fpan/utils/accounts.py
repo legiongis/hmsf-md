@@ -46,8 +46,11 @@ def check_scout_access(user):
     
 def get_perm_details(user,doc_type):
 
+    term_filter = {}
+
+    ## return false for admins to get full access to everything
     if user.is_superuser:
-        return {}
+        return False
         
     elif check_state_access(user):
     
@@ -61,24 +64,22 @@ def get_perm_details(user,doc_type):
         if state_group_name in ["FMSF","FL_BAR"]:
             return False
         else:
-            details = settings.RESTRICTED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['State']
+            term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['State']['term_filter']
         ## get full agency name to match with node value otherwise
         if state_group_name == "StatePark":
-            details['value'] = 'FL Dept. of Environmental Protection, Div. of Recreation and Parks'
+            term_filter['value'] = 'FL Dept. of Environmental Protection, Div. of Recreation and Parks'
         elif state_group_name == "FL_AquaticPreserve":
-            details['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
+            term_filter['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
         elif state_group_name == "FL_Forestry":
-            details['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
+            term_filter['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
         else:
             print "ERROR, this line should not be reached"
             
     elif check_scout_access(user):
-        details = settings.RESTRICTED_RESOURCE_MODEL_IDS_BY_NODE_PERMS[doc_type]['Scout']
-        details['value'] = user.username
-    else:
-        print "ERROR: this line should not be reached"
-        
-    return details
+        term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['Scout']['term_filter']
+        term_filter['value'] = user.username
+
+    return term_filter
     
 def user_can_edit_resource_instance(user,resourceid=None):
     if not resourceid:
