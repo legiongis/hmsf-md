@@ -16,7 +16,7 @@ With your virtual environment activated, enter a new directory and
        
         git clone https://github.com/legiongis/fpan-data
        
-- clone the legiongis/arches fork and checkout the `fpan_master` branch
+- clone the [legiongis/arches](https://github.com/legiongis/arches/tree/fpan_master) fork and checkout the `fpan_master` branch
        
         git clone https://github.com/legiongis/arches
         cd arches
