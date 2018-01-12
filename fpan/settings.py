@@ -25,10 +25,6 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
-GROUPS_BY_RESTRICTED_RESOURCE_MODEL_IDS = {
-    'Guest':['f212980f-d534-11e7-8ca8-94659cf754d0']
-}
-
 ## in fpan app, the Scout and State filtered access values are set elsewhere
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
