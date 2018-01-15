@@ -5,7 +5,9 @@
     <div class="row">
         <div class="col-xs-12">
             <h3>{% trans "Welcome," %} {{user.username}}.</h3>
-            {% if request.user|has_group:"StatePark" %}
+            {% if request.user.is_superuser %}
+            <p>{% trans "As an admin, you have <strong>full access</strong> to the database." %}</p>
+            {% elif request.user|has_group:"StatePark" %}
             <p>{% trans "As a State Park user you have access to <strong>all</strong> Archaeological Sites on State Park land." %}</p>
             {% elif request.user|has_group:"FWC" %}
             <p>{% trans "As a Fish and Wildlife Commission user you have access to <strong>all</strong> Archaeological Sites on Fish and Wildlife land." %}</p>
