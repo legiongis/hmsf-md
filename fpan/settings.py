@@ -11,7 +11,7 @@ try:
 except ImportError:
     pass
     
-GOOGLE_ANALYTICS_TRACKING_ID = "UA-108354120-1"
+GOOGLE_ANALYTICS_TRACKING_ID = None
     
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
