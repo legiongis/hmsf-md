@@ -10,7 +10,9 @@ try:
     from arches.settings import *
 except ImportError:
     pass
-
+    
+GOOGLE_ANALYTICS_TRACKING_ID = "UA-108354120-1"
+    
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
