@@ -12,7 +12,7 @@ With your virtual environment activated, enter a new directory and
        
         git clone https://github.com/legiongis/fpan
        
-- clone the package repo
+- clone the package repo [legiongis/fpan-data](https://github.com/legiongis/fpan-data)
        
         git clone https://github.com/legiongis/fpan-data
        
