@@ -104,7 +104,7 @@ def auth(request,login_type):
         user = authenticate(username=username, password=password)
         if user is not None and user.is_active:
             if login_type == "hms":
-                if check_scout_access(user):
+                if check_scout_access(user) or user.is_superuser:
                     login(request, user)
                     auth_attempt_success = True
                 else:
