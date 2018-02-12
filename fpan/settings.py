@@ -54,6 +54,14 @@ RESOURCE_MODEL_USER_RESTRICTIONS = {
     }
 }
 
+TILESERVER_RESTRICTION_BY_GRAPH = {
+    'f212980f-d534-11e7-8ca8-94659cf754d0': {
+        'allowed_groups': [
+            'FMSF','FL_BAR'
+        ]
+    }
+}
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '&cu1l36s)wxa@5yxefgdd-wkwpyw3tz2vru*ja@nh*r4*47^15'
 
