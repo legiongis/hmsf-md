@@ -176,7 +176,7 @@ def scout_signup(request):
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
             })
-            subject_line = settings.DEFAULT_FROM_EMAIL + 'Activate your account.'
+            subject_line = settings.EMAIL_SUBJECT_PREFIX + 'Activate your account.'
             from_email = settings.DEFAULT_FROM_EMAIL
             to_email = form.cleaned_data.get('email')
             email = EmailMessage(subject_line, message, from_email, to=[to_email])
