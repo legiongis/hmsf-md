@@ -62,6 +62,8 @@ TILESERVER_RESTRICTION_BY_GRAPH = {
     }
 }
 
+MENUS_TO_PRINT = 'Scout Report'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '&cu1l36s)wxa@5yxefgdd-wkwpyw3tz2vru*ja@nh*r4*47^15'
 
