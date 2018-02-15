@@ -135,6 +135,9 @@ TILE_CACHE_CONFIG = {
     # "secret": "<secret key>"
 }
 
+DEFAULT_FROM_EMAIL = ""
+EMAIL_SUBJECT_PREFIX = ""
+
 try:
     from settings_local import *
 except ImportError:
