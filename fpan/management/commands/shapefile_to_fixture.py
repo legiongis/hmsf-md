@@ -11,35 +11,26 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-y',
-            '--yes',
-            action='store_true',
-            dest='yes',
-            default=False,
-            help='forces the continuation of any command that has a confirmation prompt',
+            'shapefile',
+            help='path to input shapefile',
         )
         parser.add_argument(
-            '-db',
-            '--setup_db',
-            action='store_true',
-            dest='setup_db',
-            default=False,
-            help='runs the setup_db command before beginning the load process. wipes everything.',
+            '--max',
+            type=int,
+            help='allows you to specify the max number of features that each fixture will have',
         )
-        parser.add_argument("-c", "--components",
-            nargs="*",
-            help="email addresses to which the server setup notification will be set (defaults are added below)")
-        pass
 
     def handle(self, *args, **options):
+        
+        shp_path = options['shapefile']
+        max_feat = options['max']
+        self.convert_shp(shp_path, max_features=max_feat)
 
-        self.convert_shp()
-
-    def convert_shp(self):
+    def convert_shp(self,shp_path,max_features=None):
     
-        shp = r"C:\arches\fpan\data\shp-ref\from_julie\AllPublicLandsFL_edit.shp"
-        output = r"C:\arches\fpan\repo\fpan-data\fixtures\managedareas.json"
-        ds = DataSource(shp)
+        # shp = r"C:\arches\fpan\data\shp-ref\from_julie\AllPublicLandsFL_edit.shp"
+        output = r"C:\arches\fpan\repo\fpan-data\fixtures\managedareas0.json"
+        ds = DataSource(shp_path)
         layer = ds[0]
         
         lookup = {
@@ -50,7 +41,8 @@ class Command(BaseCommand):
         }
         agencies = lookup.keys()
         
-        ct = 0
+        feat_ct = 0
+        file_ct = 1
         data = []
         for feat in layer:
             agency = feat.get("MANAGING_A")
@@ -67,7 +59,7 @@ class Command(BaseCommand):
                 geom = feat.geom.wkt
             f = {
                 'model':'fpan.managedarea',
-                'pk':ct,
+                'pk':feat_ct,
                 'fields':   {
                     'agency':agency,
                     'category':cat,
@@ -77,12 +69,22 @@ class Command(BaseCommand):
                 }
             }
             data.append(f)
-            ct+=1
-            if ct % 100 == 0:
-                print ct
-            elif ct % 10 == 0:
-                print ct,
+            feat_ct+=1
+            if feat_ct % 100 == 0:
+                print feat_ct
+            elif feat_ct % 10 == 0:
+                print feat_ct,
+                
+            ## write partial if max_features has been specified
+            if max_features:
+                if feat_ct % max_features == 0:
+                    output = output[:-6]+str(file_ct)+".json"
+                    with open(output,"wb") as out:
+                        json.dump(data,out,indent=2)
+                    file_ct+=1
+                    data = []
 
-        with open(output,"wb") as out:
-            json.dump(data,out,indent=2)
+        if not feat_ct:
+            with open(output,"wb") as out:
+                json.dump(data,out,indent=2)
             
