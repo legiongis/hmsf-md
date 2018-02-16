@@ -51,6 +51,10 @@ def get_perm_details(user,doc_type):
     ## return false for admins to get full access to everything
     if user.is_superuser:
         return False
+    
+    ## return false if there are no user-based restrictions for this resource model
+    if not doc_type in settings.RESOURCE_MODEL_USER_RESTRICTIONS.keys():
+        return False
         
     elif check_state_access(user):
     
