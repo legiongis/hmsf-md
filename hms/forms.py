@@ -15,7 +15,7 @@ class ScoutForm(UserCreationForm):
         help_text='Required',
         widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
     middle_initial = forms.CharField(
-        max_length=2,
+        max_length=1,
         required=True,
         help_text='Required',
         widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
