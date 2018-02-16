@@ -142,3 +142,8 @@ try:
     from settings_local import *
 except ImportError:
     pass
+    
+if DEBUG:
+    SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+    SESSION_COOKIE_AGE = 7200 #auto logout after 2 hours
+    SESSION_SAVE_EVERY_REQUEST = True
