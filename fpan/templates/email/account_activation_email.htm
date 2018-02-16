@@ -1,9 +1,15 @@
 {% autoescape off %}
-Hi {{ user.username }}, welcome to the Heritage Monitoring Scouts program! We're excited to have you.
+Hello {{ user.username }}!
 
-To confirm your account, please follow this link. You'll be prompted to fill in some information about yourself. It's important that we know what regions you are interested in so we can assign you to your missions!
+Welcome to the Heritage Monitoring Scouts, we're excited to have you! To confirm your account, please navigate to activation link below by pasting it into your browser address bar.
 
-http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+
+Be ready to login with your username ({{ user.username }}) and password. Once logged in, please fill out your user profile so we can learn a bit more about you. We won't be able to assign Archaeological Sites to you until we know what regions you are interested in!
+
+Next time you visit the database, be sure to login through the Scout Login Portal:
+
+https://{{ domain }}{% url 'auth' login_type='hms'%}
 
 Thanks and welcome aboard!
 {% endautoescape %}

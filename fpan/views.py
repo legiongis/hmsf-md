@@ -6,7 +6,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
 from django.utils.translation import ugettext as _
 from hms.forms import ScoutForm, ScoutProfileForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -170,16 +170,19 @@ def scout_signup(request):
 
             user.save()
             current_site = get_current_site(request)
-            message = render_to_string('email/account_activation_email.htm', {
+            msg_vars = {
                 'user': user,
                 'domain': current_site.domain,
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
-            })
+            }
+            message_txt = render_to_string('email/account_activation_email.htm', msg_vars)
+            message_html = render_to_string('email/account_activation_email_html.htm', msg_vars)
             subject_line = settings.EMAIL_SUBJECT_PREFIX + 'Activate your account.'
             from_email = settings.DEFAULT_FROM_EMAIL
             to_email = form.cleaned_data.get('email')
-            email = EmailMessage(subject_line, message, from_email, to=[to_email])
+            email = EmailMultiAlternatives(subject_line,message_txt,from_email,to=[to_email])
+            email.attach_alternative(message_html, "text/html")
             email.send()            
             return render(request,'email/please-confirm.htm')
     else:
