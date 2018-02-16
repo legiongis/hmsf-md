@@ -1,6 +1,6 @@
 {% autoescape off %}
 <h3>Hello {{ user.username }}!</h3>
-<p>Welcome to the Heritage Monitoring Scouts, we're excited to have you! To confirm your account, please follow this link:<br><a href="https://{{ domain }}{% url 'activate' uidb64=uid token=token %}">activate your account</a></p>
+<p>Welcome to the Heritage Monitoring Scouts, we're excited to have you! To activate your account, please follow this link:<br><a href="https://{{ domain }}{% url 'activate' uidb64=uid token=token %}">https://{{ domain }}{% url 'activate' uidb64=uid token=token %}</a>.</p>
 <p>Be ready to login with your username ({{ user.username }}) and password. Once logged in, please fill out your user profile so we can learn a bit more about you. We won't be able to assign Archaeological Sites to you until we know what regions you are interested in!</p>
 <p>Every time you visit the database in the future, be sure to login through the "Scout Portal" found on the <a href="https://{{domain}}">home page</a>.</p>
 <h4>Thanks and Welcome Aboard!</h4>
