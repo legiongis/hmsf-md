@@ -367,7 +367,7 @@ class Command(BaseCommand):
         if 'auth' in components or components == 'all':
             print "\n~~~~~~~~ CONFIGURE AUTHENTICATION SYSTEM"
             load_auth_system(package)
-            load_fpan_state_auth(mock=True)
+            load_fpan_state_auth()
             print "done"
         
         if 'widgets' in components or components == 'all':
