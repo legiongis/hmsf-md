@@ -12,7 +12,7 @@
             {% elif request.user|has_group:"FWC" %}
             <p>{% trans "As a Fish and Wildlife Commission user you have access to <strong>all</strong> Archaeological Sites on Fish and Wildlife land." %}</p>
             {% elif request.user|has_group:"FL_BAR" %}
-            <p>{% trans "As a Florida Bureau of Archaeology user you have access to <strong>all</strong> Archaeological Sites." %}</p>
+            <p>{% trans "As the Florida Bureau of Archaeological Research you have access to <strong>all</strong> Archaeological Sites." %}</p>
             {% elif request.user|has_group:"FMSF" %}
             <p>{% trans "As a Florida Master Site File user you have access to <strong>all</strong> Archaeological Sites." %}</p>
             {% elif request.user|has_group:"FL_Forestry" %}
@@ -20,6 +20,7 @@
             {% elif request.user|has_group:"FL_AquaticPreserve" %}
             <p>{% trans "As a Florida Aquatic Preserve user you have access to <strong>all</strong> Archaeological Sites on any Aquatic Preserves." %}</p>
             {% endif %}
+            <p><a href="{% url 'auth' login_type='password' %}">change my password</a></p>
         </div>
     </div>
 </section>
