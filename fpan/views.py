@@ -121,6 +121,8 @@ def auth(request,login_type):
 
     next = request.GET.get('next', reverse('home'))
     if auth_attempt_success:
+        if user.is_superuser:
+            return redirect('search_home')
         if login_type == "hms":
             return redirect('hms_home')
         if login_type == "state":
