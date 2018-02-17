@@ -28,7 +28,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 <!--<![endif]-->
 
 <head>
-    <title>{{app_title}}</title>
+    <title>
+    {% block page_title %}
+    {{app_title}}
+    {% endblock %}
+    </title>
 
     <!-- Meta -->
     <meta charset="utf-8">
