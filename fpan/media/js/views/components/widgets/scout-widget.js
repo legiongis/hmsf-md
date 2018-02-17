@@ -17,20 +17,21 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
             self.availableScouts = ko.observableArray();
             self.selectedScout = params.value;
             
-            $.ajax({
-                url: fpan.urls.scouts_dropdown,
-                data: {
-                    'resourceid': self.form.resourceid
-                },
-                dataType: "json"
-            }).done(function(data) {
-                $.each(data, function() {
-                    self.availableScouts.push(this);
+            if (params.state != 'report') {
+                $.ajax({
+                    url: fpan.urls.scouts_dropdown,
+                    data: {
+                        'resourceid': self.form.resourceid
+                    },
+                    dataType: "json"
+                }).done(function(data) {
+                    $.each(data, function() {
+                        self.availableScouts.push(this);
+                    });
+                    // refresh the observable array, necessary because of async ajax
+                    self.availableScouts.valueHasMutated();
                 });
-                // refresh the observable array, necessary because of async ajax
-                self.availableScouts.valueHasMutated();
-            });
-            
+            }
         },
         template: { require: 'text!templates/views/components/widgets/scout-widget.htm' }
     });
