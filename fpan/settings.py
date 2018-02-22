@@ -107,7 +107,9 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_S
 WSGI_APPLICATION = 'fpan.wsgi.application'
 STATIC_ROOT = '/var/www/media'
 
-RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import.log')
+from datetime import datetime
+timestamp = datetime.now().strftime("%m%d%y-%H%M%S")
+RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import-{}.log'.format(timestamp))
 
 LOGGING = {   'disable_existing_loggers': False,
     'handlers': {   'file': {   'class': 'logging.FileHandler',
