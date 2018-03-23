@@ -23,4 +23,5 @@ urlpatterns = [
     url(r'^', include('arches.urls')),
     url(r'^hms/', include('hms.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^dashboard', views.fpan_dashboard, name='fpan_dashboard'),
 ]

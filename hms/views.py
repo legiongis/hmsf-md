@@ -1,11 +1,14 @@
-from django.shortcuts import render
+import csv
+import json
+from django.shortcuts import render, HttpResponse
+from django.contrib.auth.decorators import user_passes_test
 from arches.app.utils.JSONResponse import JSONResponse
 from .models import Scout, ScoutProfile
-import json
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.models import Node, Value
 from fpan.models import Region
+from datetime import datetime
 
 def scouts_dropdown(request):
     resourceid = request.GET.get('resourceid', None)
@@ -71,6 +74,47 @@ def scouts_dropdown(request):
                     return_scouts.append(obj)
                     
     return JSONResponse(return_scouts)
+
+@user_passes_test(lambda u: u.is_superuser)
+def scout_list_download(request):
+
+    csvname = datetime.now().strftime("HMS all scouts %d-%m-%y.csv")
+
+    # create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={}'.format(csvname)
+    
+    ## create writer object
+    writer = csv.writer(response)
+    
+    header_row = ['scoutid','first_name','last_name','email','street address',
+                    'city','state','zip','phone','interests','region_choices']
+    writer.writerow(header_row)
+    
+    rows = []
+    all_scouts = Scout.objects.all()
+    for scout in all_scouts:
+    
+        id = scout.username
+        first_name = scout.first_name
+        last_name = scout.last_name
+        email = scout.email
+        addr = scout.scoutprofile.street_address
+        city = scout.scoutprofile.city
+        state = scout.scoutprofile.state
+        zip = scout.scoutprofile.zip_code
+        phone = scout.scoutprofile.phone
+        interests = ";".join(scout.scoutprofile.site_interest_type)
+        regions = scout.scoutprofile.region_choices.all()
+        region_names = ";".join([r.name for r in regions])
+
+        srow = [id,first_name,last_name,email,addr,city,state,zip,phone,interests,region_names]
+        rows.append(srow)
+    
+    for row in rows:
+        writer.writerow(row)
+        
+    return response
 
 def scout_profile(request, username):
     return JSONResponse(ScoutProfile.objects.filter(user__username=username))

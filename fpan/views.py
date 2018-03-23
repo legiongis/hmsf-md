@@ -20,8 +20,10 @@ from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
 from fpan.models import Region
 from hms.models import Scout, ScoutProfile
+from hms.views import scouts_dropdown
 from django.contrib import messages
 from arches.app.utils.JSONResponse import JSONResponse
+import json
 
 
 def index(request):
@@ -208,14 +210,18 @@ def activate(request, uidb64, token):
     else:
         return HttpResponse('Activation link is invalid!')
 
-
 def show_regions(request):
     regions = Region.objects.all()
     return JSONResponse(regions)
-
 
 def server_error(request, template_name='500.html'):
     from django.template import RequestContext
     from django.http import HttpResponseServerError
     t = get_template(template_name)
     return HttpResponseServerError(t.render(RequestContext(request)))
+    
+@user_passes_test(lambda u: u.is_superuser)
+def fpan_dashboard(request):
+    scouts_unsorted = json.loads(scouts_dropdown(request).content)
+    scouts = sorted(scouts_unsorted, key=lambda k: k['username']) 
+    return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
