@@ -299,8 +299,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         </li>
                                         {% endif %}
 
-
                                         <!-- Recently Added -->
+                                        <!--
                                         {% if request.user|can_edit_resource_instance %}
                                         <li{% if 'edit-history' in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'edit_history' %}" data-bind="click: navigate.bind(this, '{% url 'edit_history' %}') ">
@@ -311,7 +311,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </a>
                                         </li>
                                         {% endif %}
-
+                                        -->
 
                                         {% if request.user|has_group:"RDM Administrator" %}
                                         <li class="list-divider-dark"></li>
