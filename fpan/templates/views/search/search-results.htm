@@ -24,7 +24,7 @@
                 <div class="search-listing-body" data-bind="html: displaydescription"></div>
 
                 <div class="search-listing-footer">
-                    {% if user|can_edit_resource_instance %}<a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-ios-refresh-empty"></i> {% trans "Edit" %} </a>{% endif %}
+                    {% if user|can_edit_resource_instance %}<a class="search-candidate-link" href="" data-bind="click: $parent.editResource.bind($parent)"><i class="ion-android-walk"></i> {% trans "Log Visit" %} </a>{% endif %}
                     <a class="search-candidate-link" href="" data-bind="visible: point, click: mapLinkClicked"><i class="fa fa-map-marker"></i> {% trans "Map" %} </a>
                     <!--ko ifnot: $root.resourceEditorContext -->
                     {% if user|can_edit_resource_instance %}
