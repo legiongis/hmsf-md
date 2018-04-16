@@ -1441,8 +1441,8 @@ define([
                     }
                     self.map.getCanvas().style.cursor = clickable ? 'pointer' : '';
                 });
-
-                map.on('click', function(e) {
+                
+                var clickResource = function(e) {
                     if (self.context === 'resource-editor') {
                         self.xyInput.updateSelectedPoint();
                     };
@@ -1481,6 +1481,14 @@ define([
                     if (self.clickData() !== clickData) {
                         self.clickData(clickData);
                     }
+                }
+                
+                map.on('touchstart', function(e) {
+                    clickResource(e);
+                });
+                
+                map.on('click', function(e) {
+                    clickResource(e);
                 });
 
                 self.drawingAdded = ko.observable(null);
