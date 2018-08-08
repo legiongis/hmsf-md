@@ -76,8 +76,10 @@ def get_perm_details(user,doc_type):
             term_filter['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
         elif state_group_name == "FL_Forestry":
             term_filter['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
+        elif state_group_name == "FWC":
+            term_filter['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
         else:
-            print "ERROR, this line should not be reached"
+            print state_group_name + " not handled properly"
             
     elif check_scout_access(user):
         term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['Scout']['term_filter']
