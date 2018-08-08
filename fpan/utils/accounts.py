@@ -112,6 +112,11 @@ def make_managed_area_nicknames():
         "FL Dept. of Agriculture and Consumer Services, Florida Forest Service":"FL_Forestry"
     }
     
+    ## note 8/1/18
+    ## when creating individual accounts for fwcc units, more nickname handling was done in
+    ## excel. This is not accounted for here, so if this function is ever updated to accommodate
+    ## fwcc, a close look must be taken at those new unit names.
+    
     agencies = [i[0] for i in ManagedArea.objects.order_by().values_list('agency').distinct()]
     d = {}
     join_dict = {}
