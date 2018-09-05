@@ -63,6 +63,7 @@ def get_perm_details(user,doc_type):
             if user.groups.filter(name=sg).exists():
                 state_group_name = sg
                 break
+        print state_group_name
 
         ## return false for a few of the state agencies that get full access
         if state_group_name in ["FMSF","FL_BAR"]:
@@ -77,7 +78,7 @@ def get_perm_details(user,doc_type):
         elif state_group_name == "FL_Forestry":
             term_filter['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
         elif state_group_name == "FWC":
-            term_filter['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
+            term_filter['value'] = 'FL Fish and Wildlife Conservation Commission'
         else:
             print state_group_name + " not handled properly"
             
