@@ -88,7 +88,9 @@ def scout_list_download(request):
     writer = csv.writer(response)
     
     header_row = ['scoutid','first_name','last_name','email','street address',
-                    'city','state','zip','phone','interests','region_choices']
+                    'city','state','zip','phone','interests','region_choices',
+                    'date_joined',
+                 ]
     writer.writerow(header_row)
     
     rows = []
@@ -107,8 +109,10 @@ def scout_list_download(request):
         interests = ";".join(scout.scoutprofile.site_interest_type)
         regions = scout.scoutprofile.region_choices.all()
         region_names = ";".join([r.name for r in regions])
+        joined = scout.date_joined.strftime("%Y-%m-%d")
 
-        srow = [id,first_name,last_name,email,addr,city,state,zip,phone,interests,region_names]
+        srow = [id,first_name,last_name,email,addr,city,state,zip,phone,
+                    interests,region_names,joined]
         rows.append(srow)
     
     for row in rows:
