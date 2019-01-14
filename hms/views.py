@@ -1,4 +1,4 @@
-import csv
+import unicodecsv as csv
 import json
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth.decorators import user_passes_test
