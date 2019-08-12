@@ -16,7 +16,6 @@ from django.template.loader import render_to_string, get_template
 from fpan.utils.tokens import account_activation_token
 from fpan.utils.accounts import check_anonymous, check_duplicate_username, check_state_access, check_scout_access
 from django.contrib.auth.models import User, Group
-from arches.app.views.main import auth as arches_auth
 from arches.app.models.system_settings import settings
 from fpan.models import Region
 from hms.models import Scout, ScoutProfile
