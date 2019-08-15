@@ -60,13 +60,13 @@ class Command(BaseCommand):
         
     def build_fpan_groups(self):
     
-        print "\nREMOVING UNECESSARY GROUPS\n-----------------------"
-        keep_groups = ["Graph Editor","Resource Editor","RDM Administrator","Guest","Crowdsource Editor"]
-        all_groups = Group.objects.filter()
-        for g in all_groups:
-            if not g.name in keep_groups:
-                print "  removing group: "+g.name
-                g.delete()
+        # print "\nREMOVING UNECESSARY GROUPS\n-----------------------"
+        # keep_groups = ["Graph Editor","Resource Editor","RDM Administrator","Guest","Crowdsource Editor","Resource Reviewer"]
+        # all_groups = Group.objects.filter()
+        # for g in all_groups:
+            # if not g.name in keep_groups:
+                # print "  removing group: "+g.name
+                # g.delete()
         
         print "\nADDING FPAN GROUPS AND TEST USERS\n----------------"
         

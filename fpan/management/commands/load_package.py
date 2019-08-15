@@ -73,13 +73,13 @@ class Command(BaseCommand):
             with open(auth_config_file,'rb') as configs:
                 auth_configs = json.load(configs)
                 
-            print "\nREMOVING UNECESSARY GROUPS\n-----------------------"
-            keep_groups = ["Graph Editor","Resource Editor","RDM Administrator","Guest","Crowdsource Editor"]
-            all_groups = Group.objects.exclude(name__in=keep_groups)
-            for g in all_groups:
-                print "  removing group: "+g.name
-                g.delete()
-            print "    done"
+            # print "\nREMOVING UNECESSARY GROUPS\n-----------------------"
+            # keep_groups = ["Graph Editor","Resource Editor","RDM Administrator","Guest","Crowdsource Editor"]
+            # all_groups = Group.objects.exclude(name__in=keep_groups)
+            # for g in all_groups:
+                # print "  removing group: "+g.name
+                # g.delete()
+            # print "    done"
             
             print "\nclearing all existing users\n----------------------"
             keep_users = ["admin","anonymous"]
