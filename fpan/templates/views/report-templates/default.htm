@@ -1,0 +1,95 @@
+{% load i18n %}
+<!-- ko if: !configForm -->
+{% block report %}
+<!-- Report Title Bar -->
+<div class="relative report-title-bar">
+
+    <!-- Title Block -->
+    <div class="report-toolbar-preview ep-form-toolbar">
+        <h4 class="report-toolbar-title"><span data-bind="text: report.get('name')"></span> - <span data-bind="text: report.get('displayname') "></span></h4>
+
+        <!-- Tools -->
+        <div class="ep-form-toolbar-tools mar-no flex">
+            <p class="report-print-date">{% trans "Report Date:" %} <span data-bind="text: reportDate"></span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Report Content -->
+<div class="rp-report-container-preview">
+
+    {% block header %}
+    {% endblock header %}
+
+    {% block body %}
+
+    <!--ko if: hasProvisionalData() && (editorContext === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === true) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits (not displayed in this report) that are pending review' %}</div>
+    <!--/ko-->
+    <!--ko if: hasProvisionalData() && (editorContext === true && report.userisreviewer === false) -->
+    <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
+    <!--/ko-->
+
+    <div class="rp-report-section relative rp-report-section-root">
+        <div class="rp-report-section-title">
+            <!-- ko foreach: { data: report.cards, as: 'card' } -->
+                <!-- ko if: $index() !== 0 --><hr class="rp-tile-separator"><!-- /ko -->
+                <div class="rp-card-section">
+                    <!-- ko component: {
+                        name: card.model.cardComponentLookup[card.model.component_id()].componentname,
+                        params: {
+                            state: 'report',
+                            preview: $parent.report.preview,
+                            card: card
+                        }
+                    } --> <!-- /ko -->
+                </div>
+            <!-- /ko -->
+        </div>
+    </div>
+
+    {% endblock body %}
+
+    <div class="rp-report-section relative report-related-resources">
+        <div class="rp-report-section-title">
+            <h4 class="rp-section-title">{% trans 'Related Resources' %}</h4>
+        </div>
+        <!-- ko foreach: { data: report.related_resources, as: 'rr' } -->
+        <div class="rp-card-section">
+            <h5 class="rp-tile-title">
+                <span class="rp-tile-title-float" data-bind="text:rr.graph_name"></span>
+            </h5>
+            <!--ko if: rr.related.length > 0 -->
+            <div class="rp-report-container-tile">
+            <div class="row rp-report-tile">
+                <!-- ko foreach: { data: rr.related } -->
+                    <dl class="dl-horizontal">
+                        <dt><a data-bind="text: $data.displayname, attr: {href: $data.link}"></a></dt>
+                        <dd data-bind="text: '( ' + $data.relationship + ' )'"></dd>
+                    </dl>
+                <!-- /ko -->
+            </div>
+            </div>
+            <!-- /ko -->
+            <!--ko if: rr.related.length === 0 -->
+            <div class="rp-report-container-tile">
+                <div class="row rp-report-tile rp-no-data">{% trans 'No relationships added' %}</div>
+            </div>
+            <!--/ko-->
+        </div>
+        <!-- /ko -->
+    </div>
+</div>
+
+
+{% endblock report %}
+<!-- /ko -->
+
+
+<!-- ko if: configForm && (configType === 'header') -->
+{% block header_form %}
+{% endblock header_form %}
+<!-- /ko -->
