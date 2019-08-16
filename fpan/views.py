@@ -1,28 +1,31 @@
+import json
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse, Http404 
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login, authenticate, logout
+from django.core.mail import EmailMultiAlternatives
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
-from django.core.mail import EmailMultiAlternatives
-from django.utils.translation import ugettext as _
-from hms.forms import ScoutForm, ScoutProfileForm
+from django.contrib.auth.models import User, Group
+from django.contrib import messages
 from django.contrib.sites.shortcuts import get_current_site
+from django.utils.translation import ugettext as _
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string, get_template
+
+from arches.app.models.system_settings import settings
+from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.views.resource import ResourceReportView
+
 from fpan.utils.tokens import account_activation_token
 from fpan.utils.accounts import check_anonymous, check_duplicate_username, check_state_access, check_scout_access
-from django.contrib.auth.models import User, Group
-from arches.app.models.system_settings import settings
 from fpan.models import Region
+
 from hms.models import Scout, ScoutProfile
 from hms.views import scouts_dropdown
-from django.contrib import messages
-from arches.app.utils.JSONResponse import JSONResponse
-import json
+from hms.forms import ScoutForm, ScoutProfileForm
 
 
 def index(request):
