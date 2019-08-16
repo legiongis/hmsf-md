@@ -15,8 +15,15 @@ from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string, get_template
 
+from arches.app.models import models
 from arches.app.models.system_settings import settings
+from arches.app.models.resource import Resource
+from arches.app.models.concept import Concept
+from arches.app.models.tile import Tile
+from arches.app.models.graph import Graph
+from arches.app.models.card import Card
 from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.resource import ResourceReportView
 
 from fpan.utils.tokens import account_activation_token
@@ -227,3 +234,114 @@ def fpan_dashboard(request):
     scouts_unsorted = json.loads(scouts_dropdown(request).content)
     scouts = sorted(scouts_unsorted, key=lambda k: k['username']) 
     return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
+
+def get_resource_relationship_types():
+    resource_relationship_types = Concept().get_child_collections('00000000-0000-0000-0000-000000000005')
+    default_relationshiptype_valueid = None
+    for relationship_type in resource_relationship_types:
+        if relationship_type[0] == '00000000-0000-0000-0000-000000000007':
+            default_relationshiptype_valueid = relationship_type[2]
+    relationship_type_values = {'values': [{'id': str(c[2]), 'text':str(
+        c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
+    return relationship_type_values
+
+class FPANResourceReportView(ResourceReportView):
+
+    def get(self, request, resourceid=None):
+
+        print "this is the new FPAN view"
+
+        lang = request.GET.get('lang', settings.LANGUAGE_CODE)
+        resource = Resource.objects.get(pk=resourceid)
+        displayname = resource.displayname
+        resource_models = models.GraphModel.objects.filter(isresource=True).exclude(
+            isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        related_resource_summary = [
+            {'graphid': str(g.graphid), 'name': g.name, 'resources': []} for g in resource_models]
+        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
+        related_resources = related_resources_search_results['related_resources']
+        relationships = related_resources_search_results['resource_relationships']
+        resource_relationship_type_values = {i['id']: i['text'] for i in get_resource_relationship_types()['values']}
+
+        for rr in related_resources:
+            for summary in related_resource_summary:
+                if rr['graph_id'] == summary['graphid']:
+                    relationship_summary = []
+                    for relationship in relationships:
+                        if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
+                            rr_type = resource_relationship_type_values[relationship['relationshiptype']] if relationship[
+                                'relationshiptype'] in resource_relationship_type_values else relationship['relationshiptype']
+                            relationship_summary.append(rr_type)
+                    summary['resources'].append({'instance_id': rr['resourceinstanceid'], 'displayname': rr[
+                                                'displayname'], 'relationships': relationship_summary})
+
+        tiles = Tile.objects.filter(resourceinstance=resource).order_by('sortorder')
+
+        graph = Graph.objects.get(graphid=resource.graph_id)
+        cards = Card.objects.filter(graph=graph).order_by('sortorder')
+        permitted_cards = []
+        permitted_tiles = []
+
+        perm = 'read_nodegroup'
+
+        for card in cards:
+            if request.user.has_perm(perm, card.nodegroup):
+                card.filter_by_perm(request.user, perm)
+                permitted_cards.append(card)
+
+        for tile in tiles:
+            if request.user.has_perm(perm, tile.nodegroup):
+                tile.filter_by_perm(request.user, perm)
+                permitted_tiles.append(tile)
+
+
+        try:
+            map_layers = models.MapLayer.objects.all()
+            map_markers = models.MapMarker.objects.all()
+            map_sources = models.MapSource.objects.all()
+            geocoding_providers = models.Geocoder.objects.all()
+        except AttributeError:
+            raise Http404(_("No active report template is available for this resource."))
+
+        cardwidgets = [widget for widgets in [card.cardxnodexwidget_set.order_by(
+            'sortorder').all() for card in permitted_cards] for widget in widgets]
+
+        datatypes = models.DDataType.objects.all()
+        widgets = models.Widget.objects.all()
+        templates = models.ReportTemplate.objects.all()
+        card_components = models.CardComponent.objects.all()
+
+        context = self.get_context_data(
+            main_script='views/resource/report',
+            report_templates=templates,
+            templates_json=JSONSerializer().serialize(templates, sort_keys=False, exclude=['name', 'description']),
+            card_components=card_components,
+            card_components_json=JSONSerializer().serialize(card_components),
+            cardwidgets=JSONSerializer().serialize(cardwidgets),
+            tiles=JSONSerializer().serialize(permitted_tiles, sort_keys=False),
+            cards=JSONSerializer().serialize(permitted_cards, sort_keys=False, exclude=[
+                'is_editable', 'description', 'instructions', 'helpenabled', 'helptext', 'helptitle', 'ontologyproperty']),
+            datatypes_json=JSONSerializer().serialize(
+                datatypes, exclude=['modulename', 'issearchable', 'configcomponent', 'configname', 'iconclass']),
+            geocoding_providers=geocoding_providers,
+            related_resources=JSONSerializer().serialize(related_resource_summary, sort_keys=False),
+            widgets=widgets,
+            map_layers=map_layers,
+            map_markers=map_markers,
+            map_sources=map_sources,
+            graph_id=graph.graphid,
+            graph_name=graph.name,
+            graph_json=JSONSerializer().serialize(graph, sort_keys=False, exclude=[
+                'functions', 'relatable_resource_model_ids', 'domain_connections', 'edges', 'is_editable', 'description', 'iconclass', 'subtitle', 'author']),
+            resourceid=resourceid,
+            displayname=displayname,
+        )
+
+        if graph.iconclass:
+            context['nav']['icon'] = graph.iconclass
+        context['nav']['title'] = graph.name
+        context['nav']['res_edit'] = True
+        context['nav']['print'] = True
+        context['nav']['print'] = True
+
+        return render(request, 'views/resource/report.htm', context)

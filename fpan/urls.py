@@ -2,9 +2,11 @@ from django.conf.urls import include, url
 from django.contrib.gis import admin
 from django.views.generic import RedirectView, TemplateView
 from arches.app.views import main
+from django.conf import settings
 from . import views
 from django.views.defaults import page_not_found
 
+uuid_regex = settings.UUID_REGEX
 handler500 = views.server_error
 
 urlpatterns = [
@@ -20,6 +22,7 @@ urlpatterns = [
     url(r'^state/home', views.state_home, name='state_home'),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         views.activate, name='activate'),
+    url(r'^report/(?P<resourceid>%s)$' % uuid_regex, views.FPANResourceReportView.as_view(), name='resource_report'),
     url(r'^', include('arches.urls')),
     url(r'^hms/', include('hms.urls')),
     url(r'^admin/', admin.site.urls),
