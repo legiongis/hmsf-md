@@ -27,6 +27,30 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
+REPORT_INLINES = {
+    "Archaeological Site" : [
+        {
+            "title":"Scout Reports",
+            "inline_model":"Scout Report",
+            "node_to_look_in":"FMSF Site ID"
+        }
+    ],
+    "Historic Cemetery" : [
+        {
+            "title":"Scout Reports",
+            "inline_model":"Scout Report",
+            "node_to_look_in":"FMSF Site ID"
+        }
+    ],
+    "Historic Structure" : [
+        {
+            "title":"Scout Reports",
+            "inline_model":"Scout Report",
+            "node_to_look_in":"FMSF Site ID"
+        }
+    ],
+}
+
 ## in fpan app, the Scout and State filtered access values are set elsewhere
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
