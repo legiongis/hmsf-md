@@ -33,6 +33,9 @@ from hms.models import Scout, ScoutProfile
 from hms.views import scouts_dropdown
 from hms.forms import ScoutForm, ScoutProfileForm
 
+# manually update the settings here
+# before adding this line, the mapbox key was not available in the report, for example.
+settings.update_from_db()
 
 def index(request):
     scout_form = ScoutForm()
