@@ -18,7 +18,6 @@ from django.template.loader import render_to_string, get_template
 from arches.app.models import models
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
-from arches.app.models.concept import Concept
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
@@ -235,15 +234,6 @@ def fpan_dashboard(request):
     scouts = sorted(scouts_unsorted, key=lambda k: k['username']) 
     return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
 
-def get_resource_relationship_types():
-    resource_relationship_types = Concept().get_child_collections('00000000-0000-0000-0000-000000000005')
-    default_relationshiptype_valueid = None
-    for relationship_type in resource_relationship_types:
-        if relationship_type[0] == '00000000-0000-0000-0000-000000000007':
-            default_relationshiptype_valueid = relationship_type[2]
-    relationship_type_values = {'values': [{'id': str(c[2]), 'text':str(
-        c[1])} for c in resource_relationship_types], 'default': str(default_relationshiptype_valueid)}
-    return relationship_type_values
 
 class FPANResourceReportView(ResourceReportView):
 
@@ -256,24 +246,6 @@ class FPANResourceReportView(ResourceReportView):
         displayname = resource.displayname
         resource_models = models.GraphModel.objects.filter(isresource=True).exclude(
             isactive=False).exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        related_resource_summary = [
-            {'graphid': str(g.graphid), 'name': g.name, 'resources': []} for g in resource_models]
-        related_resources_search_results = resource.get_related_resources(lang=lang, start=0, limit=1000)
-        related_resources = related_resources_search_results['related_resources']
-        relationships = related_resources_search_results['resource_relationships']
-        resource_relationship_type_values = {i['id']: i['text'] for i in get_resource_relationship_types()['values']}
-
-        for rr in related_resources:
-            for summary in related_resource_summary:
-                if rr['graph_id'] == summary['graphid']:
-                    relationship_summary = []
-                    for relationship in relationships:
-                        if rr['resourceinstanceid'] in (relationship['resourceinstanceidto'], relationship['resourceinstanceidfrom']):
-                            rr_type = resource_relationship_type_values[relationship['relationshiptype']] if relationship[
-                                'relationshiptype'] in resource_relationship_type_values else relationship['relationshiptype']
-                            relationship_summary.append(rr_type)
-                    summary['resources'].append({'instance_id': rr['resourceinstanceid'], 'displayname': rr[
-                                                'displayname'], 'relationships': relationship_summary})
 
         tiles = Tile.objects.filter(resourceinstance=resource).order_by('sortorder')
 
@@ -324,7 +296,6 @@ class FPANResourceReportView(ResourceReportView):
             datatypes_json=JSONSerializer().serialize(
                 datatypes, exclude=['modulename', 'issearchable', 'configcomponent', 'configname', 'iconclass']),
             geocoding_providers=geocoding_providers,
-            related_resources=JSONSerializer().serialize(related_resource_summary, sort_keys=False),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
