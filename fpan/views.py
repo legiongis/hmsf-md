@@ -33,9 +33,6 @@ from hms.models import Scout, ScoutProfile
 from hms.views import scouts_dropdown
 from hms.forms import ScoutForm, ScoutProfileForm
 
-# manually update the settings here
-# before adding this line, the mapbox key was not available in the report, for example.
-settings.update_from_db()
 
 def index(request):
     scout_form = ScoutForm()
@@ -240,6 +237,7 @@ def fpan_dashboard(request):
 
 class FPANResourceReportView(ResourceReportView):
 
+
     def get_inline_resources(self, graph, resourceid):
 
         inline_config = settings.REPORT_INLINES
@@ -297,6 +295,9 @@ class FPANResourceReportView(ResourceReportView):
     def get(self, request, resourceid=None):
 
         print "this is the new FPAN view"
+        # manually update the settings here
+        # before adding this line, the mapbox key was not available in the report, for example.
+        settings.update_from_db()
 
         lang = request.GET.get('lang', settings.LANGUAGE_CODE)
         resource = Resource.objects.get(pk=resourceid)
