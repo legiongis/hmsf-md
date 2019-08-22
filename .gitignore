@@ -5,6 +5,7 @@ fpan/settings_local.py
 private_logs/
 fpan/static/
 static/
+exports/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
