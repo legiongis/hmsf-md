@@ -62,17 +62,27 @@ class Command(BaseCommand):
                 "oldnodegroupid": None,
                 "newnodegroupid": str(n.nodegroup_id),
             }
-       
+
+        # here's an output dictionary we'll use to split the input v1 file into multiple
+        # files per resource type.
+        sorted_v1_resources = {}
+        
         # now load the old resource data export from the v1 database
         with open(r"exports\resources-with-reports_2019-08-14_14-19-22.json", "r") as f:
             data = json.loads(f.read())
             
         resources = data['business_data']['resources']
-        
+
         # iterate the resources until our lookup dictionaries is fully populated
         for rm, subset in nodeidlookup.items():
         
             subresources = [i for i in resources if i['resourceinstance']['graph_id'] == rm]
+            
+            # put this list in the 
+            sorted_v1_resources[rm] = {
+                "resources": list(subresources),
+                "resourceids": [i['resourceinstance']['resourceinstanceid'] for i in subresources]
+            }
             
             print rm, len(subresources)
             for ct, res in enumerate(subresources):
@@ -91,16 +101,15 @@ class Command(BaseCommand):
                             subset[nn.name]['oldnodegroupid'] = tile['nodegroup_id']
                     # break
 
-        outbusiness_data = {
-            "business_data": {
-                "resources": []
-            }
-        }
-        
+        sr_resources = list()
+
         for index, res in enumerate(resources):
 
             oldresid = res['resourceinstance']['resourceinstanceid']
-            subsetlookup = nodeidlookup[res['resourceinstance']['graph_id']]
+            resgraphid = res['resourceinstance']['graph_id']
+
+            # use the graphid to get the node lookup for this resource model
+            subsetlookup = nodeidlookup[resgraphid]
 
             report_node = Node.objects.get(name="Scout Report", graph_id=res['resourceinstance']['graph_id'])
             report_toptiles = [i for i in res['tiles'] if i['nodegroup_id'] == str(report_node.nodegroup_id)]
@@ -125,20 +134,42 @@ class Command(BaseCommand):
 
                 if len(newres['tiles']) > 0:
                 
-                    # comment this out for local testing because none of the resources that the reports are
-                    # related to are in the testing evironment
+                    # comment this out if the resources that these reports reference will not be loaded
                     newres['tiles'].append(self.make_resource_instance_tile(newresid, oldresid))
 
-                    outbusiness_data['business_data']['resources'].append(newres)
-            print index
+                    sr_resources.append((oldresid, newres))
+            if index % 200 == 0:
+                print index
+            if index % 25 == 0:
+                print index,
+            elif index == len(resources)-1:
+                print index
+
+        print len(sr_resources)
+        print sr_resources[:2]
+
+        for rm, data in sorted_v1_resources.items():
+            
+            print rm
+            outv1resfile = rm+".json"
+            outresdata = {"business_data": {"resources": data['resources']}}
+            outjson = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outresdata)))
+            
+            with open(os.path.join("exports", outv1resfile), "wb") as outf:
+                json.dump(outjson, outf, indent=1)
+
+            scout_reports = [s[1] for s in sr_resources if s[0] in data['resourceids']]
+            print len(scout_reports)
+            outsrfile = rm+"-ScoutReports.json"
+            outsrdata = {"business_data": {"resources": scout_reports}}
+            outsrjson = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outsrdata)))
+            with open(os.path.join("exports", outsrfile), "wb") as outsrf:
+                json.dump(outsrjson, outsrf, indent=1)
+                    
+        # with open(r"exports\converted.json", "w") as f:
         
-        
-        # self.test_all_tiles(outbusiness_data['business_data']['resources'])
-       
-        with open("converted.json", "w") as f:
-        
-            export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outbusiness_data)))
-            json.dump(export, f, indent=1)
+            # export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outbusiness_data)))
+            # json.dump(export, f, indent=1)
 
     def transform_tile(self, intile, resid, subsetlookup, photo_lookup):
         
