@@ -127,7 +127,7 @@ class Command(BaseCommand):
                 
                     # comment this out for local testing because none of the resources that the reports are
                     # related to are in the testing evironment
-                    # newres['tiles'].append(self.make_resource_instance_tile(newresid, oldresid))
+                    newres['tiles'].append(self.make_resource_instance_tile(newresid, oldresid))
 
                     outbusiness_data['business_data']['resources'].append(newres)
             print index
