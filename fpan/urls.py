@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         views.activate, name='activate'),
     url(r'^report/(?P<resourceid>%s)$' % uuid_regex, views.FPANResourceReportView.as_view(), name='resource_report'),
+    url(r'^search$', views.FPANSearchView.as_view(), name="search_home"),
+    url(r'^search/resources$', views.search_results, name="search_results"),
     url(r'^', include('arches.urls')),
     url(r'^hms/', include('hms.urls')),
     url(r'^admin/', admin.site.urls),
