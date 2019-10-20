@@ -190,6 +190,7 @@ def load_fpan_state_auth(mock=False):
     
     outlist = []
     cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
+    rv_grp = Group.objects.get_or_create(name="Resource Reviewer")[0]
     
     print "\ncreating one login per group for some state agencies\n----------------------"
     one_offs = ['FL_BAR','FMSF','FWC']
