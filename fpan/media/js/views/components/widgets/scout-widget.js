@@ -21,7 +21,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
                 $.ajax({
                     url: fpan.urls.scouts_dropdown,
                     data: {
-                        'resourceid': self.form.resourceid
+                        'resourceid': self.resourceid
                     },
                     dataType: "json"
                 }).done(function(data) {
