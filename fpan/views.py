@@ -21,7 +21,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.resource import ResourceReportView
 
