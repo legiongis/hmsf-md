@@ -2,7 +2,7 @@ import unicodecsv as csv
 import json
 from django.shortcuts import render, HttpResponse
 from django.contrib.auth.decorators import user_passes_test
-from arches.app.utils.JSONResponse import JSONResponse
+from arches.app.utils.response import JSONResponse
 from .models import Scout, ScoutProfile
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
