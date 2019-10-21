@@ -13,8 +13,7 @@ from django.template.loader import render_to_string, get_template
 from arches.app.models.system_settings import settings
 
 from fpan.utils.tokens import account_activation_token
-from fpan.utils.accounts import check_anonymous, check_duplicate_username, check_state_access, check_scout_access
-from fpan.utils.accounts import apply_advanced_docs_permissions, get_doc_type
+from fpan.utils.accounts import check_state_access, check_scout_access
 
 from hms.models import Scout
 from hms.forms import ScoutForm
