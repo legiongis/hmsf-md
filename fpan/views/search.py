@@ -10,7 +10,7 @@ from arches.app.utils.pagination import get_paginator
 from arches.app.views.search import get_nodegroups_by_datatype_and_perm
 from arches.app.views.search import get_permitted_nodegroups, select_geoms_for_results
 
-from fpan.utils.accounts import apply_advanced_docs_permissions, get_doc_type
+from fpan.utils.filter import apply_advanced_docs_permissions, get_doc_type
 
 class FPANSearchView(SearchView):
 
