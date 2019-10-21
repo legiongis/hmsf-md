@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound
 
 from arches.app.models.system_settings import settings
