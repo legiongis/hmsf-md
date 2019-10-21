@@ -1,16 +1,12 @@
+import os
+import csv
+import random
+import string
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from arches.app.models.resource import Resource
-from arches.app.models.models import Node, GraphModel
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
-from fpan.search.elasticsearch_dsl_builder import Type
 from hms.models import Scout
 from fpan.models import ManagedArea
-import random
-import string
-import os
-import csv
 
 STATE_GROUP_NAMES = ['FMSF','FL_BAR','FWC','FL_Forestry','FL_AquaticPreserve','StatePark']
 
@@ -39,7 +35,7 @@ def check_state_access(user):
     if user.is_superuser:
         state_user = True
     return state_user
-    
+
 def check_scout_access(user):
     try:
         scout = user.scout
@@ -49,6 +45,16 @@ def check_scout_access(user):
     return is_scout
 
 def user_can_edit_resource_instance(user,resourceid=None):
+    '''Not currently used. This was originally called inside of arches.app.views.resource
+    to determine whether or not a 404 should be returned from resource report that the
+    user was not allowed to edit. This would work well in a different way, to allow a user
+    to see Archaeological Sites, even though those resources are no longer going to be edited
+    by scouts at all. Example usage:
+    
+    if not user_can_edit_resource_instance(request.user, resourceid):
+        raise Http404
+    '''
+
     if not resourceid:
         return True
     res = Resource.objects.get(pk=resourceid)
