@@ -8,14 +8,6 @@ class Command(BaseCommand):
     help = 'bulk addition of user accounts from a csv file'
 
     def add_arguments(self, parser):
-        # parser.add_argument("--csv_file", default=None,
-            # help='path to the csv holding the names of the accounts to add')
-        # parser.add_argument("--land_managers", action="store_true", default=False,
-            # help='specify whether the full complement of state land manager accounts should be created')
-        # parser.add_argument("--mock_scouts", action="store_true", default=False,
-            # help='specify whether some mock scout accounts should be created')
-        # parser.add_argument("--fake_passwords", action="store_true", default=False,
-            # help='use fake passwords for testing: passwords for state land entities will match the username')
         pass
 
     def handle(self, *args, **options):
@@ -25,25 +17,27 @@ class Command(BaseCommand):
     def update_nodes(self):
         '''this function should be run on a fully populated HMS v1 database. It will accomplish the
         following things:
-            1. Change the Managed Area Category node to concept-list and attach the
-               Managed Area collection to it
-            2. Update the existing Managed Area Category tiles in place to use the new concepts
-               for each managed area instead of the existing strings.
+            1. Change the Managed Area Category, Managing Agency, and Managed Area Name nodes
+               to concept-list and attach appropriate collection to the updated node.
+            2. Update the existing Managed Area Category, Managing Agency, and Managed Area Name
+               tiles in place to use the new conceptsfor each managed area instead of the existing
+               string values in those tiles.
         '''
+
+        self.convert_managed_area_category_nodes("Managed Area Category")
+        self.convert_nodes_and_update_tiles("Managing Agency")
+        self.convert_nodes_and_update_tiles("Managed Area Name")
+
+    def convert_managed_area_category_nodes(self, collection_name):
+        '''this is essentially the same as convert_nodes_and_update_tiles() below,
+        but is kept separate at this time becuase additional logic will need to be
+        added to handle the new State Park regional grouping.'''
         
-        ma_cat_coll, ma_coll = False, False
         collection_nodes = Concept.objects.filter(nodetype_id="Collection")
         for cn in collection_nodes:
             labels = NonORMConcept().get(cn.conceptid).values
-            if "Managing Agency" in [l.value for l in labels]:
-                ma_coll = cn
-            if "Managed Area Category" in [l.value for l in labels]:
-                ma_cat_coll = cn
-
-        self.convert_managed_area_category_nodes(ma_cat_coll)
-        self.convert_managing_agency_nodes(ma_coll)
-
-    def convert_managed_area_category_nodes(self, collection):
+            if collection_name in [l.value for l in labels]:
+                collection = cn
 
         # get the real category nodes (they will be used to find the tiles)
         ma_cat_nodes = Node.objects.filter(name="Managed Area Category")
@@ -54,13 +48,12 @@ class Command(BaseCommand):
             n.datatype = "concept-list"
             n.config = {"rdmCollection":str(collection.conceptid)}
             n.save()
-            print n.__dict__
 
             # now find and convert all existing values for this node
             # ng = NodeGroup.objects.get(nodegroupid=n.nodegroup_id)
             # print ng.__dict__
             tiles = Tile.objects.filter(nodegroup_id=n.nodegroup_id)
-            print "modifying {} tiles".format(len(tiles))
+            print("modifying {} tiles".format(len(tiles)))
             for t in tiles:
                 exval = t.data[str(n.nodeid)]
                 if exval is None:
@@ -73,15 +66,21 @@ class Command(BaseCommand):
                 try:
                     newval = Value.objects.get(value=exval).valueid
                 except Value.DoesNotExist:
-                    print "ERROR:", exval
+                    print("ERROR: " + exval)
                     continue
                 t.data[str(n.nodeid)] = [str(newval)]
                 t.save()
 
-    def convert_managing_agency_nodes(self, collection):
+    def convert_nodes_and_update_tiles(self, collection_name):
+    
+        collection_nodes = Concept.objects.filter(nodetype_id="Collection")
+        for cn in collection_nodes:
+            labels = NonORMConcept().get(cn.conceptid).values
+            if collection_name in [l.value for l in labels]:
+                collection = cn
 
         # get the real category nodes (they will be used to find the tiles)
-        ma_nodes = Node.objects.filter(name="Managing Agency")
+        ma_nodes = Node.objects.filter(name=collection_name)
 
         for n in ma_nodes:
 
@@ -89,13 +88,12 @@ class Command(BaseCommand):
             n.datatype = "concept-list"
             n.config = {"rdmCollection":str(collection.conceptid)}
             n.save()
-            print n.__dict__
 
             # now find and convert all existing values for this node
             # ng = NodeGroup.objects.get(nodegroupid=n.nodegroup_id)
             # print ng.__dict__
             tiles = Tile.objects.filter(nodegroup_id=n.nodegroup_id)
-            print "modifying {} tiles".format(len(tiles))
+            print("modifying {} tiles".format(len(tiles)))
             for t in tiles:
                 exval = t.data[str(n.nodeid)]
                 if exval is None:
