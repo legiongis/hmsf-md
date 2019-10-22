@@ -4,6 +4,7 @@ import json
 import uuid
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
+from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.resource import Resource
 from arches.app.models.models import Node, NodeGroup, Value
@@ -21,9 +22,22 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
          
         photo_lookup = self.photo_type_conversion()
+        exportdir = os.path.join(os.path.dirname(settings.APP_ROOT), "exports")
+
+        resfile = None
+        for f in os.listdir(exportdir):
+            if f.startswith("resources-with-scout-reports"):
+                resfile = os.path.join(exportdir, f)
+
+        if resfile is None:
+            print "no resources with scout reports file to split"
+            exit()
+
+        print "input file:", resfile
 
         # load the single exported new Scout Report resource and get information from it
-        with open(r"exports\Scout_Report_2019-08-14_15-46-41.json", "r") as f:
+        scoutreport_model = os.path.join(exportdir, "Scout_Report_2019-08-14_15-46-41.json")
+        with open(scoutreport_model, "r") as f:
             data = json.loads(f.read())
 
         res = data['business_data']['resources'][0]
@@ -38,7 +52,7 @@ class Command(BaseCommand):
             "73889292-d536-11e7-b3b3-94659cf754d0": {},
             "c67216bf-8cc2-11e7-883c-06ed184dc22c": {},
         }
-        
+
         for i in set(all_nodes):
             n = Node.objects.get(nodeid=i)
             
@@ -68,7 +82,7 @@ class Command(BaseCommand):
         sorted_v1_resources = {}
         
         # now load the old resource data export from the v1 database
-        with open(r"exports\resources-with-reports_2019-08-14_14-19-22.json", "r") as f:
+        with open(resfile, "r") as f:
             data = json.loads(f.read())
             
         resources = data['business_data']['resources']
@@ -83,7 +97,7 @@ class Command(BaseCommand):
                 "resources": list(subresources),
                 "resourceids": [i['resourceinstance']['resourceinstanceid'] for i in subresources]
             }
-            
+
             print rm, len(subresources)
             for ct, res in enumerate(subresources):
 
@@ -99,7 +113,6 @@ class Command(BaseCommand):
                                 continue
                             subset[nn.name]['oldnode'] = nodeid
                             subset[nn.name]['oldnodegroupid'] = tile['nodegroup_id']
-                    # break
 
         sr_resources = list()
 
@@ -115,7 +128,7 @@ class Command(BaseCommand):
             report_toptiles = [i for i in res['tiles'] if i['nodegroup_id'] == str(report_node.nodegroup_id)]
 
             for t in report_toptiles:
-            
+
                 newresid = str(uuid.uuid4())
                 newres = {
                     "resourceinstance": {
@@ -125,15 +138,13 @@ class Command(BaseCommand):
                     },
                     "tiles": [],
                 }
-                
-                
 
                 child_tiles = [i for i in res['tiles'] if i['parenttile_id'] == t['tileid']]
                 for ctile in child_tiles:
                     newres['tiles'].append(self.transform_tile(ctile, newresid, subsetlookup, photo_lookup))
 
                 if len(newres['tiles']) > 0:
-                
+
                     # comment this out if the resources that these reports reference will not be loaded
                     newres['tiles'].append(self.make_resource_instance_tile(newresid, oldresid))
 
@@ -145,16 +156,12 @@ class Command(BaseCommand):
             elif index == len(resources)-1:
                 print index
 
-        print len(sr_resources)
-        print sr_resources[:2]
-
         for rm, data in sorted_v1_resources.items():
-            
-            print rm
+
             outv1resfile = rm+".json"
             outresdata = {"business_data": {"resources": data['resources']}}
             outjson = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outresdata)))
-            
+
             with open(os.path.join("exports", outv1resfile), "wb") as outf:
                 json.dump(outjson, outf, indent=1)
 
@@ -165,9 +172,11 @@ class Command(BaseCommand):
             outsrjson = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outsrdata)))
             with open(os.path.join("exports", outsrfile), "wb") as outsrf:
                 json.dump(outsrjson, outsrf, indent=1)
-                    
-        # with open(r"exports\converted.json", "w") as f:
-        
+
+        ## export the scout report resources to a new file
+        # outfile = "scout-reports"+resfile[-25:]
+        # with open(os.path.join(exportdir, outfile), "w") as f:
+
             # export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outbusiness_data)))
             # json.dump(export, f, indent=1)
 
@@ -198,7 +207,7 @@ class Command(BaseCommand):
         return newtile
 
     def make_resource_instance_tile(self, resid, otherresid):
-    
+
         return {
             "data": {
                 "a103e68f-bf7f-11e9-aa39-94659cf754d0": otherresid
@@ -210,12 +219,12 @@ class Command(BaseCommand):
              "resourceinstance_id": resid, 
              "tileid": str(uuid.uuid4())
          }
-        
+
     def check_value(self, invalue, photo_lookup):
 
         if invalue is None:
             return None
-        
+
         # this works because the only list values are dictionaries of uploaded file info
         # and uuids for values.
         if isinstance(invalue, list):
@@ -260,7 +269,7 @@ class Command(BaseCommand):
             "888ae788-4a40-4c87-8aad-3de83fff9c92": "Overview",
             "dea0f79f-f6ee-454a-bf0f-f27eb98607df": "Unique Feature",
         }
-        
+
         # hard-code the facade value in here after manually looking it up b/c I don't have
         # time to figure out the encoding issue with the cedille.
         photo_lookup_dict = {
