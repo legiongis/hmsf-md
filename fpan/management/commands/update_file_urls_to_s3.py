@@ -33,4 +33,3 @@ class Command(BaseCommand):
                   if "/files/uploadedfiles" in f['url']:
                     f['url'] = f['url'].replace("/files/uploadedfiles",s3url)
                     t.save()
-                    print i, t.resourceinstance_id
