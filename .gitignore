@@ -1,10 +1,11 @@
-fpan/media/bower_components
+fpan/media/packages
 fpan/tileserver
 fpan/uploadedfiles
 fpan/settings_local.py
 private_logs/
 fpan/static/
 static/
+exports/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

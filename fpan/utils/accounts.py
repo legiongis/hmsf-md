@@ -1,12 +1,12 @@
+import os
+import csv
+import random
+import string
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from arches.app.models.resource import Resource
 from hms.models import Scout
 from fpan.models import ManagedArea
-import random
-import string
-import os
-import csv
 
 STATE_GROUP_NAMES = ['FMSF','FL_BAR','FWC','FL_Forestry','FL_AquaticPreserve','StatePark']
 
@@ -35,7 +35,7 @@ def check_state_access(user):
     if user.is_superuser:
         state_user = True
     return state_user
-    
+
 def check_scout_access(user):
     try:
         scout = user.scout
@@ -43,55 +43,18 @@ def check_scout_access(user):
     except Scout.DoesNotExist:
         is_scout = False
     return is_scout
-    
-def get_perm_details(user,doc_type):
 
-    term_filter = {}
-
-    ## return false for admins to get full access to everything
-    if user.is_superuser:
-        return False
-    
-    ## return false if there are no user-based restrictions for this resource model
-    if not doc_type in settings.RESOURCE_MODEL_USER_RESTRICTIONS.keys():
-        return False
-        
-    elif check_state_access(user):
-    
-        ## figure out what state group the user belongs to
-        for sg in STATE_GROUP_NAMES:
-            if user.groups.filter(name=sg).exists():
-                state_group_name = sg
-                break
-        print state_group_name
-
-        ## return false for a few of the state agencies that get full access
-        if state_group_name in ["FMSF","FL_BAR"]:
-            return False
-        else:
-            term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['State']['term_filter']
-        ## get full agency name to match with node value otherwise
-        if state_group_name == "StatePark":
-            term_filter['value'] = 'FL Dept. of Environmental Protection, Div. of Recreation and Parks'
-        elif state_group_name == "FL_AquaticPreserve":
-            term_filter['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
-        elif state_group_name == "FL_Forestry":
-            term_filter['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
-        elif state_group_name == "FWC":
-            term_filter['value'] = 'FL Fish and Wildlife Conservation Commission'
-        else:
-            print state_group_name + " not handled properly"
-            
-    elif check_scout_access(user):
-        term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['Scout']['term_filter']
-        term_filter['value'] = user.username
-        
-    elif check_anonymous(user):
-        term_filter = settings.RESOURCE_MODEL_USER_RESTRICTIONS[doc_type]['default']['level']
-
-    return term_filter
-    
 def user_can_edit_resource_instance(user,resourceid=None):
+    '''Not currently used. This was originally called inside of arches.app.views.resource
+    to determine whether or not a 404 should be returned from resource report that the
+    user was not allowed to edit. This would work well in a different way, to allow a user
+    to see Archaeological Sites, even though those resources are no longer going to be edited
+    by scouts at all. Example usage in view:
+    
+    if not user_can_edit_resource_instance(request.user, resourceid):
+        raise Http404
+    '''
+
     if not resourceid:
         return True
     res = Resource.objects.get(pk=resourceid)
@@ -186,6 +149,7 @@ def load_fpan_state_auth(mock=False):
     
     outlist = []
     cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
+    rv_grp = Group.objects.get_or_create(name="Resource Reviewer")[0]
     
     print "\ncreating one login per group for some state agencies\n----------------------"
     one_offs = ['FL_BAR','FMSF','FWC']

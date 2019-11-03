@@ -27,28 +27,48 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
-## in fpan app, the Scout and State filtered access values are set elsewhere
+REPORT_INLINES = {
+    "Archaeological Site" : [
+        {
+            "title":"Scout Reports",
+            "inline_model":"Scout Report",
+            "node_to_look_in":"FMSF Site ID"
+        }
+    ],
+    "Historic Cemetery" : [
+        {
+            "title":"Scout Reports",
+            "inline_model":"Scout Report",
+            "node_to_look_in":"FMSF Site ID"
+        }
+    ],
+    "Historic Structure" : [
+        {
+            "title":"Scout Reports",
+            "inline_model":"Scout Report",
+            "node_to_look_in":"FMSF Site ID"
+        }
+    ],
+}
+
+## in FPAN the State filtered access values are set in utils.filter.get_state_node_match()
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
-        'default': {
-            'level': 'no_access',
-            'term_filter': {
-                # 'node_name':'<insert name of node>',
-                # 'value':'<insert string value to test>'
-            }
+        'public': {
+            'access_level': 'no_access'
         },
-        'Scout': {
-            'level':'term_filter',
-            'term_filter': {
+        'scout': {
+            'access_level':'match_node_value',
+            'match_config': {
                 'node_name':'Assigned To',
-                'value':'derived_string'
+                'match_to':'<username>'
             }
         },
-        'State': {
-            'level':'term_filter',
-            'term_filter': {
+        'state': {
+            'access_level':'match_node_value',
+            'match_config': {
                 'node_name':'Managing Agency',
-                'value':'derived_string'
+                'match_to':'<derived_elsewhere>'
             }
         }
     }
