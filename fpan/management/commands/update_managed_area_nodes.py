@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.models import Node, NodeGroup, Value, Concept
+from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept as NonORMConcept
 
@@ -108,6 +109,12 @@ class Command(BaseCommand):
             n.datatype = "concept-list"
             n.config = {"rdmCollection":str(man_coll.conceptid)}
             n.save()
+
+        # would probably be best to instantiate the graph objects here
+        # and save it right away. I think the change of node triggers a card change
+        # that needs to be explicitly saved.
+        #for g in Graph.objects.all():
+            #g.save()
 
     def reset_nodes_to_string(self):
 
