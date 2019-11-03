@@ -49,7 +49,7 @@ def user_can_edit_resource_instance(user,resourceid=None):
     to determine whether or not a 404 should be returned from resource report that the
     user was not allowed to edit. This would work well in a different way, to allow a user
     to see Archaeological Sites, even though those resources are no longer going to be edited
-    by scouts at all. Example usage:
+    by scouts at all. Example usage in view:
     
     if not user_can_edit_resource_instance(request.user, resourceid):
         raise Http404
