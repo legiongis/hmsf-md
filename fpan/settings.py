@@ -51,28 +51,24 @@ REPORT_INLINES = {
     ],
 }
 
-## in fpan app, the Scout and State filtered access values are set elsewhere
+## in FPAN the State filtered access values are set in utils.filter.get_state_node_match()
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
-        'default': {
-            'level': 'no_access',
-            'term_filter': {
-                # 'node_name':'<insert name of node>',
-                # 'value':'<insert string value to test>'
-            }
+        'public': {
+            'access_level': 'no_access'
         },
-        'Scout': {
-            'level':'term_filter',
-            'term_filter': {
+        'scout': {
+            'access_level':'match_node_value',
+            'match_config': {
                 'node_name':'Assigned To',
-                'value':'derived_string'
+                'match_to':'<username>'
             }
         },
-        'State': {
-            'level':'term_filter',
-            'term_filter': {
+        'state': {
+            'access_level':'match_node_value',
+            'match_config': {
                 'node_name':'Managing Agency',
-                'value':'derived_string'
+                'match_to':'<derived_elsewhere>'
             }
         }
     }
