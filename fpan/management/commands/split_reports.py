@@ -36,7 +36,8 @@ class Command(BaseCommand):
         print "input file:", resfile
 
         # load the single exported new Scout Report resource and get information from it
-        scoutreport_model = os.path.join(exportdir, "Scout_Report_2019-08-14_15-46-41.json")
+        refdatadir = os.path.join("fpan", "management", "commands", "refdata")
+        scoutreport_model = os.path.join(refdatadir, "Scout_Report_2019-08-14_15-46-41.json")
         with open(scoutreport_model, "r") as f:
             data = json.loads(f.read())
 
