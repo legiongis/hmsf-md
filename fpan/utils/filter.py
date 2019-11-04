@@ -1,8 +1,10 @@
 from django.conf import settings
+from django.contrib.auth.models import Group, User
 from arches.app.models.models import Node, GraphModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search import elasticsearch_dsl_builder as edb
 from fpan.search.elasticsearch_dsl_builder import Type
+from fpan.models.managedarea import ManagedArea
 
 from .accounts import check_anonymous, check_scout_access, check_state_access
 
@@ -15,10 +17,15 @@ def apply_advanced_docs_permissions(dsl, request):
     docs_perms = settings.RESOURCE_MODEL_USER_RESTRICTIONS
     doc_types = get_doc_type(request)
 
+    import os
+    import json
+    with open(os.path.join(os.path.dirname(settings.APP_ROOT),"exports","adv-filter-before.json"), "w") as f:
+        f.write(str(dsl))
+
     for doc in doc_types:
         
         print "DETERMINING FILTER:", doc
-    
+
         ## skip if there is no advanced permissions set for this doc type
         if not doc in docs_perms:
             print "skipping because no perms in settings.py"
@@ -34,37 +41,126 @@ def apply_advanced_docs_permissions(dsl, request):
 
         elif check_state_access(request.user):
             filter = docs_perms[doc]['state']
-        
+
         # now interpret the filter. if no access is granted it's very easy
         if filter['access_level'] == "no_access":
             dsl = add_doc_specific_criterion(dsl, doc, doc_types, no_access=True)
-        
+
         # if a node value match (resource instance filtering) is required, a bit more
         # logic is required to determine what that node value is
         elif filter['access_level'] == "match_node_value":
-        
+
             criterion = {'node_name': filter['match_config']['node_name']}
-            
+
             if filter['match_config']['match_to'] == "<username>":
                 criterion['value'] = request.user.username
-            
+
             # here's where the complex, FPAN state filtering is acquired
             elif check_state_access(request.user):
-                criterion['value'] = get_state_node_match(request.user)
-            
+                criterion = get_state_node_match(request.user)
+
             # generic allowance for specific, non-user-derived values to be passed in
             else:
                 criterion['value'] = filter['match_config']['match_to']
-            
-            print criterion
-            # apply criterion to dsl
-            dsl = add_doc_specific_criterion(dsl, doc, doc_types, criterion=criterion)
 
+            # this is a failover to allow "no_access" to be passed from the state logic above
+            # specifically in case of errors that break the parsing strategies
+            if criterion == "no_access":
+                dsl = add_doc_specific_criterion(dsl, doc, doc_types, no_access=True)
+
+            # apply criterion to dsl
+            elif criterion is not False:
+                dsl = add_doc_specific_criterion(dsl, doc, doc_types, criterion=criterion)
+
+    with open(os.path.join(os.path.dirname(settings.APP_ROOT),"exports","adv-filter-after.json"), "w") as f:
+        f.write(str(dsl))
+    # for i in dsl._query['must']:
+        # print i
     return dsl
 
-def get_state_node_match(user, doc_perms):
-    return "asdf"
-    
+def get_state_node_match(user):
+
+    # The FL_BAR user gets full access to all sites
+    if user.groups.filter(name="FL_BAR").exists():
+        return False
+
+    # The FMSF user gets full access to all sites
+    if user.groups.filter(name="FMSF").exists():
+        return False
+
+    elif user.groups.filter(name="StatePark").exists():
+
+        # for the SPAdmin account, allow access to all sites in the state parks category
+        if user.username == "SPAdmin":
+            return {
+                'node_name': "Managed Area Category",
+                'value': "State Parks"
+            }
+
+        # for district users, return a list of all the park names in their district
+        elif user.username.startswith("SPDistrict"):
+            try:
+                dist_num = int(user.username[-1])
+            except:
+                return "no_access"
+
+            parks = ManagedArea.objects.filter(sp_district=dist_num,
+                agency="FL Dept. of Environmental Protection, Div. of Recreation and Parks")
+
+            return {
+                'node_name': "Managed Area Name",
+                'value': [p.name for p in parks]
+            }
+
+        # finally, normal state park users are only allowed to see those that match their username
+        else:
+            try:
+                park = ManagedArea.objects.get(nickname=user.username)
+            except:
+                return "no_access"
+
+            return {
+                'node_name': "Managed Area Name",
+                'value': park.name
+            }
+
+    # handle state forest access
+    elif user.groups.filter(name="FL_Forestry").exists():
+
+        # for the SFAdmin account, allow access to all sites in the state parks category
+        if user.username == "SFAdmin":
+            return {
+                'node_name': "Managed Area Category",
+                'value': "State Forest"
+            }
+
+        else:
+            try:
+                forest = ManagedArea.objects.get(nickname=user.username)
+            except:
+                return "no_access"
+
+            return {
+                'node_name': "Managed Area Name",
+                'value': forest.name
+            }
+
+    elif user.groups.filter(name="FWC").exists():
+
+        return {
+            'node_name': "Managing Agency",
+            'value': "FL Fish and Wildlife Conservation Commission"
+        }
+
+    elif user.groups.filter(name="FL_AquaticPreserve").exists():
+
+        return {
+            'node_name': "Managing Agency",
+            'value': "FL Dept. of Environmental Protection, Florida Coastal Office"
+        }
+
+    else:
+        print "non state park"
 
 def get_term_perm_details(user, doc_perms):
 
@@ -78,9 +174,9 @@ def get_term_perm_details(user, doc_perms):
         filter['value'] = user.username
 
     elif check_state_access(user):
-    
+
         print "this is a state USER"
-    
+
         ## figure out what state group the user belongs to
         for sg in STATE_GROUP_NAMES:
             if user.groups.filter(name=sg).exists():
@@ -134,32 +230,35 @@ def add_doc_specific_criterion(dsl, spec_type, all_types, no_access=False, crite
                     print "error finding specified node '{}', criterion ignored".format(criterion['node_name'])
                     continue
 
-                new_string_filter = edb.Bool()
-                new_string_filter.must(edb.Match(field='strings.string', query=criterion['value'], type='phrase'))
-                new_string_filter.filter(edb.Terms(field='strings.nodegroup_id', terms=[nodegroup]))
-                # new_string_filter.should(Type(type="73889292-d536-11e7-b3b3-94659cf754d0"))
-                nested = edb.Nested(path='strings', query=new_string_filter)
+                if not isinstance(criterion['value'], list):
+                    criterion['value'] = [criterion['value']]
 
-                ## manual test to see if any criteria have been added to the query yet
-                f = dsl._dsl['query']['bool']['filter']
-                m = dsl._dsl['query']['bool']['must']
-                mn = dsl._dsl['query']['bool']['must_not']
-                s = dsl._dsl['query']['bool']['should']
+                for value in criterion['value']:
+                    new_string_filter = edb.Bool()
+                    new_string_filter.must(edb.Match(field='strings.string', query=value, type='phrase'))
+                    new_string_filter.filter(edb.Terms(field='strings.nodegroup_id', terms=[nodegroup]))
 
-                ## if they have, then the new statement needs to be MUST
-                if f or m or mn or s:
-                    paramount.must(nested)
+                    nested = edb.Nested(path='strings', query=new_string_filter)
 
-                ## otherwise, use SHOULD
-                else:
-                    paramount.should(nested)
+                    ## manual test to see if any criteria have been added to the query yet
+                    f = dsl._dsl['query']['bool']['filter']
+                    m = dsl._dsl['query']['bool']['must']
+                    mn = dsl._dsl['query']['bool']['must_not']
+                    s = dsl._dsl['query']['bool']['should']
+
+                    ## if they have, then the new statement needs to be MUST
+                    if f or m or mn or s:
+                        paramount.must(nested)
+
+                    ## otherwise, use SHOULD
+                    else:
+                        paramount.should(nested)
 
         ## add good types
         else:
             paramount.should(Type(type=doc_type))
 
     dsl.add_query(paramount)
-    print dsl
     return dsl
 
 def get_doc_type(request):

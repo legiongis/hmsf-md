@@ -55,7 +55,12 @@ REPORT_INLINES = {
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
         'public': {
-            'access_level': 'no_access'
+            # 'access_level': 'no_access'
+            'access_level':'match_node_value',
+            'match_config': {
+                'node_name':'Assigned To',
+                'match_to':'<username>'
+            }
         },
         'scout': {
             'access_level':'match_node_value',
