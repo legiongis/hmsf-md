@@ -17,11 +17,20 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
             self.availableScouts = ko.observableArray();
             self.selectedScout = params.value;
             
+            // push the anonymous user to this list so admins can expose select sites to the public
+            self.availableScouts.push({
+                'id': 'anonymous',
+                'username': 'anonymous',
+                'display_name': 'Public Access',
+                'site_interest_type': '',
+                'region_choices': '',
+            });
+
             if (params.state != 'report') {
                 $.ajax({
                     url: fpan.urls.scouts_dropdown,
                     data: {
-                        'resourceid': self.resourceid
+                        'resourceid': self.tile.resourceinstance_id
                     },
                     dataType: "json"
                 }).done(function(data) {
