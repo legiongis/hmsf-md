@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
 from django.template import RequestContext
+from django.template.loader import get_template
 from django.http import HttpResponseServerError
 from django.contrib import messages
 from arches.app.utils.response import JSONResponse
@@ -22,7 +23,7 @@ def index(request):
         'scout_form': scout_form,
         'page':'index'
     })
-    
+
 # @user_passes_test(check_anonymous)
 def hms_home(request):
 
@@ -35,11 +36,11 @@ def hms_home(request):
             messages.add_message(request, messages.INFO, 'Your profile has been updated.')
         else:
             messages.add_message(request, messages.ERROR, 'Form was invalid.')
-        
+
         return render(request, "home-hms.htm", {
             'scout_profile': scout_profile_form,
             'page':'home-hms'})
-        
+
     else:
         scout_profile_form = None
         try:
@@ -64,11 +65,12 @@ def show_regions(request):
 def server_error(request, template_name='500.html'):
 
     t = get_template(template_name)
-    return HttpResponseServerError(t.render(RequestContext(request)))
-    
+    return HttpResponseServerError(t.render(RequestContext(request).__dict__))
+
 @user_passes_test(lambda u: u.is_superuser)
 def fpan_dashboard(request):
 
     scouts_unsorted = json.loads(scouts_dropdown(request).content)
     scouts = sorted(scouts_unsorted, key=lambda k: k['username']) 
     return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
+
