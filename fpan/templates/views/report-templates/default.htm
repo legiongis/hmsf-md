@@ -33,6 +33,19 @@
     <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
     <!--/ko-->
 
+    <div data-bind="visible: report.graph.name != 'Scout Report'" class="rp-report-section-title" style="text-align: center">
+        <h3>Reports Recorded for this Site:</h3>
+        <!-- ko foreach: { data: report.attributes.inline_data, as: 'inline' } -->
+            <!-- ko foreach: { data: inline.inlines, as: 'inline_set' } -->
+                <!-- ko foreach: { data: inline_set.resources, as: 'resource' } -->
+                    <a data-bind="attr: { href: resource.resid }">
+                        <h4 data-bind="text: resource.displayname"></h4>
+                    </a>
+                <!-- /ko -->
+            <!-- /ko -->
+        <!-- /ko -->
+    </div>
+
     <div class="rp-report-section relative rp-report-section-root">
         <div class="rp-report-section-title">
             <!-- ko foreach: { data: report.cards, as: 'card' } -->
@@ -49,9 +62,8 @@
                 </div>
             <!-- /ko -->
         </div>
-    </div>
 
-    <!-- THIS IS WHERE THE INLINE RESOURCES SHOULD DISPLAYED -->
+    </div>
 
     {% endblock body %}
 

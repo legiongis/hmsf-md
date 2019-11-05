@@ -132,7 +132,7 @@ class FPANResourceReportView(ResourceReportView):
             datatypes_json=JSONSerializer().serialize(
                 datatypes, exclude=['modulename', 'issearchable', 'configcomponent', 'configname', 'iconclass']),
             geocoding_providers=geocoding_providers,
-            inline_data=inlines,
+            inline_data=JSONSerializer().serialize(inlines, sort_keys=False),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
