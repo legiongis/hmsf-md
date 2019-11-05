@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from arches.app.models.models import Node, GraphModel
+from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.search import elasticsearch_dsl_builder as edb
 from fpan.search.elasticsearch_dsl_builder import Type
@@ -290,3 +291,37 @@ def get_doc_type(request):
     else:
         ret = list(set(use_ids))
     return ret
+
+def user_can_edit_resource_instance(user,resourceid=None):
+    '''Not currently used. This was originally called inside of arches.app.views.resource
+    to determine whether or not a 404 should be returned from resource report that the
+    user was not allowed to edit. This would work well in a different way, to allow a user
+    to see Archaeological Sites, even though those resources are no longer going to be edited
+    by scouts at all. Example usage in view:
+    
+    if not user_can_edit_resource_instance(request.user, resourceid):
+        raise Http404
+    '''
+
+    if not resourceid:
+        return True
+    res = Resource.objects.get(pk=resourceid)
+    if not res.graph_id in settings.RESOURCE_MODEL_USER_RESTRICTIONS:
+        return True
+    
+    if check_scout_access(user):
+        perms = {'value': user.username, 'node_name': "Assigned To"}
+    elif check_state_access(user):
+        perms = get_state_node_match(user)
+    if perms:
+        if not isinstance(perms['value'], list):
+            perms['value'] = [perms['value']]
+
+        confirmed = False
+        for val in perms['value']:
+            print val
+            print res.get_node_values(perms['node_name'])
+            if val in res.get_node_values(perms['node_name']):
+                confirmed = True
+        return confirmed
+    return True
