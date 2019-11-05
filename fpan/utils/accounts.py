@@ -44,26 +44,6 @@ def check_scout_access(user):
         is_scout = False
     return is_scout
 
-def user_can_edit_resource_instance(user,resourceid=None):
-    '''Not currently used. This was originally called inside of arches.app.views.resource
-    to determine whether or not a 404 should be returned from resource report that the
-    user was not allowed to edit. This would work well in a different way, to allow a user
-    to see Archaeological Sites, even though those resources are no longer going to be edited
-    by scouts at all. Example usage in view:
-    
-    if not user_can_edit_resource_instance(request.user, resourceid):
-        raise Http404
-    '''
-
-    if not resourceid:
-        return True
-    res = Resource.objects.get(pk=resourceid)
-    perms = get_perm_details(user,str(res.graph.pk))
-    if perms:
-        if not perms['value'] in res.get_node_values(perms['node_name']):
-            return False
-    return True
-
 def make_managed_area_nicknames():
     """this is a helper function that was written to make acceptable usernames
     (no spaces or punctuation, and < 30 characters) from the names of Managed 
