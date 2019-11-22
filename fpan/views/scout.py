@@ -1,5 +1,6 @@
 import unicodecsv
 from datetime import datetime
+from django.conf import settings
 from django.shortcuts import render, HttpResponse
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.decorators import user_passes_test

@@ -16,11 +16,10 @@ from fpan.utils.tokens import account_activation_token
 from fpan.utils.accounts import check_state_access, check_scout_access
 
 from hms.models import Scout
-from hms.forms import ScoutForm
+from hms.forms import ScoutForm, ScoutProfileForm
 
 @never_cache
 def auth(request,login_type):
-    print "adsfads"
     if not login_type in ['hms','state','logout']:
         raise Http404("not found")
         
