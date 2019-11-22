@@ -9,6 +9,7 @@ from arches.app.utils.response import JSONResponse
 from arches.app.models.system_settings import settings
 from fpan.utils.accounts import check_anonymous, check_state_access
 from fpan.models import Region
+from fpan.views.scout import scouts_dropdown
 from hms.models import Scout, ScoutProfile
 from hms.forms import ScoutForm, ScoutProfileForm
 
