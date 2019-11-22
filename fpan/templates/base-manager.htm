@@ -145,7 +145,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         {% if nav.search %}
                         <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
-                              <i class="ion-search"></i>
+                              <i class="ion-home"></i>
 
                             </div>
                         </a>
@@ -367,6 +367,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <!-- Profile Manager -->
                                         {% if user.is_authenticated and request.user.username != 'anonymous' %}
+                                        <!--
                                         <li{% if "user-profile-manager" in main_script %} class="active-sub"{% endif %}>
                                             <a href="{% url 'user_profile_manager' %}" data-bind="click: navigate.bind(this, '{% url 'user_profile_manager' %}') ">
                                                 <i class="fa fa-user"></i>
@@ -375,6 +376,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                         </li>
+                                        -->
                                         {% endif %}
 
                                         <li class="list-divider-dark"></li>

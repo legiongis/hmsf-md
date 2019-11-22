@@ -55,7 +55,12 @@ REPORT_INLINES = {
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
         'public': {
-            'access_level': 'no_access'
+            # 'access_level': 'no_access'
+            'access_level':'match_node_value',
+            'match_config': {
+                'node_name':'Assigned To',
+                'match_to':'<username>'
+            }
         },
         'scout': {
             'access_level':'match_node_value',
@@ -81,6 +86,30 @@ TILESERVER_RESTRICTION_BY_GRAPH = {
         ]
     }
 }
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
+    },
+    # {
+        # 'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
+        # 'OPTIONS': {
+            # 'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
+        # }
+    # },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
+        'OPTIONS': {
+            'min_length': 6,
+        }
+    },
+]
 
 MENUS_TO_PRINT = 'Scout Report'
 

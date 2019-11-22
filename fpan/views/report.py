@@ -1,5 +1,5 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render, Http404
 
 from arches.app.models import models
 from arches.app.models.system_settings import settings
@@ -9,6 +9,8 @@ from arches.app.models.graph import Graph
 from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.resource import ResourceReportView
+
+from fpan.utils.filter import user_can_edit_resource_instance
 
 
 class FPANResourceReportView(ResourceReportView):
@@ -69,6 +71,9 @@ class FPANResourceReportView(ResourceReportView):
         return inline_output
 
     def get(self, request, resourceid=None):
+    
+        if not user_can_edit_resource_instance(request.user, resourceid):
+            raise Http404
 
         print "this is the new FPAN view"
         # manually update the settings here
@@ -132,7 +137,7 @@ class FPANResourceReportView(ResourceReportView):
             datatypes_json=JSONSerializer().serialize(
                 datatypes, exclude=['modulename', 'issearchable', 'configcomponent', 'configname', 'iconclass']),
             geocoding_providers=geocoding_providers,
-            inline_data=inlines,
+            inline_data=JSONSerializer().serialize(inlines, sort_keys=False),
             widgets=widgets,
             map_layers=map_layers,
             map_markers=map_markers,
