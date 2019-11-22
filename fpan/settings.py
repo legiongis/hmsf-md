@@ -87,6 +87,30 @@ TILESERVER_RESTRICTION_BY_GRAPH = {
     }
 }
 
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
+    },
+    # {
+        # 'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
+        # 'OPTIONS': {
+            # 'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
+        # }
+    # },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
+    },
+    {
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
+        'OPTIONS': {
+            'min_length': 6,
+        }
+    },
+]
+
 MENUS_TO_PRINT = 'Scout Report'
 
 # SECURITY WARNING: keep the secret key used in production secret!
