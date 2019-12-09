@@ -1,3 +1,5 @@
+import os
+import json
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from arches.app.models.models import Node, GraphModel
@@ -9,75 +11,54 @@ from fpan.models.managedarea import ManagedArea
 
 from .accounts import check_anonymous, check_scout_access, check_state_access
 
-def apply_advanced_docs_permissions(dsl, request):
+def get_match_conditions(user, graphid):
 
-    ## allow superuser admins to get full access to everything
-    if request.user.is_superuser:
-        return dsl
+    # allow superuser admins to get full access to everything
+    if user.is_superuser:
+        return "full_access"
 
     docs_perms = settings.RESOURCE_MODEL_USER_RESTRICTIONS
-    doc_types = get_doc_type(request)
+    # assume full access if there is no condition in the settings.
+    if graphid not in docs_perms:
+        return "full_access"
 
-    import os
-    import json
-    with open(os.path.join(os.path.dirname(settings.APP_ROOT),"exports","adv-filter-before.json"), "w") as f:
-        f.write(str(dsl))
+    ## standard, basic check to apply restrictions to public users
+    if check_anonymous(user):
+        perm_settings = docs_perms[graphid]['public']
 
-    for doc in doc_types:
-        
-        print "DETERMINING FILTER:", doc
+    ## alternative, FPAN-specific scenarios
+    elif check_scout_access(user):
+        perm_settings = docs_perms[graphid]['scout']
 
-        ## skip if there is no advanced permissions set for this doc type
-        if not doc in docs_perms:
-            print "skipping because no perms in settings.py"
-            continue
+    # special handling of the state land manager permissions here
+    elif check_state_access(user):
+        filter_config = get_state_node_match(user)
+        return filter_config
 
-        ## standard, basic check to apply restrictions to public users
-        if check_anonymous(request.user):
-            filter = docs_perms[doc]['public']
+    # now interpret the filter. if no access is granted it's very easy
+    if perm_settings['access_level'] == "no_access":
+        return "no_access"
 
-        ## alternative, FPAN-specific scenarios
-        elif check_scout_access(request.user):
-            filter = docs_perms[doc]['scout']
+    # if a node value match (resource instance filtering) is required, a bit more
+    # logic is required to determine what that node value is
+    elif perm_settings['access_level'] == "match_node_value":
 
-        elif check_state_access(request.user):
-            filter = docs_perms[doc]['state']
+        # create the filter config that will be returned
+        filter_config = {
+            "node_name": perm_settings['match_config']['node_name'],
+            "value": None,
+        }
 
-        # now interpret the filter. if no access is granted it's very easy
-        if filter['access_level'] == "no_access":
-            dsl = add_doc_specific_criterion(dsl, doc, doc_types, no_access=True)
+        # now conditionally find the value that should be matched against using
+        # the node named above.
+        if perm_settings['match_config']['match_to'] == "<username>":
+            filter_config['value'] = user.username
 
-        # if a node value match (resource instance filtering) is required, a bit more
-        # logic is required to determine what that node value is
-        elif filter['access_level'] == "match_node_value":
+        # generic allowance for specific, non-user-derived values to be passed in
+        else:
+            filter_config['value'] = filter_config['match_config']['match_to']
 
-            criterion = {'node_name': filter['match_config']['node_name']}
-
-            if filter['match_config']['match_to'] == "<username>":
-                criterion['value'] = request.user.username
-
-            # here's where the complex, FPAN state filtering is acquired
-            elif check_state_access(request.user):
-                criterion = get_state_node_match(request.user)
-
-            # generic allowance for specific, non-user-derived values to be passed in
-            else:
-                criterion['value'] = filter['match_config']['match_to']
-
-            # this is a failover to allow "no_access" to be passed from the state logic above
-            # specifically in case of errors that break the parsing strategies
-            if criterion == "no_access":
-                dsl = add_doc_specific_criterion(dsl, doc, doc_types, no_access=True)
-
-            # apply criterion to dsl
-            elif criterion is not False:
-                dsl = add_doc_specific_criterion(dsl, doc, doc_types, criterion=criterion)
-
-    with open(os.path.join(os.path.dirname(settings.APP_ROOT),"exports","adv-filter-after.json"), "w") as f:
-        f.write(str(dsl))
-    # for i in dsl._query['must']:
-        # print i
-    return dsl
+    return filter_config
 
 def get_state_node_match(user):
 

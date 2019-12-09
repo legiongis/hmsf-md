@@ -2,6 +2,7 @@ from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound
 
 from arches.app.models.system_settings import settings
+from arches.app.models.models import GraphModel
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
@@ -10,16 +11,59 @@ from arches.app.views.search import build_search_results_dsl
 from arches.app.utils.pagination import get_paginator
 from arches.app.views.search import get_nodegroups_by_datatype_and_perm
 from arches.app.views.search import get_permitted_nodegroups, select_geoms_for_results
+from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
+from fpan.utils.permission_backend import get_allowed_resource_ids
 
-from fpan.utils.filter import apply_advanced_docs_permissions, get_doc_type
+# from fpan.utils.filter import apply_advanced_docs_permissions, get_doc_type
 
 class FPANSearchView(SearchView):
 
     def get(self, request):
-        print "new search thing"
         return super(FPANSearchView, self).get(request)
 
+def exclude_resource_instances(dsl, id_list):
+
+    exclude_clause = Bool()
+
+    for resid in id_list:
+        id_filter = Bool()
+        exclude_clause.must_not(Match(field='resourceinstanceid', query=str(resid)))
+
+    dsl.add_query(exclude_clause)
+    return dsl
+
+def get_doc_type(request):
+
+    type_filter = request.GET.get('typeFilter', '')
+    use_ids = []
+
+    if type_filter != '':
+        type_filters = JSONDeserializer().deserialize(type_filter)
+
+        ## add all positive filters to the list of good ids
+        pos_filters = [i['graphid'] for i in type_filters if not i['inverted']]
+        for pf in pos_filters:
+            use_ids.append(pf)
+
+        ## if there are negative filters, make a list of all possible ids and
+        ## subtract the negative filter ids from it.
+        neg_filters = [i['graphid'] for i in type_filters if i['inverted']]
+        if len(neg_filters) > 0:
+            all_rm_ids = GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True)
+            use_ids = [str(i) for i in all_rm_ids if not str(i) in neg_filters]
+
+    else:
+        resource_models = GraphModel.objects.filter(isresource=True).values_list('graphid', flat=True)
+        use_ids = [str(i) for i in resource_models]
+
+    if len(use_ids) == 0:
+        ret = []
+    else:
+        ret = list(set(use_ids))
+    return ret
+
 def search_results(request):
+
     try:
         search_results_dsl = build_search_results_dsl(request)
     except Exception as err:
@@ -39,7 +83,15 @@ def search_results(request):
     if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
-    dsl = apply_advanced_docs_permissions(dsl, request)
+    excludeids = get_allowed_resource_ids(request.user, "f212980f-d534-11e7-8ca8-94659cf754d0", invert=True)
+
+    if isinstance(excludeids, list) and len(excludeids) > 0:
+        dsl = exclude_resource_instances(dsl, excludeids)
+
+    else:
+        # it's possible that excludeids could equal "no_access" or "full_access" but that's actually
+        # redundant at this point, so just ignoring those scenarios for now.
+        pass
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
