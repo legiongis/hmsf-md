@@ -12,7 +12,12 @@ def user_can_edit_this_resource(user, resourceinstanceid):
 
     res = ResourceInstance.objects.get(resourceinstanceid=resourceinstanceid)
     ok_ids = get_allowed_resource_ids(user, res.graph_id)
-    return resourceinstanceid in ok_ids
+    if ok_ids == "full_access":
+        return True
+    elif ok_ids == "no_access":
+        return False
+    else:
+        return resourceinstanceid in ok_ids
 
 
 def get_allowed_resource_ids(user, graphid, invert=False):
@@ -23,7 +28,6 @@ def get_allowed_resource_ids(user, graphid, invert=False):
     """
 
     match_terms = get_match_conditions(user, graphid)
-    print "match_terms", match_terms
     if match_terms == "no_access" or match_terms == "full_access":
         return match_terms
     else:

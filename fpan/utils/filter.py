@@ -27,7 +27,7 @@ def apply_advanced_docs_permissions(dsl, request):
             dsl = add_doc_specific_criterion(dsl, doc, doc_types, no_access=True)
 
         else:
-            dsl = add_doc_specific_criterion(dsl, doc, doc_types, criterion=criterion)
+            dsl = add_doc_specific_criterion(dsl, doc, doc_types, criterion=rules)
 
     return dsl
 
