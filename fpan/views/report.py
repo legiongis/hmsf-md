@@ -10,7 +10,7 @@ from arches.app.models.card import Card
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.views.resource import ResourceReportView
 
-from fpan.utils.filter import user_can_edit_resource_instance
+from fpan.utils.permission_backend import user_can_edit_this_resource
 
 
 class FPANResourceReportView(ResourceReportView):
@@ -71,8 +71,8 @@ class FPANResourceReportView(ResourceReportView):
         return inline_output
 
     def get(self, request, resourceid=None):
-    
-        if not user_can_edit_resource_instance(request.user, resourceid):
+
+        if not user_can_edit_this_resource(request.user, resourceid):
             raise Http404
 
         print "this is the new FPAN view"
