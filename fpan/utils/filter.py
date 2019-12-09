@@ -11,6 +11,26 @@ from fpan.models.managedarea import ManagedArea
 
 from .accounts import check_anonymous, check_scout_access, check_state_access
 
+def apply_advanced_docs_permissions(dsl, request):
+
+    docs_perms = settings.RESOURCE_MODEL_USER_RESTRICTIONS
+    doc_types = get_doc_type(request)
+
+    for doc in doc_types:
+
+        rules = get_match_conditions(request.user, doc)
+
+        if rules == "full_access":
+            continue
+
+        elif rules == "no_access":
+            dsl = add_doc_specific_criterion(dsl, doc, doc_types, no_access=True)
+
+        else:
+            dsl = add_doc_specific_criterion(dsl, doc, doc_types, criterion=criterion)
+
+    return dsl
+
 def get_match_conditions(user, graphid):
 
     # allow superuser admins to get full access to everything
