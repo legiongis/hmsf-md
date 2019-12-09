@@ -13,6 +13,7 @@ from arches.app.views.search import get_nodegroups_by_datatype_and_perm
 from arches.app.views.search import get_permitted_nodegroups, select_geoms_for_results
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from fpan.utils.permission_backend import get_allowed_resource_ids
+from fpan.utils.filter import apply_advanced_docs_permissions
 
 # from fpan.utils.filter import apply_advanced_docs_permissions, get_doc_type
 
@@ -83,15 +84,16 @@ def search_results(request):
     if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
-    excludeids = get_allowed_resource_ids(request.user, "f212980f-d534-11e7-8ca8-94659cf754d0", invert=True)
+    dsl = apply_advanced_docs_permissions(dsl, request)
+    # excludeids = get_allowed_resource_ids(request.user, "f212980f-d534-11e7-8ca8-94659cf754d0", invert=True)
 
-    if isinstance(excludeids, list) and len(excludeids) > 0:
-        dsl = exclude_resource_instances(dsl, excludeids)
+    # if isinstance(excludeids, list) and len(excludeids) > 0:
+    #     dsl = exclude_resource_instances(dsl, excludeids)
 
-    else:
+    # else:
         # it's possible that excludeids could equal "no_access" or "full_access" but that's actually
         # redundant at this point, so just ignoring those scenarios for now.
-        pass
+        # pass
 
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
