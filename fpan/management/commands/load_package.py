@@ -1,21 +1,20 @@
+import os
+import glob
+import json
+import uuid
+import shutil
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from guardian.shortcuts import assign_perm, get_perms
-from arches.app.models.models import Node,NodeGroup,Resource2ResourceConstraint
+from arches.app.models.models import Node, NodeGroup, Resource2ResourceConstraint
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
+from hms.models import Scout
 from fpan.utils.accounts import load_fpan_state_auth
 from fpan.models import Region
-from hms.models import Scout
-import psycopg2 as db
-import os
-import glob
-import shutil
-import json
-import uuid
 
 
 class Command(BaseCommand):
