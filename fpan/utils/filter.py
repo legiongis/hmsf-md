@@ -164,48 +164,6 @@ def get_state_node_match(user):
     else:
         print "non state park"
 
-def get_term_perm_details(user, doc_perms):
-
-    filter = None
-
-    if check_anonymous(user):
-        filter = doc_perms['default']['level']
-
-    elif check_scout_access(user):
-        filter = doc_perms['Scout']['term_filter']
-        filter['value'] = user.username
-
-    elif check_state_access(user):
-
-        print "this is a state USER"
-
-        ## figure out what state group the user belongs to
-        for sg in STATE_GROUP_NAMES:
-            if user.groups.filter(name=sg).exists():
-                state_group_name = sg
-                break
-        print "state group name:"
-        print state_group_name
-
-        ## return false for a few of the state agencies that get full access
-        if state_group_name in ["FMSF","FL_BAR"]:
-            return None
-        else:
-            filter = doc_perms['State']['term_filter']
-        ## get full agency name to match with node value otherwise
-        if state_group_name == "StatePark":
-            filter['value'] = 'FL Dept. of Environmental Protection, Div. of Recreation and Parks'
-        elif state_group_name == "FL_AquaticPreserve":
-            filter['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
-        elif state_group_name == "FL_Forestry":
-            filter['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
-        elif state_group_name == "FWC":
-            filter['value'] = 'FL Fish and Wildlife Conservation Commission'
-        else:
-            print state_group_name + " not handled properly"
-
-    return filter
-
 def add_doc_specific_criterion(dsl, spec_type, all_types, no_access=False, criterion=False):
 
     print "adding criterion:"
