@@ -16,8 +16,9 @@ from arches.app.models.tile import Tile
 from arches.app.models.models import Node, Value
 
 from fpan.models import Region
-from fpan.utils.accounts import check_duplicate_username, check_anonymous
+from fpan.utils.accounts import check_anonymous
 from fpan.utils.tokens import account_activation_token
+from fpan.utils.fpan_account_utils import check_duplicate_username
 from hms.models import Scout, ScoutProfile
 from hms.forms import ScoutForm, ScoutProfileForm
 

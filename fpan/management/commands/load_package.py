@@ -13,8 +13,8 @@ from arches.app.models.models import Node, NodeGroup, Resource2ResourceConstrain
 from arches.app.models.graph import Graph
 from arches.app.models.card import Card
 from hms.models import Scout
-from fpan.utils.accounts import load_fpan_state_auth
 from fpan.models import Region
+from fpan.utils.fpan_account_creation import load_fpan_state_auth, create_accounts_from_json, create_mock_scout_accounts
 
 
 class Command(BaseCommand):
@@ -40,8 +40,18 @@ class Command(BaseCommand):
         )
         parser.add_argument("-c", "--components",
             nargs="*",
-            help="list of specific components that should be loaded instead of the whole package.")
-        pass
+            help="list of specific components that should be loaded instead of the whole package."
+        )
+        parser.add_argument("--exclude_business_data",
+            action="store_true",
+            default=False,
+            help="loads all parts of the package except for the business data"
+        )
+        parser.add_argument("--fake_passwords",
+            action="store_true",
+            default=False,
+            help="creates fake (same as username) passwords for land manager accounts if they are created"
+        )
 
     def handle(self, *args, **options):
 
@@ -49,59 +59,15 @@ class Command(BaseCommand):
         comp = options['components']
         if not comp:
             comp = 'all'
-        self.load_package(source=settings.PACKAGE_PATH,setup_db=options['setup_db'], components=comp)
+        self.load_package(source=settings.PACKAGE_PATH,
+            setup_db=options['setup_db'],
+            components=comp,
+            exclude_data=options['exclude_business_data'],
+            fake_passwords=options['fake_passwords'],
+        )
 
-    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep', components=None):
-
-        ## not in use, as this is now handled at the end of the new 
-        ## manage.py setup_db command, which can be added to load_package
-        ## with the -db flag
-        def load_system_settings():
-            update_system_settings = True
-            settings_file = settings.SYSTEM_SETTINGS_LOCAL_PATH
-            if os.path.exists(settings_file):
-                update_system_settings = True
-                management.call_command('packages',operation='import_business_data', source=settings_file, overwrite='overwrite')
-                
-        def load_auth_system(package_dir):
-            auth_config_file = os.path.join(package_dir,'auth_config.json')
-            if not os.path.isfile(auth_config_file):
-                print "no auth_config.json file in package"
-                return
-                
-            with open(auth_config_file,'rb') as configs:
-                auth_configs = json.load(configs)
-
-            print "\nclearing all existing users\n----------------------"
-            keep_users = ["admin","anonymous"]
-            all_users = User.objects.exclude(username__in=keep_users)
-            for u in all_users:
-                print "  removing user: "+u.username
-                u.delete()
-            print "    done"
-            
-            print "\ncreating new Scouts for HMS\n----------------------"
-            for group,users in auth_configs.iteritems():
-                newgroup = Group.objects.get_or_create(name=group)[0]
-                for user,info in users.iteritems():
-                    print "  creating user:",user
-                    if group == "Scout":
-                        newuser = Scout.objects.create_user(user,"",info['password'])
-                        newuser.first_name = info['first_name']
-                        newuser.last_name = info['last_name']
-                        newuser.middle_initial = info['middle_initial']
-                        newuser.scoutprofile.site_interest_type = info['site_interests']
-                        for region in info['regions']:
-                            print region
-                            obj = Region.objects.get(name=region)
-                            newuser.scoutprofile.region_choices.add(obj)
-                        cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
-                        newuser.groups.add(cs_grp)
-                    else:
-                        newuser = User.objects.create_user(user,"",info['password'])
-                        newuser.first_name = info['first_name']
-                        newuser.last_name = info['last_name']
-                    newuser.save()
+    def load_package(self, source, setup_db=True, overwrite_concepts='ignore', stage_concepts='keep',
+            exclude_data=True, components=None, fake_passwords=False):
 
         def load_resource_to_resource_constraints(package_dir):
             config_paths = glob.glob(os.path.join(package_dir, 'package_config.json'))
@@ -316,35 +282,6 @@ class Command(BaseCommand):
                 f_path = os.path.join(fixture_dir,f)
                 management.call_command('loaddata',f_path)
 
-        def handle_source(source):
-
-            if os.path.isdir(source):
-                return source
-                
-            source_dir = os.path.join(os.getcwd(),'temp_' + datetime.now().strftime('%y%m%d_%H%M%S'))
-            os.mkdir(source_dir)
-            
-            if source.endswith(".zip") and os.path.isfile(source):
-                unzip_file(source, source_dir)
-                return source_dir
-            
-            try:
-                urllib.urlopen(source)
-                zip_file = os.path.join(source_dir,"source_data.zip")
-                urllib.urlretrieve(source, zip_file)
-                unzip_file(zip_file, source_dir)
-                return source_dir
-            except:
-                pass
-            
-            return False
-        
-        ## no need to handle the source now (there is no input for this) because
-        ## it is acquired from settings.PACKAGE_PATH
-        # source_dir = handle_source(source)
-        # if not source_dir:
-            # raise Exception("this is an invalid package source")
-
         if setup_db:
             management.call_command('setup_db',yes=True)
             
@@ -357,8 +294,19 @@ class Command(BaseCommand):
                   
         if 'auth' in components or components == 'all':
             print "\n~~~~~~~~ CONFIGURE AUTHENTICATION SYSTEM"
-            load_auth_system(package)
-            load_fpan_state_auth()
+
+            ## truly can't decide whether it's better to use the hard-coded
+            ## scout creation here, or to load dynamically from the package json.
+            ## both produce the same result at the moment.
+
+            # auth_config_file = os.path.join(package,'auth_config.json')
+            # if not os.path.isfile(auth_config_file):
+                # print "no auth_config.json file in package"
+                # return
+            # create_accounts_from_json(auth_config_file)
+
+            create_mock_scout_accounts()
+            load_fpan_state_auth(fake_passwords)
             print "done"
         
         if 'widgets' in components or components == 'all':
@@ -392,7 +340,7 @@ class Command(BaseCommand):
         # print "\n~~~~~~~~ LOAD MAP LAYERS"
         # load_map_layers(package)
         
-        if 'data' in components or components == 'all':
+        if ('data' in components or components == 'all') and not exclude_data is True:
             print "\n~~~~~~~~ LOAD RESOURCES & RESOURCE RELATIONS"
             load_business_data(package)
         
