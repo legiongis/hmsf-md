@@ -16,7 +16,7 @@ from arches.app.models.tile import Tile
 from arches.app.models.models import Node, Value
 
 from fpan.models import Region
-from fpan.utils.accounts import check_anonymous
+from fpan.utils.permission_backend import user_is_anonymous
 from fpan.utils.tokens import account_activation_token
 from fpan.utils.fpan_account_utils import check_duplicate_username
 from hms.models import Scout, ScoutProfile
@@ -168,7 +168,7 @@ def scout_list_download(request):
 
     return response
 
-@user_passes_test(check_anonymous)
+@user_passes_test(user_is_anonymous)
 def scout_profile(request):
     if request.method == "POST":
         scout_profile_form = ScoutProfileForm(

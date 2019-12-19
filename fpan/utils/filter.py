@@ -9,7 +9,7 @@ from arches.app.search import elasticsearch_dsl_builder as edb
 from fpan.search.elasticsearch_dsl_builder import Type
 from fpan.models.managedarea import ManagedArea
 
-from .accounts import check_anonymous, check_scout_access, check_state_access
+from .permission_backend import user_is_anonymous, user_is_scout, check_state_access
 
 def apply_advanced_docs_permissions(dsl, request):
 
@@ -43,11 +43,11 @@ def get_match_conditions(user, graphid):
         return "full_access"
 
     ## standard, basic check to apply restrictions to public users
-    if check_anonymous(user):
+    if user_is_anonymous(user):
         perm_settings = docs_perms[graphid]['public']
 
     ## alternative, FPAN-specific scenarios
-    elif check_scout_access(user):
+    elif user_is_scout(user):
         perm_settings = docs_perms[graphid]['scout']
 
     # special handling of the state land manager permissions here
