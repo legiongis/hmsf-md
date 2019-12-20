@@ -70,7 +70,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <div class="text-right">
                                 <button class="btn btn-success text-uppercase" type="submit">{% trans "Sign In" %}</button>
                             </div>
+                            <a href="{% url 'password_reset' %}" class="btn btn-link account-link" style="float:right; padding-right:0px">{% trans "Forgot password?" %}</a>
                         </div>
+
                         <div class="row" style="padding-top:10px;">
                             <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
                                 <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
