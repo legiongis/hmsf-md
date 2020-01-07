@@ -42,9 +42,16 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
 
-#mainnav-container, #mainnav {
+#mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
     background: #431825;
     color:white;
+}
+
+#mainnav .list-header {
+    font-family: 'Ropa Sans',sans-serif;
+    line-height: 1.15;
+    font-size: 1.25em;
+    color: white;
 }
 
 #mainnav-menu a {
@@ -56,7 +63,7 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
     box-shadow:none !important;
 }
 
-#mainnav-menu>li>a:hover {
+#mainnav-menu>li>a:hover, .link-submenu-item a:hover {
     background-color:#5D2134 !important;
     box-shadow:none !important;
 }
@@ -81,12 +88,11 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
 }
 
 .menu-title {
-    background-color:#5D2134;
     font-family: 'Kreon',sans-serif;
 }
 
 .navbar-brand, .navbar-brand>img {
-    height: 45px;
+    height: 49px;
     margin-right: auto;
     margin-left: auto;
 }
@@ -94,9 +100,14 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
 .active-sub>a {
     background-color:#5D2134 !important;
 }
-
-.link-submenu-item {
-    background-color:#431825 !important;
+ul .collapse li {
+    height: 35px;
+}
+ul .collapse li:first-of-type {
+    margin-top: 0px; 
+}
+ul .collapse li:last-of-type {
+    height: 45px;
 }
 
 .link-submenu {
@@ -124,8 +135,10 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
 .ep-graph-title-icon {
     background: transparent;
 }
-*/
 /*--------------------------------------*/
+.ep-graph-title-icon {
+    background: #fff;
+}
 
 .main-container {
     min-height:calc(100vh-40px);
