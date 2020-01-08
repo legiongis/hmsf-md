@@ -30,10 +30,6 @@ h5 {font-size: 1.25em;}
 
 small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !important;}
 
-.brand-title {
-    background: url(/media/img/fpan/bedge_muted.png);
-}
-
 .arches-menu-icon {
     color: white;
 }
@@ -42,7 +38,7 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
 
-#mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
+.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
     background: #431825;
     color:white;
 }

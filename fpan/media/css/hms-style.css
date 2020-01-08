@@ -2,7 +2,7 @@ body, .copyright-section {
     background: url('../img/fpan/ricepaper-hms.png');
 }
 
-#mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
+.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
     background: #5ec5b9;
     /* background: url('../img/fpan/ricepaper-hms.png'); */
 }

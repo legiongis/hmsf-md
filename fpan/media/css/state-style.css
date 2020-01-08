@@ -12,7 +12,7 @@ body, .copyright-section {
     background: url('../img/fpan/ricepaper-state.png');
 }
 
-#mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
+.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
     background: url('../img/fpan/ricepaper-state.png');
 }
 
