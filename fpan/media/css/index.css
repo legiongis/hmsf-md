@@ -34,6 +34,15 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
     color: white;
 }
 
+a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
+    color: #007fff;
+    text-decoration: none;
+}
+a:hover, li a:hover, .btn-link:hover {
+    color: #0059b3;
+    text-decoration: underline;
+}
+
 #mainnav-container {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
@@ -62,6 +71,7 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
 #mainnav-menu>li>a:hover, .link-submenu-item a:hover {
     background-color:#5D2134 !important;
     box-shadow:none !important;
+    text-decoration: none;
 }
 
 #mainnav-menu>li>a {
@@ -124,14 +134,18 @@ ul .collapse li:last-of-type {
     color: #E7E7E8;
 }
 
-.ep-tools {
-    color: #E7E7E8;
-}
+
 
 .ep-graph-title-icon {
     background: transparent;
 }
 /*--------------------------------------*/
+a.ep-tools {
+    color: #454545;
+}
+a.ep-tools:hover {
+    text-decoration: none;
+}
 .ep-graph-title-icon {
     background: #fff;
 }
