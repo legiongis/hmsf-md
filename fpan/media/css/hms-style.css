@@ -1,8 +1,19 @@
 body, .copyright-section {
     background: url('../img/fpan/ricepaper-hms.png');
 }
-
-#mainnav-container, #mainnav {
+a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
+    color: #F26422;
+}
+a:hover, li a:hover, .btn-link:hover {
+    color: #5ec5b9;
+}
+#footer a {
+    color: white;
+}
+#footer a:hover {
+    color: white;
+}
+.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
     background: #5ec5b9;
     /* background: url('../img/fpan/ricepaper-hms.png'); */
 }
@@ -13,18 +24,13 @@ body, .copyright-section {
 
 #mainnav-menu>li>a {
     background-color:#5ec5b9 !important;
+    color: white !important;
 }
 
-#mainnav-menu>li>a:hover {
+#mainnav-menu>li>a:hover, .link-submenu-item a:hover {
     background-color:#F26422 !important;
-}
-
-.link-submenu-item {
-    background-color:#F26422 !important;
-}
-
-.menu-title {
-    background-color:#F26422;
+    color: white !important;
+    text-decoration: none;
 }
 
 .popover-title {
@@ -42,12 +48,7 @@ body, .copyright-section {
 .fpan-panel {
     border-top: solid 8px #F26422;
 }
-
 .btn-success {
     background-color:#f26422;
     border:none;
-}
-
-a {
-    color: #2d8b80;
 }

@@ -11,8 +11,13 @@
 body, .copyright-section {
     background: url('../img/fpan/ricepaper-state.png');
 }
-
-#mainnav-container, #mainnav {
+a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
+    color: #273675;
+}
+a:hover, li a:hover, .btn-link:hover {
+    color: #525e91;
+}
+.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
     background: url('../img/fpan/ricepaper-state.png');
 }
 
@@ -22,18 +27,13 @@ body, .copyright-section {
 
 #mainnav-menu>li>a {
     background: url('../img/fpan/ricepaper-state.png') !important;
+    color: white !important;
 }
 
-#mainnav-menu>li>a:hover {
+#mainnav-menu>li>a:hover, .link-submenu-item a:hover {
     background:#273675 !important;
-}
-
-.link-submenu-item {
-    background:#273675 !important;
-}
-
-.menu-title {
-    background:#273675;
+    color: white !important;
+    text-decoration: none;
 }
 
 .popover-title {
@@ -51,8 +51,4 @@ body, .copyright-section {
 .btn-success {
     background-color:#273675;
     border:none;
-}
-
-a {
-    color: #273675;
 }
