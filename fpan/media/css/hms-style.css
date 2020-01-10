@@ -34,7 +34,14 @@ body, .copyright-section {
 .fpan-panel {
     border-top: solid 8px #F26422;
 }
-
+.fpan-panel a {
+    color: #F26422;
+    text-decoration: underline;
+}
+.fpan-panel a:hover {
+    font-weight: bold;
+    color: #F26422;
+}
 .btn-success {
     background-color:#f26422;
     border:none;
