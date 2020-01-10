@@ -4,7 +4,7 @@ This an app based on [Arches](http://archesproject.org/) designed to facilitate 
 
 ### Installation
 
-This is an Arches v4 project that works in conjunction with two other repos, the `fpan_master` branch of the legiongis/arches fork (a slightly modified fork of the Arches 4.0.1 release), and legiongis/fpan-data (a complete Arches package). To install your own version of this project, begin by following the ([official v4 installation documentation](https://arches4.readthedocs.io/en/latest/requirements-and-dependencies/)). After you have all dependencies installed and a virtual environment created, come back here.
+This is an Arches v4 project that works in conjunction with two other repos, the `stable/4.4.x-fpan` branch of the legiongis/arches fork (a slightly modified fork of the Arches 4.0.1 release), and legiongis/fpan-data (a complete Arches package). To install your own version of this project, begin by following the ([official v4 installation documentation](https://arches4.readthedocs.io/en/latest/requirements-and-dependencies/)). After you have all dependencies installed and a virtual environment created, come back here.
 
 With your virtual environment activated, enter a new directory and
 
@@ -21,7 +21,7 @@ With your virtual environment activated, enter a new directory and
         git clone https://github.com/legiongis/arches
         cd arches
         git fetch --all
-        git checkout fpan_master
+        git checkout stable/4.4.x-fpan
         cd ..
        
 - make settings_local.py in the project (place in `fpan/fpan`)
