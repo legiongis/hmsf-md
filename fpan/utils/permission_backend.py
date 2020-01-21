@@ -10,8 +10,7 @@ def user_is_anonymous(user):
 
 
 def check_state_access(user):
-    STATE_GROUP_NAMES = ['FMSF','FL_BAR','FWC','FL_Forestry','FL_AquaticPreserve','StatePark']
-    state_user = user.groups.filter(name__in=STATE_GROUP_NAMES).exists()
+    state_user = user.groups.filter(name="Land Manager").exists():
     if user.is_superuser:
         state_user = True
     return state_user
