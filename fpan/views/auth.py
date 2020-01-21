@@ -13,7 +13,7 @@ from django.template.loader import render_to_string, get_template
 from arches.app.models.system_settings import settings
 
 from fpan.utils.tokens import account_activation_token
-from fpan.utils.accounts import check_state_access, check_scout_access
+from fpan.utils.permission_backend import check_state_access, user_is_scout
 
 from hms.models import Scout
 from hms.forms import ScoutForm, ScoutProfileForm
@@ -37,7 +37,7 @@ def auth(request,login_type):
         user = authenticate(username=username, password=password)
         if user is not None and user.is_active:
             if login_type == "hms":
-                if check_scout_access(user) or user.is_superuser:
+                if user_is_scout(user) or user.is_superuser:
                     login(request, user)
                     auth_attempt_success = True
                 else:
@@ -80,7 +80,7 @@ def change_password(request):
             messages.success(request, _('Your password has been updated'))
             if check_state_access(user):
                 return redirect('state_home')
-            if check_scout_access(user):
+            if user_is_scout(user):
                 return redirect('hms_home')
     else:
         form = PasswordChangeForm(request.user)

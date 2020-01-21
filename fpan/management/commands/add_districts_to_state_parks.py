@@ -1,17 +1,14 @@
 import os
 import csv
-from django.core import management
 from django.core.management.base import BaseCommand, CommandError
-from arches.app.models.system_settings import settings
 from fpan.models.managedarea import ManagedArea
 
 class Command(BaseCommand):
 
-    help = 'collects stats needed for FPAN year-end reporting'
+    help = 'adds the district number to state parks based on a pre-made csv lookup'
 
     def add_arguments(self, parser):
         pass
-        # parser.add_argument("uuid",help='input the uuid string to find')
 
     def handle(self, *args, **options):
 
@@ -26,19 +23,11 @@ class Command(BaseCommand):
             for row in reader:
                 lookup[row[0]] = row[1]
 
-        mas = ManagedArea.objects.all()
-
         unmatched = []
-        for park, district in lookup.items():
+        sps = ManagedArea.objects.filter(category="State Park")
+        for sp in sps:
             try:
-                obj = ManagedArea.objects.get(name=park)
-                obj.sp_district = int(district)
-                obj.save()
-            except:
-                unmatched.append((park, district))
-        
-        for ma in mas:
-            first_word = ma.name.split(" ")[0]
-            for un in unmatched:
-                if first_word in un[0]:
-                    print un, ma.name
+                sp.sp_district = int(lookup[sp.name])
+                sp.save()
+            except KeyError:
+                print("Invalid park name: {}".format(sp.name))

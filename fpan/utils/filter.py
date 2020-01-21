@@ -9,7 +9,7 @@ from arches.app.search import elasticsearch_dsl_builder as edb
 from fpan.search.elasticsearch_dsl_builder import Type
 from fpan.models.managedarea import ManagedArea
 
-from .accounts import check_anonymous, check_scout_access, check_state_access
+from .permission_backend import user_is_anonymous, user_is_scout, check_state_access
 
 def apply_advanced_docs_permissions(dsl, request):
 
@@ -43,11 +43,11 @@ def get_match_conditions(user, graphid):
         return "full_access"
 
     ## standard, basic check to apply restrictions to public users
-    if check_anonymous(user):
+    if user_is_anonymous(user):
         perm_settings = docs_perms[graphid]['public']
 
     ## alternative, FPAN-specific scenarios
-    elif check_scout_access(user):
+    elif user_is_scout(user):
         perm_settings = docs_perms[graphid]['scout']
 
     # special handling of the state land manager permissions here
@@ -149,9 +149,14 @@ def get_state_node_match(user):
 
     elif user.groups.filter(name="FWC").exists():
 
+        try:
+            fwc = ManagedArea.objects.get(nickname=user.username)
+        except:
+            return "no_access"
+
         return {
-            'node_name': "Managing Agency",
-            'value': "FL Fish and Wildlife Conservation Commission"
+            'node_name': "Managed Area Name",
+            'value': fwc.name
         }
 
     elif user.groups.filter(name="FL_AquaticPreserve").exists():
@@ -163,48 +168,6 @@ def get_state_node_match(user):
 
     else:
         print "non state park"
-
-def get_term_perm_details(user, doc_perms):
-
-    filter = None
-
-    if check_anonymous(user):
-        filter = doc_perms['default']['level']
-
-    elif check_scout_access(user):
-        filter = doc_perms['Scout']['term_filter']
-        filter['value'] = user.username
-
-    elif check_state_access(user):
-
-        print "this is a state USER"
-
-        ## figure out what state group the user belongs to
-        for sg in STATE_GROUP_NAMES:
-            if user.groups.filter(name=sg).exists():
-                state_group_name = sg
-                break
-        print "state group name:"
-        print state_group_name
-
-        ## return false for a few of the state agencies that get full access
-        if state_group_name in ["FMSF","FL_BAR"]:
-            return None
-        else:
-            filter = doc_perms['State']['term_filter']
-        ## get full agency name to match with node value otherwise
-        if state_group_name == "StatePark":
-            filter['value'] = 'FL Dept. of Environmental Protection, Div. of Recreation and Parks'
-        elif state_group_name == "FL_AquaticPreserve":
-            filter['value'] = 'FL Dept. of Environmental Protection, Florida Coastal Office'
-        elif state_group_name == "FL_Forestry":
-            filter['value'] = 'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'
-        elif state_group_name == "FWC":
-            filter['value'] = 'FL Fish and Wildlife Conservation Commission'
-        else:
-            print state_group_name + " not handled properly"
-
-    return filter
 
 def add_doc_specific_criterion(dsl, spec_type, all_types, no_access=False, criterion=False):
 
