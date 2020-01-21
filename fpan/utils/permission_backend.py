@@ -10,7 +10,7 @@ def user_is_anonymous(user):
 
 
 def check_state_access(user):
-    state_user = user.groups.filter(name="Land Manager").exists():
+    state_user = user.groups.filter(name="Land Manager").exists()
     if user.is_superuser:
         state_user = True
     return state_user
