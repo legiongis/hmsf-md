@@ -13,7 +13,7 @@ class ManagedArea(models.Model):
     )
         
     CATEGORY_CHOICES = (
-        ("State Parks","State Parks"),
+        ("State Park","State Park"),
         ("State Forest","State Forest"),
         ("Fish and Wildlife Conservation Commission","Fish and Wildlife Conservation Commission"),
         ("Aquatic Preserve","Aquatic Preserve"),
