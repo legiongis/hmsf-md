@@ -184,6 +184,8 @@ def load_fpan_state_auth(fake_passwords=False):
             if fake_passwords:
                 pw = ma.nickname
             user = User.objects.get_or_create(username=name)[0]
+            user.set_password(pw)
+            user.save()
             user.groups.add(group)
             user.save()
             created_users.append((user,pw))
