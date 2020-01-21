@@ -125,7 +125,7 @@ def create_single_account_and_group(agency_name, fake_passwords):
     group = Group.objects.get_or_create(name=agency_name)[0]
     print("  new group added " + agency_name)
 
-    pw = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+    pw = generate_password()
     if fake_passwords:
         pw = agency_name
 
@@ -137,6 +137,10 @@ def create_single_account_and_group(agency_name, fake_passwords):
     print("  1 user added to group")
 
     return (user, pw)
+
+def generate_password():
+
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
 
 
 def load_fpan_state_auth(fake_passwords=False):
@@ -176,7 +180,7 @@ def load_fpan_state_auth(fake_passwords=False):
         ct = 0
         for ma in a_ma:
             name = ma.nickname
-            pw = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+            pw = generate_password()
             if fake_passwords:
                 pw = ma.nickname
             user = User.objects.get_or_create(username=name)[0]
@@ -186,6 +190,43 @@ def load_fpan_state_auth(fake_passwords=False):
             ct+=1
         print "  {} users added to group".format(ct)
 
+    sp_grp = Group.objects.get_or_create(name="StatePark")[0]
+    for n in range(1,6):
+        name = "SPDistrict"+str(n)
+        pw = generate_password()
+        if fake_passwords:
+            pw = name
+        user = User.objects.get_or_create(username=name)[0]
+        user.set_password(pw)
+        user.save()
+        user.groups.add(sp_grp)
+        user.save()
+        created_users.append((user,pw))
+        print("user created: "+name)
+
+    user = User.objects.get_or_create(username="SPAdmin")[0]
+    pw = generate_password()
+    if fake_passwords:
+        pw = name
+    user.set_password(pw)
+    user.save()
+    user.groups.add(sp_grp)
+    user.save()
+    created_users.append((user,pw))
+    print("user created: "+name)
+
+    user = User.objects.get_or_create(username="SFAdmin")[0]
+    pw = generate_password()
+    if fake_passwords:
+        pw = name
+    user.set_password(pw)
+    user.save()
+    sf_grp = Group.objects.get_or_create(name="FL_Forestry")[0]
+    user.groups.add(sf_grp)
+    user.save()
+    created_users.append((user,pw))
+    print("user created: "+name)
+
     ## add all new users to the Crowdsource Editor group and Land Manager group
     cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
     lm_grp = Group.objects.get_or_create(name="Land Manager")[0]
@@ -193,7 +234,7 @@ def load_fpan_state_auth(fake_passwords=False):
         user_pw[0].groups.add(cs_grp)
         user_pw[0].groups.add(lm_grp)
         user_pw[0].save()
-    
+
     with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"),"wb") as outcsv:
         write = csv.writer(outcsv)
         write.writerow(("username","password"))
