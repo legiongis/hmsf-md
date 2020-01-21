@@ -2,6 +2,9 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Match, Terms, Nested
 from arches.app.models.models import Node, ResourceInstance
 from hms.models import Scout
+from fpan.models import ManagedArea
+from arches.app.models.system_settings import settings
+settings.update_from_db()
 # from fpan.utils.filter import get_match_conditions
 
 
@@ -95,11 +98,11 @@ def get_state_node_match(user):
 
     # The FL_BAR user gets full access to all sites
     if user.groups.filter(name="FL_BAR").exists():
-        return False
+        return "full_access"
 
     # The FMSF user gets full access to all sites
     if user.groups.filter(name="FMSF").exists():
-        return False
+        return "full_access"
 
     elif user.groups.filter(name="StatePark").exists():
 
@@ -129,7 +132,7 @@ def get_state_node_match(user):
         else:
             try:
                 park = ManagedArea.objects.get(nickname=user.username)
-            except:
+            except ManagedArea.DoesNotExist:
                 return "no_access"
 
             return {
