@@ -28,7 +28,7 @@ class Command(BaseCommand):
             return
 
         if options['land_managers'] is True:
-            load_fpan_state_auth(options['fake_passwords'])
+            load_fpan_state_auth(fake_passwords=options['fake_passwords'])
 
         if options['mock_scouts'] is True:
             create_mock_scout_accounts()
