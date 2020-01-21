@@ -14,6 +14,10 @@ from fpan.models import ManagedArea, Region
 
 
 def create_accounts_from_json(json_file):
+    '''currently not in use. The idea was to allow the json definition of users
+    in a package, and then load them with this command. However, in the case of
+    HMS, this action is not needed as the default user accounts are all handled
+    in other creation commands below.'''
 
     with open(json_file,'rb') as configs:
         auth_configs = json.load(configs)
@@ -115,58 +119,54 @@ def create_mock_scout_accounts():
         scout.groups.add(scout_grp)
 
 
+def create_single_account_and_group(agency_name, fake_passwords):
+
+    print("making group: " + agency_name)
+    group = Group.objects.get_or_create(name=agency_name)[0]
+    print("  new group added " + agency_name)
+
+    pw = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
+    if fake_passwords:
+        pw = agency_name
+
+    user = User.objects.get_or_create(username=agency_name)[0]
+    user.set_password(pw)
+    user.groups.add(group)
+    user.save()
+
+    print("  1 user added to group")
+
+    return (user, pw)
+
+
 def load_fpan_state_auth(fake_passwords=False):
     """builds the groups and users for the state land manager side of things.
     If mock=True, passwords will be the same as the usernames. Otherwise,
     password are randomly generated and stored in a separate log.
     """
-    
-    outlist = []
-    cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
-    rv_grp = Group.objects.get_or_create(name="Resource Reviewer")[0]
-    
+
+    created_users = []
+
     print "\ncreating one login per group for some state agencies\n----------------------"
-    one_offs = ['FL_BAR','FMSF','FWC']
-    
+
+    one_offs = ['FL_BAR','FMSF']
+
     for agency_name in one_offs:
-        
-        print "making group:",agency_name
-        existing = Group.objects.filter(name=agency_name)
-        for e in existing:
-            print "  deleting existing group:",agency_name
-            e.delete()
-        
-        pw = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
-        if fake_passwords:
-            pw = agency_name
-        group = Group.objects.get_or_create(name=agency_name)[0]
-        print "  new group added",agency_name
-        
-        existing_users = User.objects.filter(username=agency_name)
-        for e in existing_users:
-            e.delete()
-            
-        user = User.objects.create_user(agency_name,"",pw)
-        user.groups.add(group)
-        user.groups.add(cs_grp)
-        user.save()
-        outlist.append((agency_name,pw))
-        print "  1 user added to group"
-    
+
+        new_account = create_single_account_and_group(agency_name, fake_passwords)
+        created_users.append(new_account)
+
     print "\ncreating one login per unit and one group for other state agencies\n----------------------"
     
     logins_per_unit_dict = {
         "FL Dept. of Environmental Protection, Div. of Recreation and Parks":"StatePark",
         "FL Dept. of Environmental Protection, Florida Coastal Office":"FL_AquaticPreserve",
-        "FL Dept. of Agriculture and Consumer Services, Florida Forest Service":"FL_Forestry"
+        "FL Dept. of Agriculture and Consumer Services, Florida Forest Service":"FL_Forestry",
+        "FL Fish and Wildlife Conservation Commission":"FWC",
     }
     
     all = ManagedArea.objects.all()
-    agencies = [i[0] for i in ManagedArea.objects.order_by().values_list('agency').distinct()]
-    for a in agencies:
-    
-        if not a in logins_per_unit_dict.keys():
-            continue
+    for a in logins_per_unit_dict.keys():
             
         lookup = logins_per_unit_dict[a]
         print "making group:",lookup
@@ -179,22 +179,26 @@ def load_fpan_state_auth(fake_passwords=False):
             pw = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
             if fake_passwords:
                 pw = ma.nickname
-            existing_users = User.objects.filter(username=name)
-            for e in existing_users:
-                e.delete()
-            user = User.objects.create_user(name,"",pw)
+            user = User.objects.get_or_create(username=name)[0]
             user.groups.add(group)
-            user.groups.add(cs_grp)
             user.save()
-            outlist.append((name,pw))
+            created_users.append((user,pw))
             ct+=1
         print "  {} users added to group".format(ct)
-                
+
+    ## add all new users to the Crowdsource Editor group and Land Manager group
+    cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
+    lm_grp = Group.objects.get_or_create(name="Land Manager")[0]
+    for user_pw in created_users:
+        user_pw[0].groups.add(cs_grp)
+        user_pw[0].groups.add(lm_grp)
+        user_pw[0].save()
+    
     with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"),"wb") as outcsv:
         write = csv.writer(outcsv)
         write.writerow(("username","password"))
-        for user_pw in outlist:
-            write.writerow(user_pw)
+        for user_pw in created_users:
+            write.writerow((user_pw[0].username, user_pw[1]))
 
 
 def create_accounts_from_csv(csv_file):
@@ -250,8 +254,7 @@ def make_managed_area_nicknames():
     
     ## note 8/1/18
     ## when creating individual accounts for fwcc units, more nickname handling was done in
-    ## excel. This is not accounted for here, so if this function is ever updated to accommodate
-    ## fwcc, a close look must be taken at those new unit names.
+    ## excel. This is now accounted for in fpan_account_utils.add_fwcc_nicknames()
     
     agencies = [i[0] for i in ManagedArea.objects.order_by().values_list('agency').distinct()]
     d = {}
