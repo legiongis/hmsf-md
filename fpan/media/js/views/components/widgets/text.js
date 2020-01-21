@@ -13,14 +13,21 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue'];
             this.username = ko.observable("abc");
             
+            
+            
             this.username.subscribe(function(newValue) {
                 alert("The new value is " + newValue);
                 params.value(newValue);
             });
+          
+            
             this.username.subscribe(function(oldValue) {
                 alert("The person's previous name is " + oldValue);
                 params.value(oldValue);
             }, null, "beforeChange");
+         
+            
+            console.log(params.user);
             
             WidgetViewModel.apply(this, [params]);     
         },

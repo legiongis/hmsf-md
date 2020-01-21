@@ -10,7 +10,7 @@
         <!-- /ko -->
         <div class="col-xs-12">
         <!-- ko if: node.nodeid == "a72bbb27-bd5d-11e9-9b8f-94659cf754d0" -->
-                <input type="text" data-bind="textInput: username, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disabled}, style: {width: width}" class="form-control input-lg widget-input">
+                <input type="text" data-bind="textInput: username, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disabled}, user: {{ user.username }}, style: {width: width}" class="form-control input-lg widget-input">
         <!-- /ko -->
         <!-- ko ifnot: node.nodeid == "a72bbb27-bd5d-11e9-9b8f-94659cf754d0" -->
             <input type="text" data-bind="textInput: value, attr: {placeholder: placeholder, maxlength: maxLength, disabled: disabled}, style: {width: width}" class="form-control input-lg widget-input">
