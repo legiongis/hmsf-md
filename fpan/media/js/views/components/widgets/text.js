@@ -8,27 +8,36 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     * @param {string} params.config().label - label to use alongside the text input
     * @param {string} params.config().placeholder - default text to show in the text input
     */
-    return ko.components.register('text-widget', {
+    return ko.components.register('text-widget', {        
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue'];
-            this.username = ko.observable("abc");
             
-            
-            
-            this.username.subscribe(function(newValue) {
-                alert("The new value is " + newValue);
+            ko.extenders.defaultIfNull = function(target, defaultVal) {
+                var result = ko.computed({
+                    read: target,
+                    write: function(newVal) {
+                        if (!newVal) {
+                            target(defaultVal);
+                        } else {
+                            target(newVal);
+                        }
+                    }
+                });
+                result(target());
+                return result;
+            };
+            this.username = ko.observable().extend({ defaultIfNull: params.user });
+       
+           var subscription1 = this.username.subscribe(function(newValue) {
                 params.value(newValue);
             });
-          
-            
-            this.username.subscribe(function(oldValue) {
-                alert("The person's previous name is " + oldValue);
+            var subscription2 = this.username.subscribe(function(oldValue) {
                 params.value(oldValue);
             }, null, "beforeChange");
-         
             
-            console.log(params.user);
-            
+            subscription1.dispose();
+            subscription2.dispose();
+
             WidgetViewModel.apply(this, [params]);     
         },
         template: { require: 'text!widget-templates/text' }

@@ -285,6 +285,7 @@
                             expanded: self.expanded,
                             graph: self.form.graph,
                             type: "resource-editor",
+                            user: "{{user.username}}",    
                             disabled: !self.card.isWritable && !self.preview
                         }
                     }, css:{ "active": widget.selected, "hover": widget.hovered, "widget-preview": self.preview
