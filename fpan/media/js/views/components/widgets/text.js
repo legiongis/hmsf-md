@@ -11,33 +11,41 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
     return ko.components.register('text-widget', {        
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue'];
+            var self = this;
             
-            ko.extenders.defaultIfNull = function(target, defaultVal) {
-                var result = ko.computed({
-                    read: target,
-                    write: function(newVal) {
-                        if (!newVal) {
-                            target(defaultVal);
-                        } else {
-                            target(newVal);
+            if (params.state != 'report') {
+                //set a default value for an observable
+                ko.extenders.defaultIfNull = function(target, defaultVal) {
+                    var result = ko.computed({
+                        read: target,
+                        write: function(newVal) {
+                            if (!newVal) {
+                                target(defaultVal);
+                                console.log(defaultVal);
+                                if (params.node.cid == 'c17') {
+                                    params.value(defaultVal);
+                                }
+                            } else {
+                                target(newVal);                                 console.log(newVal);
+                                if (params.node.cid == 'c17') {
+                                    params.value(newVal);
+                                }
+                            }
                         }
-                    }
+                    });
+                    result(target());
+                    return result;
+                }
+                self.username = ko.observable().extend({ defaultIfNull: params.user });
+                self.username.subscribe(function(newValue) {
+                    params.value(newValue);
                 });
-                result(target());
-                return result;
-            };
-            this.username = ko.observable().extend({ defaultIfNull: params.user });
-       
-           var subscription1 = this.username.subscribe(function(newValue) {
-                params.value(newValue);
-            });
-            var subscription2 = this.username.subscribe(function(oldValue) {
-                params.value(oldValue);
-            }, null, "beforeChange");
-            
-            subscription1.dispose();
-            subscription2.dispose();
+                self.username.subscribe(function(oldValue) {
+                    params.value(oldValue);
+                }, null, "beforeChange");         
+            }
 
+           
             WidgetViewModel.apply(this, [params]);     
         },
         template: { require: 'text!widget-templates/text' }
