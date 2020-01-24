@@ -5,7 +5,6 @@ from hms.models import Scout
 from fpan.models import ManagedArea
 from arches.app.models.system_settings import settings
 settings.update_from_db()
-# from fpan.utils.filter import get_match_conditions
 
 
 def user_is_anonymous(user):
@@ -163,9 +162,14 @@ def get_state_node_match(user):
 
     elif user.groups.filter(name="FWC").exists():
 
+        try:
+            fwc = ManagedArea.objects.get(nickname=user.username)
+        except:
+            return "no_access"
+
         return {
-            'node_name': "Managing Agency",
-            'value': "FL Fish and Wildlife Conservation Commission"
+            'node_name': "Managed Area Name",
+            'value': fwc.name
         }
 
     elif user.groups.filter(name="FL_AquaticPreserve").exists():

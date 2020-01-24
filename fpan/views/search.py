@@ -5,7 +5,7 @@ from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel
 from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-
+from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.views.search import SearchView
 from arches.app.views.search import build_search_results_dsl
 from arches.app.utils.pagination import get_paginator
@@ -14,8 +14,6 @@ from arches.app.views.search import get_permitted_nodegroups, select_geoms_for_r
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from fpan.utils.permission_backend import get_allowed_resource_ids
 from fpan.utils.filter import apply_advanced_docs_permissions
-
-# from fpan.utils.filter import apply_advanced_docs_permissions, get_doc_type
 
 class FPANSearchView(SearchView):
 
@@ -65,6 +63,8 @@ def get_doc_type(request):
 
 def search_results(request):
 
+    print 40*"%^"
+
     try:
         search_results_dsl = build_search_results_dsl(request)
     except Exception as err:
@@ -84,7 +84,11 @@ def search_results(request):
     if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
+    print "before"
+    print dsl
     dsl = apply_advanced_docs_permissions(dsl, request)
+    print "after"
+    print dsl
     # excludeids = get_allowed_resource_ids(request.user, "f212980f-d534-11e7-8ca8-94659cf754d0", invert=True)
 
     # if isinstance(excludeids, list) and len(excludeids) > 0:
@@ -94,11 +98,11 @@ def search_results(request):
         # it's possible that excludeids could equal "no_access" or "full_access" but that's actually
         # redundant at this point, so just ignoring those scenarios for now.
         # pass
-
+    print get_doc_type(request)
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
     if results is not None:
-        user_is_reviewer = request.user.groups.filter(name='Resource Reviewer').exists()
+        user_is_reviewer = user_is_resource_reviewer(request.user)
         total = results['hits']['total']
         page = 1 if request.GET.get('page') == '' else int(request.GET.get('page', 1))
 
