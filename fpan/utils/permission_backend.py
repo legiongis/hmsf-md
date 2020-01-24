@@ -5,7 +5,6 @@ from hms.models import Scout
 from fpan.models import ManagedArea
 from arches.app.models.system_settings import settings
 settings.update_from_db()
-# from fpan.utils.filter import get_match_conditions
 
 
 def user_is_anonymous(user):
