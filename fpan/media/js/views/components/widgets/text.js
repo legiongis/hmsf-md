@@ -12,8 +12,7 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'width', 'maxLength', 'defaultValue'];
             var self = this;
-            
-            if (params.state != 'report') {
+            if (params.state != 'report' && params.tile.tileid == "" ) {
                 //set a default value for an observable
                 ko.extenders.defaultIfNull = function(target, defaultVal) {
                     var result = ko.computed({
@@ -21,12 +20,11 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                         write: function(newVal) {
                             if (!newVal) {
                                 target(defaultVal);
-                                console.log(defaultVal);
                                 if (params.node.cid == 'c17') {
                                     params.value(defaultVal);
                                 }
                             } else {
-                                target(newVal);                                 console.log(newVal);
+                                target(newVal);                                 
                                 if (params.node.cid == 'c17') {
                                     params.value(newVal);
                                 }
@@ -44,8 +42,6 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                     params.value(oldValue);
                 }, null, "beforeChange");         
             }
-
-           
             WidgetViewModel.apply(this, [params]);     
         },
         template: { require: 'text!widget-templates/text' }
