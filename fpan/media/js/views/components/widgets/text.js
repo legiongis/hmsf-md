@@ -20,12 +20,12 @@ define(['knockout', 'underscore', 'viewmodels/widget'], function (ko, _, WidgetV
                         write: function(newVal) {
                             if (!newVal) {
                                 target(defaultVal);
-                                if (params.node.cid == 'c17') {
+                                if (params.node.id == 'a72bbb27-bd5d-11e9-9b8f-94659cf754d0') {
                                     params.value(defaultVal);
                                 }
                             } else {
                                 target(newVal);                                 
-                                if (params.node.cid == 'c17') {
+                                if (params.node.id == 'a72bbb27-bd5d-11e9-9b8f-94659cf754d0') {
                                     params.value(newVal);
                                 }
                             }
