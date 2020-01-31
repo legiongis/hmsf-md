@@ -26,7 +26,20 @@
                         <li>Citizens sign up as Heritage Monitoring Scouts, and can begin monitoring Historic Cemeteries and Historic Structures right away!</li>
                         <li>To monitor Archaeological Sites, Scouts must first choose a region of interest, and then wait until an administrator assigns a site to them.</li>
                         <li>Once an Archaeological Site has been assigned to a Scout, that Scout can view the site's location, and log a Scout Visit!</li>
-                    </ul>
+                    </ul>                  
+                    
+                    <div class="panel scout-panel">
+                        <div class="panel-heading">
+                            <i class="fa fa-download" aria-hidden="true"></i>                            
+                            {% trans "Would you like a monitoring form to take with you in the field?" %}
+                        </div>
+                        <div class="panel-body">
+                        <ul>
+                            <li><a href="{% static 'files/Fillable_Form_Archaeological_Sites.pdf' %}">Download the Archaeological Site form</a></li>
+                            <li><a href="{% static 'files/Fillable_Form_Historic_Structures.pdf' %}">Download the Historic Structure form</a></li>
+                        </ul>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-xs-12 col-sm-6">
                     <h2>{% trans "How do I log a visit?" %}</h2>
@@ -35,11 +48,7 @@
                         <li>To monitor an Archaeological Site, you must first request access to that site. Please email us at <a href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a> to request access or get suggestions on sites you can monitor in your area.</li>
                         <li>Once an Archaeological Site has been assigned, you can view the site's location and log a Scout Visit by following the <a href="http://fpan.us/uploads/nerc/HMS%20Florida%20Arches%20Instructions.pdf">detailed instructions</a>.</li>
                     </ol>
-                    <h2>{% trans "Would you like a monitoring form to take with you in the field?" %}</h2>
-                    <ul>
-                        <li><a href="{% static 'files/Fillable_Form_Archaeological_Sites.pdf' %}">Download the Archaeological Site form</a></li>
-                        <li><a href="{% static 'files/Fillable_Form_Historic_Structures.pdf' %}">Download the Historic Structure form</a></li>
-                    </ul>
+                
                 </div>
             </div>
         </div>
