@@ -10,6 +10,7 @@ class ManagedArea(models.Model):
         ("FL Dept. of Agriculture and Consumer Services, Florida Forest Service","FL Dept. of Agriculture and Consumer Services, Florida Forest Service"),
         ("FL Fish and Wildlife Conservation Commission","FL Fish and Wildlife Conservation Commission"),
         ("FL Dept. of Environmental Protection, Florida Coastal Office","FL Dept. of Environmental Protection, Florida Coastal Office"),
+        ("FL Dept. of Environmental Protection, Office of Water Policy","FL Dept. of Environmental Protection, Office of Water Policy"),
     )
         
     CATEGORY_CHOICES = (
@@ -17,6 +18,16 @@ class ManagedArea(models.Model):
         ("State Forest","State Forest"),
         ("Fish and Wildlife Conservation Commission","Fish and Wildlife Conservation Commission"),
         ("Aquatic Preserve","Aquatic Preserve"),
+        ("Water Management District","Water Management District"),
+    )
+    
+    WMD_DISTRICT_CHOICES = (
+        ("North","North"),
+        ("North Central","North Central"),
+        ("West","West"),
+        ("South","South"),
+        ("Southwest","Southwest"),
+        ("South Central","South Central"),
     )
 
     name = models.CharField(max_length=254)
@@ -24,6 +35,7 @@ class ManagedArea(models.Model):
     category = models.CharField(max_length=254,choices=CATEGORY_CHOICES)
     nickname = models.CharField(max_length=30,null=True,blank=True)
     sp_district = models.IntegerField(null=True, blank=True)
+    wmd_district = models.CharField(max_length=20,choices=WMD_DISTRICT_CHOICES,null=True,blank=True)
     geom = models.MultiPolygonField()
 
     # Returns the string representation of the model.
