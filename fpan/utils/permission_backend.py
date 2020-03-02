@@ -179,6 +179,33 @@ def get_state_node_match(user):
             'value': "FL Dept. of Environmental Protection, Florida Coastal Office"
         }
 
+    elif user.groups.filter(name="FL_WMD").exists():
+
+        if user.username == "SJRWMD":
+            return {
+                'node_name': "Managed Area Category",
+                'value': "Water Management District"
+            }
+
+        elif user.username == "SJRWMD_NorthRegion":
+            districts = ["North","North Central","West"]
+            ma = ManagedArea.objects.filter(wmd_district__in=districts)
+
+        elif user.username == "SJRWMD_SouthRegion":
+            districts = ["South", "South Central", "Southwest"]
+            ma = ManagedArea.objects.filter(wmd_district__in=districts)
+
+        else:
+            districts = ["North", "North Central", "West", "South", "Southwest", "South Central"]
+            for district in districts:
+                if user.username.startswith("SJRWMD") and district.replace(" ","") in user.username:
+                    ma = ManagedArea.objects.filter(wmd_district=district)
+
+        return {
+            'node_name': "Managed Area Name",
+            'value': [m.name for m in ma]
+        }
+
     else:
         print "non state park"
 
