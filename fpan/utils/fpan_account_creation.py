@@ -173,7 +173,7 @@ def load_fpan_state_auth(fake_passwords=False):
     for a in logins_per_unit_dict.keys():
             
         lookup = logins_per_unit_dict[a]
-        print "making group:",lookup
+        print("making group: " + lookup)
         group = Group.objects.get_or_create(name=lookup)[0]
         a_ma = all.filter(agency=a)
         
@@ -182,7 +182,7 @@ def load_fpan_state_auth(fake_passwords=False):
             name = ma.nickname
             pw = generate_password()
             if fake_passwords:
-                pw = ma.nickname
+                pw = name
             user = User.objects.get_or_create(username=name)[0]
             user.set_password(pw)
             user.save()
@@ -206,7 +206,8 @@ def load_fpan_state_auth(fake_passwords=False):
         created_users.append((user,pw))
         print("user created: "+name)
 
-    user = User.objects.get_or_create(username="SPAdmin")[0]
+    name = "SPAdmin"
+    user = User.objects.get_or_create(username=name)[0]
     pw = generate_password()
     if fake_passwords:
         pw = name
@@ -217,7 +218,8 @@ def load_fpan_state_auth(fake_passwords=False):
     created_users.append((user,pw))
     print("user created: "+name)
 
-    user = User.objects.get_or_create(username="SFAdmin")[0]
+    name = "SFAdmin"
+    user = User.objects.get_or_create(username=name)[0]
     pw = generate_password()
     if fake_passwords:
         pw = name

@@ -4,7 +4,10 @@ from arches.app.models.models import Node, ResourceInstance
 from hms.models import Scout
 from fpan.models import ManagedArea
 from arches.app.models.system_settings import settings
-settings.update_from_db()
+try:
+    settings.update_from_db()
+except:
+    pass
 
 
 def user_is_anonymous(user):
@@ -207,7 +210,7 @@ def get_state_node_match(user):
         }
 
     else:
-        print "non state park"
+        return "no_access"
 
 
 def get_allowed_resource_ids(user, graphid, invert=False):
