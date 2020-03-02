@@ -229,6 +229,8 @@ def load_fpan_state_auth(fake_passwords=False):
     created_users.append((user,pw))
     print("user created: "+name)
 
+    created_users += create_water_management_district_accounts(fake_passwords=fake_passwords)
+
     ## add all new users to the Crowdsource Editor group and Land Manager group
     cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
     lm_grp = Group.objects.get_or_create(name="Land Manager")[0]
@@ -242,6 +244,38 @@ def load_fpan_state_auth(fake_passwords=False):
         write.writerow(("username","password"))
         for user_pw in created_users:
             write.writerow((user_pw[0].username, user_pw[1]))
+
+def create_water_management_district_accounts(fake_passwords=False):
+
+    new_users = list()
+
+    print("making group: FL_WMD")
+    wmd_grp = Group.objects.get_or_create(name="FL_WMD")[0]
+    accounts = [
+        "SJRWMD",
+        "SJRWMD_NorthRegion",
+        "SJRWMD_SouthRegion",
+        "SJRWMD_North",
+        "SJRWMD_NorthCentral",
+        "SJRWMD_West",
+        "SJRWMD_South",
+        "SJRWMD_Southwest",
+        "SJRWMD_SouthCentral"
+    ]
+
+    for name in accounts:
+        user = User.objects.get_or_create(username=name)[0]
+        pw = generate_password()
+        if fake_passwords:
+            pw = name
+        user.set_password(pw)
+        user.save()
+        user.groups.add(wmd_grp)
+        user.save()
+        new_users.append((user,pw))
+        print("user created: "+name)
+
+    return new_users
 
 
 def create_accounts_from_csv(csv_file):
