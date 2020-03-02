@@ -52,3 +52,10 @@ a:hover, li a:hover, .btn-link:hover {
     background-color:#f26422;
     border:none;
 }
+.scout-panel {
+    border: 1px solid #F26422;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+.scout-panel .panel-heading {
+    background-color: #F26422;
+}
