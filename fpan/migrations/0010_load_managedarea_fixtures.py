@@ -20,7 +20,6 @@ def load_managedareas(apps, schema_editor):
     ## these operations add some extra info to some of the managed areas
     ## that is not included in the fixture files.
     add_fwcc_nicknames()
-    management.call_command('add_districts_to_state_parks')
 
 
 def remove_managedareas(apps, schema_editor):
@@ -30,7 +29,7 @@ def remove_managedareas(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('fpan', '0008_alter_state_park_category_value'),
+        ('fpan', '0009_alter_ma_for_wmd'),
     ]
 
     operations = [

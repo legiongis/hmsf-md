@@ -19,7 +19,7 @@ def remove_regions(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('fpan', '0009_load_managedarea_fixtures'),
+        ('fpan', '0010_load_managedarea_fixtures'),
     ]
 
     operations = [
