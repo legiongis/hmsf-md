@@ -16,9 +16,8 @@ from arches.app.models.tile import Tile
 from arches.app.models.models import Node, Value
 
 from fpan.models import Region
-from fpan.utils.permission_backend import user_is_anonymous
+from fpan.utils.accounts import check_duplicate_username, check_anonymous
 from fpan.utils.tokens import account_activation_token
-from fpan.utils.fpan_account_utils import check_duplicate_username
 from hms.models import Scout, ScoutProfile
 from hms.forms import ScoutForm, ScoutProfileForm
 
@@ -126,7 +125,7 @@ def scouts_dropdown(request):
 @user_passes_test(lambda u: u.is_superuser)
 def scout_list_download(request):
 
-    csvname = datetime.now().strftime("HMS all scouts %d-%m-%y.csv")
+    csvname = datetime.now().strftime("HMS_all_scouts_%d-%m-%y.csv")
 
     # create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
@@ -168,7 +167,7 @@ def scout_list_download(request):
 
     return response
 
-@user_passes_test(user_is_anonymous)
+@user_passes_test(check_anonymous)
 def scout_profile(request):
     if request.method == "POST":
         scout_profile_form = ScoutProfileForm(
