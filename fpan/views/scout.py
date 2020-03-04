@@ -126,7 +126,7 @@ def scouts_dropdown(request):
 @user_passes_test(lambda u: u.is_superuser)
 def scout_list_download(request):
 
-    csvname = datetime.now().strftime("HMS all scouts %d-%m-%y.csv")
+    csvname = datetime.now().strftime("HMS_all_scouts_%d-%m-%y.csv")
 
     # create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type='text/csv')
