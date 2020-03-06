@@ -29,7 +29,7 @@ class Command(BaseCommand):
     def convert_shp(self,shp_path,max_features=None):
     
         # shp = r"C:\arches\fpan\data\shp-ref\from_julie\AllPublicLandsFL_edit.shp"
-        output = r"C:\arches\fpan\repo\fpan-data\fixtures\managedareas0.json"
+        output = r"D:\arches\fpan\repo\fpan\fpan\fixtures\watermanagementdistricts.json"
         ds = DataSource(shp_path)
         layer = ds[0]
         
@@ -37,7 +37,8 @@ class Command(BaseCommand):
             'FL Dept. of Environmental Protection, Div. of Recreation and Parks':'State Park',
             'FL Dept. of Agriculture and Consumer Services, Florida Forest Service':'State Forest',
             'FL Fish and Wildlife Conservation Commission':'Fish and Wildlife Conservation Commission',
-            'FL Dept. of Environmental Protection, Florida Coastal Office':'Aquatic Preserve'
+            'FL Dept. of Environmental Protection, Florida Coastal Office':'Aquatic Preserve',
+            'FL Dept. of Environmental Protection, Office of Water Policy': 'Water Management District',
         }
         agencies = lookup.keys()
         
@@ -84,7 +85,7 @@ class Command(BaseCommand):
                     file_ct+=1
                     data = []
 
-        if not feat_ct:
+        if not max_features:
             with open(output,"wb") as out:
                 json.dump(data,out,indent=2)
             

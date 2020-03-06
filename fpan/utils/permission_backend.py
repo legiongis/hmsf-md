@@ -4,7 +4,10 @@ from arches.app.models.models import Node, ResourceInstance
 from hms.models import Scout
 from fpan.models import ManagedArea
 from arches.app.models.system_settings import settings
-settings.update_from_db()
+try:
+    settings.update_from_db()
+except:
+    pass
 
 
 def user_is_anonymous(user):
@@ -179,8 +182,35 @@ def get_state_node_match(user):
             'value': "FL Dept. of Environmental Protection, Florida Coastal Office"
         }
 
+    elif user.groups.filter(name="FL_WMD").exists():
+
+        if user.username == "SJRWMD":
+            return {
+                'node_name': "Managed Area Category",
+                'value': "Water Management District"
+            }
+
+        elif user.username == "SJRWMD_NorthRegion":
+            districts = ["North","North Central","West"]
+            ma = ManagedArea.objects.filter(wmd_district__in=districts)
+
+        elif user.username == "SJRWMD_SouthRegion":
+            districts = ["South", "South Central", "Southwest"]
+            ma = ManagedArea.objects.filter(wmd_district__in=districts)
+
+        else:
+            districts = ["North", "North Central", "West", "South", "Southwest", "South Central"]
+            for district in districts:
+                if user.username.startswith("SJRWMD") and district.replace(" ","") in user.username:
+                    ma = ManagedArea.objects.filter(wmd_district=district)
+
+        return {
+            'node_name': "Managed Area Name",
+            'value': [m.name for m in ma]
+        }
+
     else:
-        print "non state park"
+        return "no_access"
 
 
 def get_allowed_resource_ids(user, graphid, invert=False):
