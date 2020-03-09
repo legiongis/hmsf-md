@@ -312,3 +312,6 @@ input[type='text'] {
     font-family: "Helsing-Regular", "Georgia", serif !important;
     font-size: 3.052em;
 }
+.rr-splash-description {
+    padding-bottom: 20px;
+}
