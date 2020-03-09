@@ -3,6 +3,7 @@ Django settings for fpan project.
 """
 
 import os
+import sys
 import arches
 import inspect
 
@@ -160,15 +161,6 @@ from datetime import datetime
 timestamp = datetime.now().strftime("%m%d%y-%H%M%S")
 RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import-{}.log'.format(timestamp))
 
-LOGGING = {   'disable_existing_loggers': False,
-    'handlers': {   'file': {   'class': 'logging.FileHandler',
-                                'filename': os.path.join(APP_ROOT, 'arches.log'),
-                                'level': 'DEBUG'}},
-    'loggers': {   'arches': {   'handlers': [   'file'],
-                                 'level': 'DEBUG',
-                                 'propagate': True}},
-    'version': 1}
-
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 
 MEDIA_ROOT = os.path.join(APP_ROOT)
@@ -189,6 +181,22 @@ TILE_CACHE_CONFIG = {
 DEFAULT_FROM_EMAIL = ""
 EMAIL_SUBJECT_PREFIX = ""
 
+# Use Nose for running tests - errors occur unless you run test modules individually
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    import logging
+    logging.disable(logging.CRITICAL)
+
+INSTALLED_APPS += ('django_nose', )
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-coverage',
+    '--nologcapture',
+    '--cover-package=fpan',
+    '--verbosity=3',
+    '--cover-erase',
+]
+
+
 try:
     from settings_local import *
 except ImportError:
@@ -198,3 +206,52 @@ if not DEBUG:
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     SESSION_COOKIE_AGE = 7200 #auto logout after 2 hours
     SESSION_SAVE_EVERY_REQUEST = True
+
+# set log level to info, unless debug is true (which would be set in settings_local.py
+LOG_LEVEL = 'INFO'
+if DEBUG is True:
+    LOG_LEVEL = 'DEBUG'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'full': {
+            'format': '%(asctime)s %(name)s:%(lineno)d %(levelname)s %(message)s',
+        },
+        'console': {
+            'format': '%(message)s',
+        },
+    },
+    'handlers': {
+        'arches': {
+            'level': LOG_LEVEL,  # DEBUG, INFO, WARNING, ERROR
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(APP_ROOT, 'logs', 'arches.log'),
+            'formatter': 'full'
+        },
+        'fpan': {
+            'level': LOG_LEVEL,  # DEBUG, INFO, WARNING, ERROR
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(APP_ROOT, 'logs', 'fpan.log'),
+            'formatter': 'full'
+        },
+        'console': {
+            'level': LOG_LEVEL,
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
+        }
+    },
+    'loggers': {
+        'arches': {
+            'handlers': ['arches', 'console'],
+            'level': LOG_LEVEL,
+            'propagate': True
+        },
+        'fpan': {
+            'handlers': ['fpan', 'console'],
+            'level': LOG_LEVEL,
+            'propagate': True
+        }
+    }
+}

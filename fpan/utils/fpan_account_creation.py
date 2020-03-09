@@ -241,11 +241,14 @@ def load_fpan_state_auth(fake_passwords=False):
         user_pw[0].groups.add(lm_grp)
         user_pw[0].save()
 
-    with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"),"wb") as outcsv:
-        write = csv.writer(outcsv)
-        write.writerow(("username","password"))
-        for user_pw in created_users:
-            write.writerow((user_pw[0].username, user_pw[1]))
+    ## only write the log with passwords in it if real passwords were created.
+    ## this is especially important to accommodate test running
+    if fake_passwords is False:
+        with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"),"wb") as outcsv:
+            write = csv.writer(outcsv)
+            write.writerow(("username","password"))
+            for user_pw in created_users:
+                write.writerow((user_pw[0].username, user_pw[1]))
 
 def create_water_management_district_accounts(fake_passwords=False):
 
