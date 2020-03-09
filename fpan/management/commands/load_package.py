@@ -3,6 +3,7 @@ import glob
 import json
 import uuid
 import shutil
+import logging
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
@@ -16,6 +17,7 @@ from hms.models import Scout
 from fpan.models import Region
 from fpan.utils.fpan_account_creation import load_fpan_state_auth, create_accounts_from_json, create_mock_scout_accounts
 
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
 
@@ -297,7 +299,7 @@ class Command(BaseCommand):
         package = settings.PACKAGE_PATH
 
         if 'auth' in components or components == 'all':
-            print "\n~~~~~~~~ CONFIGURE AUTHENTICATION SYSTEM"
+            logger.info("~~ CONFIGURING AUTHENTICATION SYSTEM")
 
             ## truly can't decide whether it's better to use the hard-coded
             ## scout creation here, or to load dynamically from the package json.
@@ -311,43 +313,37 @@ class Command(BaseCommand):
 
             create_mock_scout_accounts()
             load_fpan_state_auth(fake_passwords)
-            print "done"
-        
+
         if 'widgets' in components or components == 'all':
-            print "\n~~~~~~~~ LOAD WIDGETS"
+            logger.info("~~ LOADING WIDGETS")
             load_widgets(package)
-            print "done"
-            
+
         if 'functions' in components or components == 'all':
-            print "\n~~~~~~~~ LOAD FUNCTIONS"
+            logger.info("~~ LOADING FUNCTIONS")
             load_functions(package)
-            print "done"
-        
+
         ## loading datatypes not tested in fpan - 10/13/17
         # print "\n~~~~~~~~ LOAD DATATYPES"
         # load_datatypes(package)
-        
+
         if 'concepts' in components or components == 'all':
-            print "\n~~~~~~~~ LOAD CONCEPTS & COLLECTIONS"
+            logger.info("~~ LOADING CONCEPTS & COLLECTIONS")
             load_concepts(package)
-            
+
         if 'graphs' in components or components == 'all':
-            print "\n~~~~~~~~ LOAD RESOURCE MODELS & BRANCHES"
+            logger.info("~~ LOADING RESOURCE MODELS & BRANCHES")
             load_graphs(package)
-            print "\n~~~~~~~~ ...and RESOURCE TO RESOURCE CONSTRAINTS"
+            logger.info("~~ LOADING RESOURCE TO RESOURCE CONSTRAINTS")
             load_resource_to_resource_constraints(package)
-            print "done"
-            print "\n~~~~~~~~ ...and APPLYING PERMISSIONS"
+            logger.info("~~ APPLYING PERMISSIONS")
             load_permissions(package)
-        
-        ## loading map layers not tested in fpan - 10/13/17
+
         if 'maps' in components or components == 'all':
-            print "\n~~~~~~~~ LOAD MAP LAYERS"
+            logger.info("~~ LOADING MAP LAYERS")
             load_map_layers(package)
-            print "done"
-        
+
         if ('data' in components or components == 'all') and not exclude_data is True:
-            print "\n~~~~~~~~ LOAD RESOURCES & RESOURCE RELATIONS"
+            logger.info("~~ LOADING RESOURCES & RESOURCE RELATIONS")
             load_business_data(package)
         
         ## loading resource views not tested in fpan - 10/13/17
