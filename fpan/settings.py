@@ -3,6 +3,7 @@ Django settings for fpan project.
 """
 
 import os
+import sys
 import arches
 import inspect
 
@@ -188,6 +189,22 @@ TILE_CACHE_CONFIG = {
 
 DEFAULT_FROM_EMAIL = ""
 EMAIL_SUBJECT_PREFIX = ""
+
+# Use Nose for running tests - errors occur unless you run test modules individually
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    import logging
+    logging.disable(logging.CRITICAL)
+
+INSTALLED_APPS += ('django_nose', )
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--with-coverage',
+    '--nologcapture',
+    '--cover-package=fpan',
+    '--verbosity=3',
+    '--cover-erase',
+]
+
 
 try:
     from settings_local import *
