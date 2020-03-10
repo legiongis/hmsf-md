@@ -246,14 +246,20 @@ def get_allowed_resource_ids(user, graphid, invert=False):
     if not isinstance(match_value, list):
         match_value = [match_value]
 
+    paramount = Bool()
     for value in match_value:
         match_filter = Bool()
         match_filter.must(Match(field='strings.string', query=value, type='phrase'))
         match_filter.filter(Terms(field='strings.nodegroup_id', terms=[nodegroup]))
         container = Nested(path='strings', query=match_filter)
+        paramount.should(container)
 
-    query.add_query(container)
-    print query
+    query.add_query(paramount)
+
+    if settings.LOG_LEVEL == "DEBUG":
+        with open(os.path.join(settings.LOG_DIR, "allowed_resources_query.json"), "w") as output:
+            output.write(str(query))
+
     results = query.search(index='resource', doc_type=graphid)
 
     resourceids = [i['_source']['resourceinstanceid'] for i in results['hits']['hits']]
