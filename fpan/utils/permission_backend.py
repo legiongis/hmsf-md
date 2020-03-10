@@ -1,3 +1,5 @@
+import os
+import logging
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Match, Terms, Nested
 from arches.app.models.models import Node, ResourceInstance
@@ -9,6 +11,7 @@ try:
 except:
     pass
 
+logger = logging.getLogger(__name__)
 
 def user_is_anonymous(user):
     return user.username == 'anonymous'
@@ -237,7 +240,7 @@ def get_allowed_resource_ids(user, graphid, invert=False):
         nodegroup = str(node[0].nodegroup_id)
     else:
         nodegroup = ""
-        print "error finding specified node '{}', criterion ignored".format(match_node)
+        logger.warning("error finding specified node '{}'. criterion ignored.".format(match_node))
         return "no_access"
 
     if not isinstance(match_value, list):
