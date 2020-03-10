@@ -1,5 +1,6 @@
 import os
 import json
+import logging
 from django.conf import settings
 from django.contrib.auth.models import Group, User
 from arches.app.models.models import Node, GraphModel
@@ -9,6 +10,7 @@ from arches.app.search import elasticsearch_dsl_builder as edb
 from fpan.search.elasticsearch_dsl_builder import Type
 from .permission_backend import get_match_conditions
 
+logger = logging.getLogger(__name__)
 
 def apply_advanced_docs_permissions(dsl, request):
 
@@ -33,8 +35,7 @@ def apply_advanced_docs_permissions(dsl, request):
 
 def add_doc_specific_criterion(dsl, spec_type, all_types, no_access=False, criterion=False):
 
-    print "adding criterion:"
-    print criterion
+    logger.debug("adding criterion: {} to {}".format(criterion, spec_type))
 
     paramount = edb.Bool()
     for doc_type in all_types:
@@ -44,7 +45,7 @@ def add_doc_specific_criterion(dsl, spec_type, all_types, no_access=False, crite
 
             ## if no_access is the permission level for the user, exclude doc
             if no_access is True:
-                print "restricting access"
+                logger.debug("restricting access to {}".format(doc_type))
                 paramount.must_not(Type(type=doc_type))
                 continue
 
@@ -54,7 +55,7 @@ def add_doc_specific_criterion(dsl, spec_type, all_types, no_access=False, crite
                     nodegroup = str(node[0].nodegroup_id)
                 else:
                     nodegroup = ""
-                    print "error finding specified node '{}', criterion ignored".format(criterion['node_name'])
+                    logger.warning("error finding specified node '{}'. criterion ignored.".format(criterion['node_name']))
                     continue
 
                 if not isinstance(criterion['value'], list):
