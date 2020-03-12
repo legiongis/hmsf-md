@@ -1,3 +1,5 @@
+import os
+import logging
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Query, Bool, Match, Terms, Nested
 from arches.app.models.models import Node, ResourceInstance
@@ -9,6 +11,7 @@ try:
 except:
     pass
 
+logger = logging.getLogger(__name__)
 
 def user_is_anonymous(user):
     return user.username == 'anonymous'
@@ -237,20 +240,26 @@ def get_allowed_resource_ids(user, graphid, invert=False):
         nodegroup = str(node[0].nodegroup_id)
     else:
         nodegroup = ""
-        print "error finding specified node '{}', criterion ignored".format(match_node)
+        logger.warning("error finding specified node '{}'. criterion ignored.".format(match_node))
         return "no_access"
 
     if not isinstance(match_value, list):
         match_value = [match_value]
 
+    paramount = Bool()
     for value in match_value:
         match_filter = Bool()
         match_filter.must(Match(field='strings.string', query=value, type='phrase'))
         match_filter.filter(Terms(field='strings.nodegroup_id', terms=[nodegroup]))
         container = Nested(path='strings', query=match_filter)
+        paramount.should(container)
 
-    query.add_query(container)
-    print query
+    query.add_query(paramount)
+
+    if settings.LOG_LEVEL == "DEBUG":
+        with open(os.path.join(settings.LOG_DIR, "allowed_resources_query.json"), "w") as output:
+            output.write(str(query))
+
     results = query.search(index='resource', doc_type=graphid)
 
     resourceids = [i['_source']['resourceinstanceid'] for i in results['hits']['hits']]

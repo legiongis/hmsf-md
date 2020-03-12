@@ -1,6 +1,8 @@
+import os
+import logging
 from django.utils.translation import ugettext as _
 from django.http import HttpResponseNotFound
-
+from django.conf import settings
 from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel
 from arches.app.utils.response import JSONResponse
@@ -13,7 +15,9 @@ from arches.app.views.search import get_nodegroups_by_datatype_and_perm
 from arches.app.views.search import get_permitted_nodegroups, select_geoms_for_results
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from fpan.utils.permission_backend import get_allowed_resource_ids
-from fpan.utils.filter import apply_advanced_docs_permissions
+from fpan.utils.search_filter import apply_advanced_docs_permissions
+
+logger = logging.getLogger(__name__)
 
 class FPANSearchView(SearchView):
 
@@ -63,8 +67,6 @@ def get_doc_type(request):
 
 def search_results(request):
 
-    print 40*"%^"
-
     try:
         search_results_dsl = build_search_results_dsl(request)
     except Exception as err:
@@ -84,11 +86,16 @@ def search_results(request):
     if request.GET.get('tiles', None) is not None:
         dsl.include('tiles')
 
-    print "before"
-    print dsl
+    if settings.LOG_LEVEL == "DEBUG":
+        with open(os.path.join(settings.LOG_DIR, "dsl_before_fpan.json"), "w") as output:
+            output.write(str(dsl))
+
     dsl = apply_advanced_docs_permissions(dsl, request)
-    print "after"
-    print dsl
+
+    if settings.LOG_LEVEL == "DEBUG":
+        with open(os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w") as output:
+            output.write(str(dsl))
+
     # excludeids = get_allowed_resource_ids(request.user, "f212980f-d534-11e7-8ca8-94659cf754d0", invert=True)
 
     # if isinstance(excludeids, list) and len(excludeids) > 0:
@@ -98,7 +105,7 @@ def search_results(request):
         # it's possible that excludeids could equal "no_access" or "full_access" but that's actually
         # redundant at this point, so just ignoring those scenarios for now.
         # pass
-    print get_doc_type(request)
+
     results = dsl.search(index='resource', doc_type=get_doc_type(request))
 
     if results is not None:

@@ -18,6 +18,8 @@ APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
+LOG_DIR = os.path.join(APP_ROOT, "logs")
+
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
 
@@ -159,7 +161,7 @@ STATIC_ROOT = '/var/www/media'
 
 from datetime import datetime
 timestamp = datetime.now().strftime("%m%d%y-%H%M%S")
-RESOURCE_IMPORT_LOG = os.path.join(APP_ROOT, 'logs', 'resource_import-{}.log'.format(timestamp))
+RESOURCE_IMPORT_LOG = os.path.join(LOG_DIR, 'resource_import-{}.log'.format(timestamp))
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 
@@ -227,13 +229,13 @@ LOGGING = {
         'arches': {
             'level': LOG_LEVEL,  # DEBUG, INFO, WARNING, ERROR
             'class': 'logging.FileHandler',
-            'filename': os.path.join(APP_ROOT, 'logs', 'arches.log'),
+            'filename': os.path.join(LOG_DIR, 'arches.log'),
             'formatter': 'full'
         },
         'fpan': {
             'level': LOG_LEVEL,  # DEBUG, INFO, WARNING, ERROR
             'class': 'logging.FileHandler',
-            'filename': os.path.join(APP_ROOT, 'logs', 'fpan.log'),
+            'filename': os.path.join(LOG_DIR, 'fpan.log'),
             'formatter': 'full'
         },
         'console': {
