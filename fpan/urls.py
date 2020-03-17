@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
 from django.conf import settings
-from .views import main, report, auth, scout, search
+from fpan.views import main, report, auth, scout, search
 
 uuid_regex = settings.UUID_REGEX
 handler500 = main.server_error

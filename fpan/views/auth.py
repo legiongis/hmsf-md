@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse, Http404
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
