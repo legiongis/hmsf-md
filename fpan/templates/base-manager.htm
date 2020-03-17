@@ -447,6 +447,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 help: "{{nav.help.template}}",
             };
         });
+        define('fpan', [], function () {
+            return {
+                urls: {
+                    scouts_dropdown: "{% url 'scouts_dropdown' %}"
+                }
+            };
+        });
         {% endautoescape %}
     </script>
 {% endblock pre_require_js %}
