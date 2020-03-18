@@ -9,10 +9,10 @@ from arches.app.utils.response import JSONResponse
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.views.search import SearchView
-from arches.app.views.search import build_search_results_dsl
+# from arches.app.views.search import build_search_results_dsl
 from arches.app.utils.pagination import get_paginator
-from arches.app.views.search import get_nodegroups_by_datatype_and_perm
-from arches.app.views.search import get_permitted_nodegroups, select_geoms_for_results
+# from arches.app.views.search import get_nodegroups_by_datatype_and_perm
+from arches.app.views.search import get_permitted_nodegroups #, select_geoms_for_results
 from arches.app.search.elasticsearch_dsl_builder import Bool, Match, Query, Nested, Term, Terms, GeoShape, Range, MinAgg, MaxAgg, RangeAgg, Aggregation, GeoHashGridAgg, GeoBoundsAgg, FiltersAgg, NestedAgg
 from fpan.utils.permission_backend import get_allowed_resource_ids
 from fpan.utils.search_filter import apply_advanced_docs_permissions
