@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        print "this command is not fully implemented yet -- exiting."
+        print("this command is not fully implemented yet -- exiting.")
         exit()
         
         # self.repair_geometry(source=options['source'],geom_field=options['geom_field'])
@@ -60,7 +60,7 @@ class Command(BaseCommand):
                     prepaired_wkt = subprocess.check_output(cmd,shell=True)
                     
                 except:
-                    print "geometry couldn't be prepaired"
+                    print("geometry couldn't be prepaired")
                     prepaired_wkt = wkt
                 # return prepaired_wkt
                 row.insert(geo,prepaired_wkt)

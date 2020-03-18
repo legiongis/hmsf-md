@@ -24,7 +24,6 @@ def auth(request,login_type):
         raise Http404("not found")
         
     if login_type == 'logout':
-        print "login type is logout"
         logout(request)
         return redirect('fpan_home')
 

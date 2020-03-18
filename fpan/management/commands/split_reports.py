@@ -30,10 +30,10 @@ class Command(BaseCommand):
                 resfile = os.path.join(exportdir, f)
 
         if resfile is None:
-            print "no resources with scout reports file to split"
+            print("no resources with scout reports file to split")
             exit()
 
-        print "input file:", resfile
+        print(f"input file: {resfile}")
 
         # load the single exported new Scout Report resource and get information from it
         refdatadir = os.path.join("fpan", "management", "commands", "refdata")
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                 "resourceids": [i['resourceinstance']['resourceinstanceid'] for i in subresources]
             }
 
-            print rm, len(subresources)
+            print(f"{rm} {len(subresources)}")
             for ct, res in enumerate(subresources):
 
                 for tile in res['tiles']:
@@ -109,7 +109,6 @@ class Command(BaseCommand):
                         for nodeid in set(all_nodes):
                                 # if not i in [v['oldnode'] for k, v in subset.iteritems()]:
                             nn = Node.objects.get(nodeid=nodeid)
-                            # print nn.name
                             if not nn.name in nodeidlookup[rm]:
                                 continue
                             subset[nn.name]['oldnode'] = nodeid
@@ -151,11 +150,11 @@ class Command(BaseCommand):
 
                     sr_resources.append((oldresid, newres))
             if index % 200 == 0:
-                print index
+                print(index)
             if index % 25 == 0:
-                print index,
+                print(index, end="")
             elif index == len(resources)-1:
-                print index
+                print(index)
 
         for rm, data in sorted_v1_resources.items():
 
@@ -167,7 +166,7 @@ class Command(BaseCommand):
                 json.dump(outjson, outf, indent=1)
 
             scout_reports = [s[1] for s in sr_resources if s[0] in data['resourceids']]
-            print len(scout_reports)
+            print(len(scout_reports))
             outsrfile = rm+"-ScoutReports.json"
             outsrdata = {"business_data": {"resources": scout_reports}}
             outsrjson = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outsrdata)))
@@ -231,12 +230,11 @@ class Command(BaseCommand):
         if isinstance(invalue, list):
             for val in invalue:
                 if isinstance(val, dict):
-                    # print val
                     continue
                 try:
                     valueobj = Value.objects.get(valueid=val)
                 except Value.DoesNotExist as e:
-                    print "this is not a valid Value and it's in a list:", val
+                    print(f"this is not a valid Value and it's in a list: {val}")
         else:
             try:
                 uuid.UUID(invalue)
@@ -249,7 +247,7 @@ class Command(BaseCommand):
                 if invalue in photo_lookup:
                     invalue = photo_lookup[invalue]
                 else:
-                    print "this is not a valid Value:", invalue
+                    print(f"this is not a valid Value: {invalue}")
 
         return invalue
 

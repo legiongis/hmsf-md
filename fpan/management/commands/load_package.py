@@ -91,8 +91,8 @@ class Command(BaseCommand):
                             sql = f.read()
                             cursor.execute(sql)
             except Exception as e:
-                print e
-                print 'Could not connect to db'
+                print(e)
+                print('Could not connect to db')
 
         def load_graphs(package_dir):
             branches = os.path.join(package_dir, 'graphs', 'branches')
@@ -247,7 +247,7 @@ class Command(BaseCommand):
             
             perm_config_file = os.path.join(package_dir,'permissions_config.json')
             if not os.path.isfile(perm_config_file):
-                print "no permissions_config.json file in package"
+                print("no permissions_config.json file in package")
                 return
                 
             with open(perm_config_file,'rb') as configs:
@@ -265,33 +265,33 @@ class Command(BaseCommand):
                 try:
                     g = Graph.objects.get(name=g_name)
                     if not g.isresource:
-                        print "graph: {} - Error: this is a Branch, not a Resource Model\n--".format(g_name)
+                        print(f"graph: {g_name} - Error: this is a Branch, not a Resource Model\n--")
                         continue
-                    print "graph:",g_name
+                    print(f"graph: {g_name}")
                 except ObjectDoesNotExist:
-                    print "graph: {} - Error: does not exist\n--".format(g_name)
+                    print(f"graph: {g_name} - Error: does not exist\n--")
                     continue
                 for group_name, perms in data.iteritems():
                     try:
                         group = Group.objects.get(name=group_name)
-                        print "  group:",group_name
+                        print(f"  group: {group_name}"),
                     except ObjectDoesNotExist:
-                        print "    group: {} - Error: does not exist\n--".format(group_name)
+                        print(f"    group: {group_name} - Error: does not exist\n--")
                         continue
                     for perm_type, card_names in perms.iteritems():
                         if not perm_type in valid_perms:
-                            print "    permission: {} - Error: invalid permission type".format(perm_type)
+                            print(f"    permission: {perm_type} - Error: invalid permission type")
                             perm_error = True
                             continue
-                        print "    permission:",perm_type
+                        print(f"    permission: {perm_type}")
                         cards,msg = get_cards(card_names,g)
                         if len(cards) > 0:
-                            print "      cards: "+", ".join(msg)
+                            print(f"      cards: {', '.join(msg)}")
                         for c in cards:
                             assign_perm(perm_type,group,c._nodegroup_cache)
             
             if perm_error:
-                print "valid permission types:",valid_perms
+                print(f"valid permission types: {valid_perms}")
 
         if setup_db:
             management.call_command('setup_db',yes=True)
@@ -307,7 +307,7 @@ class Command(BaseCommand):
 
             # auth_config_file = os.path.join(package,'auth_config.json')
             # if not os.path.isfile(auth_config_file):
-                # print "no auth_config.json file in package"
+                # print("no auth_config.json file in package")
                 # return
             # create_accounts_from_json(auth_config_file)
 
@@ -323,7 +323,7 @@ class Command(BaseCommand):
             load_functions(package)
 
         ## loading datatypes not tested in fpan - 10/13/17
-        # print "\n~~~~~~~~ LOAD DATATYPES"
+        # logger.info("\n~~~~~~~~ LOAD DATATYPES")
         # load_datatypes(package)
 
         if 'concepts' in components or components == 'all':
@@ -347,5 +347,5 @@ class Command(BaseCommand):
             load_business_data(package)
         
         ## loading resource views not tested in fpan - 10/13/17
-        # print "\n~~~~~~~~ LOAD RESOURCE VIEWS"
+        # logger.info("\n~~~~~~~~ LOAD RESOURCE VIEWS")
         # load_resource_views(package)

@@ -74,9 +74,9 @@ class Command(BaseCommand):
                 t.save(log=False)
                 
                 if i % 500 == 0:
-                    print i
+                    print(i)
                 elif i % 50 == 0:
-                    print i,
+                    print(i, end="")
 
                 
     def set_nodes_to_concept_list(self):
