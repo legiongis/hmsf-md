@@ -30,6 +30,8 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
+SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
+
 REPORT_INLINES = {
     "Archaeological Site" : [
         {
