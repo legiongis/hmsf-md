@@ -110,6 +110,7 @@ define([
 
         doQuery: function() {
             var queryString = JSON.parse(this.queryString());
+            queryString["site-filter"] = true;
             if (this.updateRequest) {
                 this.updateRequest.abort();
             }
