@@ -8,6 +8,7 @@ handler500 = main.server_error
 
 urlpatterns = [
     url(r'^$', main.index, name='fpan_home'),
+    url(r'^user/resource-instance-permissions', main.get_resource_instance_permissions, name='resource_instance_permissions'),
     url(r'^hms/home', main.hms_home, name='hms_home'),
     url(r'^state/home', main.state_home, name='state_home'),
     url(r'^regions/$', main.show_regions, name='show_regions'),

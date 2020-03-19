@@ -7,7 +7,8 @@ from django.http import HttpResponseServerError
 from django.contrib import messages
 from arches.app.utils.response import JSONResponse
 from arches.app.models.system_settings import settings
-from fpan.utils.permission_backend import user_is_anonymous, check_state_access
+from arches.app.models.models import GraphModel
+from fpan.utils.permission_backend import user_is_anonymous, check_state_access, get_match_conditions
 from fpan.models import Region
 from fpan.views.scout import scouts_dropdown
 from hms.models import Scout, ScoutProfile
@@ -74,3 +75,16 @@ def fpan_dashboard(request):
     scouts = sorted(scouts_unsorted, key=lambda k: k['username']) 
     return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
 
+def get_resource_instance_permissions(request):
+
+    resource_graphs = (
+        GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+        .exclude(isresource=False)
+        .exclude(isactive=False)
+    )
+
+    access_info = {}
+    for rg in resource_graphs:
+        access_info[str(rg.graphid)] = get_match_conditions(request.user, str(rg.graphid))
+
+    return JSONResponse(access_info)
