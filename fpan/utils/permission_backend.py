@@ -40,16 +40,18 @@ def user_can_edit_this_resource(user, resourceinstanceid):
     """
 
     res = ResourceInstance.objects.get(resourceinstanceid=resourceinstanceid)
-    ok_ids = get_allowed_resource_ids(user, res.graph_id)
-    if ok_ids == "full_access":
+    res_access = get_allowed_resource_ids(user, str(res.graph_id))
+    if res_access["access_level"] == "full_access":
         return True
-    elif ok_ids == "no_access":
+    elif res_access["access_level"] == "no_access":
         return False
     else:
-        return resourceinstanceid in ok_ids
+        return resourceinstanceid in res_access["id_list"]
 
 
 def get_match_conditions(user, graphid):
+
+    graphid = str(graphid)
 
     # allow superuser admins to get full access to everything
     if user.is_superuser:
@@ -223,10 +225,18 @@ def get_allowed_resource_ids(user, graphid, invert=False):
     ids that the user is NOT allowed to access.
     """
 
+    response = {
+        "access_level": "",
+        "id_list": []
+    }
+
     match_terms = get_match_conditions(user, graphid)
+
     if match_terms == "no_access" or match_terms == "full_access":
-        return match_terms
+        response["access_level"] = match_terms
+        return response
     else:
+        response["access_level"] = "partial_access"
         match_node = match_terms['node_name']
         match_value = match_terms['value']
 
@@ -260,12 +270,13 @@ def get_allowed_resource_ids(user, graphid, invert=False):
         with open(os.path.join(settings.LOG_DIR, "allowed_resources_query.json"), "w") as output:
             output.write(str(query))
 
-    results = query.search(index='resource', doc_type=graphid)
+    results = query.search(index='resources', doc_type=graphid)
 
     resourceids = [i['_source']['resourceinstanceid'] for i in results['hits']['hits']]
 
     if invert is True:
         inverted_res = ResourceInstance.objects.filter(graph_id=graphid).exclude(resourceinstanceid__in=resourceids)
-        return [i.resourceinstanceid for i in inverted_res]
+        resourceids = [i.resourceinstanceid for i in inverted_res]
 
-    return resourceids
+    response["id_list"] = resourceids
+    return response
