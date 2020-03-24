@@ -187,7 +187,7 @@ def get_state_node_match(user):
 
     elif user.groups.filter(name="FL_WMD").exists():
 
-        if user.username == "SJRWMD":
+        if user.username == "SJRWMD_Admin":
             return {
                 'node_name': "Managed Area Category",
                 'value': "Water Management District"
