@@ -40,7 +40,7 @@ class Command(BaseCommand):
         outrows = []
         with open(source,"rb") as opencsv:
             reader = csv.reader(opencsv)
-            header = reader.next()
+            header = next(reader)
             outrows.append(header)
             geo = header.index(geom_field)
             for row in reader:

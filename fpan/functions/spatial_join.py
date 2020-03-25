@@ -159,7 +159,7 @@ class SpatialJoin(BaseFunction):
                 print("  checking for previously saved tiles with this target_ng_id")
             previously_saved_tiles = Tile.objects.filter(nodegroup_id=target_ng_id,resourceinstance_id=tile.resourceinstance_id)
             if verbose:
-                print(f" {len(previously_saved_tiles) found}"
+                print(f" {len(previously_saved_tiles)} found")
             if len(previously_saved_tiles) > 0:
                 for t in previously_saved_tiles:
                     if target_node_datatype == "concept-list":

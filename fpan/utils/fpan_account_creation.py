@@ -293,7 +293,7 @@ def create_accounts_from_csv(csv_file):
     with open(csv_file,"rU") as opencsv:
 
         reader = csv.reader(opencsv)
-        reader.next()
+        next(reader)
 
         for row in reader:
             name = row[2]
