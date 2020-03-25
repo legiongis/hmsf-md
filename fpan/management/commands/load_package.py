@@ -163,8 +163,8 @@ class Command(BaseCommand):
             tile_server_overlays = glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'overlays',  '*.xml'))
             tile_server_overlays += glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'overlays', '*.json'))
            
-            load_tile_server_layers(tile_server_basemaps, True)
-            load_tile_server_layers(tile_server_overlays, False)
+#            load_tile_server_layers(tile_server_basemaps, True)
+#            load_tile_server_layers(tile_server_overlays, False)
 
         def load_business_data(package_dir):
             business_data = []
