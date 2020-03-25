@@ -19,15 +19,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import os
 import sys
 import inspect
-path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) 
+path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 if path not in sys.path:
     sys.path.append(path)
 
-# reverting back to the old style of setting the DJANGO_SETTINGS_MODULE env variable
-# refer to the following blog post under the heading "Leaking of process environment variables."
-# http://blog.dscpl.com.au/2012/10/requests-running-in-wrong-django.html
-os.environ['DJANGO_SETTINGS_MODULE'] = "fpan.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fpan.settings")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
+
+from arches.app.models.system_settings import settings
+settings.update_from_db()
