@@ -246,7 +246,7 @@ def load_fpan_state_auth(fake_passwords=False):
     if fake_passwords is False:
         with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"),"wb") as outcsv:
             write = csv.writer(outcsv)
-            write.writerow(("username","password"))
+            write.writerow((b"username",b"password"))
             for user_pw in created_users:
                 write.writerow((user_pw[0].username, user_pw[1]))
 
