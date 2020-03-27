@@ -20,15 +20,15 @@ class MVT(APIBase):
         except models.Node.DoesNotExist:
             raise Http404()
         config = node.config
-        cache_key = f"mvt_{nodeid}_{zoom}_{x}_{y}"
+        cache_key = f"mvt_{nodeid}_{request.user.username}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
 
         res_access = get_allowed_resource_ids(request.user, str(node.graph_id))
 
-        if res_access["access_level"] == "no_access":
-            return HttpResponseForbidden()
-        elif res_access["access_level"] == "full_access":
-            resid_where = f"NULL IS NULL"
+        if res_access["access_level"] == "full_access":
+            resid_where = "NULL IS NULL"
+        elif res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
+            raise Http404()
         else:
             ids = "','".join(res_access["id_list"])
             resid_where = f"resourceinstanceid IN ('{ids}')"
