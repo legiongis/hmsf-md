@@ -261,7 +261,7 @@ class Command(BaseCommand):
             ]
             perm_error = False
             
-            for g_name,data in perm_configs.iteritems():
+            for g_name,data in perm_configs.items():
                 try:
                     g = Graph.objects.get(name=g_name)
                     if not g.isresource:
@@ -271,14 +271,14 @@ class Command(BaseCommand):
                 except ObjectDoesNotExist:
                     print(f"graph: {g_name} - Error: does not exist\n--")
                     continue
-                for group_name, perms in data.iteritems():
+                for group_name, perms in data.items():
                     try:
                         group = Group.objects.get(name=group_name)
                         print(f"  group: {group_name}"),
                     except ObjectDoesNotExist:
                         print(f"    group: {group_name} - Error: does not exist\n--")
                         continue
-                    for perm_type, card_names in perms.iteritems():
+                    for perm_type, card_names in perms.items():
                         if not perm_type in valid_perms:
                             print(f"    permission: {perm_type} - Error: invalid permission type")
                             perm_error = True
@@ -294,7 +294,7 @@ class Command(BaseCommand):
                 print(f"valid permission types: {valid_perms}")
 
         if setup_db:
-            management.call_command('setup_db',yes=True)
+            management.call_command('setup_db',force=True)
 
         package = settings.PACKAGE_PATH
 
