@@ -22,19 +22,19 @@ def create_accounts_from_json(json_file):
     with open(json_file,'rb') as configs:
         auth_configs = json.load(configs)
 
-    print "\nclearing all existing users\n----------------------"
+    print("\nclearing all existing users\n----------------------")
     keep_users = ["admin","anonymous"]
     all_users = User.objects.exclude(username__in=keep_users)
     for u in all_users:
-        print "  removing user: "+u.username
+        print(f"  removing user: {u.username}")
         u.delete()
-    print "    done"
+    print("    done")
     
-    print "\ncreating new Scouts for HMS\n----------------------"
+    print("\ncreating new Scouts for HMS\n----------------------")
     for group,users in auth_configs.iteritems():
         newgroup = Group.objects.get_or_create(name=group)[0]
         for user,info in users.iteritems():
-            print "  creating user:",user
+            print(f"  creating user: {user}")
             if group == "Scout":
                 newuser = Scout.objects.create_user(user,"",info['password'])
                 newuser.first_name = info['first_name']
@@ -42,7 +42,7 @@ def create_accounts_from_json(json_file):
                 newuser.middle_initial = info['middle_initial']
                 newuser.scoutprofile.site_interest_type = info['site_interests']
                 for region in info['regions']:
-                    print region
+                    print(region)
                     obj = Region.objects.get(name=region)
                     newuser.scoutprofile.region_choices.add(obj)
                 cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
@@ -56,14 +56,14 @@ def create_accounts_from_json(json_file):
 
 def create_mock_scout_accounts():
 
-    print "----------------"
+    print("----------------")
     scout_grp = Group.objects.get_or_create(name="Scout")[0]
     scouts = Scout.objects.all()
-    print "deleting existing scouts:",scouts
+    print(f"deleting existing scouts: {scouts}")
     for s in scouts:
         s.delete()
 
-    print "creating new scouts:"
+    print("creating new scouts:")
     cen_region = Region.objects.get(name="Central")
     ec_region = Region.objects.get(name="East Central")
     ne_region = Region.objects.get(name="Northeast")
@@ -80,7 +80,7 @@ def create_mock_scout_accounts():
     frank.scoutprofile.region_choices.add(ec_region)
     frank.scoutprofile.site_interest_type = ["Prehistoric","Historic"]
     frank.save()
-    print "  scout created: Frank Hardy"
+    print("  scout created: Frank Hardy")
 
     joe = Scout.objects.create_user("jbhardy","","joe")
     joe.first_name = "Joe"
@@ -89,7 +89,7 @@ def create_mock_scout_accounts():
     joe.scoutprofile.region_choices.add(ne_region)
     joe.scoutprofile.site_interest_type = ["Cemeteries"]
     joe.save()
-    print "  scout created: Joe Hardy"
+    print("  scout created: Joe Hardy")
 
     chet = Scout.objects.create_user("cjmorton","","chet")
     chet.first_name = "Chet"
@@ -99,7 +99,7 @@ def create_mock_scout_accounts():
     chet.scoutprofile.region_choices.add(nw_region)
     chet.scoutprofile.site_interest_type = ["Historic"]
     chet.save()
-    print "  scout created: Chet Morton"
+    print("  scout created: Chet Morton")
 
     biff = Scout.objects.create_user("bahooper","","biff")
     biff.first_name = "Biff"
@@ -110,7 +110,7 @@ def create_mock_scout_accounts():
     biff.scoutprofile.region_choices.add(ec_region)
     biff.scoutprofile.site_interest_type = ["Historic","Cemeteries","Prehistoric"]
     biff.save()
-    print "  scout created: Biff Hooper"
+    print("  scout created: Biff Hooper")
 
     ## add to the Scout group and Heritage Manager group
     cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
@@ -151,7 +151,7 @@ def load_fpan_state_auth(fake_passwords=False):
 
     created_users = []
 
-    print "\ncreating one login per group for some state agencies\n----------------------"
+    print("\ncreating one login per group for some state agencies\n----------------------")
 
     one_offs = ['FL_BAR','FMSF']
 
@@ -160,7 +160,7 @@ def load_fpan_state_auth(fake_passwords=False):
         new_account = create_single_account_and_group(agency_name, fake_passwords)
         created_users.append(new_account)
 
-    print "\ncreating one login per unit and one group for other state agencies\n----------------------"
+    print("\ncreating one login per unit and one group for other state agencies\n----------------------")
     
     logins_per_unit_dict = {
         "FL Dept. of Environmental Protection, Div. of Recreation and Parks":"StatePark",
@@ -173,7 +173,7 @@ def load_fpan_state_auth(fake_passwords=False):
     for a in logins_per_unit_dict.keys():
             
         lookup = logins_per_unit_dict[a]
-        print("making group: " + lookup)
+        print(f"making group: {lookup}")
         group = Group.objects.get_or_create(name=lookup)[0]
         a_ma = all.filter(agency=a)
         
@@ -190,7 +190,7 @@ def load_fpan_state_auth(fake_passwords=False):
             user.save()
             created_users.append((user,pw))
             ct+=1
-        print "  {} users added to group".format(ct)
+        print(f"  {ct} users added to group")
 
     sp_grp = Group.objects.get_or_create(name="StatePark")[0]
     for n in range(1,6):
@@ -204,7 +204,7 @@ def load_fpan_state_auth(fake_passwords=False):
         user.groups.add(sp_grp)
         user.save()
         created_users.append((user,pw))
-        print("user created: "+name)
+        print(f"user created: {name}")
 
     name = "SPAdmin"
     user = User.objects.get_or_create(username=name)[0]
@@ -246,7 +246,7 @@ def load_fpan_state_auth(fake_passwords=False):
     if fake_passwords is False:
         with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"),"wb") as outcsv:
             write = csv.writer(outcsv)
-            write.writerow(("username","password"))
+            write.writerow((b"username",b"password"))
             for user_pw in created_users:
                 write.writerow((user_pw[0].username, user_pw[1]))
 
@@ -287,19 +287,19 @@ def create_accounts_from_csv(csv_file):
     """ this function needs to be updated before it is used. it was created
     for a one-off effort, but could be reused if it's fixed up a bit."""
 
-    print "adding accounts"
+    print("adding accounts")
     outrows = []
-    print len(User.objects.all())
+    print(User.objects.all().count())
     with open(csv_file,"rU") as opencsv:
 
         reader = csv.reader(opencsv)
-        reader.next()
+        next(reader)
 
         for row in reader:
             name = row[2]
             pw = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
             if len(User.objects.filter(username=name)) > 0:
-                print " ",name, "already exists"
+                print(f" {name} already exists")
                 continue
             user = User.objects.create_user(name,"",pw)
             cs_grp = Group.objects.get(name="Crowdsource Editor")
@@ -307,12 +307,12 @@ def create_accounts_from_csv(csv_file):
             fwc_grp = Group.objects.get(name="FWC")
             user.groups.add(fwc_grp)
             user.save()
-            print " ",user.username, "added"
+            print(f" {user.username} added")
             outrows.append([name,pw])
 
     outlog = os.path.join(os.path.dirname(csv_file),os.path.basename(csv_file).replace(".csv","_log.csv"))
 
-    print len(User.objects.all())
+    print(User.objects.all().count())
     with open(outlog, "wb") as outcsv:
         writer = csv.writer(outcsv)
         writer.writerow(['username','password'])
@@ -343,11 +343,11 @@ def make_managed_area_nicknames():
     join_dict = {}
     for a in agencies:
         lookup = agency_dict[a]
-        print a, lookup
+        print(f"{a} {lookup}")
         if a == "FL Fish and Wildlife Conservation Commission":
             continue
         a_ma = all.filter(agency=a)
-        print len(a_ma)
+        print(len(a_ma))
         ct = 0
         abbreviations1 = {
             "Historic State Park":"HSP",
@@ -378,16 +378,16 @@ def make_managed_area_nicknames():
             if len(sn)>30:
                 sn = ma.name.split(" ")[0]+ma.name.split(" ")[1]+abbr
                 sn = "".join([i for i in sn if not i in strip_chars])
-                print sn
+                print(sn)
             if len(sn)>30:
                 ct+=1
-                print sn
+                print(sn)
             join_dict[ma.name] = sn
             
-        print ct,"are too long"
+        print(f"{ct} are too long")
         d[lookup]=ct
 
-    print len(join_dict)
+    print(len(join_dict))
     names = join_dict.keys()
     names.sort()
     with open(os.path.join(settings.SECRET_LOG,"nicknames.csv"),"wb") as csvout:

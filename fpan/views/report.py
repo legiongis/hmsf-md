@@ -75,7 +75,6 @@ class FPANResourceReportView(ResourceReportView):
         if not user_can_edit_this_resource(request.user, resourceid):
             raise Http404
 
-        print "this is the new FPAN view"
         # manually update the settings here
         # before adding this line, the mapbox key was not available in the report, for example.
         settings.update_from_db()

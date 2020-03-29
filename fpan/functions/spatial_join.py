@@ -68,12 +68,12 @@ def get_valueid_from_preflabel(preflabel):
     vs = models.Value.objects.filter(value=preflabel)
 
     if len(vs) == 0:
-        print "no match for this preflabel:",preflabel
+        print(f"no match for this preflabel: {preflabel}")
         return None
     if len(vs) > 1:
         concept_ids = [i.concept_id for i in vs]
         if len(set(concept_ids)) > 1:
-            print "too many values for this preflabel:", preflabel
+            print(f"too many values for this preflabel: {preflabel}")
             return None
 
     return str(vs[0].valueid)
@@ -86,7 +86,7 @@ class SpatialJoin(BaseFunction):
         ## but useful during development
         verbose = False
         if verbose:
-            print "verbose:",verbose
+            print(f"verbose: {verbose}")
 
         ## return early if there is no spatial data to use for a comparison
         spatial_node_id = self.config['spatial_node_id']
@@ -107,7 +107,7 @@ class SpatialJoin(BaseFunction):
 
         for table_field_target in table_field_targets:
             if verbose:
-                print "processing input:",table_field_target
+                print(f"processing input: {table_field_target}")
             ## skip if the table_name.field_name input is not valid
             if not "." in table_field_target['table_field']:
                 continue
@@ -140,7 +140,7 @@ class SpatialJoin(BaseFunction):
             ## just set the new value right here
             if str(target_ng_id) == str(tile.nodegroup_id):
                 if verbose:
-                    print "  inside same nodegroup"
+                    print("  inside same nodegroup")
                 ## set precedent for correlating new values with target node
                 ## datatype. the following will work on a limited basis
                 if target_node_datatype == "concept-list":
@@ -156,10 +156,10 @@ class SpatialJoin(BaseFunction):
             ## if the tile that is to be updated already exists, then it is easy
             ## to find and update it. this should be combined with a 
             if verbose:
-                print "  checking for previously saved tiles with this target_ng_id"
+                print("  checking for previously saved tiles with this target_ng_id")
             previously_saved_tiles = Tile.objects.filter(nodegroup_id=target_ng_id,resourceinstance_id=tile.resourceinstance_id)
             if verbose:
-                print " ",len(previously_saved_tiles),"found"
+                print(f" {len(previously_saved_tiles)} found")
             if len(previously_saved_tiles) > 0:
                 for t in previously_saved_tiles:
                     if target_node_datatype == "concept-list":
@@ -172,7 +172,7 @@ class SpatialJoin(BaseFunction):
                 continue
             
             if verbose:
-                print "  must need a brand new tile"
+                print("  must need a brand new tile")
             parenttile = Tile().get_blank_tile(target_node_id,resourceid=tile.resourceinstance_id)
             existing_pts = Tile.objects.filter(nodegroup_id=parenttile.nodegroup_id,resourceinstance_id=tile.resourceinstance_id)
             
@@ -181,7 +181,7 @@ class SpatialJoin(BaseFunction):
                 for ng_id,tilelist in parenttile.tiles.iteritems():
                     if ng_id == target_ng_id:
                         if verbose:
-                            print "  creating new parent tile and tile"
+                            print("  creating new parent tile and tile")
                         for t in tilelist:
                             if target_node_datatype == "concept-list":
                                 t.data[target_node_id] = attributes
@@ -198,7 +198,7 @@ class SpatialJoin(BaseFunction):
                 for ng_id,tilelist in parenttile.tiles.iteritems():
                     if ng_id == target_ng_id:
                         if verbose:
-                            print "  creating new tile and assigning to existing parent tile"
+                            print("  creating new tile and assigning to existing parent tile")
                         for t in tilelist:
                             if target_node_datatype == "concept-list":
                                 t.data[target_node_id] = attributes
@@ -215,22 +215,22 @@ class SpatialJoin(BaseFunction):
             ## but this has not been tested yet.
             if len(existing_pts) > 1:
                 if verbose:
-                    print "  there are multiple existing parent tiles. this circumstance"\
-                        "is not supported at this time."
+                    print("  there are multiple existing parent tiles. this circumstance"\
+                        "is not supported at this time.")
                 continue
             
             # tos = Tile.objects.filter(resourceinstance_id=tile.resourceinstance_id)
             # for to in tos:
-                # print to.serialize()
-            # print len(tos)
+                # print(to.serialize())
+            # print(len(tos))
 
         return
 
     def on_import(self):
-        print 'calling on import'
+        print('calling on import')
 
     def get(self):
-        print 'calling get'
+        print('calling get')
 
     def delete(self):
-        print 'calling delete'
+        print('calling delete')

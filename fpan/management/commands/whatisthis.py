@@ -25,10 +25,8 @@ class Command(BaseCommand):
         try:
             val = uuid.UUID(in_uuid, version=4)
         except:
-            print "  -- this is not a vali uuid"
+            print("  -- this is not a valid uuid")
             return False
-        
-        # start1 = time.time()
         
         ## search all models and see if the UUID matches an existing object
         neo = False
@@ -41,15 +39,13 @@ class Command(BaseCommand):
         
         ## return False if nothing was found
         if not neo:
-            print "  -- this uuid doesn't match any objects in your database"
+            print("  -- this uuid doesn't match any objects in your database")
             return False
         
-        print "this is a", neo
+        print(f"this is a {neo}")
         
         for k,v in vars(neo).iteritems():
-            print k
-            print " ",v
-        
-        # print round(time.time()-start1,2)
+            print(k)
+            print(f" {v}")
         
         return neo

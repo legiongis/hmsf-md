@@ -1,4 +1,4 @@
-import unicodecsv
+import csv
 from datetime import datetime
 from django.conf import settings
 from django.shortcuts import render, HttpResponse
@@ -133,7 +133,7 @@ def scout_list_download(request):
     response['Content-Disposition'] = 'attachment; filename={}'.format(csvname)
 
     ## create writer object
-    writer = unicodecsv.writer(response)
+    writer = csv.writer(response)
 
     header_row = ['scoutid','first_name','last_name','email','street address',
                     'city','state','zip','phone','interests','region_choices',

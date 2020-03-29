@@ -72,9 +72,9 @@ class Command(BaseCommand):
             data.append(f)
             feat_ct+=1
             if feat_ct % 100 == 0:
-                print feat_ct
+                print(feat_ct)
             elif feat_ct % 10 == 0:
-                print feat_ct,
+                print(feat_ct, end="")
                 
             ## write partial if max_features has been specified
             if max_features:

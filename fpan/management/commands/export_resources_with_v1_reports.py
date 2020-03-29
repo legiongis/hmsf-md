@@ -32,18 +32,17 @@ class Command(BaseCommand):
         exportresids = set()
 
         for rm_id in model_ids:
-            print rm_id
+            print(rm_id)
             resources = Resource.objects.filter(graph_id=rm_id)
-            print "total number of resources:", len(resources)
+            print(f"total number of resources: {len(resources)}")
             report_node = Node.objects.get(name="Scout Report", graph_id=rm_id)
             report_toptiles = Tile.objects.filter(nodegroup_id=report_node.nodegroup_id)
-            print "total number of reports:", len(report_toptiles)
+            print(f"total number of reports: {len(report_toptiles)}")
             resids = set([i.resourceinstance_id for i in report_toptiles])
             exportresids.update(resids)
             resrep = [i for i in resources if i.resourceinstanceid in resids]
-            print "resources with reports:", len(resrep)
+            print(f"resources with reports: {len(resrep)}")
 
-        # print len(exportresids)
         resource_exporter = ResourceExporter('json', single_file=True)
         data = resource_exporter.export(resourceinstanceids=list(exportresids))
         for file in data:

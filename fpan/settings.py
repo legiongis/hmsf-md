@@ -9,11 +9,11 @@ import inspect
 
 try:
     from arches.settings import *
-except ImportError:
+except ImportError as e:
     pass
-    
+
 GOOGLE_ANALYTICS_TRACKING_ID = None
-    
+
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
@@ -29,6 +29,8 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
+
+SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
 REPORT_INLINES = {
     "Archaeological Site" : [
@@ -200,10 +202,10 @@ NOSE_ARGS = [
 
 
 try:
-    from settings_local import *
-except ImportError:
+    from .settings_local import *
+except ImportError as e:
     pass
-    
+
 if not DEBUG:
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     SESSION_COOKIE_AGE = 7200 #auto logout after 2 hours

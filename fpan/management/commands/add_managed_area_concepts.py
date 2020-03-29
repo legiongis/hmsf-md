@@ -85,4 +85,4 @@ class Command(BaseCommand):
             v.concept = c
             v.save()
 
-            print ma.name, "saved"
+            print(f"{ma.name} saved")

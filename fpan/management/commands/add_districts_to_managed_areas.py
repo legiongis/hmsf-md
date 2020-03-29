@@ -24,7 +24,7 @@ class Command(BaseCommand):
         lookupfile = os.path.join(refdatadir, "FSP_Districts.csv")
         with open(lookupfile, "r") as f:
             reader = csv.reader(f)
-            reader.next()
+            next(reader)
             for row in reader:
                 lookup[row[0]] = row[1]
 
@@ -46,7 +46,7 @@ class Command(BaseCommand):
         lookupfile = os.path.join(refdatadir, "WMD_Districts.csv")
         with open(lookupfile, "r") as f:
             reader = csv.reader(f)
-            reader.next()
+            next(reader)
             for row in reader:
                 lookup[row[0]] = row[1]
 
