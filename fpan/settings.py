@@ -36,6 +36,8 @@ SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 # someone were to hit the shapefile export url somehow.
 RESOURCE_FORMATTERS['shp'] = None
 
+DISABLE_PROVISIONAL_EDITING = True
+
 REPORT_INLINES = {
     "Archaeological Site" : [
         {
