@@ -72,7 +72,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                     card: card,
                                     tile: null,
                                     loading: self.loading,
-                                    form: self
+                                    form: self,
+                                    pageVm: $root
                                 }
                             } --> <!-- /ko -->
                         </ul>
@@ -112,8 +113,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
             <!--ko if: selection() === 'related-resources' -->
-            <div data-bind="with: relatedResourcesManager">
-                {% include 'views/resource/related-resources/related-resources-manager.htm' %}
+            <div>
+                 <div data-bind="component: {
+                    name: 'related-resources-manager',
+                    params: relatedResourcesManagerObj
+                }"></div>
             </div>
             <!--/ko -->
 
@@ -269,7 +273,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     provisionalTileViewModel: provisionalTileViewModel,
                     reviewer: reviewer,
                     loading: loading,
-                    form: $data
+                    form: $data,
+                    pageVm: $root
                 }
             }"></div>
             <!-- /ko -->
@@ -298,6 +303,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 ontologyclass: '{{ontologyclass}}',
                 relationship_types: {{ relationship_types }},
                 datatypes: {{datatypes_json}},
+                appliedFunctions: {{applied_functions}},
                 cardComponents: {{card_components_json}},
                 nodegroups: {{nodegroups}},
                 userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
