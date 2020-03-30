@@ -32,6 +32,10 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_process
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
+# manually disable the shapefile exporter class. This creates a 500 error if
+# someone were to hit the shapefile export url somehow.
+RESOURCE_FORMATTERS['shp'] = None
+
 REPORT_INLINES = {
     "Archaeological Site" : [
         {
