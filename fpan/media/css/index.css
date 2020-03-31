@@ -15,18 +15,18 @@ h1, h2, h3, h4, h5, h6 {
     line-height: 1.15;
 }
 
-h1 {
+h1, .card-component-panel h1 {
   margin-top: 0;
   font-size: 3.052em;
 }
 
-h2 {font-size: 2.441em;}
+h2, .card-component-panel h2 {font-size: 2.441em;}
 
-h3 {font-size: 1.953em;}
+h3, .card-component-panel h3 {font-size: 1.953em;}
 
-h4 {font-size: 1.563em;}
+h4, .card-component-panel h4 {font-size: 1.563em;}
 
-h5 {font-size: 1.25em;}
+h5, .card-component-panel h5 {font-size: 1.25em; font-weight: 400;}
 
 small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !important;}
 
