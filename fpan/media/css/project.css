@@ -1,0 +1,26 @@
+/* Nifty Arches Overrides */
+.left-panel-overflow {
+    height: calc(100vh - 225px);
+    overflow-y: auto;
+}
+.card-component-panel {
+    overflow: scroll;
+}
+.search-toolbar {
+    height: 50px; 
+}
+.search-type-btn-panel {
+    height: 49px;
+}
+.search-type-btn {
+    height: 49px;
+}
+.card-form-preview-container {
+    overflow-y: hidden;
+}
+.widget-input-label {
+    font-size: 1em;
+}
+.ep-graph-title-icon {
+    border: 0px solid #ddd;
+}
