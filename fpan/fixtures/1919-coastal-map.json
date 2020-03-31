@@ -1,0 +1,37 @@
+[
+ {
+  "model": "models.mapsource",
+  "fields": {
+   "name": "coastal-route-map-1919",
+   "source": {
+    "type": "raster",
+    "tiles": [
+     "https://db.legiongis.com/geoserver/fpan/wms?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.1&request=GetMap&srs=EPSG:3857&width=256&height=256&layers=fpan:1919-coastal-map&transparent=true"
+    ],
+    "tileSize": 256
+   }
+  }
+ },
+ {
+  "model": "models.maplayer",
+  "fields": {
+   "name": "Inside Route - Key West to New Orleans | 1919",
+   "layerdefinitions": [
+    {
+     "id": "coastal-route-map-1919",
+     "type": "raster",
+     "source": "coastal-route-map-1919"
+    }
+   ],
+   "isoverlay": true,
+   "activated": false,
+   "icon": "none",
+   "addtomap": false,
+   "centerx": null,
+   "centery": null,
+   "zoom": null,
+   "legend": "",
+   "searchonly": false
+  }
+ }
+]
