@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string, get_template
+from django.views.decorators.csrf import csrf_exempt
 
 from arches.app.models.system_settings import settings
 
@@ -19,6 +20,7 @@ from hms.models import Scout
 from hms.forms import ScoutForm, ScoutProfileForm
 
 @never_cache
+@csrf_exempt
 def auth(request,login_type):
     if not login_type in ['hms','state','logout']:
         raise Http404("not found")
