@@ -5,6 +5,9 @@ from django.db import transaction, connection
 from arches.app.models import models
 from arches.app.views.api import APIBase
 from arches.app.models.system_settings import settings
+from arches.app.models.resource import Resource
+from arches.app.models.graph import Graph
+from arches.app.utils.response import JSONResponse
 from fpan.utils.permission_backend import get_allowed_resource_ids
 
 class MVT(APIBase):
@@ -126,3 +129,24 @@ class MVT(APIBase):
         if not len(tile):
             raise Http404()
         return HttpResponse(tile, content_type="application/x-protobuf")
+
+
+class ResourceIdLookup(APIBase):
+
+    def get(self, request):
+
+        site_models = [
+            "Archaeological Site",
+            "Historic Cemetery",
+            "Historic Structure"
+        ]
+        response = {"resources": []}
+
+        for g in Graph.objects.filter(name__in=site_models):
+
+            resources = Resource.objects.filter(graph_id=g.pk)
+            for res in resources:
+                siteid = res.get_node_values("FMSF ID")[0]
+                response['resources'].append((g.name, siteid, res.resourceinstanceid))
+
+        return JSONResponse(response)

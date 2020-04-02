@@ -30,5 +30,6 @@ urlpatterns = [
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         auth.activate, name='activate'),
     url(r'^auth/', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
+    url(r"api/lookup$", api.ResourceIdLookup.as_view(), name="resource_lookup"),
     url(r'^', include('arches.urls')),
 ]
