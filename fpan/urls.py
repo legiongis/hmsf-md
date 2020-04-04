@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
 from django.conf import settings
+from arches.app.views.auth import UserProfileView, GetClientIdView
 from fpan.views import api, main, report, auth, scout, search
 
 uuid_regex = settings.UUID_REGEX
@@ -25,6 +26,8 @@ urlpatterns = [
         api.MVT.as_view(),
         name="mvt",
     ),
+    url(r'^auth/user_profile$', UserProfileView.as_view(), name='user_profile'),
+    url(r'^auth/get_client_id$', GetClientIdView.as_view(), name='get_client_id'),
     url(r'^auth/password$', auth.change_password, name='change_password'),
     url(r'^auth/(?P<login_type>[\w-]+)', auth.auth, name='auth'),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
