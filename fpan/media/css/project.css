@@ -16,7 +16,7 @@
     height: 49px;
 }
 .card-form-preview-container {
-    overflow-y: hidden;
+    overflow-y: auto;
 }
 .widget-input-label {
     font-size: 1em;

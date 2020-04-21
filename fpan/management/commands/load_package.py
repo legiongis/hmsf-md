@@ -109,62 +109,27 @@ class Command(BaseCommand):
 
             for path in collection_data:
                 management.call_command('packages',operation='import_reference_data', source=path, overwrite='overwrite', stage='keep')
-
+ 
+            
         def load_mapbox_styles(style_paths, basemap):
             for path in style_paths:
                 style = json.load(open(path))
-                meta = {
-                    "icon": "fa fa-globe",
-                    "name": style["name"]
-                }
-                if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
-                    meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
+                try:
+                    meta = {"icon": "fa fa-globe", "name": style["name"]}
+                    if os.path.exists(os.path.join(os.path.dirname(path), "meta.json")):
+                        meta = json.load(open(os.path.join(os.path.dirname(path), "meta.json")))
+                    if basemap == True: 
+                        management.call_command('packages', operation='add_mapbox_layer', layer_icon=meta["icon"], layer_name=meta["name"], mapbox_json_path=path, is_basemap="true")
+                    if basemap == False:
+                        management.call_command('packages', operation='add_mapbox_layer', layer_icon=meta["icon"], layer_name=meta["name"], mapbox_json_path=path)
+                except KeyError as e:
+                    logger.warning("The map layer '{}' was not imported: {} is missing.".format(path, e))
 
-                if basemap == True: 
-                    management.call_command('packages', operation='add_mapbox_layer', layer_icon=meta["icon"], layer_name=meta["name"], mapbox_json_path=path, is_basemap="true")
-                if basemap == False:
-                    management.call_command('packages', operation='add_mapbox_layer', layer_icon=meta["icon"], layer_name=meta["name"], mapbox_json_path=path)
-                       
-        def load_tile_server_layers(xml_paths, basemap):
-            for path in xml_paths:
-                meta = {
-                    "icon": "fa fa-globe",
-                    "name": os.path.basename(path)
-                }
-                if os.path.exists(os.path.join(os.path.dirname(path), 'meta.json')):
-                    meta = json.load(open(os.path.join(os.path.dirname(path), 'meta.json')))
-                
-                tile_config_path = False
-                mapnik_xml_path = False
-                if path.endswith('.json'):
-                    tile_config_path = path
-                if path.endswith('.xml'):
-                    mapnik_xml_path = path                    
-                                
-                if mapnik_xml_path is False:
-                    if basemap == True: 
-                        management.call_command('packages', operation='add_tileserver_layer', layer_icon=meta["icon"], layer_name=meta["name"], tile_config_path=path, is_basemap='true')
-                    if basemap == False:    
-                        management.call_command('packages', operation='add_tileserver_layer', layer_icon=meta["icon"], layer_name=meta["name"], tile_config_path=path)
-                if tile_config_path is False:
-                    if basemap == True: 
-                        management.call_command('packages', operation='add_tileserver_layer', layer_icon=meta["icon"], layer_name=meta["name"], mapnik_xml_path=path, is_basemap='true')
-                    if basemap == False:    
-                        management.call_command('packages', operation='add_tileserver_layer', layer_icon=meta["icon"], layer_name=meta["name"], mapnik_xml_path=path)
-                        
         def load_map_layers(package_dir):
-            basemap_styles = glob.glob(os.path.join(package_dir, 'map_layers', 'mapbox_spec_json', 'basemaps', '*', '*.json'))
-            overlay_styles = glob.glob(os.path.join(package_dir, 'map_layers', 'mapbox_spec_json', 'overlays', '*', '*.json'))
+            basemap_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "basemaps", "*", "*.json"))
+            overlay_styles = glob.glob(os.path.join(package_dir, "map_layers", "mapbox_spec_json", "overlays", "*", "*.json"))
             load_mapbox_styles(basemap_styles, True)
             load_mapbox_styles(overlay_styles, False)
-
-            tile_server_basemaps = glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'basemaps',  '*.xml'))
-            tile_server_basemaps += glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'basemaps', '*.json'))
-            tile_server_overlays = glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'overlays',  '*.xml'))
-            tile_server_overlays += glob.glob(os.path.join(package_dir, 'map_layers', 'tile_server', 'overlays', '*.json'))
-           
-#            load_tile_server_layers(tile_server_basemaps, True)
-#            load_tile_server_layers(tile_server_overlays, False)
 
         def load_business_data(package_dir):
             business_data = []
