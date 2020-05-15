@@ -39,5 +39,5 @@ class ManagedArea(models.Model):
     geom = models.MultiPolygonField()
 
     # Returns the string representation of the model.
-    def __unicode__(self):              # __unicode__ on Python 2
+    def __str__(self):              # __unicode__ on Python 2
         return self.name
