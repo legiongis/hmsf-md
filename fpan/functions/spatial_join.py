@@ -34,8 +34,8 @@ def attribute_from_postgis(table,field,geojson):
 
     ## make connection to postgis database
     db = settings.DATABASES['default']
-    db_conn = "dbname = {} user = {} host = {} password = {}".format(
-        db['NAME'],db['USER'],db['HOST'],db['PASSWORD'])
+    db_conn = "dbname = {} port = {} user = {} host = {} password = {}".format(
+        db['NAME'],db['PORT'],db['USER'],db['HOST'],db['PASSWORD'])
     conn = psycopg2.connect(db_conn)
     cur = conn.cursor()
 
