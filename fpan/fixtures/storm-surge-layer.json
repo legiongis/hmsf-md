@@ -1,0 +1,37 @@
+[
+ {
+  "model": "models.mapsource",
+  "fields": {
+   "name": "storm-surge-layer1",
+   "source": {
+    "type": "raster",
+    "tiles": [
+     "https://maps.floridadisaster.org/GIS/rest/services/Hazards/Storm_Surge_Zones/MapServer/0/tile/{z}/{y}/{x}"
+    ],
+    "tileSize": 256
+   }
+  }
+ },
+ {
+  "model": "models.maplayer",
+  "fields": {
+   "name": "Storm Surge Zones1",
+   "layerdefinitions": [
+    {
+     "id": "storm-surge-layer1",
+     "type": "raster",
+     "source": "storm-surge-layer1"
+    }
+   ],
+   "isoverlay": true,
+   "activated": false,
+   "icon": "none",
+   "addtomap": false,
+   "centerx": null,
+   "centery": null,
+   "zoom": null,
+   "legend": "Storm surge zones from Statewide Regional Evacuation Studies (http://floridadisaster.org/res)",
+   "searchonly": false
+  }
+ }
+]
