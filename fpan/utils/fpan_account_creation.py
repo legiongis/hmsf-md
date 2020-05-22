@@ -29,7 +29,7 @@ def create_accounts_from_json(json_file):
         print(f"  removing user: {u.username}")
         u.delete()
     print("    done")
-    
+
     print("\ncreating new Scouts for HMS\n----------------------")
     for group,users in auth_configs.iteritems():
         newgroup = Group.objects.get_or_create(name=group)[0]
@@ -161,22 +161,22 @@ def load_fpan_state_auth(fake_passwords=False):
         created_users.append(new_account)
 
     print("\ncreating one login per unit and one group for other state agencies\n----------------------")
-    
+
     logins_per_unit_dict = {
         "FL Dept. of Environmental Protection, Div. of Recreation and Parks":"StatePark",
         "FL Dept. of Environmental Protection, Florida Coastal Office":"FL_AquaticPreserve",
         "FL Dept. of Agriculture and Consumer Services, Florida Forest Service":"FL_Forestry",
         "FL Fish and Wildlife Conservation Commission":"FWC",
     }
-    
+
     all = ManagedArea.objects.all()
     for a in logins_per_unit_dict.keys():
-            
+
         lookup = logins_per_unit_dict[a]
         print(f"making group: {lookup}")
         group = Group.objects.get_or_create(name=lookup)[0]
         a_ma = all.filter(agency=a)
-        
+
         ct = 0
         for ma in a_ma:
             name = ma.nickname
@@ -244,9 +244,9 @@ def load_fpan_state_auth(fake_passwords=False):
     ## only write the log with passwords in it if real passwords were created.
     ## this is especially important to accommodate test running
     if fake_passwords is False:
-        with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"),"wb") as outcsv:
+        with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"), "w", newline="") as outcsv:
             write = csv.writer(outcsv)
-            write.writerow((b"username",b"password"))
+            write.writerow(("username", "password"))
             for user_pw in created_users:
                 write.writerow((user_pw[0].username, user_pw[1]))
 
@@ -322,22 +322,22 @@ def create_accounts_from_csv(csv_file):
 
 def make_managed_area_nicknames():
     """this is a helper function that was written to make acceptable usernames
-    (no spaces or punctuation, and < 30 characters) from the names of Managed 
-    Areas. It produces a CSV that is later used to join with a shapefile and 
+    (no spaces or punctuation, and < 30 characters) from the names of Managed
+    Areas. It produces a CSV that is later used to join with a shapefile and
     create a fixture and load into the ManagedArea.nickname field."""
     all = ManagedArea.objects.all()
-    
+
     agency_dict = {
         "FL Fish and Wildlife Conservation Commission":"FWC",
         "FL Dept. of Environmental Protection, Div. of Recreation and Parks":"StatePark",
         "FL Dept. of Environmental Protection, Florida Coastal Office":"FL_AquaticPreserve",
         "FL Dept. of Agriculture and Consumer Services, Florida Forest Service":"FL_Forestry"
     }
-    
+
     ## note 8/1/18
     ## when creating individual accounts for fwcc units, more nickname handling was done in
     ## excel. This is now accounted for in fpan_account_utils.add_fwcc_nicknames()
-    
+
     agencies = [i[0] for i in ManagedArea.objects.order_by().values_list('agency').distinct()]
     d = {}
     join_dict = {}
@@ -353,7 +353,7 @@ def make_managed_area_nicknames():
             "Historic State Park":"HSP",
             "State Forest and Park":"SFP"
         }
-            
+
         abbreviations2 = {
             "State Forest":"SF",
             "State Park":"SP",
@@ -361,9 +361,9 @@ def make_managed_area_nicknames():
             "National Estuarine Research Reserve":"NERR",
             "Agricultural and Conservation Easement":"ACE"
         }
-        
+
         strip_chars = [" ",".","#","-","'"]
-            
+
         for ma in a_ma:
             sn = ma.name
             for k,v in abbreviations1.iteritems():
@@ -383,7 +383,7 @@ def make_managed_area_nicknames():
                 ct+=1
                 print(sn)
             join_dict[ma.name] = sn
-            
+
         print(f"{ct} are too long")
         d[lookup]=ct
 
