@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ('models', '5712_update_sys_setting'),
     ]
 
     operations = [
