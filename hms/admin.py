@@ -10,6 +10,7 @@ class ScoutProfileInline(admin.StackedInline):
     fk_name = 'user'
 
 class ScoutProfileAdmin(admin.ModelAdmin):
+    search_fields = ["username", "first_name", "last_name"]
     inlines = (ScoutProfileInline, )
 
     def get_inline_instance(self, request, obj=None):
