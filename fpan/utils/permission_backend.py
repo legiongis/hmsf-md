@@ -90,9 +90,10 @@ def get_match_conditions(user, graphid):
         }
 
         # now conditionally find the value that should be matched against using
-        # the node named above.
+        # the node named above. Add 'anonymous' to allow scouts to see public
+        # access sites while they are logged in.
         if perm_settings['match_config']['match_to'] == "<username>":
-            filter_config['value'] = user.username
+            filter_config['value'] = [user.username, "anonymous"]
 
         # generic allowance for specific, non-user-derived values to be passed in
         else:
