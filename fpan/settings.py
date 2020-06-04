@@ -12,6 +12,7 @@ try:
 except ImportError as e:
     pass
 
+DOMAIN = "hms.fpan.us"
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 APP_NAME = "FPAN"
@@ -178,8 +179,14 @@ TILE_CACHE_CONFIG = {
     # "secret": "<secret key>"
 }
 
-DEFAULT_FROM_EMAIL = ""
-EMAIL_SUBJECT_PREFIX = ""
+DEFAULT_FROM_EMAIL = 'no-reply@fpan.us'
+EMAIL_SUBJECT_PREFIX = '[HMS] '
+
+# put ADMINS and MANAGERS contact info in settings_local.py
+ADMINS = (
+    # ('Your Name', 'your_email@example.com'),
+)
+MANAGERS = ADMINS
 
 # Use Nose for running tests - errors occur unless you run test modules individually
 if len(sys.argv) > 1 and sys.argv[1] == "test":
