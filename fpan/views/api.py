@@ -147,7 +147,7 @@ class ResourceIdLookup(APIBase):
             resources = Resource.objects.filter(graph_id=g.pk)
             for res in resources:
                 try:
-                     siteid = res.get_node_values("FMSF ID")[0]
+                    siteid = res.get_node_values("FMSF ID")[0]
                 except IndexError:
                     continue
                 response['resources'].append((g.name, siteid, res.resourceinstanceid))

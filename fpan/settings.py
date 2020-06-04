@@ -12,6 +12,7 @@ try:
 except ImportError as e:
     pass
 
+DOMAIN = "hms.fpan.us"
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 APP_NAME = "FPAN"
@@ -90,14 +91,6 @@ RESOURCE_MODEL_USER_RESTRICTIONS = {
     }
 }
 
-TILESERVER_RESTRICTION_BY_GRAPH = {
-    'f212980f-d534-11e7-8ca8-94659cf754d0': {
-        'allowed_groups': [
-            'FMSF','FL_BAR'
-        ]
-    }
-}
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
@@ -121,8 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
         }
     },
 ]
-
-MENUS_TO_PRINT = 'Scout Report'
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '&cu1l36s)wxa@5yxefgdd-wkwpyw3tz2vru*ja@nh*r4*47^15'
@@ -188,8 +179,14 @@ TILE_CACHE_CONFIG = {
     # "secret": "<secret key>"
 }
 
-DEFAULT_FROM_EMAIL = ""
-EMAIL_SUBJECT_PREFIX = ""
+DEFAULT_FROM_EMAIL = 'no-reply@fpan.us'
+EMAIL_SUBJECT_PREFIX = '[HMS] '
+
+# put ADMINS and MANAGERS contact info in settings_local.py
+ADMINS = (
+    # ('Your Name', 'your_email@example.com'),
+)
+MANAGERS = ADMINS
 
 # Use Nose for running tests - errors occur unless you run test modules individually
 if len(sys.argv) > 1 and sys.argv[1] == "test":
