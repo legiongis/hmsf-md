@@ -1,0 +1,19 @@
+{% autoescape off %}
+<p>New reports: {{ total_reports_ct }}<br>
+New sites visited: {{ new_sites_visited_ct }}</p>
+
+{% for date, info in count_data.items %}
+<p>
+<strong>{{date}}</strong><br>{{info.ct}} Report{% if info.ct != 1 %}s{% endif %}
+{% if info.ct != 0 %}
+<ul>
+{% for report in info.reports %}
+  <li>{{ report.fmsfid }}{% if report.new_site == True %}*{% endif %} - <a href="https://{{domain}}/report/{{ report.resid }}">view report</a></li>
+{% endfor %}
+</ul>
+{% endif %}
+</p>
+{% endfor %}
+
+<p><em>* previously unvisited sites</em></p>
+{% endautoescape %}
