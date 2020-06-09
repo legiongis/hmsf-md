@@ -1,13 +1,16 @@
 {% autoescape off %}
 Hello {{ user.username }}!
 
-Welcome to the Heritage Monitoring Scouts, we're excited to have you! To activate your account, please navigate to link below by pasting it into your browser address bar.
+Welcome to the Heritage Monitoring Scouts, we're excited to have you! To grant you access to the database and connect you with resources in your area, we need to learn a bit more about you. Please follow the instructions below to complete your registration.
 
-https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+To Activate Your Account:
 
-Be ready to login with your username ({{ user.username }}) and password. Once logged in, please fill out your user profile so we can learn a bit more about you. We won't be able to assign Archaeological Sites to you until we know what regions you are interested in!
+     1.  Paste this link into your browser address bar to verify your email: https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
 
-Every time you visit the database in the future, be sure to login through the "Scout Portal" found on the home page, https://hms.fpan.us.
+     2. The link above will take you to the Scout Login page. Use your scout ID ({{ user.username }}) and password to log in. Once you are logged in, scroll down to fill in the rest of your Scout Profile. Your account is not active until you fill in this information.
 
-Thanks and Welcome Aboard!
+*If the above link is broken or expired, simply go to the "Scout Portal" located here (https://{{domain}}/auth/hms) and log in to your account there to complete your profile. You will be able to access the database from this portal for all future visits.
+
+Thanks for Signing Up and Welcome Aboard!
+
 {% endautoescape %}
