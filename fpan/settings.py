@@ -183,10 +183,17 @@ DEFAULT_FROM_EMAIL = 'no-reply@fpan.us'
 EMAIL_SUBJECT_PREFIX = '[HMS] '
 
 # put ADMINS and MANAGERS contact info in settings_local.py
+# these addresses will get emails from application errors
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 MANAGERS = ADMINS
+
+# also put these in settings_local.py. These addresses will
+# get database summaries and updates (not errors)
+FPAN_ADMINS = (
+    # ('Your Name', 'your_email@Example.com'),
+)
 
 # Use Nose for running tests - errors occur unless you run test modules individually
 if len(sys.argv) > 1 and sys.argv[1] == "test":

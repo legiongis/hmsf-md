@@ -42,7 +42,7 @@ def send_weekly_summary(use_date=None):
     message_html = render_to_string('email/weekly_report_email_html.htm', msg_vars)
     subject_line = f"{settings.EMAIL_SUBJECT_PREFIX}- Week of {startend_date_str}"
     from_email = settings.DEFAULT_FROM_EMAIL
-    to_emails = [i[1] for i in settings.ADMINS]
+    to_emails = [i[1] for i in settings.FPAN_ADMINS]
     email = EmailMultiAlternatives(subject_line, message_txt, from_email, to=to_emails)
     email.attach_alternative(message_html, "text/html")
     email.send()
