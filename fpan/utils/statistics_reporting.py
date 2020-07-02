@@ -33,6 +33,8 @@ def get_past_week_report_counts(use_date=None):
         date = date.split(";")[0]
 
         site_uuid = get_node_value(report, "FMSF Site ID")
+        if site_uuid == '':
+            continue
         site_res = Resource.objects.get(resourceinstanceid=site_uuid)
         fmsfid = get_node_value(site_res, "FMSF ID")
 
