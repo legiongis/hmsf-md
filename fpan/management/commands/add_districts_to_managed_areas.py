@@ -1,7 +1,7 @@
 import os
 import csv
 from django.core.management.base import BaseCommand, CommandError
-from fpan.models.managedarea import ManagedArea
+from fpan.models import ManagedArea
 
 class Command(BaseCommand):
 
