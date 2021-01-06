@@ -302,8 +302,7 @@ LANGUAGE_CODE = "en"
 # a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGES = [
         ('en', _('English')),
-        ('es', _('Spanish')),
         ]
 # override this to permenantly display/hide the language switcher
-SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
+SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1 
 
