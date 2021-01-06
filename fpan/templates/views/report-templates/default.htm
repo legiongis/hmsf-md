@@ -44,7 +44,7 @@
     <!-- Debug to find out what the name of the report is so you can add to ko conditional below
     <div data-bind="text: console.log(report.graph.name)"></div> -->
 
-    <div data-bind="visible: report.graph.name != 'Scout Report' && report.graph.name !='System Settings'" class="rp-report-section-title" style="text-align: center">
+    <div data-bind="visible: report.graph.name != 'Scout Report' && report.graph.name !='Arches System Settings'" class="rp-report-section-title" style="text-align: center">
         <h3>Reports Recorded for this Site:</h3>
         <!-- ko foreach: { data: report.attributes.inline_data, as: 'inline' } -->
             <!-- ko foreach: { data: inline.inlines, as: 'inline_set' } -->
