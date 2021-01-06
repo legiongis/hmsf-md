@@ -1,3 +1,4 @@
+from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
 from django.conf import settings
@@ -36,3 +37,5 @@ urlpatterns = [
     url(r"api/lookup$", api.ResourceIdLookup.as_view(), name="resource_lookup"),
     url(r'^', include('arches.urls')),
 ]
+if settings.SHOW_LANGUAGE_SWITCH is True:
+    urlpatterns = i18n_patterns(*urlpatterns)
