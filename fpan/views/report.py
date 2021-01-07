@@ -15,6 +15,8 @@ from fpan.utils.permission_backend import user_can_edit_this_resource
 
 class FPANResourceReportView(ResourceReportView):
 
+    print("in the fpan report view")
+
 
     def get_inline_resources(self, graph, resourceid):
 

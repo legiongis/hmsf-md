@@ -3,7 +3,12 @@ from django.conf.urls import include, url
 from django.views.generic import RedirectView
 from django.conf import settings
 from arches.app.views.auth import UserProfileView, GetClientIdView
+<<<<<<< HEAD
 from fpan.views import api, main, report, auth, scout, search
+=======
+from arches.app.views.user import UserManagerView
+from fpan.views import api, main, auth, scout, search #,report
+>>>>>>> 8867439... initial refactor of inline_data to context_processor
 
 uuid_regex = settings.UUID_REGEX
 handler500 = main.server_error
@@ -20,7 +25,7 @@ urlpatterns = [
     url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
-    url(r'^report/(?P<resourceid>%s)$' % uuid_regex, report.FPANResourceReportView.as_view(), name='resource_report'),
+    # url(r'^report/(?P<resourceid>%s)$' % uuid_regex, report.FPANResourceReportView.as_view(), name='resource_report'),
     # url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
     url(
         r"^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$" % uuid_regex,
