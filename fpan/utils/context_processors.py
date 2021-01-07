@@ -4,8 +4,6 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from .permission_backend import check_state_access, user_is_scout, get_match_conditions
-from .helpers import get_inline_resources
-
 
 def user_type(request):
 
@@ -21,16 +19,8 @@ def user_type(request):
         'full_site_access': full_access
     }
 
-def report_info(request):
-
-    if request.resolver_match.url_name == "resource_report":
-        resid = request.resolver_match.kwargs['resourceid']
-        inlines = get_inline_resources(resid)
-        return {"inline_data": inlines}
-    else:
-        return {}
-
 def debug(request):
     return {
-        'debug':settings.DEBUG
+        'debug':settings.DEBUG,
+        'testsetting': "yesyesyes"
     }

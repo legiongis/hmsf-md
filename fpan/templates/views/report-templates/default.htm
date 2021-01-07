@@ -40,12 +40,13 @@
     <div class="report-provisional-flag">{% trans 'This resource has provisional edits that are pending review' %}</div>
     <!--/ko-->
 
-    <!-- Below div added for FPAN -->
+    {% comment %}
+    <!-- Below div added for FPAN  - DEPRECATED: remove once the augmented Related Resource section is fully styled. -->
     <!-- Debug to find out what the name of the report is so you can add to ko conditional below
     <div data-bind="text: console.log(report.graph.name)"></div> -->
-
     <div data-bind="visible: report.graph.name != 'Scout Report' && report.graph.name !='Arches System Settings'" class="rp-report-section-title" style="text-align: center">
-        <h3>Reports Recorded for this Site:</h3>
+        <h3>Reports Recorded for this Site (remove this section, retain the button):</h3>
+        <p>effefeefef</p>
         <!-- ko foreach: { data: report.attributes.inline_data, as: 'inline' } -->
             <!-- ko foreach: { data: inline.inlines, as: 'inline_set' } -->
                 <!-- ko foreach: { data: inline_set.resources, as: 'resource' } -->
@@ -55,7 +56,56 @@
                 <!-- /ko -->
             <!-- /ko -->
         <!-- /ko -->
-        <a class="btn btn-primary" href="/add-resource/14578901-bd5d-11e9-822a-94659cf754d0">Create Report</a>
+
+    </div>
+    {% endcomment %}
+
+    <!-- Below div added for FPAN - adapted version of default Related Resources section -->
+    <!-- Debug to find out what the name of the report is so you can add to ko conditional below
+    <div data-bind="text: console.log(report.graph.name)"></div> -->
+    <div data-bind="visible: report.graph.name != 'Scout Report' && report.graph.name !='Arches System Settings'" class="rp-report-section relative rp-report-section-root">
+        <div class="rp-card-section">
+            <div class="rp-report-section-title">
+                <h3 class="rp-section-title">{% trans 'Reports Recorded for this Site' %}</h3>
+            </div>
+
+            <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
+            <!-- ko if: resourceData.name == "Scout Report" -->
+            <!-- ko foreach: { data: resourceData.loadedRelatedResources(), as: 'relatedResource' } -->
+            <div class="rp-report-container-tile" style="padding-top:0px; padding-bottom:0px">
+                <div class="row rp-report-tile">
+                    <dl class="dl-horizontal">
+                        <dt><a data-bind="text: relatedResource.displayName, attr: {href: relatedResource.link}"></a></dt>
+                        <!-- ko if: relatedResource.relationship -->
+                        <dd data-bind="text: '( ' + relatedResource.relationship + ' )'"></dd>
+                        <!-- /ko -->
+                    </dl>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko if: resourceData.paginator() && resourceData.paginator().has_next -->
+            <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, false)">
+                {% trans "Load More" %}
+                <span data-bind="text: '(' + resourceData.remainingResources() + ')'"></span>
+            </button>
+
+            <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, true)">
+                {% trans "Load All" %}
+                <span data-bind="text: '(' + (resourceData.totalRelatedResources - resourceData.loadedRelatedResources().length) + ')'"></span>
+            </button>
+            <!-- /ko -->
+
+            <!--ko if: resourceData.totalRelatedResources === 0 -->
+            <div class="rp-report-container-tile">
+                <div class="row rp-report-tile rp-no-data">{% trans 'None yet!' %}</div>
+            </div>
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+
+            <a class="btn btn-primary" href="/add-resource/14578901-bd5d-11e9-822a-94659cf754d0">Create New Report</a>
+        </div>
     </div>
 
     <div class="rp-report-section relative rp-report-section-root">
@@ -79,8 +129,6 @@
             <!-- /ko -->
         </div>
     </div>
-
-    <!-- Removed related resources section for FPAN -->
 
     {% endblock body %}
 
