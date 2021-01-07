@@ -2,7 +2,7 @@ import os
 import json
 import logging
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
-from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, GeoShape, Nested
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.models.system_settings import settings
 from fpan.utils.search_filter import apply_advanced_docs_permissions
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 details = {
     "searchcomponentid": "",
     "name": "Site Filter",
-    "icon": "",
+    "icon": "fa fa-key",
     "modulename": "site_filter.py",
     "classname": "SiteFilter",
     "type": "popup",
@@ -46,6 +46,26 @@ class SiteFilter(BaseSearchFilter):
 
                 if not search_query is None:
                     search_results_object["query"].add_query(search_query)
+
+                # coords = [[[-81.477111876252,29.133006285427328],[-81.47314589490625,28.67123161923965],[-81.06663280694531,28.667751860292498],[-81.07258177896466,29.134738397156326],[-81.477111876252,29.133006285427328]]]
+                # geoshape = GeoShape(
+                #     field="geometries.geom.features.geometry", type="Polygon", coordinates=coords
+                # )
+                #
+                # try:
+                #     self.request.user.ManagerProfile
+                # except Exception as e:
+                #     print(e)
+                #
+                #
+                # spatial_query = Bool()
+                # spatial_query.filter(geoshape)
+                #
+                # search_query = Bool()
+                # search_query.filter(Nested(path="geometries", query=spatial_query))
+                #
+                # search_results_object["query"].add_query(search_query)
+                # print(search_results_object["query"])
 
                 if settings.LOG_LEVEL == "DEBUG":
                     with open(os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w") as output:

@@ -29,7 +29,34 @@ def apply_advanced_docs_permissions(original_dsl, request):
         else:
             clause = add_doc_specific_criterion(original_dsl, doc, doc_types, criterion=rules)
 
+    # clause = make_management_area_geofilter(request.user, doc_type="f212980f-d534-11e7-8ca8-94659cf754d0")
     return clause
+
+
+def make_management_area_geofilter(user, doc_type=None):
+
+    # ultimately, find the areas or area groups for this user
+    from fpan.models import ManagementArea
+    ma = ManagementArea.objects.get(name="test")
+    feature_geom = JSONDeserializer().deserialize(ma.geom.geojson)
+
+    geoshape = edb.GeoShape(
+        field="geometries.geom.features.geometry",
+        type=feature_geom["type"],
+        coordinates=feature_geom["coordinates"]
+    )
+
+    spatial_query = edb.Bool()
+    spatial_query.filter(geoshape)
+    if doc_type:
+        spatial_query.filter(edb.Terms(field="graph_id", terms=doc_type))
+
+
+    search_query = edb.Bool()
+    search_query.filter(edb.Nested(path="geometries", query=spatial_query))
+
+
+    return search_query
 
 
 def add_doc_specific_criterion(original_dsl, spec_type, all_types, no_access=False, criterion=False):
@@ -111,7 +138,6 @@ def get_doc_type(request):
 
     else:
         use_ids = [str(i) for i in all_resource_graphids]
-        print(use_ids)
 
     if len(use_ids) == 0:
         ret = []

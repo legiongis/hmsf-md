@@ -28,13 +28,21 @@ class MVT(APIBase):
 
         res_access = get_allowed_resource_ids(request.user, str(node.graph_id))
 
+        # set extra where clause to a default "match everything" value
+        resid_where = "NULL IS NULL"
         if res_access["access_level"] == "full_access":
-            resid_where = "NULL IS NULL"
+            pass
         elif res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
             raise Http404()
         else:
             ids = "','".join(res_access["id_list"])
             resid_where = f"resourceinstanceid IN ('{ids}')"
+
+        # Proof of concept for pulling geom from ORM to filter map
+        if 1 == 2:
+            from fpan.models import ManagementArea
+            ma = ManagementArea.objects.get(name="test")
+            resid_where = f"ST_Intersects(geom, ST_Transform('{ma.geom}', 3857))"
 
         if tile is None:
             with connection.cursor() as cursor:
