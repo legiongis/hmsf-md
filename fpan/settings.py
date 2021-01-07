@@ -38,30 +38,7 @@ SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 RESOURCE_FORMATTERS['shp'] = None
 
 DISABLE_PROVISIONAL_EDITING = True
-
-REPORT_INLINES = {
-    "Archaeological Site" : [
-        {
-            "title":"Scout Reports",
-            "inline_model":"Scout Report",
-            "node_to_look_in":"FMSF Site ID"
-        }
-    ],
-    "Historic Cemetery" : [
-        {
-            "title":"Scout Reports",
-            "inline_model":"Scout Report",
-            "node_to_look_in":"FMSF Site ID"
-        }
-    ],
-    "Historic Structure" : [
-        {
-            "title":"Scout Reports",
-            "inline_model":"Scout Report",
-            "node_to_look_in":"FMSF Site ID"
-        }
-    ],
-}
+HIDE_EMPTY_NODES_IN_REPORT = True
 
 ## in FPAN the State filtered access values are set in utils.filter.get_state_node_match()
 RESOURCE_MODEL_USER_RESTRICTIONS = {
@@ -269,3 +246,39 @@ LOGGING = {
         }
     }
 }
+
+# support localization
+from django.utils.translation import gettext_lazy as _
+
+MIDDLEWARE = [
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    #'arches.app.utils.middleware.TokenMiddleware',
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "arches.app.utils.middleware.ModifyAuthorizationHeader",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "arches.app.utils.middleware.SetAnonymousUser",
+]
+
+# default language of the application
+# language code needs to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = "en"
+# list of languages to display in the language switcher,
+# if left empty or with a single entry then the switch won't be displayed
+# language codes need to be all lower case with the form:
+# {langcode}-{regioncode} eg: en, en-gb ....
+# a list of language codes can be found here http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGES = [
+        ('en', _('English')),
+        ]
+# override this to permenantly display/hide the language switcher
+SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1

@@ -1,8 +1,10 @@
+from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
 from django.conf import settings
 from arches.app.views.auth import UserProfileView, GetClientIdView
-from fpan.views import api, main, report, auth, scout, search
+from arches.app.views.user import UserManagerView
+from fpan.views import api, main, auth, scout, search
 
 uuid_regex = settings.UUID_REGEX
 handler500 = main.server_error
@@ -19,7 +21,6 @@ urlpatterns = [
     url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
-    url(r'^report/(?P<resourceid>%s)$' % uuid_regex, report.FPANResourceReportView.as_view(), name='resource_report'),
     # url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
     url(
         r"^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$" % uuid_regex,
@@ -36,3 +37,5 @@ urlpatterns = [
     url(r"api/lookup$", api.ResourceIdLookup.as_view(), name="resource_lookup"),
     url(r'^', include('arches.urls')),
 ]
+if settings.SHOW_LANGUAGE_SWITCH is True:
+    urlpatterns = i18n_patterns(*urlpatterns)

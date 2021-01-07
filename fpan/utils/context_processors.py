@@ -1,6 +1,8 @@
 from django.conf import settings
 from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+
 from .permission_backend import check_state_access, user_is_scout, get_match_conditions
 
 def user_type(request):
@@ -19,5 +21,6 @@ def user_type(request):
 
 def debug(request):
     return {
-        'debug':settings.DEBUG
+        'debug':settings.DEBUG,
+        'testsetting': "yesyesyes"
     }
