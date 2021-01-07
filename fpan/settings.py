@@ -30,6 +30,7 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.report_info')
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 ELASTICSEARCH_PREFIX = 'fpan'

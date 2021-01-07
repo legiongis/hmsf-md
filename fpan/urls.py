@@ -3,13 +3,8 @@ from django.conf.urls import include, url
 from django.views.generic import RedirectView
 from django.conf import settings
 from arches.app.views.auth import UserProfileView, GetClientIdView
-<<<<<<< HEAD
 from arches.app.views.user import UserManagerView
 from fpan.views import api, main, auth, scout, search
-=======
-from fpan.views import api, main, report, auth, scout, search
-from arches.app.views.user import UserManagerView
->>>>>>> 1909b96... initial work on user profile update
 
 uuid_regex = settings.UUID_REGEX
 handler500 = main.server_error
