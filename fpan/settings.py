@@ -32,6 +32,7 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_process
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
+ELASTICSEARCH_PREFIX = 'fpan'
 
 # manually disable the shapefile exporter class. This creates a 500 error if
 # someone were to hit the shapefile export url somehow.
@@ -123,9 +124,9 @@ DATABASES = {
 
 INSTALLED_APPS+=('fpan', 'hms')
 
-## the following two variables should be handled in settings_local.py
-SECRET_LOG = "path/to/directory/outside/of/version/control"
-PACKAGE_PATH = "path/to/location/of/cloned/fpan-data/repo"
+# the code should be refactored to not even use SECRET_LOG anymore...
+SECRET_LOG = LOG_DIR
+PACKAGE_PATH = os.path.join(os.path.dirname(os.path.dirname(APP_ROOT)), "fpan-data")
 
 ALLOWED_HOSTS = []
 
