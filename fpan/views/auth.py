@@ -12,6 +12,7 @@ from django.template.loader import render_to_string, get_template
 from django.views.decorators.csrf import csrf_exempt
 
 from arches.app.models.system_settings import settings
+from arches.app.views.user import UserManagerView
 
 from fpan.utils.tokens import account_activation_token
 from fpan.utils.permission_backend import check_state_access, user_is_scout
@@ -24,13 +25,13 @@ from hms.forms import ScoutForm, ScoutProfileForm
 def auth(request,login_type):
     if not login_type in ['hms','state','logout']:
         raise Http404("not found")
-        
+
     if login_type == 'logout':
         logout(request)
         return redirect('fpan_home')
 
     auth_attempt_success = None
-    
+
     # POST request is taken to mean user is logging in
     if request.method == 'POST':
         username = request.POST['username']
@@ -105,3 +106,12 @@ def activate(request, uidb64, token):
         return redirect('auth',login_type='hms')
     else:
         return HttpResponse('Activation link is invalid!')
+
+
+class FPANUserManagerView(UserManagerView):
+    """ this view powers the modified profile manager, and is built from the analogous
+        view in core arches. The main difference is that different forms are passed
+        to the view based on what type of user (land manager or scout) is logged
+        in, and different templates are used to render."""
+    print("new view")
+    pass
