@@ -1,0 +1,37 @@
+[
+{
+ "model": "hms.managementagency",
+ "fields": {
+  "code": "FSP",
+  "name": "FL Dept. of Environmental Protection, Div. of Recreation and Parks"
+ }
+},
+{
+ "model": "hms.managementagency",
+ "fields": {
+  "code": "FFS",
+  "name": "FL Dept. of Agriculture and Consumer Services, Florida Forest Service"
+ }
+},
+{
+ "model": "hms.managementagency",
+ "fields": {
+  "code": "FWCC",
+  "name": "FL Fish and Wildlife Conservation Commission"
+ }
+},
+{
+ "model": "hms.managementagency",
+ "fields": {
+  "code": "FCO",
+  "name": "FL Dept. of Environmental Protection, Florida Coastal Office"
+ }
+},
+{
+ "model": "hms.managementagency",
+ "fields": {
+  "code": "OWP",
+  "name": "FL Dept. of Environmental Protection, Office of Water Policy"
+ }
+}
+]
