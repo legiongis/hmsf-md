@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db import models
+from django.contrib.gis.db import models
 from django.contrib.auth.models import User, Group
 from fpan.models import Region
 from django.db.models.signals import post_save
@@ -22,7 +22,7 @@ SITE_INTEREST_CHOICES = (
     ('Underwater', 'Underwater'),
     ('Other', 'Other'),)
 
-class ScoutProfile(models.Model): 
+class ScoutProfile(models.Model):
     user = models.OneToOneField(Scout, on_delete=models.CASCADE)
     street_address = models.CharField(max_length=30)
     city = models.CharField(max_length=30)
@@ -62,3 +62,127 @@ def create_user_scout(sender, instance, created, **kwargs):
 @receiver(post_save, sender=Scout)
 def save_user_scout(sender, instance, **kwargs):
     instance.scoutprofile.save()
+
+class LandManager(User):
+
+    class Meta:
+        verbose_name = "Land Manager"
+        verbose_name_plural = "Land Managers"
+
+    def __str__(self):
+        if self.user:
+            return self.user.username
+
+class LandManagerProfile(models.Model):
+
+    class Meta:
+        verbose_name = "Land Manager Profile"
+        verbose_name_plural = "Land Manager Profiles"
+
+    user = models.OneToOneField(
+        LandManager,
+        on_delete=models.CASCADE
+    )
+    management_agency = models.ForeignKey(
+        "ManagementAgency",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
+    full_access = models.BooleanField(
+        default=False,
+        help_text="Give this user access to all Archaeological Sites.",
+    )
+    apply_agency_filter = models.BooleanField(
+        default=False,
+        help_text="Give this user access to all Archaeological Sites managed"\
+            "by their Agency (as defined above).",
+        blank=True,
+        null=True,
+    )
+    apply_area_filter = models.BooleanField(
+        default=False,
+        help_text="Give this user access to all Archaeological Sites within "\
+            "any of the specified areas or groups of areas below.",
+        blank=True,
+        null=True,
+    )
+    individual_areas = models.ManyToManyField("ManagementArea", blank=True)
+    grouped_areas = models.ManyToManyField("ManagementAreaGroup", blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+
+## PROBLEM: these signals cause errors in the admin interface when createing
+## new land managers or land manager profiles. The solution now is to comment
+## them out and direct admins to create new profiles through the Land Manager
+## Profile admin page, and also make the new Land Manager through that page
+## at the same time.
+
+# @receiver(post_save, sender=LandManager)
+# def create_user_land_manager(sender, instance, created, **kwargs):
+#     if created:
+#         LandManagerProfile.objects.create(user=instance)
+
+# @receiver(post_save, sender=LandManager)
+# def save_user_land_manager(sender, instance, **kwargs):
+#     instance.landmanagerprofile.save()
+
+
+class ManagementAgency(models.Model):
+
+    class Meta:
+        verbose_name = "Management Agency"
+        verbose_name_plural = "Management Agencies"
+
+    code = models.CharField(
+        primary_key=True,
+        max_length=20
+    )
+    name = models.CharField(null=True, blank=True, max_length=200)
+
+    def __str__(self):
+        return self.name
+
+class ManagementArea(models.Model):
+
+    class Meta:
+        verbose_name = "Management Area"
+        verbose_name_plural = "Management Areas"
+
+    name = models.CharField(max_length=254)
+    description = models.CharField(
+        max_length=254,
+        null=True,
+        blank=True,
+    )
+    management_agency = models.ForeignKey(
+        ManagementAgency,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE
+    )
+    # type = models.ForeignKey(ManagementAreaType, null=True, blank=True, on_delete=models.CASCADE)
+    nickname = models.CharField(max_length=30,null=True,blank=True)
+    load_id = models.CharField(max_length=200,null=True,blank=True)
+    geom = models.MultiPolygonField()
+
+    def __str__(self):
+        if self.management_agency:
+            return f"{self.name} - {self.management_agency.code}"
+        else:
+            return self.name
+
+class ManagementAreaGroup(models.Model):
+
+    class Meta:
+        verbose_name = "Management Area Group"
+        verbose_name_plural = "Management Area Groups"
+
+    name = models.CharField(max_length=100)
+    areas = models.ManyToManyField(ManagementArea)
+    note = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
