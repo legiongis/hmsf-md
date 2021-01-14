@@ -11,28 +11,6 @@ from .permission_backend import get_match_conditions
 
 logger = logging.getLogger(__name__)
 
-def apply_advanced_docs_permissions(original_dsl, request):
-
-    docs_perms = settings.RESOURCE_MODEL_USER_RESTRICTIONS
-    doc_types = get_doc_type(request)
-
-    clause = None
-    for doc in doc_types:
-
-        rules = get_match_conditions(request.user, doc)
-        if rules == "full_access":
-            continue
-
-        elif rules == "no_access":
-            clause = add_doc_specific_criterion(original_dsl, doc, doc_types, no_access=True)
-
-        else:
-            clause = add_doc_specific_criterion(original_dsl, doc, doc_types, criterion=rules)
-
-    # clause = make_management_area_geofilter(request.user, doc_type="f212980f-d534-11e7-8ca8-94659cf754d0")
-    return clause
-
-
 def make_management_area_geofilter(user, doc_type=None):
 
     # ultimately, find the areas or area groups for this user
@@ -110,37 +88,3 @@ def add_doc_specific_criterion(original_dsl, spec_type, all_types, no_access=Fal
             paramount.should(edb.Terms(field="graph_id", terms=doc_type))
 
     return paramount
-
-def get_doc_type(request):
-
-    all_resource_graphids = (
-        GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        .exclude(isresource=False)
-        .exclude(isactive=False)
-    ).values_list('graphid', flat=True)
-
-    type_filter = request.GET.get('typeFilter', '')
-    use_ids = []
-
-    if type_filter != '':
-        type_filters = JSONDeserializer().deserialize(type_filter)
-
-        ## add all positive filters to the list of good ids
-        pos_filters = [i['graphid'] for i in type_filters if not i['inverted']]
-        for pf in pos_filters:
-            use_ids.append(pf)
-
-        ## if there are negative filters, make a list of all possible ids and
-        ## subtract the negative filter ids from it.
-        neg_filters = [i['graphid'] for i in type_filters if i['inverted']]
-        if len(neg_filters) > 0:
-            use_ids = [str(i) for i in all_resource_graphids if not str(i) in neg_filters]
-
-    else:
-        use_ids = [str(i) for i in all_resource_graphids]
-
-    if len(use_ids) == 0:
-        ret = []
-    else:
-        ret = list(set(use_ids))
-    return ret

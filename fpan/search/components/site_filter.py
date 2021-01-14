@@ -7,7 +7,9 @@ from arches.app.search.components.base import BaseSearchFilter
 from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from fpan.utils.search_filter import apply_advanced_docs_permissions
+
+from fpan.utils.search_filter import add_doc_specific_criterion
+from fpan.utils.permission_backend import get_match_conditions
 
 logger = logging.getLogger(__name__)
 
@@ -41,10 +43,30 @@ class SiteFilter(BaseSearchFilter):
 
         try:
 
-            search_query = apply_advanced_docs_permissions(original_dsl, self.request)
+            docs_perms = settings.RESOURCE_MODEL_USER_RESTRICTIONS
+            doc_types = self.get_doc_types(self.request)
 
-            if not search_query is None:
-                search_results_object["query"].add_query(search_query)
+            clause = None
+            print(doc_types)
+            for doc in doc_types:
+
+                print("getting perms for " + doc)
+
+                rules = get_match_conditions(self.request.user, doc)
+                print(rules)
+                if rules == "full_access":
+                    continue
+
+                elif rules == "no_access":
+                    clause = add_doc_specific_criterion(original_dsl, doc, doc_types, no_access=True)
+
+                else:
+                    clause = add_doc_specific_criterion(original_dsl, doc, doc_types, criterion=rules)
+
+            # clause = make_management_area_geofilter(request.user, doc_type="f212980f-d534-11e7-8ca8-94659cf754d0")
+
+            if not clause is None:
+                search_results_object["query"].add_query(clause)
 
             # coords = [[[-81.477111876252,29.133006285427328],[-81.47314589490625,28.67123161923965],[-81.06663280694531,28.667751860292498],[-81.07258177896466,29.134738397156326],[-81.477111876252,29.133006285427328]]]
             # geoshape = GeoShape(
