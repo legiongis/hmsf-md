@@ -8,7 +8,8 @@ from django.contrib import messages
 from arches.app.utils.response import JSONResponse
 from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel
-from fpan.utils.permission_backend import user_is_anonymous, check_state_access, get_match_conditions
+from fpan.utils.permission_backend import user_is_anonymous, user_is_land_manager
+from fpan.search.components.site_filter import SiteFilter
 from fpan.models import Region
 from fpan.views.scout import scouts_dropdown
 from hms.models import Scout, ScoutProfile
@@ -53,7 +54,7 @@ def hms_home(request):
         'scout_profile': scout_profile_form,
         'page':'home-hms'})
 
-@user_passes_test(check_state_access)
+@user_passes_test(user_is_land_manager)
 def state_home(request):
 
     return render(request, 'home-state.htm', {'page':'home-state'})
@@ -72,7 +73,7 @@ def server_error(request, template_name='500.html'):
 def fpan_dashboard(request):
 
     scouts_unsorted = json.loads(scouts_dropdown(request).content)
-    scouts = sorted(scouts_unsorted, key=lambda k: k['username']) 
+    scouts = sorted(scouts_unsorted, key=lambda k: k['username'])
     return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
 
 def get_resource_instance_permissions(request):
@@ -85,6 +86,6 @@ def get_resource_instance_permissions(request):
 
     access_info = {}
     for rg in resource_graphs:
-        access_info[str(rg.graphid)] = get_match_conditions(request.user, str(rg.graphid))
+        access_info[str(rg.graphid)] = SiteFilter.get_match_conditions(request.user, str(rg.graphid))
 
     return JSONResponse(access_info)

@@ -15,7 +15,7 @@ from arches.app.models.system_settings import settings
 from arches.app.views.user import UserManagerView
 
 from fpan.utils.tokens import account_activation_token
-from fpan.utils.permission_backend import check_state_access, user_is_scout
+from fpan.utils.permission_backend import user_is_land_manager, user_is_scout
 
 from hms.models import Scout
 from hms.forms import ScoutForm, ScoutProfileForm
@@ -45,7 +45,7 @@ def auth(request,login_type):
                 else:
                     auth_attempt_success = False
             elif login_type == "state":
-                if check_state_access(user):
+                if user_is_land_manager(user):
                     login(request, user)
                     auth_attempt_success = True
                 else:
@@ -80,7 +80,7 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(request, _('Your password has been updated'))
-            if check_state_access(user):
+            if user_is_land_manager(user):
                 return redirect('state_home')
             if user_is_scout(user):
                 return redirect('hms_home')
