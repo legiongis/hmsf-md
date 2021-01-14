@@ -63,24 +63,33 @@ def create_user_scout(sender, instance, created, **kwargs):
 def save_user_scout(sender, instance, **kwargs):
     instance.scoutprofile.save()
 
-class LandManager(User):
+## DEPRECATED - Previously, this model was used in conjunction with
+## LandManagerProfile, which has since been renamed LandManager. The change cut
+## this intermediate model out of the mix, as it was ultimately not necessary.
+# class LandManager(User):
+#
+#     class Meta:
+#         verbose_name = "Land Manager"
+#         verbose_name_plural = "Land Managers"
+#
+#     def __str__(self):
+#         return self.username
+#
+#     def get_areas(self):
+#         areas = self.landmanagerprofile.individual_areas.all()
+#         for ga in self.landmanagerprofile.grouped_areas.all():
+#             areas = areas.union(ga.areas.all())
+#         return areas
+
+class LandManager(models.Model):
 
     class Meta:
         verbose_name = "Land Manager"
         verbose_name_plural = "Land Managers"
 
-    def __str__(self):
-        if self.user:
-            return self.user.username
-
-class LandManagerProfile(models.Model):
-
-    class Meta:
-        verbose_name = "Land Manager Profile"
-        verbose_name_plural = "Land Manager Profiles"
-
     user = models.OneToOneField(
-        LandManager,
+        User,
+        related_name="landmanager",
         on_delete=models.CASCADE
     )
     management_agency = models.ForeignKey(
@@ -112,6 +121,23 @@ class LandManagerProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def get_areas(self):
+        areas = self.individual_areas.all()
+        for ga in self.grouped_areas.all():
+            areas = areas.union(ga.areas.all())
+        return areas
+
+    @property
+    def filter_rules(self):
+
+        rules = {"access_level": "", "":""}
+
+@receiver(post_save, sender=LandManager)
+def create_user_land_manager(sender, instance, created, **kwargs):
+    if created:
+        group_cs = Group.objects.get(name='Crowdsource Editor')
+        group_cs.user_set.add(instance)
 
 
 ## PROBLEM: these signals cause errors in the admin interface when createing
