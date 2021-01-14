@@ -8,7 +8,7 @@ from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.utils.response import JSONResponse
-from fpan.utils.permission_backend import get_allowed_resource_ids
+from fpan.search.components.site_filter import SiteFilter
 
 class MVT(APIBase):
     EARTHCIRCUM = 40075016.6856
@@ -26,7 +26,7 @@ class MVT(APIBase):
         cache_key = f"mvt_{nodeid}_{request.user.username}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
 
-        res_access = get_allowed_resource_ids(request.user, str(node.graph_id))
+        res_access = SiteFilter().get_allowed_resource_ids(request.user, str(node.graph_id))
 
         # set extra where clause to a default "match everything" value
         resid_where = "NULL IS NULL"
