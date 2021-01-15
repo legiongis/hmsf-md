@@ -41,6 +41,13 @@ RESOURCE_FORMATTERS['shp'] = None
 DISABLE_PROVISIONAL_EDITING = True
 HIDE_EMPTY_NODES_IN_REPORT = True
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'fpan_cachetable',
+    }
+}
+
 ## in FPAN the State filtered access values are set in utils.filter.get_state_node_match()
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
