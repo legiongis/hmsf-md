@@ -149,7 +149,7 @@ class LandManager(models.Model):
 def create_user_land_manager(sender, instance, created, **kwargs):
     if created:
         group_cs = Group.objects.get(name='Crowdsource Editor')
-        group_cs.user_set.add(instance)
+        group_cs.user_set.add(instance.user)
 
 
 ## PROBLEM: these signals cause errors in the admin interface when createing
