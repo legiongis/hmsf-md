@@ -48,29 +48,16 @@ CACHES = {
     }
 }
 
-## in FPAN the State filtered access values are set in utils.filter.get_state_node_match()
+## example of the default filter that is applied to anonymous and Scout users.
+## the land manager accounts don't reference this setting at all, their permissions
+## are all handled in the site_filter component.
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
-        'public': {
-            # 'access_level': 'no_access'
-            'access_level':'match_node_value',
-            'match_config': {
+        'default': {
+            'access_level':'attribute_filter',
+            'filter_config': {
                 'node_name':'Assigned To',
-                'match_to':'<username>'
-            }
-        },
-        'scout': {
-            'access_level':'match_node_value',
-            'match_config': {
-                'node_name':'Assigned To',
-                'match_to':'<username>'
-            }
-        },
-        'state': {
-            'access_level':'match_node_value',
-            'match_config': {
-                'node_name':'Managing Agency',
-                'match_to':'<derived_elsewhere>'
+                'value':"<username>"
             }
         }
     }
