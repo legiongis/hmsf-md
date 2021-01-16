@@ -6,6 +6,7 @@ from fpan.models import Region
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.gis.geos import MultiPolygon
 
 # Create your models here.
 class Scout(User):
@@ -122,11 +123,22 @@ class LandManager(models.Model):
     def __str__(self):
         return self.user.username
 
-    def get_areas(self):
+    @property
+    def all_areas(self):
         areas = self.individual_areas.all()
         for ga in self.grouped_areas.all():
             areas = areas.union(ga.areas.all())
         return areas
+
+    @property
+    def areas_as_multipolygon(self):
+        poly_agg = list()
+        for area in self.all_areas:
+            # each area is a MultiPolygon so iterate the Polygons within it
+            for poly in area.geom:
+                poly_agg.append(poly)
+        full_multi = MultiPolygon(poly_agg, srid=4326)
+        return full_multi
 
     @property
     def filter_rules(self):
