@@ -75,17 +75,3 @@ def fpan_dashboard(request):
     scouts_unsorted = json.loads(scouts_dropdown(request).content)
     scouts = sorted(scouts_unsorted, key=lambda k: k['username'])
     return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
-
-def get_resource_instance_permissions(request):
-
-    resource_graphs = (
-        GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-        .exclude(isresource=False)
-        .exclude(isactive=False)
-    )
-
-    access_info = {}
-    for rg in resource_graphs:
-        access_info[str(rg.graphid)] = SiteFilter.get_match_conditions(request.user, str(rg.graphid))
-
-    return JSONResponse(access_info)
