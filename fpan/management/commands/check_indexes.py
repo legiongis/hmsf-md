@@ -12,7 +12,12 @@ class Command(BaseCommand):
     'objects and prints a list of missing resources to the logs directory.'
 
     def add_arguments(self, parser):
-        pass
+
+        parser.add_argument("--index",
+            action="store_true",
+            default=False,
+            help="attempt to index resources that aren't in index."
+        )
 
     def handle(self, *args, **options):
 
@@ -36,18 +41,29 @@ class Command(BaseCommand):
             print(f"- in db: {len(db_resourceids)}")
             print(f"- in index: {len(es_resourceids)}")
             if db_resourceids != es_resourceids:
-                db_diff = db_resourceids - es_resourceids
-                if len(db_diff) > 0:
-                    print("  db resources not in index:")
-                    [print("    " + i) for i in db_diff[:5]]
-                    if len(db_diff) > 5:
-                        print("...")
-                es_diff = es_resourceids - db_resourceids
+                es_diff = list(es_resourceids - db_resourceids)
                 if len(es_diff) > 0:
-                    print("  indexed resources not in db:")
+                    print(f"  {len(es_diff)} indexed resources not in db:")
                     [print("    " + i) for i in es_diff[:5]]
                     if len(es_diff) > 5:
-                        print("...")
+                        print("    ...")
+                db_diff = list(db_resourceids - es_resourceids)
+                if len(db_diff) > 0:
+                    print(f"  {len(db_diff)} db resources not in index:")
+                    [print("    " + i) for i in db_diff[:5]]
+                    if len(db_diff) > 5:
+                        print("    ...")
+                    if options["index"]:
+                        print("    indexing these resources now...")
+                        for id in db_diff:
+                            r = Resource.objects.get(pk=id)
+                            try:
+                                r.index()
+                            except Exception as e:
+                                print(e)
+                                break
+
+
 
     def get_es_contents(self):
 
