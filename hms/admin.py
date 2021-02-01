@@ -1,7 +1,15 @@
-from django.contrib import admin
+from django.contrib.gis import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from hms.models import Scout, ScoutProfile
+from hms.models import (
+    Scout,
+    ScoutProfile,
+    LandManager,
+    ManagementAgency,
+    ManagementArea,
+    ManagementAreaGroup,
+    ManagementAreaCategory,
+)
 
 
 class ScoutProfileInline(admin.StackedInline):
@@ -18,5 +26,26 @@ class ScoutProfileAdmin(admin.ModelAdmin):
             return list()
         return super(ScoutProfileAdmin, self).get_inline_instance(request, obj)
 
-
 admin.site.register(Scout, ScoutProfileAdmin)
+
+class LandManagerAdmin(admin.ModelAdmin):
+    filter_horizontal = ('individual_areas', 'grouped_areas')
+
+admin.site.register(LandManager, LandManagerAdmin)
+
+## this is registered so that a new Land Manager can be made directly from the
+## Land Manager Profile interface, using the green + button.
+# admin.site.register(LandManager)
+
+class ManagementAreaAdmin(admin.GeoModelAdmin):
+    list_display = ('name', 'management_level', 'category', 'management_agency', 'load_id')
+    list_filter = ('category', 'management_level', 'management_agency')
+    search_fields = ("name", )
+
+class ManagementAreaGroupAdmin(admin.ModelAdmin):
+    filter_horizontal = ('areas',)
+
+admin.site.register(ManagementArea, ManagementAreaAdmin)
+admin.site.register(ManagementAgency)
+admin.site.register(ManagementAreaCategory)
+admin.site.register(ManagementAreaGroup, ManagementAreaGroupAdmin)

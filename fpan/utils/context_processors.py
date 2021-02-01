@@ -3,24 +3,26 @@ from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 
-from .permission_backend import check_state_access, user_is_scout, get_match_conditions
+from .permission_backend import user_is_land_manager, user_is_scout
 
 def user_type(request):
 
-    full_access = request.user.is_superuser
-    if request.user.groups.filter(name="FL_BAR").exists() or \
-       request.user.groups.filter(name="FMSF").exists():
-        full_access = True
+    user_type = "anonymous"
+    if user_is_scout(request.user):
+        user_type = "scout"
+    elif user_is_land_manager(request.user):
+        user_type = "landmanager"
+    elif request.user.is_superuser:
+        user_type = "admin"
 
     return {
-        'user_is_state': check_state_access(request.user),
+        'user_is_state': user_is_land_manager(request.user),
         'user_is_scout': user_is_scout(request.user),
         'user_is_admin': request.user.is_superuser,
-        'full_site_access': full_access
+        'user_type': user_type,
     }
 
 def debug(request):
     return {
         'debug':settings.DEBUG,
-        'testsetting': "yesyesyes"
     }

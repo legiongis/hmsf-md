@@ -1,0 +1,37 @@
+[
+{
+ "model": "fpan.agency",
+ "fields": {
+  "code": "fsp",
+  "name": "FL Dept. of Environmental Protection, Div. of Recreation and Parks"
+ }
+},
+{
+ "model": "fpan.agency",
+ "fields": {
+  "code": "ffs",
+  "name": "FL Dept. of Agriculture and Consumer Services, Florida Forest Service"
+ }
+},
+{
+ "model": "fpan.agency",
+ "fields": {
+  "code": "fwcc",
+  "name": "FL Fish and Wildlife Conservation Commission"
+ }
+},
+{
+ "model": "fpan.agency",
+ "fields": {
+  "code": "fco",
+  "name": "FL Dept. of Environmental Protection, Florida Coastal Office"
+ }
+},
+{
+ "model": "fpan.agency",
+ "fields": {
+  "code": "owp",
+  "name": "FL Dept. of Environmental Protection, Office of Water Policy"
+ }
+}
+]

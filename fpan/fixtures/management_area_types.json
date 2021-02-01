@@ -1,0 +1,26 @@
+[
+{
+ "model": "fpan.managementareatype",
+ "fields": {
+  "name": "State Park"
+ }
+},
+{
+ "model": "fpan.managementareatype",
+ "fields": {
+  "name": "County Park"
+ }
+},
+{
+ "model": "fpan.managementareatype",
+ "fields": {
+  "name": "State Forest"
+ }
+},
+{
+ "model": "fpan.managementareatype",
+ "fields": {
+  "name": "Aquatic Preserve"
+ }
+}
+]

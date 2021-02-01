@@ -11,7 +11,9 @@ handler500 = main.server_error
 
 urlpatterns = [
     url(r'^$', main.index, name='fpan_home'),
-    url(r'^user/resource-instance-permissions', main.get_resource_instance_permissions, name='resource_instance_permissions'),
+    url(r'^profile', UserManagerView.as_view(), name="fpan_profile_manager"),
+    url(r"^user$", auth.FPANUserManagerView.as_view(), name="user_profile_manager"),
+    # url(r'^user/resource-instance-permissions', main.get_resource_instance_permissions, name='resource_instance_permissions'),
     url(r'^hms/home', main.hms_home, name='hms_home'),
     url(r'^state/home', main.state_home, name='state_home'),
     url(r'^regions/$', main.show_regions, name='show_regions'),
@@ -21,7 +23,7 @@ urlpatterns = [
     url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
-    # url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
+    #url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
     url(
         r"^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$" % uuid_regex,
         api.MVT.as_view(),

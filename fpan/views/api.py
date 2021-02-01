@@ -1,14 +1,18 @@
+import logging
 from psycopg2 import sql
 from django.core.cache import cache
 from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.db import transaction, connection
+from django.db.utils import IntegrityError
 from arches.app.models import models
 from arches.app.views.api import APIBase
 from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.utils.response import JSONResponse
-from fpan.utils.permission_backend import get_allowed_resource_ids
+from fpan.search.components.site_filter import SiteFilter
+
+logger = logging.getLogger(__name__)
 
 class MVT(APIBase):
     EARTHCIRCUM = 40075016.6856
@@ -16,7 +20,11 @@ class MVT(APIBase):
 
     def get(self, request, nodeid, zoom, x, y):
         if hasattr(request.user, "userprofile") is not True:
-            models.UserProfile.objects.create(user=request.user)
+            try:
+                models.UserProfile.objects.create(user=request.user)
+            except IntegrityError as e:
+                logger.warning(e)
+                raise Http404()
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
@@ -26,17 +34,30 @@ class MVT(APIBase):
         cache_key = f"mvt_{nodeid}_{request.user.username}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
 
-        res_access = get_allowed_resource_ids(request.user, str(node.graph_id))
+        BUST_RESOURCE_LAYER_CACHE = False
+        if tile is None or BUST_RESOURCE_LAYER_CACHE is True:
 
-        if res_access["access_level"] == "full_access":
+            # set extra where clause to a default "match everything" value
             resid_where = "NULL IS NULL"
-        elif res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
-            raise Http404()
-        else:
-            ids = "','".join(res_access["id_list"])
-            resid_where = f"resourceinstanceid IN ('{ids}')"
 
-        if tile is None:
+            ## disable the real postgis spatial query because it was slower (and more picky about the input geometry)
+            ## than just calling another geo query on ES and retrieving ids from
+            ## that. could use another look down the road...
+            # rules = SiteFilter().get_rules(request.user, str(node.graph_id))
+            # if rules["access_level"] == "geo_filter":
+            #     geom = rules["geometry"]
+            #     # ST_SetSRID({geom}, 4236)
+            #     resid_where = f"ST_Intersects(geom, ST_Transform('{geom}', 3857))"
+            # else:
+            res_access = SiteFilter().get_allowed_resource_ids(request.user, str(node.graph_id))
+
+            if res_access["access_level"] != "full_access":
+                if res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
+                    raise Http404()
+                else:
+                    ids = "','".join(res_access["id_list"])
+                    resid_where = f"resourceinstanceid IN ('{ids}')"
+
             with connection.cursor() as cursor:
 
                 query_params = {

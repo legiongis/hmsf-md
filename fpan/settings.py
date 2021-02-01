@@ -32,6 +32,7 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_process
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
+ELASTICSEARCH_PREFIX = 'fpan'
 
 # manually disable the shapefile exporter class. This creates a 500 error if
 # someone were to hit the shapefile export url somehow.
@@ -40,30 +41,29 @@ RESOURCE_FORMATTERS['shp'] = None
 DISABLE_PROVISIONAL_EDITING = True
 HIDE_EMPTY_NODES_IN_REPORT = True
 
-## in FPAN the State filtered access values are set in utils.filter.get_state_node_match()
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'fpan_cachetable',
+    }
+}
+
+## example of the default filter that is applied to anonymous and Scout users.
+## the land manager accounts don't reference this setting at all, their permissions
+## are all handled in the site_filter component.
 RESOURCE_MODEL_USER_RESTRICTIONS = {
     'f212980f-d534-11e7-8ca8-94659cf754d0': {
-        'public': {
-            # 'access_level': 'no_access'
-            'access_level':'match_node_value',
-            'match_config': {
+        'default': {
+            'access_level':'attribute_filter',
+            'filter_config': {
                 'node_name':'Assigned To',
-                'match_to':'<username>'
+                'value':"<username>"
             }
-        },
-        'scout': {
-            'access_level':'match_node_value',
-            'match_config': {
-                'node_name':'Assigned To',
-                'match_to':'<username>'
-            }
-        },
-        'state': {
-            'access_level':'match_node_value',
-            'match_config': {
-                'node_name':'Managing Agency',
-                'match_to':'<derived_elsewhere>'
-            }
+        }
+    },
+    '14578901-bd5d-11e9-822a-94659cf754d0': {
+        'default': {
+            'access_level':'no_access'
         }
     }
 }
@@ -123,9 +123,9 @@ DATABASES = {
 
 INSTALLED_APPS+=('fpan', 'hms')
 
-## the following two variables should be handled in settings_local.py
-SECRET_LOG = "path/to/directory/outside/of/version/control"
-PACKAGE_PATH = "path/to/location/of/cloned/fpan-data/repo"
+# the code should be refactored to not even use SECRET_LOG anymore...
+SECRET_LOG = LOG_DIR
+PACKAGE_PATH = os.path.join(os.path.dirname(os.path.dirname(APP_ROOT)), "fpan-data")
 
 ALLOWED_HOSTS = []
 
