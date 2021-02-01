@@ -14,6 +14,7 @@ from hms.models import (
 class Command(BaseCommand):
 
     help = 'Loads Management Areas from shapefile.'
+    quiet = False
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -46,8 +47,16 @@ class Command(BaseCommand):
             choices=["Federal", "State", "County", "City"],
             help='Management Level for these areas.',
         )
+        parser.add_argument(
+            '--quiet',
+            action="store_true",
+            help='Suppress output messages.',
+        )
 
     def handle(self, *args, **options):
+
+        if options['quiet'] is True:
+            self.quiet = True
 
         if options['operation'] == "load":
             self.load_areas(options['source'], options['group_names'], options['level'], options['category'])
@@ -186,7 +195,9 @@ class Command(BaseCommand):
             newarea.load_id = load_id
             newarea.save()
             ct += 1
-        print(f"{ct} FPAN regions migrated")
+
+        if not self.quiet:
+            print(f"{ct} FPAN regions migrated")
 
         ## get or create the necessary groups
         sp1 = ManagementAreaGroup.objects.get_or_create(name="SP District 1")[0]
@@ -268,8 +279,9 @@ class Command(BaseCommand):
             newarea.save()
             ct += 1
 
-        print(f"{ct} Managed Areas migrated")
+        if not self.quiet:
+            print(f"{ct} Managed Areas migrated")
 
-        print(f"load id: {load_id}")
-        print(f"to undo to this load, run:")
-        print(f"\n    python manage.py areas remove --load-id {load_id}\n")
+            print(f"load id: {load_id}")
+            print(f"to undo to this load, run:")
+            print(f"\n    python manage.py areas remove --load-id {load_id}\n")
