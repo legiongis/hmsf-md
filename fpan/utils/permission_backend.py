@@ -21,11 +21,9 @@ def user_is_land_manager(user):
     state_user = False
 
     if hasattr(user, "landmanager"):
-        print("user_is_land_manager: this is a land manager 2.0")
         state_user = True
 
     elif user.groups.filter(name="Land Manager").exists():
-        print("user_is_land_manager: this is a land manager 1.0")
         state_user = True
 
     ## this should really not be here, but upstream code will need to account

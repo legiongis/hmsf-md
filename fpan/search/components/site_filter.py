@@ -150,12 +150,10 @@ class SiteFilter(BaseSearchFilter):
 
         ## standard, basic check to apply restrictions to public users
         if user_is_anonymous(user):
-            print("  anonymous user")
             rules = settings_perms[doc_id]['default']
 
         ## alternative, FPAN-specific scenarios
         elif user_is_scout(user):
-            print("  scout user")
             rules = settings_perms[doc_id]['default']
 
         # special handling of the state land manager permissions here
@@ -164,7 +162,6 @@ class SiteFilter(BaseSearchFilter):
             ## In the case of 2.0, don't use any settings. perms, handle it all
             ## in here.
             if hasattr(user, "landmanager"):
-                print("  land manager 2.0")
                 if user.landmanager.full_access is True:
                     rules = full_access
 
@@ -176,7 +173,6 @@ class SiteFilter(BaseSearchFilter):
                 else:
                     rules = no_access
             else:
-                print("  land manager 1.0")
                 rules = self.get_state_node_match(user)
 
         else:

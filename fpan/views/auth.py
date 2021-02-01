@@ -113,5 +113,4 @@ class FPANUserManagerView(UserManagerView):
         view in core arches. The main difference is that different forms are passed
         to the view based on what type of user (land manager or scout) is logged
         in, and different templates are used to render."""
-    print("new view")
     pass
