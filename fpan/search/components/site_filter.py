@@ -187,9 +187,10 @@ class SiteFilter(BaseSearchFilter):
         ## directive 3) set all values to lists for later iteration.
         if rules["access_level"] == "attribute_filter":
 
+            node_name = rules["filter_config"]["node_name"]
             node = Node.objects.filter(
                 graph_id=doc_id,
-                name=rules["filter_config"]["node_name"],
+                name=node_name,
             )
             if len(node) == 1:
                 ngid = str(node[0].nodegroup_id)
