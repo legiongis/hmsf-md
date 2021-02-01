@@ -8,6 +8,7 @@ from hms.models import (
     ManagementAgency,
     ManagementArea,
     ManagementAreaGroup,
+    ManagementAreaCategory,
 )
 
 
@@ -36,10 +37,15 @@ admin.site.register(LandManager, LandManagerAdmin)
 ## Land Manager Profile interface, using the green + button.
 # admin.site.register(LandManager)
 
+class ManagementAreaAdmin(admin.GeoModelAdmin):
+    list_display = ('name', 'management_level', 'category', 'management_agency', 'load_id')
+    list_filter = ('category', 'management_level', 'management_agency')
+    search_fields = ("name", )
 
 class ManagementAreaGroupAdmin(admin.ModelAdmin):
     filter_horizontal = ('areas',)
 
-admin.site.register(ManagementArea, admin.GeoModelAdmin)
+admin.site.register(ManagementArea, ManagementAreaAdmin)
 admin.site.register(ManagementAgency)
+admin.site.register(ManagementAreaCategory)
 admin.site.register(ManagementAreaGroup, ManagementAreaGroupAdmin)

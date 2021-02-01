@@ -183,6 +183,24 @@ class ManagementAgency(models.Model):
     def __str__(self):
         return self.name
 
+class ManagementAreaCategory(models.Model):
+
+    class Meta:
+        verbose_name = "Management Area Category"
+        verbose_name_plural = "Management Area Categories"
+
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+MANAGEMENT_LEVELS = (
+    ("Federal","Federal"),
+    ("State","State"),
+    ("County","County"),
+    ("City","City"),
+)
+
 class ManagementArea(models.Model):
 
     class Meta:
@@ -190,6 +208,13 @@ class ManagementArea(models.Model):
         verbose_name_plural = "Management Areas"
 
     name = models.CharField(max_length=254)
+    category = models.ForeignKey(
+        ManagementAreaCategory,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text="Used for internal management. Not linked to permissions rules."
+    )
     description = models.CharField(
         max_length=254,
         null=True,
@@ -199,18 +224,26 @@ class ManagementArea(models.Model):
         ManagementAgency,
         null=True,
         blank=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        help_text="Used to grant access to Land Managers whose accounts have "\
+        "the Agency Filter applied."
     )
-    # type = models.ForeignKey(ManagementAreaType, null=True, blank=True, on_delete=models.CASCADE)
+    management_level = models.CharField(
+        max_length=25,
+        choices=MANAGEMENT_LEVELS,
+        null=True,
+        blank=True,
+        help_text="Used for internal management. Not linked to permissions rules."
+    )
     nickname = models.CharField(max_length=30,null=True,blank=True)
     load_id = models.CharField(max_length=200,null=True,blank=True)
     geom = models.MultiPolygonField()
 
     def __str__(self):
         if self.management_agency:
-            return f"{self.name} - {self.management_agency.code}"
+            return f"{self.name} | {self.category} | {self.management_agency.name}"
         else:
-            return self.name
+            return f"{self.name} | {self.category}"
 
 class ManagementAreaGroup(models.Model):
 
