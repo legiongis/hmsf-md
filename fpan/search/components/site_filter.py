@@ -62,21 +62,28 @@ class SiteFilter(BaseSearchFilter):
             raise(Exception("Site filter is registered but not shown as enabled."))
 
         try:
-            for doc in self.doc_types:
 
-                rules = self.get_rules(self.request.user, doc)
+            ## collect all of the graph-specific rules for this user
+            collected_rules = {}
+            for graphid in self.doc_types:
+                collected_rules[graphid] = self.get_rules(self.request.user, graphid)
 
-                if rules["access_level"] == "full_access":
-                    continue
+            ## iterate rules and generate a composite query based on them
+            for graphid, rule in collected_rules.items():
 
-                elif rules["access_level"] == "no_access":
-                    self.create_no_access_filter(doc)
+                if rule["access_level"] == "full_access":
+                    self.add_full_access_clause(graphid)
 
-                elif rules["access_level"] == "geo_filter":
-                    self.create_geo_filter(doc, rules["filter_config"]["geometry"])
+                elif rule["access_level"] == "no_access":
+                    self.add_no_access_clause(graphid)
 
-                elif rules["access_level"] == "attribute_filter":
-                    self.create_attribute_filter(doc, rules["filter_config"])
+                elif rule["access_level"] == "geo_filter":
+                    self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
+                    # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
+
+                elif rule["access_level"] == "attribute_filter":
+                    # self.create_attribute_filter(graphid, rule["filter_config"])
+                    self.add_attribute_filter_clause(graphid, rule["filter_config"])
 
                 else:
                     raise(Exception("Invalid rules for filter."))
@@ -92,6 +99,29 @@ class SiteFilter(BaseSearchFilter):
             print(e)
             logger.debug(e)
             raise(e)
+
+    def add_full_access_clause(self, graphid):
+        self.paramount.should(Terms(field="graph_id", terms=graphid))
+
+    def add_no_access_clause(self, graphid):
+        self.paramount.must_not(Terms(field="graph_id", terms=graphid))
+
+    def add_geo_filter_clause(self, graphid, geometry):
+
+        nested = self.create_nested_geo_filter(geometry)
+        if self.existing_query:
+            self.paramount.should(nested)
+        else:
+            self.paramount.must(nested)
+
+    def add_attribute_filter_clause(self, graphid, filter_config):
+
+        for val in filter_config["value_list"]:
+            nested = self.create_nested_attribute_filter(graphid, filter_config["nodegroup_id"], val)
+            if self.existing_query:
+                self.paramount.should(nested)
+            else:
+                self.paramount.must(nested)
 
     def get_rules(self, user, doc_id):
 
@@ -170,7 +200,7 @@ class SiteFilter(BaseSearchFilter):
             rules["filter_config"]["nodegroup_id"] = ngid
 
             if rules["filter_config"]["value"] == "<username>":
-                rules["filter_config"]["value"] = self.request.user.username
+                rules["filter_config"]["value"] = user.username
 
             if isinstance(rules["filter_config"]["value"], list):
                 rules["filter_config"]["value_list"] = rules["filter_config"]["value"]
@@ -310,9 +340,8 @@ class SiteFilter(BaseSearchFilter):
         has been updated and this method could be removed to use that one."""
 
         all_resource_graphids = (
-            GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
-            .exclude(isresource=False)
-            .exclude(isactive=False)
+            GraphModel.objects.filter(isresource=True, isactive=True)
+            .exclude(name="Arches System Settings")
         ).values_list('graphid', flat=True)
 
         type_filter = request.GET.get('typeFilter', '')
@@ -341,42 +370,6 @@ class SiteFilter(BaseSearchFilter):
             ret = list(set(use_ids))
         return ret
 
-    def create_no_access_filter(self, doc_id):
-
-        for doc_type in self.doc_types:
-            if doc_type == doc_id:
-                self.paramount.must_not(Terms(field="graph_id", terms=doc_type))
-            else:
-                self.paramount.should(Terms(field="graph_id", terms=doc_type))
-        return self.paramount
-
-    def create_geo_filter(self, doc_id, geometry):
-
-        for doc_type in self.doc_types:
-            if doc_type == doc_id:
-                nested = self.create_nested_geo_filter(geometry)
-                if self.existing_query:
-                    self.paramount.should(nested)
-                else:
-                    self.paramount.must(nested)
-            else:
-                self.paramount.should(Terms(field="graph_id", terms=doc_type))
-        return self.paramount
-
-    def create_attribute_filter(self, doc_id, filter_config):
-
-        for doc_type in self.doc_types:
-            if doc_type == doc_id:
-                for val in filter_config["value_list"]:
-                    nested = self.create_nested_attribute_filter(doc_id, filter_config["nodegroup_id"], val)
-                    if self.existing_query:
-                        self.paramount.should(nested)
-                    else:
-                        self.paramount.must(nested)
-            else:
-                self.paramount.should(Terms(field="graph_id", terms=doc_type))
-        return self.paramount
-
     def create_nested_attribute_filter(self, doc_id, nodegroup_id, value):
 
         new_string_filter = Bool()
@@ -400,32 +393,21 @@ class SiteFilter(BaseSearchFilter):
         nested = Nested(path='geometries', query=new_spatial_filter)
         return nested
 
-    def resource_id_query(self, rules, doc):
+    def quick_query(self, rules, doc):
 
-        simple = Bool()
-        if rules["access_level"] == "no_access":
-
-            nested = self.create_no_access_filter(doc)
-            simple.must(nested)
-
-        elif rules["access_level"] == "attribute_filter":
-
-            for value in rules["filter_config"]["value_list"]:
-                nested = self.create_nested_attribute_filter(doc,
-                    rules["filter_config"]["nodegroup_id"], value)
-                simple.must(nested)
+        if rules["access_level"] == "attribute_filter":
+            self.add_attribute_filter_clause(doc, rules["filter_config"])
 
         elif rules["access_level"] == "geo_filter":
-
-            nested = self.create_nested_geo_filter(rules["filter_config"]["geometry"])
-            simple.must(nested)
+            self.add_geo_filter_clause(doc, rules["filter_config"]["geometry"])
 
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
         query.include('graph_id')
         query.include('resourceinstanceid')
-        query.add_query(simple)
+        query.add_query(self.paramount)
 
+        ## doc_type is deprecated, must use a filter for graphid instead (i think)
         results = query.search(index='resources', doc_type=doc)
 
         return results
@@ -433,7 +415,7 @@ class SiteFilter(BaseSearchFilter):
     def get_allowed_resource_ids(self, user, graphid, invert=False):
         """
         Returns the resourceinstanceids for all resources that a user is allowed to
-        access. Optionally only gets ids from one graph. Set invert=True to return
+        access from a given graph. Set invert=True to return
         ids that the user is NOT allowed to access.
         """
 
@@ -452,14 +434,13 @@ class SiteFilter(BaseSearchFilter):
             response["access_level"] = "no_access"
             return response
 
-        logger.debug("heading to quick query")
-        results = self.resource_id_query(rules, graphid)
+        results = self.quick_query(rules, graphid)
 
         resourceids = list(set([i['_source']['resourceinstanceid'] for i in results['hits']['hits']]))
 
         if invert is True:
             inverted_res = ResourceInstance.objects.filter(graph_id=graphid).exclude(resourceinstanceid__in=resourceids)
-            resourceids = [i.resourceinstanceid for i in inverted_res]
+            resourceids = [str(i.resourceinstanceid) for i in inverted_res]
 
         response["id_list"] = resourceids
 
