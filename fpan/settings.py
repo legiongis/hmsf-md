@@ -60,6 +60,11 @@ RESOURCE_MODEL_USER_RESTRICTIONS = {
                 'value':"<username>"
             }
         }
+    },
+    '14578901-bd5d-11e9-822a-94659cf754d0': {
+        'default': {
+            'access_level':'no_access'
+        }
     }
 }
 

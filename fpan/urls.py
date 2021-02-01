@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
-    url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
+    #url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
     url(
         r"^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$" % uuid_regex,
         api.MVT.as_view(),
