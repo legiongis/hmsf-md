@@ -58,6 +58,8 @@ def create_user_scout(sender, instance, created, **kwargs):
     group.user_set.add(instance)
     group_cs = Group.objects.get(name='Crowdsource Editor')
     group_cs.user_set.add(instance)
+    group_cs = Group.objects.get(name='Resource Editor')
+    group_cs.user_set.add(instance)
     instance.scoutprofile.save()
 
 @receiver(post_save, sender=Scout)
@@ -150,6 +152,8 @@ def create_user_land_manager(sender, instance, created, **kwargs):
     if created:
         group_cs = Group.objects.get(name='Crowdsource Editor')
         group_cs.user_set.add(instance.user)
+        group_cs = Group.objects.get(name='Resource Editor')
+        group_cs.user_set.add(instance)
 
 
 ## PROBLEM: these signals cause errors in the admin interface when createing
