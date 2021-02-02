@@ -153,7 +153,7 @@ def create_user_land_manager(sender, instance, created, **kwargs):
         group_cs = Group.objects.get(name='Crowdsource Editor')
         group_cs.user_set.add(instance.user)
         group_cs = Group.objects.get(name='Resource Editor')
-        group_cs.user_set.add(instance)
+        group_cs.user_set.add(instance.user)
 
 
 ## PROBLEM: these signals cause errors in the admin interface when createing
