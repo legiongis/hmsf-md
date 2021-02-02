@@ -152,31 +152,32 @@ class SiteFilter(BaseSearchFilter):
         if user_is_anonymous(user):
             rules = settings_perms[doc_id]['default']
 
-        ## alternative, FPAN-specific scenarios
-        elif user_is_scout(user):
-            rules = settings_perms[doc_id]['default']
-
-        # special handling of the state land manager permissions here
-        elif user_is_land_manager(user):
-            ## TEMPORARY extra check to see if this is a 1.0 or 2.0 land manager
-            ## In the case of 2.0, don't use any settings. perms, handle it all
-            ## in here.
-            if hasattr(user, "landmanager"):
-                if user.landmanager.full_access is True:
-                    rules = full_access
-
-                elif user.landmanager.apply_area_filter is True:
-                    multipolygon = user.landmanager.areas_as_multipolygon
-                    geo_filter["filter_config"]["geometry"] = multipolygon
-                    rules = geo_filter
-
-                else:
-                    rules = no_access
-            else:
-                rules = self.get_state_node_match(user)
-
         else:
-            rules = no_access
+            rules = full_access
+
+        ## alternative, FPAN-specific scenarios for Archaeological Sites
+        if doc_id == "f212980f-d534-11e7-8ca8-94659cf754d0":
+            if user_is_scout(user):
+                rules = settings_perms[doc_id]['default']
+
+            # special handling of the state land manager permissions here
+            if user_is_land_manager(user):
+                ## TEMPORARY extra check to see if this is a 1.0 or 2.0 land manager
+                ## In the case of 2.0, don't use any settings. perms, handle it all
+                ## in here.
+                if hasattr(user, "landmanager"):
+                    if user.landmanager.full_access is True:
+                        rules = full_access
+
+                    elif user.landmanager.apply_area_filter is True:
+                        multipolygon = user.landmanager.areas_as_multipolygon
+                        geo_filter["filter_config"]["geometry"] = multipolygon
+                        rules = geo_filter
+
+                    else:
+                        rules = no_access
+                else:
+                    rules = self.get_state_node_match(user)
 
         ## do a little bit of processing on attribute filters to standardize
         ## their configs 1) change node name to nodegroupids 2) handle <username>
