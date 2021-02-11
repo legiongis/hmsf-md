@@ -12,6 +12,8 @@ from arches.app.models.graph import Graph
 from arches.app.utils.response import JSONResponse
 from fpan.search.components.site_filter import SiteFilter
 
+from hms.models import UserXResourceInstanceAccess
+
 logger = logging.getLogger(__name__)
 
 class MVT(APIBase):
@@ -38,7 +40,7 @@ class MVT(APIBase):
         if tile is None or BUST_RESOURCE_LAYER_CACHE is True:
 
             # set extra where clause to a default "match everything" value
-            resid_where = "NULL IS NULL"
+
 
             ## disable the real postgis spatial query because it was slower (and more picky about the input geometry)
             ## than just calling another geo query on ES and retrieving ids from
@@ -49,14 +51,34 @@ class MVT(APIBase):
             #     # ST_SetSRID({geom}, 4236)
             #     resid_where = f"ST_Intersects(geom, ST_Transform('{geom}', 3857))"
             # else:
-            res_access = SiteFilter().get_allowed_resource_ids(request.user, str(node.graph_id))
 
-            if res_access["access_level"] != "full_access":
-                if res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
-                    raise Http404()
+            # this is the new Land Manager, and uses the new permissions table.
+            if hasattr(request.user, "landmanager"):
+
+                rules = SiteFilter().get_rules(request.user, str(node.graph_id))
+
+                if rules["access_level"] == "full_access":
+                    resid_where = "NULL IS NULL"
+                elif rules["access_level"] == "no_access":
+                    # raise Http404()
+                    return HttpResponse(None, content_type="application/x-protobuf")
                 else:
-                    ids = "','".join(res_access["id_list"])
-                    resid_where = f"resourceinstanceid IN ('{ids}')"
+                    a = UserXResourceInstanceAccess.objects.filter(user=request.user)
+                    res_ids = [str(i.resource.resourceinstanceid) for i in a]
+                    ids_str = "','".join(res_ids)
+                    resid_where = f"resourceinstanceid IN ('{ids_str}')"
+
+            else:
+                resid_where = "NULL IS NULL"
+                res_access = SiteFilter().get_allowed_resource_ids(request.user, str(node.graph_id))
+
+                if res_access["access_level"] != "full_access":
+                    if res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
+                        # raise Http404()
+                        return HttpResponse(None, content_type="application/x-protobuf")
+                    else:
+                        ids = "','".join(res_access["id_list"])
+                        resid_where = f"resourceinstanceid IN ('{ids}')"
 
             with connection.cursor() as cursor:
 
@@ -148,7 +170,8 @@ class MVT(APIBase):
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
 
         if not len(tile):
-            raise Http404()
+            # raise Http404()
+            HttpResponse(None, content_type="application/x-protobuf")
         return HttpResponse(tile, content_type="application/x-protobuf")
 
 
