@@ -14,6 +14,7 @@ from fpan.utils.permission_backend import (
     user_is_scout,
     user_is_land_manager,
 )
+from hms.models import UserXResourceInstanceAccess
 
 logger = logging.getLogger(__name__)
 
@@ -80,16 +81,21 @@ class SiteFilter(BaseSearchFilter):
                 elif rule["access_level"] == "no_access":
                     self.add_no_access_clause(graphid)
 
-                elif rule["access_level"] == "geo_filter":
-                    self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
-                    # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
-
-                elif rule["access_level"] == "attribute_filter":
-                    # self.create_attribute_filter(graphid, rule["filter_config"])
-                    self.add_attribute_filter_clause(graphid, rule["filter_config"])
-
                 else:
-                    raise(Exception("Invalid rules for filter."))
+                    if hasattr(self.request.user, 'landmanager'):
+                        self.add_resourceid_filter_clause(graphid, self.request.user)
+
+                    else:
+                        if rule["access_level"] == "geo_filter":
+                            self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
+                            # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
+
+                        elif rule["access_level"] == "attribute_filter":
+                            # self.create_attribute_filter(graphid, rule["filter_config"])
+                            self.add_attribute_filter_clause(graphid, rule["filter_config"])
+
+                        else:
+                            raise(Exception("Invalid rules for filter."))
 
             search_results_object["query"].add_query(self.paramount)
 
@@ -125,6 +131,21 @@ class SiteFilter(BaseSearchFilter):
                 self.paramount.should(nested)
             else:
                 self.paramount.must(nested)
+
+    def add_resourceid_filter_clause(self, graphid, user):
+
+        allowed = UserXResourceInstanceAccess.objects.filter(
+            user=user,
+            resource__graph_id=graphid,
+        )
+        resids = [str(i.resource.resourceinstanceid) for i in allowed]
+
+        new_resid_filter = Bool()
+        new_resid_filter.should(Terms(field='resourceinstanceid', terms=resids))
+        if self.existing_query:
+            self.paramount.should(new_resid_filter)
+        else:
+            self.paramount.must(new_resid_filter)
 
     def get_rules(self, user, doc_id):
 
