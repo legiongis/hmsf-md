@@ -48,8 +48,11 @@ class SiteFilter(BaseSearchFilter):
 
         original_dsl = search_results_object["query"]._dsl
         ## manual test to see if any criteria have been added to the query yet
-        if original_dsl['query']['match_all'] == {}:
-            self.existing_query = True
+        try:
+            if original_dsl['query']['match_all'] == {}:
+                self.existing_query = True
+        except KeyError:
+            pass
 
         if settings.LOG_LEVEL == "DEBUG":
             with open(os.path.join(settings.LOG_DIR, "dsl_before_fpan.json"), "w") as output:
