@@ -1,0 +1,44 @@
+{% load i18n %}
+
+<style>
+.sj-target {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    padding: 10px;
+    margin: 10px 0px;
+}
+.sj-target .widget-container {
+    padding: 0px 10px 10px;
+}
+.sj-target .remove-btn {
+    position: relative;
+    float: right;
+    margin-top: -5px;
+    text-align: right;
+    color: #777;
+}
+</style>
+
+<div style="">
+  <div class="row widget-container">
+    <div class="col-xs-12">
+      <h5>usage notes</h5>
+      <ul>
+        <li>This function is only intended for use with the HMS Archaeological Site resource model.</li>
+        <li>It updates the UserXResourceInstanceAccess table when a new Scout is assigned to a site.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="row widget-container">
+    <div class="form-group">
+      <div class="relative">
+          <label class="col-xs-12 control-label widget-input-label"> {% trans "Name of Spatial Coordinates Node" %}</label>
+      </div>
+      <div class="col-xs-12">
+          <select data-placeholder="{% trans 'select assignment node' %}"
+          data-bind="chosen: {width: '100%', disable_search_threshold: 15}, value: assignment_node_id, options: nodes, optionsText: 'name', optionsValue: 'nodeid', valueAllowUnset: true"></select>
+      </div>
+    </div>
+  </div>
+</div>

@@ -3,7 +3,7 @@ define(['knockout',
         'viewmodels/function',
         'bindings/chosen'],
 function (ko, koMapping, FunctionViewModel, chosen) {
-    return ko.components.register('views/components/functions/instance_permissions_update', {
+    return ko.components.register('views/components/functions/scout_assignment', {
         viewModel: function(params) {
             FunctionViewModel.apply(this, arguments);
             var self = this;
@@ -23,14 +23,14 @@ function (ko, koMapping, FunctionViewModel, chosen) {
             this.triggering_nodegroups = params.config.triggering_nodegroups;
 
             // set spatial node id from existing params
-            this.spatial_node_id = params.config.spatial_node_id;
+            this.assignment_node_id = params.config.assignment_node_id;
 
             // and subscribe it so it updates automatically as the select2
             // widget is used. note that the widget must reference this variable
             // name. the function may be empty, but in this case we need to use
             // it to get the nodegroup_id of the selected node and then update
             // the triggering_nodegroup config variable.
-            this.spatial_node_id.subscribe(function(ng){
+            this.assignment_node_id.subscribe(function(ng){
                 _.each(self.nodes(), function(node){
                   if (ng == node.nodeid) {
                       self.triggering_nodegroups([node.nodegroup_id]);
@@ -38,27 +38,10 @@ function (ko, koMapping, FunctionViewModel, chosen) {
               })
             })
 
-            // the following three sections are simpler versions of above; set
-            // a variable based on previous config value, and subscribe it to
-            // the input widget that references this variable name
-
-            this.inputs = params.config.inputs;
-
-            this.addTarget = function() {
-                this.inputs.push({target_node_id:ko.observable(''), table_field: ko.observable('')})
-            }
-
-            this.removeTarget = function(val) {
-                self.inputs.remove(val)
-            }
-
-            this.inputs.subscribe(function(val) {
-                window.setTimeout(function() {$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
-            }, this)
             window.setTimeout(function(){$("select[data-bind^=chosen]").trigger("chosen:updated")}, 300);
         },
         template: {
-            require: 'text!templates/views/components/functions/instance_permissions_update.htm'
+            require: 'text!templates/views/components/functions/scout_assignment.htm'
         }
     });
 })
