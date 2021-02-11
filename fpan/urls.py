@@ -50,7 +50,7 @@ urlpatterns = [
     # the following are just pass through views so FPAN can add custom permissions
     url(r"^resource$", FPANResourceListView.as_view(), name="resource"),
     url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, FPANResourceEditLogView.as_view(), name="resource_edit_log"),
-    url(r"^resource/history$", FPANResourceEditLogView.as_view(), name="edit_history"),
+    #url(r"^resource/history$", FPANResourceEditLogView.as_view(), name="edit_history"),
     url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), FPANResourceData.as_view(), name="resource_data"),
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, FPANResourceTiles.as_view(), name="resource_tiles"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
