@@ -60,8 +60,7 @@ class MVT(APIBase):
                 if rules["access_level"] == "full_access":
                     resid_where = "NULL IS NULL"
                 elif rules["access_level"] == "no_access":
-                    # raise Http404()
-                    return HttpResponse(None, content_type="application/x-protobuf")
+                    return HttpResponse(b'', content_type="application/x-protobuf")
                 else:
                     a = UserXResourceInstanceAccess.objects.filter(user=request.user)
                     res_ids = [str(i.resource.resourceinstanceid) for i in a]
@@ -74,8 +73,7 @@ class MVT(APIBase):
 
                 if res_access["access_level"] != "full_access":
                     if res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
-                        # raise Http404()
-                        return HttpResponse(None, content_type="application/x-protobuf")
+                        return HttpResponse(b'', content_type="application/x-protobuf")
                     else:
                         ids = "','".join(res_access["id_list"])
                         resid_where = f"resourceinstanceid IN ('{ids}')"
@@ -170,8 +168,7 @@ class MVT(APIBase):
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
 
         if not len(tile):
-            # raise Http404()
-            HttpResponse(None, content_type="application/x-protobuf")
+            return HttpResponse(b'', content_type="application/x-protobuf")
         return HttpResponse(tile, content_type="application/x-protobuf")
 
 
