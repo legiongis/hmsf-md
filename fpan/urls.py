@@ -5,6 +5,15 @@ from django.conf import settings
 from arches.app.views.auth import UserProfileView, GetClientIdView
 from arches.app.views.user import UserManagerView
 from fpan.views import api, main, auth, scout, search
+from fpan.views.resource import (
+    FPANResourceListView,
+    FPANResourceEditLogView,
+    FPANResourceData,
+    FPANResourceTiles,
+    FPANResourceCards,
+    FPANResourceReportView,
+    FPANRelatedResourcesView,
+)
 
 uuid_regex = settings.UUID_REGEX
 handler500 = main.server_error
@@ -37,6 +46,17 @@ urlpatterns = [
         auth.activate, name='activate'),
     url(r'^auth/', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
     url(r"api/lookup$", api.ResourceIdLookup.as_view(), name="resource_lookup"),
+
+    # the following are just pass through views so FPAN can add custom permissions
+    url(r"^resource$", FPANResourceListView.as_view(), name="resource"),
+    url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, FPANResourceEditLogView.as_view(), name="resource_edit_log"),
+    url(r"^resource/history$", FPANResourceEditLogView.as_view(), name="edit_history"),
+    url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), FPANResourceData.as_view(), name="resource_data"),
+    url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, FPANResourceTiles.as_view(), name="resource_tiles"),
+    url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
+    url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
+    url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
+
     url(r'^', include('arches.urls')),
 ]
 if settings.SHOW_LANGUAGE_SWITCH is True:
