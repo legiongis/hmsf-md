@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 class MVT(APIBase):
     EARTHCIRCUM = 40075016.6856
     PIXELSPERTILE = 256
+    EMPTY_TILE = HttpResponse(b'', content_type="application/x-protobuf")
 
     def get(self, request, nodeid, zoom, x, y):
         if hasattr(request.user, "userprofile") is not True:
@@ -60,9 +61,11 @@ class MVT(APIBase):
                 if rules["access_level"] == "full_access":
                     resid_where = "NULL IS NULL"
                 elif rules["access_level"] == "no_access":
-                    return HttpResponse(b'', content_type="application/x-protobuf")
+                    return self.EMPTY_TILE
                 else:
                     a = UserXResourceInstanceAccess.objects.filter(user=request.user)
+                    if len(a) == 0:
+                        return self.EMPTY_TILE
                     res_ids = [str(i.resource.resourceinstanceid) for i in a]
                     ids_str = "','".join(res_ids)
                     resid_where = f"resourceinstanceid IN ('{ids_str}')"
@@ -73,7 +76,7 @@ class MVT(APIBase):
 
                 if res_access["access_level"] != "full_access":
                     if res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
-                        return HttpResponse(b'', content_type="application/x-protobuf")
+                        return self.EMPTY_TILE
                     else:
                         ids = "','".join(res_access["id_list"])
                         resid_where = f"resourceinstanceid IN ('{ids}')"
@@ -168,7 +171,7 @@ class MVT(APIBase):
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
 
         if not len(tile):
-            return HttpResponse(b'', content_type="application/x-protobuf")
+            return self.EMPTY_TILE
         return HttpResponse(tile, content_type="application/x-protobuf")
 
 
