@@ -23,8 +23,13 @@ def can_access_resource_instance(function):
         elif rules["access_level"] == "no_access":
             can_edit = False
         else:
-            allowed = UserXResourceInstanceAccess.objects.filter(user=request.user)
-            res_ids = [str(i.resource.resourceinstanceid) for i in allowed]
+            # this is for land manager 2.0
+            if hasattr(request.user, 'landmanager'):
+                allowed = UserXResourceInstanceAccess.objects.filter(user=request.user)
+                res_ids = [str(i.resource.resourceinstanceid) for i in allowed]
+            # retain compatibility for 1.0 for now
+            else:
+                res_ids = SiteFilter().get_allowed_resource_ids(request.user, str(r.graph_id))["id_list"]
             if resourceid in res_ids:
                 can_edit = True
             else:
