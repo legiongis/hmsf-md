@@ -15,7 +15,10 @@ def can_access_resource_instance(function):
             # technically this should be 403/forbidden
             raise Http404
 
-        r = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        try:
+            r = ResourceInstance.objects.get(resourceinstanceid=resourceid)
+        except ResourceInstance.DoesNotExist:
+            raise Http404
         rules = SiteFilter().get_rules(request.user, str(r.graph_id))
 
         if rules["access_level"] == "full_access":
@@ -24,12 +27,14 @@ def can_access_resource_instance(function):
             can_edit = False
         else:
             # this is for land manager 2.0
+
             if hasattr(request.user, 'landmanager'):
                 allowed = UserXResourceInstanceAccess.objects.filter(user=request.user)
                 res_ids = [str(i.resource.resourceinstanceid) for i in allowed]
             # retain compatibility for 1.0 for now
             else:
                 res_ids = SiteFilter().get_allowed_resource_ids(request.user, str(r.graph_id))["id_list"]
+                print(res_ids)
             if resourceid in res_ids:
                 can_edit = True
             else:

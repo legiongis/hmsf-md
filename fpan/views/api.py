@@ -37,11 +37,8 @@ class MVT(APIBase):
         cache_key = f"mvt_{nodeid}_{request.user.username}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
 
-        BUST_RESOURCE_LAYER_CACHE = False
+        BUST_RESOURCE_LAYER_CACHE = True
         if tile is None or BUST_RESOURCE_LAYER_CACHE is True:
-
-            # set extra where clause to a default "match everything" value
-
 
             ## disable the real postgis spatial query because it was slower (and more picky about the input geometry)
             ## than just calling another geo query on ES and retrieving ids from
@@ -59,11 +56,15 @@ class MVT(APIBase):
                 rules = SiteFilter().get_rules(request.user, str(node.graph_id))
 
                 if rules["access_level"] == "full_access":
+                    # set extra where clause to match everything
                     resid_where = "NULL IS NULL"
                 elif rules["access_level"] == "no_access":
                     return self.EMPTY_TILE
                 else:
-                    a = UserXResourceInstanceAccess.objects.filter(user=request.user)
+                    a = UserXResourceInstanceAccess.objects.filter(
+                        user=request.user,
+                        resource__graph_id=node.graph.graphid,
+                    )
                     if len(a) == 0:
                         return self.EMPTY_TILE
                     res_ids = [str(i.resource.resourceinstanceid) for i in a]

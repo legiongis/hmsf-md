@@ -1,5 +1,6 @@
 import os
 import json
+import copy
 import logging
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -125,12 +126,16 @@ class SiteFilter(BaseSearchFilter):
 
     def add_attribute_filter_clause(self, graphid, filter_config):
 
-        for val in filter_config["value_list"]:
-            nested = self.create_nested_attribute_filter(graphid, filter_config["nodegroup_id"], val)
-            if self.existing_query:
-                self.paramount.should(nested)
-            else:
-                self.paramount.must(nested)
+        nested = self.create_nested_attribute_filter(
+            graphid,
+            filter_config["nodegroup_id"],
+            filter_config["value_list"],
+        )
+        if self.existing_query:
+            self.paramount.should(nested)
+        else:
+            self.paramount.must(nested)
+
 
     def add_resourceid_filter_clause(self, graphid, user):
 
@@ -174,7 +179,7 @@ class SiteFilter(BaseSearchFilter):
 
         ## standard, basic check to apply restrictions to public users
         if user_is_anonymous(user):
-            rules = settings_perms[doc_id]['default']
+            rules = copy.deepcopy(settings_perms[doc_id]['default'])
 
         else:
             rules = full_access
@@ -182,7 +187,7 @@ class SiteFilter(BaseSearchFilter):
         ## alternative, FPAN-specific scenarios for Archaeological Sites
         if doc_id == "f212980f-d534-11e7-8ca8-94659cf754d0":
             if user_is_scout(user):
-                rules = settings_perms[doc_id]['default']
+                rules = copy.deepcopy(settings_perms[doc_id]['default'])
 
             # special handling of the state land manager permissions here
             if user_is_land_manager(user):
@@ -222,7 +227,10 @@ class SiteFilter(BaseSearchFilter):
             rules["filter_config"]["nodegroup_id"] = ngid
 
             if rules["filter_config"]["value"] == "<username>":
-                rules["filter_config"]["value"] = user.username
+                if user.username == "anonymous":
+                    rules["filter_config"]["value"] = ["anonymous"]
+                else:
+                    rules["filter_config"]["value"] = [user.username, "anonymous"]
 
             if isinstance(rules["filter_config"]["value"], list):
                 rules["filter_config"]["value_list"] = rules["filter_config"]["value"]
@@ -392,11 +400,12 @@ class SiteFilter(BaseSearchFilter):
             ret = list(set(use_ids))
         return ret
 
-    def create_nested_attribute_filter(self, doc_id, nodegroup_id, value):
+    def create_nested_attribute_filter(self, doc_id, nodegroup_id, value_list):
 
         new_string_filter = Bool()
-        new_string_filter.must(Match(field='strings.string', query=value, type='phrase'))
         new_string_filter.filter(Terms(field='strings.nodegroup_id', terms=[nodegroup_id]))
+        for value in value_list:
+            new_string_filter.should(Match(field='strings.string', query=value, type='phrase'))
         nested = Nested(path='strings', query=new_string_filter)
         return nested
 
