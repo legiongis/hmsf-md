@@ -1,5 +1,6 @@
 import os
 import json
+import copy
 import logging
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -178,7 +179,7 @@ class SiteFilter(BaseSearchFilter):
 
         ## standard, basic check to apply restrictions to public users
         if user_is_anonymous(user):
-            rules = settings_perms[doc_id]['default']
+            rules = copy.deepcopy(settings_perms[doc_id]['default'])
 
         else:
             rules = full_access
@@ -186,7 +187,7 @@ class SiteFilter(BaseSearchFilter):
         ## alternative, FPAN-specific scenarios for Archaeological Sites
         if doc_id == "f212980f-d534-11e7-8ca8-94659cf754d0":
             if user_is_scout(user):
-                rules = settings_perms[doc_id]['default']
+                rules = copy.deepcopy(settings_perms[doc_id]['default'])
 
             # special handling of the state land manager permissions here
             if user_is_land_manager(user):
@@ -226,7 +227,10 @@ class SiteFilter(BaseSearchFilter):
             rules["filter_config"]["nodegroup_id"] = ngid
 
             if rules["filter_config"]["value"] == "<username>":
-                rules["filter_config"]["value"] = user.username
+                if user.username == "anonymous":
+                    rules["filter_config"]["value"] = ["anonymous"]
+                else:
+                    rules["filter_config"]["value"] = [user.username, "anonymous"]
 
             if isinstance(rules["filter_config"]["value"], list):
                 rules["filter_config"]["value_list"] = rules["filter_config"]["value"]
