@@ -125,12 +125,16 @@ class SiteFilter(BaseSearchFilter):
 
     def add_attribute_filter_clause(self, graphid, filter_config):
 
-        for val in filter_config["value_list"]:
-            nested = self.create_nested_attribute_filter(graphid, filter_config["nodegroup_id"], val)
-            if self.existing_query:
-                self.paramount.should(nested)
-            else:
-                self.paramount.must(nested)
+        nested = self.create_nested_attribute_filter(
+            graphid,
+            filter_config["nodegroup_id"],
+            filter_config["value_list"],
+        )
+        if self.existing_query:
+            self.paramount.should(nested)
+        else:
+            self.paramount.must(nested)
+
 
     def add_resourceid_filter_clause(self, graphid, user):
 
@@ -392,11 +396,12 @@ class SiteFilter(BaseSearchFilter):
             ret = list(set(use_ids))
         return ret
 
-    def create_nested_attribute_filter(self, doc_id, nodegroup_id, value):
+    def create_nested_attribute_filter(self, doc_id, nodegroup_id, value_list):
 
         new_string_filter = Bool()
-        new_string_filter.must(Match(field='strings.string', query=value, type='phrase'))
         new_string_filter.filter(Terms(field='strings.nodegroup_id', terms=[nodegroup_id]))
+        for value in value_list:
+            new_string_filter.should(Match(field='strings.string', query=value, type='phrase'))
         nested = Nested(path='strings', query=new_string_filter)
         return nested
 
