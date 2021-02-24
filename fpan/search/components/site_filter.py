@@ -83,6 +83,29 @@ class SiteFilter(BaseSearchFilter):
                     self.add_no_access_clause(graphid)
 
                 else:
+                    # make called to access table and if under 1500 resources are
+                    # allowed, then push all of these resource ids directly to
+                    # the ES query. Otherwise, revert to using the actual
+                    # query rules.
+
+                    #allowed = UserXResourceInstanceAccess.objects.filter(
+                    #    user=self.request.user,
+                    #    resource__graph_id=graphid,
+                    #)
+                    # if len(allowed) < 1500:
+                    #     # this should be altered to take the resids as an arg 
+                    #     self.add_resourceid_filter_clause(graphid, self.request.user)
+                    #else:
+                        # if rule["access_level"] == "geo_filter":
+                        #     self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
+                        #     # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
+                        #
+                        # elif rule["access_level"] == "attribute_filter":
+                        #     # self.create_attribute_filter(graphid, rule["filter_config"])
+                        #     self.add_attribute_filter_clause(graphid, rule["filter_config"])
+                        # else:
+                            # raise(Exception("Invalid rules for filter."))
+
                     if hasattr(self.request.user, 'landmanager'):
                         self.add_resourceid_filter_clause(graphid, self.request.user)
 
