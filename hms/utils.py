@@ -22,9 +22,9 @@ def update_hms_permissions_table(user=None):
         all_resources = []
         for graphid in graphids:
             try:
-                res_access = SiteFilter().get_allowed_resource_ids(user, graphid)
-            except:
-                print("--- ERROR ---", user)
+                res_access = SiteFilter().get_resource_access_from_es_query(user, graphid)
+            except Exception as e:
+                print("--- ERROR UPDATING PERMISSIONS TABLE ---", user)
                 continue
             all_resources += res_access.get("id_list", [])
 
