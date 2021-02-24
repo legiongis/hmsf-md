@@ -443,7 +443,7 @@ class SiteFilter(BaseSearchFilter):
 
         return results
 
-    def get_allowed_resource_ids(self, user, graphid, invert=False):
+    def get_resource_access_from_es_query(self, user, graphid, invert=False):
         """
         Returns the resourceinstanceids for all resources that a user is allowed to
         access from a given graph. Set invert=True to return

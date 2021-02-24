@@ -36,19 +36,3 @@ def user_is_land_manager(user):
 
 def user_is_scout(user):
     return hasattr(user, "scout")
-
-
-def user_can_edit_this_resource(user, resourceinstanceid):
-    """
-    Determines whether this user can edit this specific resource instance.
-    Return True or False.
-    """
-
-    res = ResourceInstance.objects.get(resourceinstanceid=resourceinstanceid)
-    res_access = get_allowed_resource_ids(user, str(res.graph_id))
-    if res_access["access_level"] == "full_access":
-        return True
-    elif res_access["access_level"] == "no_access":
-        return False
-    else:
-        return resourceinstanceid in res_access["id_list"]

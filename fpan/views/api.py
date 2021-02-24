@@ -10,9 +10,7 @@ from arches.app.models.system_settings import settings
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.utils.response import JSONResponse
-# from fpan.search.components.site_filter import SiteFilter
 
-# from hms.models import UserXResourceInstanceAccess
 from hms.utils import get_resource_instance_access
 
 logger = logging.getLogger(__name__)
@@ -67,38 +65,6 @@ class MVT(APIBase):
                     return self.EMPTY_TILE
                 resid_str = "','".join(resids)
                 resid_where = f"resourceinstanceid IN ('{resid_str}')"
-
-            # this is the new Land Manager, and uses the new permissions table.
-            # if hasattr(request.user, "landmanager"):
-            #
-            #     rules = SiteFilter().get_rules(request.user, str(node.graph_id))
-            #
-            #     if rules["access_level"] == "full_access":
-            #         # set extra where clause to match everything
-            #         resid_where = "NULL IS NULL"
-            #     elif rules["access_level"] == "no_access":
-            #         return self.EMPTY_TILE
-            #     else:
-            #         a = UserXResourceInstanceAccess.objects.filter(
-            #             user=request.user,
-            #             resource__graph_id=node.graph.graphid,
-            #         )
-            #         if len(a) == 0:
-            #             return self.EMPTY_TILE
-            #         res_ids = [str(i.resource.resourceinstanceid) for i in a]
-            #         ids_str = "','".join(res_ids)
-            #         resid_where = f"resourceinstanceid IN ('{ids_str}')"
-            #
-            # else:
-            #     resid_where = "NULL IS NULL"
-            #     res_access = SiteFilter().get_allowed_resource_ids(request.user, str(node.graph_id))
-            #
-            #     if res_access["access_level"] != "full_access":
-            #         if res_access["access_level"] == "no_access" or len(res_access["id_list"]) == 0:
-            #             return self.EMPTY_TILE
-            #         else:
-            #             ids = "','".join(res_access["id_list"])
-            #             resid_where = f"resourceinstanceid IN ('{ids}')"
 
             with connection.cursor() as cursor:
 

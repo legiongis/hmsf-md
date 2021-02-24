@@ -143,19 +143,6 @@ RESOURCE_IMPORT_LOG = os.path.join(LOG_DIR, 'resource_import-{}.log'.format(time
 
 MEDIA_ROOT = os.path.join(APP_ROOT)
 
-TILE_CACHE_CONFIG = {
-    "name": "Disk",
-    "path": os.path.join(APP_ROOT, 'tileserver', 'cache')
-
-    # to reconfigure to use S3 (recommended for production), use the following
-    # template:
-
-    # "name": "S3",
-    # "bucket": "<bucket name>",
-    # "access": "<access key>",
-    # "secret": "<secret key>"
-}
-
 DEFAULT_FROM_EMAIL = 'no-reply@fpan.us'
 EMAIL_SUBJECT_PREFIX = '[HMS] '
 
