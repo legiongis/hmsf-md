@@ -41,12 +41,12 @@ RESOURCE_FORMATTERS['shp'] = None
 DISABLE_PROVISIONAL_EDITING = True
 HIDE_EMPTY_NODES_IN_REPORT = True
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'fpan_cachetable',
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'fpan_cachetable',
+#     }
+# }
 
 ## example of the default filter that is applied to anonymous and Scout users.
 ## the land manager accounts don't reference this setting at all, their permissions
