@@ -32,9 +32,10 @@ def get_past_week_report_counts(use_date=None):
         # there are multiple dates (this shouldn't happen though)
         date = date.split(";")[0]
 
-        site_uuid = get_node_value(report, "FMSF Site ID")
-        if site_uuid == '':
+        related_site = get_node_value(report, "FMSF Site ID")
+        if not related_site:
             continue
+        site_uuid = related_site["resourceId"]
         site_res = Resource.objects.get(resourceinstanceid=site_uuid)
         fmsfid = get_node_value(site_res, "FMSF ID")
 
