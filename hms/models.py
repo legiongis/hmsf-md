@@ -166,32 +166,9 @@ class LandManager(models.Model):
         This is because self.save() and post_save here do not yet have the updated versions
         of the ManyToManyFields (individual_areas and grouped_areas)"""
 
-        from fpan.search.components.site_filter import SiteFilter
+        from hms.utils import update_hms_permissions_table
+        update_hms_permissions_table(user=self.user)
 
-        all_resource_graphids = (
-            GraphModel.objects.filter(isresource=True, isactive=True)
-            .exclude(name="Arches System Settings")
-        ).values_list('graphid', flat=True)
-
-        all_resources = []
-        for graphid in [str(i) for i in all_resource_graphids]:
-            try:
-                res_access = SiteFilter().get_allowed_resource_ids(self.user, graphid)
-            except:
-                continue
-            if res_access["access_level"] == "partial_access":
-                all_resources += res_access["id_list"]
-
-        for resourceid in all_resources:
-            res = Resource.objects.get(pk=resourceid)
-            obj, created = UserXResourceInstanceAccess.objects.get_or_create(
-                user=self.user,
-                resource=res
-            )
-
-        for entry in UserXResourceInstanceAccess.objects.filter(user=self.user):
-            if not str(entry.resource.resourceinstanceid) in all_resources:
-                entry.delete()
 
 @receiver(post_save, sender=LandManager)
 def create_user_land_manager(sender, instance, created, **kwargs):
