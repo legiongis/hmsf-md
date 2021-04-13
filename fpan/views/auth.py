@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
 from django.http import HttpResponse, Http404
@@ -20,13 +21,17 @@ from fpan.utils.permission_backend import user_is_land_manager, user_is_scout
 from hms.models import Scout
 from hms.forms import ScoutForm, ScoutProfileForm
 
+logger = logging.getLogger(__name__)
+
 @never_cache
 @csrf_exempt
-def auth(request,login_type):
+def auth(request, login_type):
+
     if not login_type in ['hms','state','logout']:
         raise Http404("not found")
 
     if login_type == 'logout':
+        logger.info(f"logging user out via fpan.views.auth: {request.user.username}")
         logout(request)
         return redirect('fpan_home')
 
