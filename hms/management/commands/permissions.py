@@ -27,5 +27,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        user = options["user"]
+        if options["user"] is not None:
+            user = User.objects.get(username=user)
+
         if options['operation'] == "update":
-            update_hms_permissions_table(user=options["user"])
+            update_hms_permissions_table(user=user)

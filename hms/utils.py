@@ -25,6 +25,7 @@ def update_hms_permissions_table(user=None):
                 res_access = SiteFilter().get_resource_access_from_es_query(user, graphid)
             except Exception as e:
                 print("--- ERROR UPDATING PERMISSIONS TABLE ---", user)
+                print(e)
                 continue
             all_resources += res_access.get("id_list", [])
 
