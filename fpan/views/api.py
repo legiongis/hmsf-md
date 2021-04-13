@@ -26,7 +26,7 @@ class MVT(APIBase):
                 models.UserProfile.objects.create(user=request.user)
             except IntegrityError as e:
                 logger.warning(e)
-                raise Http404()
+                #raise Http404()
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
