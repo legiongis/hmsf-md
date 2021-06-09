@@ -210,6 +210,13 @@ class ManagementAgency(models.Model):
     def __str__(self):
         return self.name
 
+    def serialize(self):
+
+        return {
+            'id': self.code,
+            'name': self.name,
+        }
+
 class ManagementAreaCategory(models.Model):
 
     class Meta:
@@ -271,6 +278,23 @@ class ManagementArea(models.Model):
             return f"{self.name} | {self.category} | {self.management_agency.name}"
         else:
             return f"{self.name} | {self.category}"
+
+    def serialize(self):
+        display_name = self.name
+        category, agency = None, None
+        if self.category:
+            display_name += " | " + self.category.name
+            category = self.category.name
+        if self.management_agency:
+            agency = self.management_agency.name
+        return {
+            "id": self.pk,
+            "display_name": display_name,
+            "name": self.name,
+            "category": category,
+            "agency": agency,
+            "level": self.management_level,
+        }
 
 class ManagementAreaGroup(models.Model):
 

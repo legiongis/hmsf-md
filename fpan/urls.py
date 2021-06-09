@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
     url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
+    url(r'^management_areas/$', scout.management_areas_dropdown, name='management_areas_dropdown'),
+    url(r'^management_agencies/$', scout.management_agencies_dropdown, name='management_agencies_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
     #url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
     url(
@@ -54,7 +56,6 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex), FPANResourceData.as_view(), name="resource_data"),
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, FPANResourceTiles.as_view(), name="resource_tiles"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
-    url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
 
     url(r'^', include('arches.urls')),
