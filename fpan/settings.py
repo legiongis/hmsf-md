@@ -41,12 +41,12 @@ RESOURCE_FORMATTERS['shp'] = None
 DISABLE_PROVISIONAL_EDITING = True
 HIDE_EMPTY_NODES_IN_REPORT = True
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'fpan_cachetable',
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'fpan_cachetable',
+#     }
+# }
 
 ## example of the default filter that is applied to anonymous and Scout users.
 ## the land manager accounts don't reference this setting at all, their permissions
@@ -142,19 +142,6 @@ RESOURCE_IMPORT_LOG = os.path.join(LOG_DIR, 'resource_import-{}.log'.format(time
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 
 MEDIA_ROOT = os.path.join(APP_ROOT)
-
-TILE_CACHE_CONFIG = {
-    "name": "Disk",
-    "path": os.path.join(APP_ROOT, 'tileserver', 'cache')
-
-    # to reconfigure to use S3 (recommended for production), use the following
-    # template:
-
-    # "name": "S3",
-    # "bucket": "<bucket name>",
-    # "access": "<access key>",
-    # "secret": "<secret key>"
-}
 
 DEFAULT_FROM_EMAIL = 'no-reply@fpan.us'
 EMAIL_SUBJECT_PREFIX = '[HMS] '

@@ -19,7 +19,7 @@ from fpan.models import Region
 from fpan.utils.permission_backend import user_is_anonymous
 from fpan.utils.tokens import account_activation_token
 from fpan.utils.fpan_account_utils import check_duplicate_username
-from hms.models import Scout, ScoutProfile
+from hms.models import Scout, ScoutProfile, ManagementArea, ManagementAgency
 from hms.forms import ScoutForm, ScoutProfileForm
 
 def scout_signup(request):
@@ -122,6 +122,14 @@ def scouts_dropdown(request):
                     return_scouts.append(obj)
 
     return JSONResponse(return_scouts)
+
+def management_areas_dropdown(request):
+
+    return JSONResponse([i.serialize() for i in ManagementArea.objects.all()])
+
+def management_agencies_dropdown(request):
+
+    return JSONResponse([i.serialize() for i in ManagementAgency.objects.all()])
 
 @user_passes_test(lambda u: u.is_superuser)
 def scout_list_download(request):

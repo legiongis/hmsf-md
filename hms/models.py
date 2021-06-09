@@ -166,32 +166,9 @@ class LandManager(models.Model):
         This is because self.save() and post_save here do not yet have the updated versions
         of the ManyToManyFields (individual_areas and grouped_areas)"""
 
-        from fpan.search.components.site_filter import SiteFilter
+        from hms.utils import update_hms_permissions_table
+        update_hms_permissions_table(user=self.user)
 
-        all_resource_graphids = (
-            GraphModel.objects.filter(isresource=True, isactive=True)
-            .exclude(name="Arches System Settings")
-        ).values_list('graphid', flat=True)
-
-        all_resources = []
-        for graphid in [str(i) for i in all_resource_graphids]:
-            try:
-                res_access = SiteFilter().get_allowed_resource_ids(self.user, graphid)
-            except:
-                continue
-            if res_access["access_level"] == "partial_access":
-                all_resources += res_access["id_list"]
-
-        for resourceid in all_resources:
-            res = Resource.objects.get(pk=resourceid)
-            obj, created = UserXResourceInstanceAccess.objects.get_or_create(
-                user=self.user,
-                resource=res
-            )
-
-        for entry in UserXResourceInstanceAccess.objects.filter(user=self.user):
-            if not str(entry.resource.resourceinstanceid) in all_resources:
-                entry.delete()
 
 @receiver(post_save, sender=LandManager)
 def create_user_land_manager(sender, instance, created, **kwargs):
@@ -232,6 +209,13 @@ class ManagementAgency(models.Model):
 
     def __str__(self):
         return self.name
+
+    def serialize(self):
+
+        return {
+            'id': self.code,
+            'name': self.name,
+        }
 
 class ManagementAreaCategory(models.Model):
 
@@ -294,6 +278,23 @@ class ManagementArea(models.Model):
             return f"{self.name} | {self.category} | {self.management_agency.name}"
         else:
             return f"{self.name} | {self.category}"
+
+    def serialize(self):
+        display_name = self.name
+        category, agency = None, None
+        if self.category:
+            display_name += " | " + self.category.name
+            category = self.category.name
+        if self.management_agency:
+            agency = self.management_agency.name
+        return {
+            "id": self.pk,
+            "display_name": display_name,
+            "name": self.name,
+            "category": category,
+            "agency": agency,
+            "level": self.management_level,
+        }
 
 class ManagementAreaGroup(models.Model):
 

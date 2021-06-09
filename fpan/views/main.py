@@ -9,7 +9,6 @@ from arches.app.utils.response import JSONResponse
 from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel
 from fpan.utils.permission_backend import user_is_anonymous, user_is_land_manager
-from fpan.search.components.site_filter import SiteFilter
 from fpan.models import Region
 from fpan.views.scout import scouts_dropdown
 from hms.models import Scout, ScoutProfile
