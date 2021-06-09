@@ -181,8 +181,10 @@ except ImportError as e:
     pass
 
 if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-    SESSION_COOKIE_AGE = 7200 #auto logout after 2 hours
+    SESSION_COOKIE_AGE = 600 #auto logout after 2 hours
     SESSION_SAVE_EVERY_REQUEST = True
 
 # set log level to info, unless debug is true (which would be set in settings_local.py

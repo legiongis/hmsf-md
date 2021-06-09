@@ -42,7 +42,9 @@ def auth(request, login_type):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
+
         if user is not None and user.is_active:
+            logger.info(f"logging user in via fpan.views.auth: {username}")
             if login_type == "hms":
                 if user_is_scout(user) or user.is_superuser:
                     login(request, user)
