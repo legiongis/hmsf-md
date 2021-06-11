@@ -1,36 +1,43 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','bindings/chosen'], function (ko, _, WidgetViewModel, $, fpan, chosen) {
+define([
+    'knockout',
+    'viewmodels/domain-widget',
+    'widget-data',
+    'plugins/knockout-select2'
+], function(ko, DomainWidgetViewModel, widgetData) {
     /**
-    * registers a text-widget component for use in forms
-    * @function external:"ko.components".text-widget
-    * @param {object} params
-    * @param {string} params.value - the value being managed
-    * @param {function} params.config - observable containing config object
-    * @param {string} params.config().label - label to use alongside the text input
-    * @param {string} params.config().placeholder - default text to show in the text input
-    */
+     * registers a select-widget component for use in forms
+     * @function external:"ko.components".select-widget
+     * @param {object} params
+     * @param {boolean} params.value - the value being managed
+     * @param {object} params.config -
+     * @param {string} params.config.label - label to use alongside the select input
+     * @param {string} params.config.placeholder - default text to show in the select input
+     * @param {string} params.config.options -
+     */
     return ko.components.register('username-widget', {
         viewModel: function(params) {
-            params.configKeys = ['options', 'placeholder', 'defaultValue'];
-            WidgetViewModel.apply(this, [params]);
+            params.configKeys = ['placeholder', 'defaultValue'];
+
+            if (params.node.config) {
+              params.node.config.options = ko.observableArray(widgetData.dropdownLists.usernames)
+            }
+
+            DomainWidgetViewModel.apply(this, [params]);
 
             var self = this;
-            self.availableOptions = ko.observableArray();
-            self.selectedOption = params.value;
-            self.multiple = true;
-
-            async function updateDropdownList() {
-              await new Promise(r => setTimeout(r, 500));
-              fpan.user_list.forEach( function (user) {
-                self.availableOptions.push(user)
-              });
-              self.availableOptions.valueHasMutated();
+            if (self.value() == null || self.value().length == 0) {
+              widgetData.dropdownLists.usernames.forEach( function (user) {
+                if (user.text == params.user) {
+                  console.log(user)
+                  self.value([user.id])
+                }
+              })
             }
-            updateDropdownList();
 
-            if (params.widget && this.value() == "{current-user}") {
-              this.value(params.user);
-            }
+            this.multiple = true;
         },
-        template: { require: 'text!templates/views/components/widgets/username-widget.htm' }
+        template: {
+            require: 'text!widget-templates/select'
+        }
     });
 });

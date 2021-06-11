@@ -3,6 +3,6 @@
     "name": "management-area-widget",
     "component": "views/components/widgets/management-area-widget",
     "defaultconfig": {},
-    "helptext": null,
-    "datatype": "string"
+    "helptext": "",
+    "datatype": "management-area-datatype"
 }

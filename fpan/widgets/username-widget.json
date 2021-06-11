@@ -4,5 +4,5 @@
     "component": "views/components/widgets/username-widget",
     "defaultconfig": {},
     "helptext": null,
-    "datatype": "string"
+    "datatype": "username-datatype"
 }
