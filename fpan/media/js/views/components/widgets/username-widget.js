@@ -18,9 +18,10 @@ define([
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'defaultValue'];
 
-            if (params.node.config) {
-              params.node.config.options = ko.observableArray(widgetData.dropdownLists.usernames)
+            if (!params.node.config) {
+              params.node.config = {};
             }
+            params.node.config.options = ko.observableArray(widgetData.dropdownLists.usernames)
 
             DomainWidgetViewModel.apply(this, [params]);
 
