@@ -22,11 +22,13 @@ class UsernameDataType(DomainListDataType):
 
     def get_dropdown_options(self):
 
+        values = User.objects.all().values_list("pk", "username")
+
         return [{
-            "id": str(i.pk),
+            "id": str(i[0]),
             "selected": "false",
-            "text": i.username
-        } for i in User.objects.all() ]
+            "text": i[1]
+        } for i in values]
 
     def get_option_text(self, node, option_id):
 
