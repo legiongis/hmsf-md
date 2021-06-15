@@ -242,6 +242,7 @@ class ManagementArea(models.Model):
         verbose_name_plural = "Management Areas"
 
     name = models.CharField(max_length=254)
+    display_name = models.CharField(max_length=254,null=True,blank=True)
     category = models.ForeignKey(
         ManagementAreaCategory,
         null=True,
@@ -274,27 +275,18 @@ class ManagementArea(models.Model):
     geom = models.MultiPolygonField()
 
     def __str__(self):
-        if self.management_agency:
-            return f"{self.name} | {self.category} | {self.management_agency.name}"
-        else:
-            return f"{self.name} | {self.category}"
+        return self.display_name
 
-    def serialize(self):
-        display_name = self.name
-        category, agency = None, None
-        if self.category:
-            display_name += " | " + self.category.name
-            category = self.category.name
+
+    def save(self, *args, **kwargs):
+
         if self.management_agency:
-            agency = self.management_agency.name
-        return {
-            "id": self.pk,
-            "display_name": display_name,
-            "name": self.name,
-            "category": category,
-            "agency": agency,
-            "level": self.management_level,
-        }
+            self.display_name = f"{self.name} | {self.category} | {self.management_agency.name}"
+        else:
+            self.display_name = f"{self.name} | {self.category}"
+
+        super(ManagementArea, self).save(*args, **kwargs)
+
 
 class ManagementAreaGroup(models.Model):
 
