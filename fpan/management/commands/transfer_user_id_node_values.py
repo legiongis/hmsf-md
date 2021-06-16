@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--erase",
-            action="store_true"
+            action="store_true",
             help='erases fully matched values from the existing node'
         )
 
