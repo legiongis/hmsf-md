@@ -29,7 +29,6 @@ define([
             if (self.value() == null || self.value().length == 0) {
               widgetData.dropdownLists.usernames.forEach( function (user) {
                 if (user.text == params.user) {
-                  console.log(user)
                   self.value([user.id])
                 }
               })
