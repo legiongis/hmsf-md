@@ -44,7 +44,7 @@ def remove_areas(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hms', '0004_auto_20210131_2324'),
+        ('hms', '0007_managementarea_display_name'),
     ]
 
     operations = [
