@@ -6,16 +6,16 @@ from django.contrib.auth.models import User
 widget = Widget.objects.get(name='username-widget')
 
 details = {
-    'widgetid': '99998980-cbd9-11e7-b225-aaaa9c555555',
     'datatype': 'username-datatype',
     'iconclass': 'fa fa-file-code-o',
     'modulename': 'username.py',
     'classname': 'UsernameDataType',
     'defaultwidget': widget,
-    'defaultconfig': None,
-    'configcomponent': None,
-    'configname': None,
-    'isgeometric': False
+    'defaultconfig': {"options": []},
+    'configcomponent': 'views/components/datatypes/domain-value',
+    'configname': 'domain-value-datatype-config',
+    'isgeometric': False,
+    'issearchable': True,
     }
 
 class UsernameDataType(DomainListDataType):

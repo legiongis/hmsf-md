@@ -6,16 +6,16 @@ from hms.models import ManagementArea
 widget = Widget.objects.get(name='management-area-widget')
 
 details = {
-    'widgetid': '0c298980-cbd9-11e7-b225-aaaa9cf754d0',
     'datatype': 'management-area-datatype',
     'iconclass': 'fa fa-file-code-o',
     'modulename': 'management_area.py',
     'classname': 'ManagementAreaDataType',
     'defaultwidget': widget,
-    'defaultconfig': None,
-    'configcomponent': None,
-    'configname': None,
-    'isgeometric': False
+    'defaultconfig': {"options": []},
+    'configcomponent': 'views/components/datatypes/domain-value',
+    'configname': 'domain-value-datatype-config',
+    'isgeometric': False,
+    'issearchable': True,
     }
 
 class ManagementAreaDataType(DomainListDataType):
