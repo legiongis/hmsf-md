@@ -148,13 +148,15 @@ class Command(BaseCommand):
 
         """
         details = self.get_source_details(source)
+        entity = self.get_orm_entity(extension_type)
 
-        instance = models.Widget.objects.get(name=details["name"])
-        instance.datatype = details["datatype"]
-        instance.helptext = details["helptext"]
-        instance.defaultconfig = details["defaultconfig"]
-        instance.component = details["component"]
-        instance.save()
+        if extension_type == "widget":
+            instance = entity.objects.get(name=details["name"])
+            instance.datatype = details["datatype"]
+            instance.helptext = details["helptext"]
+            instance.defaultconfig = details["defaultconfig"]
+            instance.component = details["component"]
+            instance.save()
 
     def unregister(self, extension_type, name):
         """
