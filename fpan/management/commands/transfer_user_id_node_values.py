@@ -24,6 +24,10 @@ class Command(BaseCommand):
             action="store_true",
             help='erases fully matched values from the existing node'
         )
+        parser.add_argument("--dry-run",
+            action="store_true",
+            help='print out old and new values without altering Tiles'
+        )
         parser.add_argument("--resourceid",
             help='specify single resourceid to update'
         )
@@ -85,6 +89,8 @@ class Command(BaseCommand):
                 continue
             match = "None"
             old_value = tile.data.get(old_nodeid, None)
+            if old_value is None:
+                old_value = ""
 
             ## split by , then by - and ; to extract names
             unames1 = [i.lstrip().rstrip().lower() for i in old_value.split(",")]
@@ -121,16 +127,19 @@ class Command(BaseCommand):
             else:
                 unmatched_ct += 1
 
-            Tile().update_node_value(new_nodeid, new_value, tileid=tile.tileid)
-            if match == "Full" and options['erase'] is True:
-                Tile().update_node_value(old_nodeid, None, tileid=tile.tileid)
+            if options['dry_run'] is True:
+                print(f"{resid}: {old_value} --> {','.join([str(i.username) for i in matched_users])}")
+            else:
+                Tile().update_node_value(new_nodeid, new_value, tileid=tile.tileid)
+                if match == "Full" and options['erase'] is True:
+                    Tile().update_node_value(old_nodeid, None, tileid=tile.tileid)
 
-            rows.append((
-                resid,
-                old_value,
-                ",".join([str(i.username) for i in matched_users]),
-                match
-            ))
+                rows.append((
+                    resid,
+                    old_value,
+                    ",".join([str(i.username) for i in matched_users]),
+                    match
+                ))
 
         unmatched_frequency = sorted(unmatched.items(), key=lambda x:x[1])
         for k in unmatched_frequency:
