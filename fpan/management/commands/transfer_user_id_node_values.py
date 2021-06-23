@@ -24,6 +24,9 @@ class Command(BaseCommand):
             action="store_true",
             help='erases fully matched values from the existing node'
         )
+        parser.add_argument("--resourceid",
+            help='specify single resourceid to update'
+        )
 
     def handle(self, *args, **options):
 
@@ -77,8 +80,9 @@ class Command(BaseCommand):
             ("resourceid", "original_value", "matching_usernames", "match")
         ]
         for tile in tiles:
-            # if str(tile.resourceinstance_id) != "30ab8bc9-bb53-4696-b7fd-ca046e2dfd69":
-            #     continue
+            resid = str(tile.resourceinstance_id)
+            if options['resourceid'] and resid != options['resourceid']:
+                continue
             match = "None"
             old_value = tile.data.get(old_nodeid, None)
 
@@ -122,7 +126,7 @@ class Command(BaseCommand):
                 Tile().update_node_value(old_nodeid, None, tileid=tile.tileid)
 
             rows.append((
-                str(tile.resourceinstance_id),
+                resid,
                 old_value,
                 ",".join([str(i.username) for i in matched_users]),
                 match
@@ -136,9 +140,10 @@ class Command(BaseCommand):
         print(f"partial matches: {partial_matched}")
         print(f"unmatched: {unmatched_ct}")
 
-        timestamp = datetime.now().strftime("%m-%d-%Y")
-        filename = f"scout_id_transfer-{timestamp}.csv"
-        outfile = os.path.join(settings.LOG_DIR, filename)
-        with open(outfile, "w") as out:
-            writer = csv.writer(out)
-            writer.writerows(rows)
+        if len(rows) > 0:
+            timestamp = datetime.now().strftime("%m-%d-%Y")
+            filename = f"scout_id_transfer-{timestamp}.csv"
+            outfile = os.path.join(settings.LOG_DIR, filename)
+            with open(outfile, "w") as out:
+                writer = csv.writer(out)
+                writer.writerows(rows)
