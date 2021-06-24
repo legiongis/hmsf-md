@@ -2,7 +2,7 @@
     "widgetid":"2d298980-cbd9-11e7-b225-94659cf754d0",
     "name": "management-area-widget",
     "component": "views/components/widgets/management-area-widget",
-    "defaultconfig": {},
-    "helptext": null,
-    "datatype": "string"
+    "defaultconfig": {"placeholder": "Select an option", "defaultValue": ""},
+    "helptext": "",
+    "datatype": "management-area-datatype"
 }

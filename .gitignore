@@ -8,6 +8,7 @@ static/
 exports/
 fpan/logs/*.json
 fpan/logs/*.csv
+CACHE
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

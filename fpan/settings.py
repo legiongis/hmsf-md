@@ -30,6 +30,7 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.widget_data')
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 ELASTICSEARCH_PREFIX = 'fpan'
@@ -184,7 +185,7 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Strict'
     SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-    SESSION_COOKIE_AGE = 600 #auto logout after 2 hours
+    SESSION_COOKIE_AGE = 1800 #auto logout after 1/2 hour
     SESSION_SAVE_EVERY_REQUEST = True
 
 # set log level to info, unless debug is true (which would be set in settings_local.py

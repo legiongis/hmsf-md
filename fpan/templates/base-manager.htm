@@ -440,6 +440,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block pre_require_js %}
     <script>
         {% autoescape off %}
+        define('widget-data', [], function () {
+            return {
+                dropdownLists: {{ lists }}
+            };
+        });
         define('view-data', [], function () {
             return {
                 graphs: {{graphs}},
@@ -449,7 +454,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
         });
         define('fpan', [], function () {
             return {
-                user_list: {{user_list}},
                 urls: {
                     scouts_dropdown: "{% url 'scouts_dropdown' %}",
                     management_areas_dropdown: "{% url 'management_areas_dropdown' %}",
