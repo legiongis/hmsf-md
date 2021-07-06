@@ -36,15 +36,14 @@ class Command(BaseCommand):
             reader = csv.reader(openf)
             for row in reader:
                 if row[3] == "Full":
-                    if "wayte" in row[1].lower():
-                        print(row[1])
-                    else:
+                    if "wayte" not in row[1].lower():
                         resourceids[row[0]] = row[1]
 
         print(f"{len(resourceids)} resources will be updated")
 
         tiles = Tile.objects.filter(nodegroup_id=old_node.nodegroup)
 
+        ct = 0
         for tile in tiles:
             resid = str(tile.resourceinstance_id)
             if resid not in resourceids.keys():
@@ -54,4 +53,7 @@ class Command(BaseCommand):
             if not old_value == resourceids[resid]:
                 print(old_value)
                 print(resourceids[resid])
-            # Tile().update_node_value(old_nodeid, None, tileid=tile.tileid)
+            Tile().update_node_value(old_nodeid, None, tileid=tile.tileid)
+            ct += 1
+
+        print(f"finished, {ct} updated")
