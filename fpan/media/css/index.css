@@ -320,7 +320,12 @@ input[type='text'] {
 .footer {
     text-align: center;
 }
-
+#footer a.a-scout {
+    color: white;
+}
+#footer a.a-scout:hover {
+    color: white;
+}
 .title-v1 {
     margin-bottom: 0px;
 }
