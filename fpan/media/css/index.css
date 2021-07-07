@@ -9,6 +9,9 @@ body {
     font-size: 16px;
     line-height: 1.65;
 }
+body.body-scout  {
+    background: url('../img/fpan/ricepaper-hms.png');
+}
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Ropa Sans',sans-serif !important;
@@ -37,6 +40,9 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
 a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
     color: #007fff;
     text-decoration: none;
+}
+.a-scout, li .a-scout, .search-candidate-title-scout, .search-candidate-link-scout, .btn-link-scout {
+    color: #F26422;
 }
 a:hover, li a:hover, .btn-link:hover {
     color: #0059b3;
@@ -110,7 +116,7 @@ ul .collapse li {
     height: 35px;
 }
 ul .collapse li:first-of-type {
-    margin-top: 0px; 
+    margin-top: 0px;
 }
 ul .collapse li:last-of-type {
     height: 45px;
@@ -276,7 +282,7 @@ input[type='text'] {
     top:-15px;
     background: transparent;
 }
-    
+
 .fpan-panel {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
