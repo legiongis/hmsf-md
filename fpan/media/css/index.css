@@ -79,6 +79,9 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     background: #431825;
     color:white;
 }
+.brand-title-admin, .mainnav-container-admin, .mainnav-admin, .mainnav-menu-admin>.active, .mainnav-admin .menu-popover, .mainnav-admin .sub-menu ul, .brand-title-anonymous, .mainnav-container-anonymous, .mainnav-anonymous, .mainnav-menu-anonymous>.active, .mainnav-anonymous .menu-popover, .mainnav-anonymous .sub-menu ul  {
+    background: #431825 !important;
+}
 .brand-title-scout, .mainnav-container-scout, .mainnav-scout, .mainnav-menu-scout>.active, .mainnav-scout .menu-popover, .mainnav-scout .sub-menu ul  {
     background: #5ec5b9 !important;
 }
@@ -143,7 +146,6 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     color: white !important;
     text-decoration: none;
 }
-
 
 .mainnav-anonymous .popover-title, .mainnav-admin .popover-title {
     background-color:#5D2134 !important;
