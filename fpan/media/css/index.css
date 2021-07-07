@@ -9,8 +9,11 @@ body {
     font-size: 16px;
     line-height: 1.65;
 }
-body.body-scout  {
+body.body-scout .copyright-section-scout {
     background: url('../img/fpan/ricepaper-hms.png');
+}
+body.body-landmanager, .copyright-section-landmanager {
+    background: url('../img/fpan/ricepaper-state.png');
 }
 
 h1, h2, h3, h4, h5, h6 {
