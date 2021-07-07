@@ -45,7 +45,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     <div class="navbar-header">
                         <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
                             <img src="{{ STATIC_URL }}img/fpan/fpan_sun.png" alt="FPAN logo" class="brand-icon">
-                            <div class="brand-title">
+                            <div class="brand-title brand-title-{{user_type}}">
                                 <span class="brand-text">{{ app_name }}</span>
                             </div>
                         </a>
@@ -236,13 +236,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 </div>
 
                 {% block mainnav %}
-                <nav id="mainnav-container">
-                    <div id="mainnav">
+                <nav id="mainnav-container" class="mainnav-container-{{user_type}}">
+                    <div id="mainnav" class="mainnav-{{user_type}}">
                         {% block navbar %}
                         <div id="mainnav-menu-wrap">
                             <div class="nano">
                                 <div class="nano-content" tabindex="0">
-                                    <ul id="mainnav-menu" class="list-group">
+                                    <ul id="mainnav-menu" class="list-group mainnav-menu-{{user_type}}">
 
                                         <!-- Tools -->
                                         <li class="list-header">{% trans "Tools" %}</li>
@@ -257,10 +257,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                             <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                                 </li>
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
                                                 </li>
                                             </ul>
@@ -287,7 +287,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                             </a>
                                             <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
                                                 <!-- ko foreach: createableResources -->
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
                                                         css: { 'arches-menu-item-disabled': disable_instance_creation },
                                                         attr: {
@@ -310,10 +310,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                             <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu"  href="{% url 'graph' '' %}" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
                                                 </li>
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu" href="{% url 'graph' '' %}#branches" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}#branches')">{% trans "Branches" %}</a>
                                                 </li>
                                             </ul>
@@ -330,13 +330,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                                 </span>
                                             </a>
                                             <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu" href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
                                                 </li>
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu" href="{% url 'map_layer_manager' %}#basemaps" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#basemaps')">{% trans "Basemaps" %}</a>
                                                 </li>
-                                                <li class="link-submenu-item">
+                                                <li class="link-submenu-item-{{user_type}}">
                                                     <a class="link-submenu" href="{% url 'map_layer_manager' %}#overlays" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#overlays')">{% trans "Overlays" %}</a>
                                                 </li>
                                             </ul>
