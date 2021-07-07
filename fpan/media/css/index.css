@@ -3,7 +3,7 @@
   src: url("../fonts/Helsing.otf");
 }
 
-body {
+body, body.body-anonymous, body.body-admin {
     font-family: 'Kreon',sans-serif;
     background: url('../img/fpan/ricepaper.png');
     font-size: 16px;
@@ -40,7 +40,7 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
     color: white;
 }
 
-a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
+a, li a, .search-candidate-title, .search-candidate-link, .btn-link, a.a-anonymous, li a.a-anonymous, .search-candidate-title-anonymous, .search-candidate-link-anonymous, .btn-link-anonymous, a.a-admin, li a.a-admin, .search-candidate-title-admin, .search-candidate-link-admin, .btn-link-admin {
     color: #007fff;
     text-decoration: none;
 }
@@ -50,7 +50,7 @@ a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
 .a-landmanager, li .a-landmanager, .search-candidate-title-landmanager, .search-candidate-link-landmanager, .btn-link-landmanager {
     color: #273675;
 }
-a:hover, li a:hover, .btn-link:hover {
+a:hover, li a:hover, .btn-link:hover, a.a-anonymous:hover, li a.a-anonymous:hover, .btn-link-anonymous:hover, a.a-admin:hover, li a.a-admin:hover, .btn-link-admin:hover {
     color: #0059b3;
     text-decoration: underline;
 }
@@ -72,9 +72,15 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
 
-.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
+.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul, .brand-title-anonymous, #mainnav-container-anonymous, #mainnav-anonymous, #mainnav-menu-anonymous>.active, .menu-popover-anonymous .sub-menu-anonymous ul, .brand-title-admin, #mainnav-container-admin, #mainnav-admin, #mainnav-menu-admin>.active, .menu-popover-admin .sub-menu-admin ul   {
     background: #431825;
     color:white;
+}
+.brand-title-scout, #mainnav-container-scout, #mainnav-scout, #mainnav-menu-scout>.active, .menu-popover-scout .sub-menu-scout ul  {
+    background: #5ec5b9;
+}
+.brand-title-landmanager, #mainnav-container-landmanager, #mainnav-landmanager, #mainnav-menu-landmanager>.active, .menu-popover-landmanager .sub-menu-landmanager ul  {
+    background: url('../img/fpan/ricepaper-state.png');
 }
 
 #mainnav .list-header {
@@ -104,6 +110,37 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     box-shadow:none !important;
     color: white;
 }
+
+#mainnav-menu-scout>li {
+    background-color:#5ec5b9 !important;
+}
+
+#mainnav-menu-scout>li>a {
+    background-color:#5ec5b9 !important;
+    color: white !important;
+}
+
+#mainnav-menu-scout>li>a:hover, .link-submenu-item a:hover {
+    background-color:#F26422 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+#mainnav-menu-landmanager>li {
+    background: url('../img/fpan/ricepaper-state.png') !important;
+}
+
+#mainnav-menu-landmanager>li>a {
+    background: url('../img/fpan/ricepaper-state.png') !important;
+    color: white !important;
+}
+
+#mainnav-menu-landmanager>li>a:hover, .link-submenu-item a:hover {
+    background:#273675 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
 
 .popover-title {
     background-color:#5D2134 !important;
@@ -302,7 +339,7 @@ input[type='text'] {
     background: transparent;
 }
 
-.fpan-panel {
+.fpan-panel, .fpan-panel-anonymous, .fpan-panel-admin {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
     border-top: solid 8px #431825;
