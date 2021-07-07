@@ -60,6 +60,14 @@ a.a-scout:hover, li a.ascout:hover, .btn-link-scout:hover {
 a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     color: #525e91;
 }
+.btn-success-scout {
+    background-color:#f26422;
+    border:none;
+}
+.btn-success-landmanager {
+    background-color:#273675;
+    border:none;
+}
 #mainnav-container {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
