@@ -47,11 +47,19 @@ a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
 .a-scout, li .a-scout, .search-candidate-title-scout, .search-candidate-link-scout, .btn-link-scout {
     color: #F26422;
 }
+.a-landmanager, li .a-landmanager, .search-candidate-title-landmanager, .search-candidate-link-landmanager, .btn-link-landmanager {
+    color: #273675;
+}
 a:hover, li a:hover, .btn-link:hover {
     color: #0059b3;
     text-decoration: underline;
 }
-
+a.a-scout:hover, li a.ascout:hover, .btn-link-scout:hover {
+    color: #5ec5b9;
+}
+a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
+    color: #525e91;
+}
 #mainnav-container {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
