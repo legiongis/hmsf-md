@@ -310,6 +310,14 @@ input[type='text'] {
     border-top: solid 8px #273675;
 }
 
+.scout-panel {
+    border: 1px solid #F26422;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+.scout-panel .panel-heading {
+    background-color: #F26422;
+}
+
 #login-failed-alert {
     background-color: transparent;
     border: none;
