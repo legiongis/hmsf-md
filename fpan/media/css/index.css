@@ -72,14 +72,14 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
 
-#mainnav-container, #mainnav, #mainnav-menu>.active, .brand-title-anonymous, .menu-popover-anonymous .sub-menu-anonymous ul, .brand-title-admin, .menu-popover-admin .sub-menu-admin ul   {
+#mainnav-container, #mainnav, #mainnav-menu>.active, .brand-title-anonymous, .sub-menu-anonymous ul, .brand-title-admin, .sub-menu ul   {
     background: #431825;
     color:white;
 }
-.brand-title-scout, .mainnav-container-scout, .mainnav-scout, .mainnav-menu-scout>.active, .menu-popover-scout .sub-menu-scout ul  {
+.brand-title-scout, .mainnav-container-scout, .mainnav-scout, .mainnav-menu-scout>.active, .mainnav-scout .menu-popover, .mainnav-scout .sub-menu ul  {
     background: #5ec5b9 !important;
 }
-.brand-title-landmanager, .mainnav-container-landmanager, .mainnav-landmanager, .mainnav-menu-landmanager>.active, .menu-popover-landmanager .sub-menu-landmanager ul  {
+.brand-title-landmanager, .mainnav-container-landmanager, .mainnav-landmanager, .mainnav-menu-landmanager>.active, .mainnav-landmanager .menu-popover, .mainnav-landmanager .sub-menu ul  {
     background: url('../img/fpan/ricepaper-state.png') !important;
 }
 
@@ -142,36 +142,36 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
 }
 
 
-.mainnav-menu-anonymous .popover-title, .mainnav-menu-admin .popover-title {
+.mainnav-anonymous .popover-title, .mainnav-admin .popover-title {
     background-color:#5D2134 !important;
 }
-.mainnav-menu-scout .popover-title {
+.mainnav-scout .popover-title {
     background-color:#F26422 !important;
 }
-.mainnav-menu-landmanager .popover-title {
+.mainnav-landmanager .popover-title {
     background:#273675 !important;
 }
 
-.mainnav-menu-anonymous .single-content, .mainnav-menu-admin .single-content {
+.mainnav-anonymous .single-content, .mainnav-admin .single-content {
     background-color:#5D2134 !important;
     font-family: 'Kreon',sans-serif;
 }
-.mainnav-menu-scout .single-content {
+.mainnav-scout .single-content {
     background-color:#F26422 !important;
     font-family: 'Kreon',sans-serif;
 }
-.mainnav-menu-landmanager .single-content {
+.mainnav-landmanager .single-content {
     background:#273675 !important;
     font-family: 'Kreon',sans-serif;
 }
 
-.mainnav-menu-anonymous .hover, .mainnav-menu-admin .hover  {
+.mainnav-anonymous .hover, .mainnav-admin .hover  {
     background-color:#5D2134;
 }
-.mainnav-menu-scout .hover {
+.mainnav-scout .hover {
     background-color:#F26422;
 }
-.mainnav-menu-landmanager .hover {
+.mainnav-landmanager .hover {
     background:#273675;
 }
 .menu-title {
