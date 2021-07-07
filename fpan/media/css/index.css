@@ -9,10 +9,10 @@ body, body.body-anonymous, body.body-admin {
     font-size: 16px;
     line-height: 1.65;
 }
-body.body-scout, .copyright-section-scout {
+body.body-scout, body.body-hms, body.body-hms .copyright-section {
     background: url('../img/fpan/ricepaper-hms.png');
 }
-body.body-landmanager, .copyright-section-landmanager {
+body.body-landmanager, body.body-state, body.body-state .copyright-section {
     background: url('../img/fpan/ricepaper-state.png');
 }
 
@@ -44,10 +44,10 @@ a, li a, .search-candidate-title, .search-candidate-link, .btn-link, a.a-anonymo
     color: #007fff;
     text-decoration: none;
 }
-.a-scout, li .a-scout, .search-candidate-title-scout, .search-candidate-link-scout, .btn-link-scout {
+.a-scout, li .a-scout, body.body-hms .a-anonymous, .search-candidate-title-scout, .search-candidate-link-scout, .btn-link-scout {
     color: #F26422;
 }
-.a-landmanager, li .a-landmanager, .search-candidate-title-landmanager, .search-candidate-link-landmanager, .btn-link-landmanager {
+.a-landmanager, li .a-landmanager, body.body-state .a-anonymous, .search-candidate-title-landmanager, .search-candidate-link-landmanager, .btn-link-landmanager {
     color: #273675;
 }
 a:hover, li a:hover, .btn-link:hover, a.a-anonymous:hover, li a.a-anonymous:hover, .btn-link-anonymous:hover, a.a-admin:hover, li a.a-admin:hover, .btn-link-admin:hover {
@@ -60,13 +60,16 @@ a.a-scout:hover, li a.ascout:hover, .btn-link-scout:hover {
 a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     color: #525e91;
 }
-.btn-success-scout {
+.body-scout .btn-success, .body-hms .btn-success {
     background-color:#f26422;
     border:none;
 }
-.btn-success-landmanager {
+.body-landmanager .btn-success, .body-state .btn-success {
     background-color:#273675;
     border:none;
+}
+.body-scout .btn-success:hover, .body-hms .btn-success:hover, .body-landmanager .btn-success:hover, .body-state .btn-success:hover  {
+    background-color: #449d44;
 }
 #mainnav-container {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
@@ -363,12 +366,12 @@ input[type='text'] {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
     border-top: solid 8px #431825;
 }
-.fpan-panel-scout {
+.fpan-panel-scout, .fpan-panel-hms {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
     border-top: solid 8px #F26422;
 }
-.fpan-panel-landmanager {
+.fpan-panel-landmanager, .fpan-panel-state {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
     border-top: solid 8px #273675;
@@ -389,6 +392,8 @@ input[type='text'] {
 
 .state-logos-list {
     display:inline-flex;
+    list-style-type: none;
+    padding-left: 0px !important;
 }
 
 .state-logos-list li {
@@ -402,10 +407,10 @@ input[type='text'] {
 .footer {
     text-align: center;
 }
-#footer a.a-scout {
+#footer a.a-scout, .body-hms #footer a.a-anonymous {
     color: white;
 }
-#footer a.a-scout:hover {
+#footer a.a-scout:hover, .body-hms #footer a.a-anonymous:hover {
     color: white;
 }
 .title-v1 {

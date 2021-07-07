@@ -76,8 +76,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 The #page-top ID is part of the scrolling feature.
 The data-spy and data-target are part of the built-in Bootstrap scrollspy function.
 -->
-
+{% block bodytag %}
 <body id="body" style=""  data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery body-{{user_type}}">
+{% endblock %}
+
     <div id="intro"></div>
     <!--=== Header ===-->
     {% include "fpan/partials/_header.htm" %}
