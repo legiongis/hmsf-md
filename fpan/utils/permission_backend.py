@@ -26,11 +26,6 @@ def user_is_land_manager(user):
     elif user.groups.filter(name="Land Manager").exists():
         state_user = True
 
-    ## this should really not be here, but upstream code will need to account
-    ## for its removal
-    elif user.is_superuser:
-        state_user = True
-
     return state_user
 
 
