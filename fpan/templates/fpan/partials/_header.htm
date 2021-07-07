@@ -12,37 +12,37 @@
                 <span class="icon-bar"></span>
             </button>
 
-            <a class="navbar-brand" style="padding-top: 5px;" href="{% url 'fpan_home' %}">
+            <a class="navbar-brand a-{{user_type}}" style="padding-top: 5px;" href="{% url 'fpan_home' %}">
                 <img src="{% static 'img/fpan/fpan_sun.png' %}" style="height: 36px; width: 36px;" alt="Logo">
             </a>
-        
+
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="navbar-right collapse navbar-collapse navbar-ex1-collapse">
             <div class="menu-container">
                 <ul class="nav navbar-nav">
                     <li class="page-scroll">
-                        <a href="{% url 'fpan_home' %}"><h3>{% trans "Home" %}</h3></a>
+                        <a class="a-{{user_type}}" href="{% url 'fpan_home' %}"><h3>{% trans "Home" %}</h3></a>
                     </li>
                     <li class="page-scroll">
-                        <a href="{% url 'hms_home' %}"><h3>{% trans "HMS Program" %}</h3></a>
+                        <a class="a-{{user_type}}" href="{% url 'hms_home' %}"><h3>{% trans "HMS Program" %}</h3></a>
                     </li>
                     {% if page == 'index' %}
                     <li class="page-scroll">
-                        <a href="#scout-signup"><h3>Scout Signup!</h3></a>
+                        <a class="a-{{user_type}}" href="#scout-signup"><h3>Scout Signup!</h3></a>
                     </li>
                     {% endif %}
                     <li class="page-scroll">
-                        <a href="{% url 'search_home' %}"><h3>{% trans "Explore the Database" %}</h3></a>
+                        <a class="a-{{user_type}}" href="{% url 'search_home' %}"><h3>{% trans "Explore the Database" %}</h3></a>
                     </li>
                     {% if scout_profile %}
                     <li class="page-scroll">
-                        <a href="#scout-profile"><h3>View Profile</h3></a>
+                        <a class="a-{{user_type}}" href="#scout-profile"><h3>View Profile</h3></a>
                     </li>
                     {% endif %}
                     {% if user.username != 'anonymous' %}
                     <li>
-                        <a id="auth-link" href="{% url 'auth' login_type='logout' %}" alt="click to logout">
+                        <a id="auth-link" class="a-{{user_type}}" href="{% url 'auth' login_type='logout' %}" alt="click to logout">
                             <h3>{{ user.username }} - {% trans "logout" %}</h3>
                         </a>
                     </li>

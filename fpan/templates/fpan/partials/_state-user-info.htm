@@ -22,7 +22,7 @@
             {% elif request.user|has_group:"FL_WMD" %}
             <p>{% trans "As a Water Management District user, you have access to <strong>all</strong> Archaeological Sites within the Conservation Area(s) you manage." %}</p>
             {% endif %}
-            <p><a href="{% url 'auth' login_type='password' %}">change my password</a></p>
+            <p><a class="a-{{user_type}}" href="{% url 'auth' login_type='password' %}">change my password</a></p>
         </div>
     </div>
 </section>
