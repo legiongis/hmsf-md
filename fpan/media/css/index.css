@@ -299,6 +299,16 @@ input[type='text'] {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
     border-top: solid 8px #431825;
 }
+.fpan-panel-scout {
+    background: url('../img/fpan/bedge_muted.png');
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+    border-top: solid 8px #F26422;
+}
+.fpan-panel-landmanager {
+    background: url('../img/fpan/bedge_muted.png');
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+    border-top: solid 8px #273675;
+}
 
 #login-failed-alert {
     background-color: transparent;

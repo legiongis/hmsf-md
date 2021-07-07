@@ -1,7 +1,7 @@
 {% load staticfiles %}
 {% load template_tags %}
 {% load i18n %}
-<section id="" class="scout-profile-section fpan-panel" style="padding: 25px;">
+<section id="" class="scout-profile-section fpan-panel-{{user_type}}" style="padding: 25px;">
     <div class="row">
         <div class="col-xs-12">
             <h3>{% trans "Welcome," %} {{user.username}}.</h3>
