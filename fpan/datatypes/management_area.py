@@ -20,15 +20,6 @@ details = {
 
 class ManagementAreaDataType(DomainListDataType):
 
-    def get_dropdown_options(self):
-
-        values = ManagementArea.objects.all().values_list("pk", "display_name")
-        return [{
-            "id": str(i[0]),
-            "selected": "false",
-            "text": i[1]
-        } for i in values ]
-
     def get_option_text(self, node, option_id):
 
         return ManagementArea.objects.get(pk=option_id).__str__()
