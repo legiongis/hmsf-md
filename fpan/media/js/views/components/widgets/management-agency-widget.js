@@ -24,7 +24,7 @@ define([
             if (!params.node.configKeys) {
               params.node.configKeys = {};
             }
-            params.node.config.options = ko.observableArray(widgetData.dropdownLists.managementAreas)
+            params.node.config.options = ko.observableArray(widgetData.dropdownLists.managementAgencies)
 
             DomainWidgetViewModel.apply(this, [params]);
 
