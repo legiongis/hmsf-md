@@ -10,11 +10,16 @@ from arches.app.models.models import NodeGroup, Node, Value
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 
+from hms.models import ManagementArea, ManagementAgency
+
 class Command(BaseCommand):
 
     help = '2021 July 9 - this command supports the transfer of existing '\
         'management area-related nodes to corresponding nodes in the new '\
         'Management branch.'
+
+    matched = {}
+    no_match = {}
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run",
@@ -27,49 +32,64 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.process()
+        for graph_name in ["Archaeological Site", "Historic Cemetery", "Historic Structure"]:
+            self.process_graph(graph_name)
+
+        self.report()
 
     def value_to_pk(self, value_uuid):
 
         v = Value.objects.get(pk=value_uuid)
-        mas = ManagementArea.objects.filter(name=v.label)
-        print(mas)
+        # print(v.__dict__)
+        print(f"{value_uuid} --> {v.value}")
+        try:
+            ma = ManagementArea.objects.get(name=v.value)
+        except ManagementArea.DoesNotExist:
+            ma = None    
+        return ma
 
-    def process(self):
+    def process_graph(self, graph_name):
 
-        # first get all of the existing tiles for this node group
-        # note that both nodes (old and new) are in the same node group, so only
-        # one group of tiles is needed.
-        old_node = Node.objects.get(name="Managed Area Name", graph__name="Archaeological Site")
+        print(f"\n -- {graph_name} --")
+
+        old_node = Node.objects.get(name="Managed Area Name", graph__name=graph_name)
         old_nodeid = str(old_node.nodeid)
         tiles = Tile.objects.filter(nodegroup_id=old_node.nodegroup)
 
-        print(tiles.count())
+        tiles_ct = tiles.count()
+        print(tiles_ct)
 
-        # new_node = Node.objects.get(name="Scout ID(s)")
-        # new_nodeid = str(new_node.nodeid)
-        #
-        # full_matched = 0
-        # partial_matched = 0
-        # unmatched_ct = 0
-        # unmatched = {}
-        # rows = [
-        #     ("resourceid", "original_value", "matching_usernames", "match")
-        # ]
-        print()
-
-        for tile in tiles:
-            print("%%%%")
+        for n, tile in enumerate(tiles, start=1):
+            if n % 1000 == 0:
+                print(f"{n}, ", end="", flush=True)
+            if n == tiles_ct:
+                print(f"{n} - done")
             resid = str(tile.resourceinstance_id)
-            print(resid)
-            # if options['resourceid'] and resid != options['resourceid']:
-            #     continue
-
             old_value = tile.data.get(old_nodeid, None)
-            if old_value is None:
-                old_value = ""
-            print(old_value)
-            break
+
+            if old_value is not None:
+                # if not isinstance(old_value, list):
+                #     print(type(old_value))
+                #     print(old_value)
+                for value_uuid in old_value:
+
+                    area_name = Value.objects.get(pk=value_uuid).value
+                    mas = ManagementArea.objects.filter(name=area_name)
+                    if len(mas) >= 1:
+                        ma = mas[0]
+                        self.matched.update({area_name: self.matched.get(area_name, 0) + 1})
+                    else:
+                        self.no_match.update({area_name: self.no_match.get(area_name, 0) + 1})
+
+    def report(self):
+
+        print("NO MATCH FOUND:")
+        for k, v in self.no_match.items():
+            print(f"{k}")
+        print(f"unmatched: {len(self.no_match)}")
+        print(f"matched: {len(self.matched)}")
+
+                # break
 
             ## split by , then by - and ; to extract names
         #     unames1 = [i.lstrip().rstrip().lower() for i in old_value.split(",")]
