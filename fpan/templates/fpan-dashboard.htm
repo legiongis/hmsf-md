@@ -13,14 +13,14 @@ FPAN - Admin Dashboard
 <section class="about-section section-first" style="padding-top: 0px;">
     <div class="row">
         <div class="col-xs-12">
-            <div class="col-xs-12 fpan-panel" style="padding-top:35px;padding-bottom:35px;">
+            <div class="col-xs-12 fpan-panel-{{user_type}}" style="padding-top:35px;padding-bottom:35px;">
                 <div class="title-v1">
                     <h1 style="">{% trans "HMS Admin Dashboard" %}</h1>
                 </div>
                 <div class="col-xs-12">
                     <h2>{% trans "Scout Summary" %}</h2>
-                    <h4>Number of Scouts = {{ scouts|length }} &nbsp;&rarr;&nbsp; <a href="{% url 'scout_list_download' %}">click to download full list</a></h4>
-                    <ul class="fpan-panel" style="max-height:200px;overflow-y:auto; padding:5px;background:url({% static 'img/fpan/ricepaper.png' %});">
+                    <h4>Number of Scouts = {{ scouts|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}">click to download full list</a></h4>
+                    <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px;background:url({% static 'img/fpan/ricepaper.png' %});">
                         {% for scout in scouts %}
                         <li><strong>{{scout.username}}</strong> | <em>regions:</em>
                             {% for region in scout.region_choices %}
@@ -35,7 +35,7 @@ FPAN - Admin Dashboard
                 </div>
             </div>
         </div>
-        
+
     </div>
 </section>
 {% endblock %}

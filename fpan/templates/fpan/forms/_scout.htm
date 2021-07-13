@@ -1,5 +1,5 @@
 <section id="scout-signup" class="scout-signup-section">
-    <div class="fpan-panel" style="padding-bottom: 15px;">
+    <div class="fpan-panel-{{user_type}}" style="padding-bottom: 15px;">
         <form action="{% url 'scout_signup' %}" method="post">
             {% csrf_token %}
             <div class="row">
@@ -35,23 +35,23 @@
                             Ethics Agreement
                         </div>
                         <div class="panel-body">
-                            {% include 'fpan/ethics_agreement.htm' %}                     
+                            {% include 'fpan/ethics_agreement.htm' %}
                         </div>
                         <div class="panel-footer">
                             <label for="ethics_agreement"
-                                   class="control-label" 
+                                   class="control-label"
                                    style="color: #555"
                                    id="label-for-ethics">
-                                <input type="checkbox" 
-                                       id="ethics_agreement" 
+                                <input type="checkbox"
+                                       id="ethics_agreement"
                                        onclick="ethics_check(this)">
                                 I have read and will abide by the HMS Florida Code of Ethics and Program Agreement.
                            </label>
-                           
+
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </form>
     </div>
@@ -70,5 +70,5 @@
         submitBtn.disabled = true;
         document.getElementById("label-for-ethics").style.color = "red";
     }
-    
+
 </script>

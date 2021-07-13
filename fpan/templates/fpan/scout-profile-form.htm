@@ -1,5 +1,5 @@
 <br>
-<section id="scout-profile" class="scout-profile-section fpan-panel" style="padding: 40px;">
+<section id="scout-profile" class="scout-profile-section fpan-panel-{{user_type}}" style="padding: 40px;">
 
     <h3>
     {% if user.first_name %}
@@ -8,9 +8,9 @@
     {{ user.username }}
     {% endif %}
     </h3>
-    
+
     <h5>
-    At any time you may update your Scout Profile below, or <a href="{% url 'auth' login_type='password' %}">change your password</a>.
+    At any time you may update your Scout Profile below, or <a class="a-{{user_type}}" href="{% url 'auth' login_type='password' %}">change your password</a>.
     </h5>
 
     {% if messages %}
@@ -20,7 +20,7 @@
         {% endfor %}
     </ul>
     {% endif %}
-    
+
     {% include "fpan/forms/_scout-profile.htm" %}
 
 </section>

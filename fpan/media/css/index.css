@@ -3,11 +3,17 @@
   src: url("../fonts/Helsing.otf");
 }
 
-body {
+body, body.body-anonymous, body.body-admin {
     font-family: 'Kreon',sans-serif;
     background: url('../img/fpan/ricepaper.png');
     font-size: 16px;
     line-height: 1.65;
+}
+body.body-scout, body.body-hms, body.body-hms .copyright-section {
+    background: url('../img/fpan/ricepaper-hms.png');
+}
+body.body-landmanager, body.body-state, body.body-state .copyright-section {
+    background: url('../img/fpan/ricepaper-state.png');
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -34,22 +40,53 @@ small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !imp
     color: white;
 }
 
-a, li a, .search-candidate-title, .search-candidate-link, .btn-link {
+a, li a, .search-candidate-title, .search-candidate-link, .btn-link, a.a-anonymous, li a.a-anonymous, .search-candidate-title-anonymous, .search-candidate-link-anonymous, .btn-link-anonymous, a.a-admin, li a.a-admin, .search-candidate-title-admin, .search-candidate-link-admin, .btn-link-admin {
     color: #007fff;
     text-decoration: none;
 }
-a:hover, li a:hover, .btn-link:hover {
+.a-scout, li .a-scout, body.body-hms .a-anonymous, .search-candidate-title-scout, .search-candidate-link-scout, .btn-link-scout {
+    color: #F26422;
+}
+.a-landmanager, li .a-landmanager, body.body-state .a-anonymous, .search-candidate-title-landmanager, .search-candidate-link-landmanager, .btn-link-landmanager {
+    color: #273675;
+}
+a:hover, li a:hover, .btn-link:hover, a.a-anonymous:hover, li a.a-anonymous:hover, .btn-link-anonymous:hover, a.a-admin:hover, li a.a-admin:hover, .btn-link-admin:hover {
     color: #0059b3;
     text-decoration: underline;
 }
-
+a.a-scout:hover, li a.ascout:hover, .btn-link-scout:hover {
+    color: #5ec5b9;
+}
+a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
+    color: #525e91;
+}
+.body-scout .btn-success, .body-hms .btn-success {
+    background-color:#f26422;
+    border:none;
+}
+.body-landmanager .btn-success, .body-state .btn-success {
+    background-color:#273675;
+    border:none;
+}
+.body-scout .btn-success:hover, .body-hms .btn-success:hover, .body-landmanager .btn-success:hover, .body-state .btn-success:hover  {
+    background-color: #449d44;
+}
 #mainnav-container {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
 }
 
-.brand-title, #mainnav-container, #mainnav, #mainnav-menu>.active, .menu-popover .sub-menu ul  {
+#mainnav-container, #mainnav, #mainnav-menu>.active, .brand-title-anonymous, .sub-menu-anonymous ul, .brand-title-admin, .sub-menu ul   {
     background: #431825;
     color:white;
+}
+.brand-title-admin, .mainnav-container-admin, .mainnav-admin, .mainnav-menu-admin>.active, .mainnav-admin .menu-popover, .mainnav-admin .sub-menu ul, .brand-title-anonymous, .mainnav-container-anonymous, .mainnav-anonymous, .mainnav-menu-anonymous>.active, .mainnav-anonymous .menu-popover, .mainnav-anonymous .sub-menu ul  {
+    background: #431825 !important;
+}
+.brand-title-scout, .mainnav-container-scout, .mainnav-scout, .mainnav-menu-scout>.active, .mainnav-scout .menu-popover, .mainnav-scout .sub-menu ul  {
+    background: #5ec5b9 !important;
+}
+.brand-title-landmanager, .mainnav-container-landmanager, .mainnav-landmanager, .mainnav-menu-landmanager>.active, .mainnav-landmanager .menu-popover, .mainnav-landmanager .sub-menu ul  {
+    background: url('../img/fpan/ricepaper-state.png') !important;
 }
 
 #mainnav .list-header {
@@ -68,31 +105,80 @@ a:hover, li a:hover, .btn-link:hover {
     box-shadow:none !important;
 }
 
-#mainnav-menu>li>a:hover, .link-submenu-item a:hover {
-    background-color:#5D2134 !important;
+#mainnav-menu>li>a:hover, .link-submenu-item-admin a:hover, .link-submenu-item-anonymous a:hover {
+    background-color:#5D2134;
     box-shadow:none !important;
     text-decoration: none;
 }
 
 #mainnav-menu>li>a {
-    background-color:#431825 !important;
+    background-color:#431825;
     box-shadow:none !important;
     color: white;
 }
 
-.popover-title {
-    background-color:#5D2134 !important;
+.mainnav-menu-scout>li {
+    background-color:#5ec5b9 !important;
 }
 
-.single-content {
+.mainnav-menu-scout>li>a {
+    background-color:#5ec5b9 !important;
+    color: white !important;
+}
+
+.mainnav-menu-scout>li>a:hover, .link-submenu-item-scout a:hover {
+    background-color:#F26422 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+.mainnav-menu-landmanager>li {
+    background: url('../img/fpan/ricepaper-state.png') !important;
+}
+
+.mainnav-menu-landmanager>li>a {
+    background: url('../img/fpan/ricepaper-state.png') !important;
+    color: white !important;
+}
+
+.mainnav-menu-landmanager>li>a:hover, .link-submenu-item-landmanager a:hover {
+    background:#273675 !important;
+    color: white !important;
+    text-decoration: none;
+}
+
+.mainnav-anonymous .popover-title, .mainnav-admin .popover-title {
+    background-color:#5D2134 !important;
+}
+.mainnav-scout .popover-title {
+    background-color:#F26422 !important;
+}
+.mainnav-landmanager .popover-title {
+    background:#273675 !important;
+}
+
+.mainnav-anonymous .single-content, .mainnav-admin .single-content {
     background-color:#5D2134 !important;
     font-family: 'Kreon',sans-serif;
 }
-
-.hover {
-    background-color:#5D2134;
+.mainnav-scout .single-content {
+    background-color:#F26422 !important;
+    font-family: 'Kreon',sans-serif;
+}
+.mainnav-landmanager .single-content {
+    background:#273675 !important;
+    font-family: 'Kreon',sans-serif;
 }
 
+.mainnav-anonymous .hover, .mainnav-admin .hover  {
+    background-color:#5D2134;
+}
+.mainnav-scout .hover {
+    background-color:#F26422;
+}
+.mainnav-landmanager .hover {
+    background:#273675;
+}
 .menu-title {
     font-family: 'Kreon',sans-serif;
 }
@@ -110,7 +196,7 @@ ul .collapse li {
     height: 35px;
 }
 ul .collapse li:first-of-type {
-    margin-top: 0px; 
+    margin-top: 0px;
 }
 ul .collapse li:last-of-type {
     height: 45px;
@@ -276,11 +362,29 @@ input[type='text'] {
     top:-15px;
     background: transparent;
 }
-    
-.fpan-panel {
+
+.fpan-panel, .fpan-panel-anonymous, .fpan-panel-admin {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
     border-top: solid 8px #431825;
+}
+.fpan-panel-scout, .fpan-panel-hms {
+    background: url('../img/fpan/bedge_muted.png');
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+    border-top: solid 8px #F26422;
+}
+.fpan-panel-landmanager, .fpan-panel-state {
+    background: url('../img/fpan/bedge_muted.png');
+    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+    border-top: solid 8px #273675;
+}
+
+.scout-panel {
+    border: 1px solid #F26422;
+    background-color: rgba(255, 255, 255, 0.4);
+}
+.scout-panel .panel-heading {
+    background-color: #F26422;
 }
 
 #login-failed-alert {
@@ -290,6 +394,8 @@ input[type='text'] {
 
 .state-logos-list {
     display:inline-flex;
+    list-style-type: none;
+    padding-left: 0px !important;
 }
 
 .state-logos-list li {
@@ -303,7 +409,12 @@ input[type='text'] {
 .footer {
     text-align: center;
 }
-
+#footer a.a-scout, .body-hms #footer a.a-anonymous {
+    color: white;
+}
+#footer a.a-scout:hover, .body-hms #footer a.a-anonymous:hover {
+    color: white;
+}
 .title-v1 {
     margin-bottom: 0px;
 }
