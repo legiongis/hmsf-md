@@ -1,6 +1,7 @@
 import logging
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
+from django.views.generic import View
 from django.http import HttpResponse, Http404
 from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
@@ -23,80 +24,70 @@ from hms.forms import ScoutForm, ScoutProfileForm
 
 logger = logging.getLogger(__name__)
 
-@never_cache
-@csrf_exempt
-def auth(request, login_type):
 
-    if not login_type in ['hms','state','logout']:
-        raise Http404("not found")
+class LoginView(View):
+    def get(self, request):
 
-    if login_type == 'logout':
-        logger.info(f"logging user out via fpan.views.auth: {request.user.username}")
-        logout(request)
-        return redirect('fpan_home')
+        login_type = request.GET.get("t", "landmanager")
+        if request.GET.get("logout", None) is not None:
 
-    auth_attempt_success = None
+            if user_is_scout(request.user):
+                login_type = "scout"
+            # send land managers and admin back to the landmanager login
+            else:
+                login_type = "landmanager"
 
-    # POST request is taken to mean user is logging in
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+            logout(request)
+            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
+            return redirect(f"/auth/?t={login_type}")
+        else:
+            next = request.GET.get("next", None)
+            return render(request, "login.htm", {
+                "auth_failed": False,
+                "next": next,
+                "login_type": login_type,
+            })
+
+    def post(self, request):
+        # POST request is taken to mean user is logging in
+
+        login_type = request.GET.get("t", "anonymous")
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
 
+        # set next redirect based on user type if not previously specified
+        next = request.POST.get("next", None)
+        if next is None:
+            if login_type == "landmanager":
+                next = request.POST.get("next", reverse("state_home"))
+            elif login_type == "scout":
+                next = request.POST.get("next", reverse("hms_home"))
+            else:
+                next = request.POST.get("next", reverse("search_home"))
+
+        auth_attempt_success = True
         if user is not None and user.is_active:
-            logger.info(f"logging user in via fpan.views.auth: {username}")
-            if login_type == "hms":
-                if user_is_scout(user) or user.is_superuser:
-                    login(request, user)
-                    auth_attempt_success = True
-                else:
-                    auth_attempt_success = False
-            elif login_type == "state":
-                if user_is_land_manager(user):
-                    login(request, user)
-                    auth_attempt_success = True
-                else:
-                    auth_attempt_success = False
-            user.password = ''
-        else:
-            auth_attempt_success = False
 
-    next = request.GET.get('next', reverse('home'))
-    if auth_attempt_success:
-        if user.is_superuser:
-            return redirect('search_home')
-        if login_type == "hms":
-            return redirect('hms_home')
-        if login_type == "state":
-            return redirect('state_home')
-        return redirect(next)
-    else:
-        return render(request, 'login.htm', {
-            'app_name': settings.APP_NAME,
-            'auth_failed': (auth_attempt_success is not None),
-            'next': next,
-            'login_type':login_type,
-            'page':'login',
-        })
+            # these conditionals ensure that scouts and land managers must
+            # use the correct login portals
+            if user_is_land_manager(user) and login_type != "landmanager":
+                auth_attempt_success = False
 
-@never_cache
-def change_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, _('Your password has been updated'))
-            if user_is_land_manager(user):
-                return redirect('state_home')
-            if user_is_scout(user):
-                return redirect('hms_home')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change-password.htm', {
-        'form': form,
-        'page':'change-password'
-    })
+            if user_is_scout(user) and login_type != "scout":
+                auth_attempt_success = False
+            
+            # if user survives above checks, login
+            if auth_attempt_success is True:
+                login(request, user)
+                user.password = ""
+                return redirect(next)
+
+        return render(request, "login.htm", {
+            "auth_failed": True,
+            "next": next,
+            "login_type": login_type
+        }, status=401)
 
 def activate(request, uidb64, token):
     try:
