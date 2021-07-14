@@ -31,87 +31,80 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endblock loading_mask %}
 
 {% block content %}
-
-<div class="row" style="height:20px;"></div>
+<div class="row">
     <div class="col-xs-12 col-sm-6 col-sm-offset-3">
         <div class="cls-content">
-            <div class="cls-content-sm login-panel fpan-panel-{{login_type}}">
-                <div class="panel-body">
-                    {% if login_type == "scout" %}
-                    <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:100%">
-                    <h3 class="login-panel-header">{% trans "Sign in to your HMS account with your <strong>Scout ID</strong> and <strong>password</strong>." %}</h3>
-                    {% elif login_type == "landmanager" %}
-                    <img src="{% static 'img/state/dhr logo.png' %}" style="width:100%">
-                    <h3 class="login-panel-header">{% trans "Sign in to record site condition assessments with your <strong>Land Manager ID</strong> and <strong>password</strong>." %}</h3>
+            <div class="cls-content-sm login-panel panel-body fpan-panel-{{login_type}}">
+                {% if login_type == "scout" %}
+                <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:100%">
+                <h3 class="login-panel-header">{% trans "Sign in to your HMS account with your <strong>Scout ID</strong> and <strong>password</strong>." %}</h3>
+                {% elif login_type == "landmanager" %}
+                <img src="{% static 'img/state/dhr logo.png' %}" style="width:100%">
+                <h3 class="login-panel-header">{% trans "Sign in to record site condition assessments with your <strong>Land Manager ID</strong> and <strong>password</strong>." %}</h3>
+                {% endif %}
+                <p><em>{% trans "Both ID and password are case-sensitive." %}</em></p>
+                <form id="login-form"
+                        action=''
+                        method='POST' {% if auth_failed %}
+                        autocomplete="off" {% endif %}>
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+                            <input type="text" class="form-control input-lg" placeholder="{% if login_type == 'scout' %}Scout ID{% elif login_type == 'landmanager' %}Land Manager ID{% endif %}" name='username' autofocus>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
+                            <input type="password" class="form-control input-lg" placeholder="Password" name='password'>
+                        </div>
+                    </div>
+                    <div class="form-group text-right" style="margin-bottom: 0px;">
+                        <button class="btn btn-success text-uppercase" type="submit">{% trans "Sign In" %}</button>
+                        <br>
+                        <a class="a-{{login_type}}" href="{% url 'password_reset' %}" >{% trans "Forgot password?" %}</a>
+                        <br>
+                        {% if login_type == "scout" %}
+                        <a class="a-{{login_type}}" href="{% url 'auth' %}?t=landmanager">
+                            {% trans "Switch to Land Manager Portal" %} &rarr;
+                        </a>
+                        {% elif login_type == "landmanager" %}
+                        <a class="a-{{login_type}}" href="{% url 'auth' %}?t=scout">
+                            {% trans "Switch to Scout Portal" %} &rarr;
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% if auth_failed %}
+                    <div class="form-group">
+                        <div id="login-failed-alert" class="alert alert-danger" role="alert">
+                            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
+                            <h4>{% trans "Login failed" %}</h4>
+                            <span>{% trans "Invalid username and/or password. Make sure you are using the correct login portal for your account type." %}
+                                <em>
+                                {% if login_type == "scout" %}
+                                <a class="a-{{login_type}}" href="{% url 'auth' %}?t=landmanager">
+                                    {% trans "Go to Land Manager Portal." %}
+                                </a>
+                                {% elif login_type == "landmanager" %}
+                                <a class="a-{{login_type}}" href="{% url 'auth' %}?t=scout">
+                                    {% trans "Go to Scout Portal." %}
+                                </a>
+                                {% endif %}
+                                </em>
+                            </span>
+                        </div>
+                    </div>
                     {% endif %}
-                    <p><em>{% trans "Both ID and password are case-sensitive." %}</em></p>
-                    <form id="login-form"
-                          action=''
-                          method='POST' {% if auth_failed %}
-                          autocomplete="off" {% endif %}>
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
-                                <input type="text" class="form-control input-lg" placeholder="{% if login_type == 'scout' %}Scout ID{% elif login_type == 'landmanager' %}Land Manager ID{% endif %}" name='username' autofocus>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="input-group">
-                                <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
-                                <input type="password" class="form-control input-lg" placeholder="Password" name='password'>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="text-right">
-                                <button class="btn btn-success text-uppercase" type="submit">{% trans "Sign In" %}</button>
-                            </div>
-                            
-                            <div class="text-right"></div>
-                            <a class="a-{{login_type}}" href="{% url 'password_reset' %}" style="float:right; padding-right:0px">{% trans "Forgot password?" %}</a>
-                            <br>
-                            {% if login_type == "scout" %}
-                            <a class="a-{{login_type}}" href="{% url 'auth' %}?t=landmanager" style="float:right; padding-right:0px">
-                                {% trans "Switch to Land Manager Portal" %} &rarr;
-                            </a>
-                            {% elif login_type == "landmanager" %}
-                            <a class="a-{{login_type}}" href="{% url 'auth' %}?t=scout" style="float:right; padding-right:0px">
-                                {% trans "Switch to Scout Portal" %} &rarr;
-                            </a>
-                            {% endif %}
-                            </div>
-                        </div>
-
-                        <div class="form-group" style="padding-top:10px;">
-                            <div style="{% if not auth_failed %}display:none;{% endif %}" id="login-failed-alert" class="alert alert-danger fade in" role="alert">
-                                <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
-                                <h4>{% trans "Login failed" %}</h4>
-                                <span>{% trans "Invalid username and/or password. Make sure you are using the correct login portal for your account type." %}
-                                    <em>
-                                    {% if login_type == "scout" %}
-                                    <a class="a-{{login_type}}" href="{% url 'auth' %}?t=landmanager">
-                                        {% trans "Go to Land Manager Portal." %}
-                                    </a>
-                                    {% elif login_type == "landmanager" %}
-                                    <a class="a-{{login_type}}" href="{% url 'auth' %}?t=scout">
-                                        {% trans "Go to Scout Portal." %}
-                                    </a>
-                                    {% endif %}
-                                    </em>
-                                </span>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 {% if login_type == "landmanager" %}
-<!-- <section id="contact" class="contacts-section"> -->
-<section id="logos" class="">
+<div class="row">
     <div class="copyright-section copyright-section-{{ login_type }}">
-        <ul class="state-logos-list" style="">
+        <ul class="state-logos-list">
             <li>
                 <img src="{% static 'img/state/FL-DEP-LOGO-color.png' %}" class="state-logo-img">
             </li>
@@ -123,6 +116,55 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
             </li>
         </ul>
     </div>
-</section>
+</div>
+{% endif %}
+{% if debug %}
+<div class="row" style="margin-top: 20px;">
+    <div class="col-xs-12 fpan-panel-{{login_type}} fpan-panel-{{user_type}}">
+        <h2>While in development...</h2>
+        <p>The following test accounts are available to anyone who wants to try things out. Login with username/password as shown below.</p>
+        <h3>Example Heritage Monitoring Scouts (w/ region preferences)</h3>
+        <p>Scouts only have access to Archaeological Sites to which they have been assigned. Assignment of a site is done by an admin, and is limited to Scouts who have expressed a preference for the region in which the site is located.</p>
+        <ul>
+            <li>cjmorton/chet ("Central","Northeast","East Central")</li>
+            <li>fahardy/frank ("Southeast","East Central")</li>
+            <li>jfhardy/joe ("Northwest","Northeast","North Central")</li>
+            <li>bahooper/biff ("Southwest","Southeast","East Central")</li>
+        </ul>
+        <h3>Example State Land Manager Users (w/ agency)</h3>
+        <p>State Land Managers have different levels of access to Archaeological Sites based on their agency.</p>
+        <ul>
+            <li>FMSF/FSMF (Florida Master Site File)</li>
+            <ul>
+                <li>Access to all Archaeological Sites.</li>
+            </ul>
+            <li>FWC/FWC (Fish and Wildlife Conservation Commission)</li>
+            <ul>
+                <li>Access to Archaeological Sites on any Fish and Wildlife land.</li>
+            </ul>
+            <li>FL_BAR/FL_BAR (Florida Bureau of Archaeological Research)</li>
+            <ul>
+                <li>Access to all Archaeological Sites.</li>
+            </ul>
+            <li>TomokaSP/TomokaSP (State Park)</li>
+            <ul>
+                <li>Access to Archaeological Sites in all State Parks.</li>
+            </ul>
+            <li>JenningsSF/JenningsSF (State Forest)</li>
+            <ul>
+                <li>Access to Archaeological Sites in all State Forests.</li>
+            </ul>
+            <li>MarshViewPreserve/MarshViewPreserve (FL Aquatic Preserve)</li>
+            <ul>
+                <li>Access to Archaeological Sites in all Aquatic Preserves.</li>
+            </ul>
+        </ul>
+        <h3>Admin User</h3>
+        <p>The admin has access to everything.</p>
+        <ul>
+            <li>admin/admin</li>
+        </ul>
+    </div>
+</div>
 {% endif %}
 {% endblock content %}

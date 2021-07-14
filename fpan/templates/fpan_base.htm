@@ -131,16 +131,10 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     </nav>
     <!--=== End Header ===-->
     <div class="container main-container">
-
     {% block content %}
     {% endblock %}
-
-    {% comment %}
-    {% if debug %}
-        {% include "fpan/partials/_test-section.htm" %}
-    {% endif %}
-    {% endcomment %}
     </div>
+
     <!-- Contact Section -->
     {% block footer %}
     <section id="footer" class="footer">
