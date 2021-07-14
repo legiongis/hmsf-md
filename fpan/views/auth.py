@@ -84,86 +84,10 @@ class LoginView(View):
                 return redirect(next)
 
         return render(request, "login.htm", {
-            "auth_failed": not auth_attempt_success,
+            "auth_failed": True,
             "next": next,
             "login_type": login_type
         }, status=401)
-
-
-@never_cache
-@csrf_exempt
-def old_auth(request, login_type):
-
-    if not login_type in ['hms','state','logout']:
-        raise Http404("not found")
-
-    if login_type == 'logout':
-        logger.info(f"logging user out via fpan.views.auth: {request.user.username}")
-        logout(request)
-        return redirect('fpan_home')
-
-    auth_attempt_success = None
-
-    # POST request is taken to mean user is logging in
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username, password=password)
-
-        if user is not None and user.is_active:
-            logger.info(f"logging user in via fpan.views.auth: {username}")
-            if login_type == "hms":
-                if user_is_scout(user) or user.is_superuser:
-                    login(request, user)
-                    auth_attempt_success = True
-                else:
-                    auth_attempt_success = False
-            elif login_type == "state":
-                if user_is_land_manager(user):
-                    login(request, user)
-                    auth_attempt_success = True
-                else:
-                    auth_attempt_success = False
-            user.password = ''
-        else:
-            auth_attempt_success = False
-
-    next = request.GET.get('next', reverse('home'))
-    if auth_attempt_success:
-        if user.is_superuser:
-            return redirect('search_home')
-        if login_type == "hms":
-            return redirect('hms_home')
-        if login_type == "state":
-            return redirect('state_home')
-        return redirect(next)
-    else:
-        return render(request, 'login.htm', {
-            'app_name': settings.APP_NAME,
-            'auth_failed': (auth_attempt_success is not None),
-            'next': next,
-            'login_type':login_type,
-            'page':'login',
-        })
-
-@never_cache
-def change_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Important!
-            messages.success(request, _('Your password has been updated'))
-            if user_is_land_manager(user):
-                return redirect('state_home')
-            if user_is_scout(user):
-                return redirect('hms_home')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change-password.htm', {
-        'form': form,
-        'page':'change-password'
-    })
 
 def activate(request, uidb64, token):
     try:
