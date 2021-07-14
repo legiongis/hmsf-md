@@ -62,7 +62,7 @@ class LoginView(View):
         if login_type == "scout":
             next = request.POST.get("next", reverse("hms_home"))
         else:
-            next = request.POST.get("next", reverse("search"))
+            next = request.POST.get("next", reverse("search_home"))
 
         login_fail = render(request, "login.htm", {
             "auth_failed": True,
