@@ -32,11 +32,14 @@ State Land Management - Home
         </div>
     </section>
     <br>
-    <!--  End About Section -->
 
-    <!-- News Section -->
-    {# include "fpan/partials/_news-section.htm" #}
-    <!-- End News Section -->
-    {% include "fpan/partials/_state-user-info.htm" %}
+    <section id="" class="scout-profile-section fpan-panel-{{user_type}}" style="padding: 25px;">
+        <div class="row">
+            <div class="col-xs-12">
+                <h3>{% trans "Welcome," %} {{user.username}}.</h3>
+                <p><a class="a-{{user_type}}" href="{% url 'password_reset' %}">change my password</a></p>
+            </div>
+        </div>
+    </section>
 
 {% endblock %}
