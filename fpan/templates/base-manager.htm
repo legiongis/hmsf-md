@@ -111,19 +111,19 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <!-- Login -->
                         {% if nav.login %}
                             {% if user.username == 'anonymous' %}
-                            <a href="{% url 'auth' login_type='hms' %}" class="ep-tools ep-tools-login">
+                            <a href="{% url 'auth' %}?t=scout" class="ep-tools ep-tools-login">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Scout Login">
                                 <h5 class="hidden-xs">{% trans "Scout Login" %}</h5>
                                 </div>
                             </a>
-                            <a href="{% url 'auth' login_type='state' %}" class="ep-tools ep-tools-login">
+                            <a href="{% url 'auth' %}?t=landmanager" class="ep-tools ep-tools-login">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="State Manager Login">
 
                                 <h5 class="hidden-xs">{% trans "State Manager Login" %}</h5>
                                 </div>
                             </a>
                             {% else %}
-                            <a href="{% url 'auth' login_type='logout' %}" class="ep-tools ep-tools-login">
+                            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login">
                                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Logout">
 
                                 <h5 class="hidden-xs">{% trans "Welcome" %}, {{ user.username }}</h5>

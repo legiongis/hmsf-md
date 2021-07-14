@@ -75,7 +75,60 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
     <div id="intro"></div>
     <!--=== Header ===-->
-    {% include "fpan/partials/_header.htm" %}
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="background-color:#30111b;">
+        <div class="container">
+    
+            <div class="menu-container page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">{% trans "Toggle navigation" %}</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+    
+                <a class="navbar-brand a-{{user_type}}" style="padding-top: 5px;" href="{% url 'fpan_home' %}">
+                    <img src="{% static 'img/fpan/fpan_sun.png' %}" style="height: 36px; width: 36px;" alt="Logo">
+                </a>
+    
+    
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="navbar-right collapse navbar-collapse navbar-ex1-collapse">
+                <div class="menu-container">
+                    <ul class="nav navbar-nav">
+                        <li class="page-scroll">
+                            <a class="a-{{user_type}}" href="{% url 'fpan_home' %}"><h3>{% trans "Home" %}</h3></a>
+                        </li>
+                        <li class="page-scroll">
+                            <a class="a-{{user_type}}" href="{% url 'hms_home' %}"><h3>{% trans "HMS Program" %}</h3></a>
+                        </li>
+                        {% if page == 'index' %}
+                        <li class="page-scroll">
+                            <a class="a-{{user_type}}" href="#scout-signup"><h3>Scout Signup!</h3></a>
+                        </li>
+                        {% endif %}
+                        <li class="page-scroll">
+                            <a class="a-{{user_type}}" href="{% url 'search_home' %}"><h3>{% trans "Explore the Database" %}</h3></a>
+                        </li>
+                        {% if scout_profile %}
+                        <li class="page-scroll">
+                            <a class="a-{{user_type}}" href="#scout-profile"><h3>View Profile</h3></a>
+                        </li>
+                        {% endif %}
+                        {% if user.username != 'anonymous' %}
+                        <li>
+                            <a id="auth-link" class="a-{{user_type}}" href="{% url 'auth' %}?logout=true" alt="click to logout">
+                                <h3>{{ user.username }} - {% trans "logout" %}</h3>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                </div>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
     <!--=== End Header ===-->
     <div class="container main-container">
 
@@ -89,7 +142,13 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     <!-- Contact Section -->
     <div class="container"  style="">
     {% block footer %}
-    {% include "fpan/partials/_copyright-section.htm" %}
+    <section id="footer" class="footer">
+        <div class="row" style="margin: 10px 0px;">
+            <div class="col-xs-12">
+                <span>&copy; {% now "Y" %} | powered by <a class="a-{{user_type}}" href="http://archesproject.org">Arches v5</a> | source code &mdash; <a class="a-{{user_type}}" href="https://github.com/legiongis/arches/tree/fpan_master">arches</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan">fpan</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan-data">fpan-data</a> | admin contact &mdash; <a id="email-contact" class="a-{{user_type}}"></a></span>
+            </div>
+        </div>
+    </section>
     {% endblock %}
     </div>
 </body>
@@ -102,6 +161,15 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 
     ga('create', '{{GOOGLE_ANALYTICS_TRACKING_ID}}', 'auto');
     ga('send', 'pageview');
+
+    var c1 = "admin";
+    var c2 = "@";
+    var c3 = "legiongis.com";
+    var email = c1+c2+c3
+    $(document).ready(function() {
+        document.getElementById('email-contact').textContent = email;
+        document.getElementById('email-contact').href = "mailto:"+email;
+    });
 </script>
 {% endif %}
 </html>
