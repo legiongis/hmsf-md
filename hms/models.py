@@ -68,8 +68,8 @@ class ScoutProfile(models.Model):
 def create_user_scout(sender, instance, created, **kwargs):
     if created:
         ScoutProfile.objects.create(user=instance)
-    group = Group.objects.get(name='Scout')
-    group.user_set.add(instance)
+    # group = Group.objects.get(name='Scout')
+    # group.user_set.add(instance)
     group_cs = Group.objects.get(name='Crowdsource Editor')
     group_cs.user_set.add(instance)
     group_cs = Group.objects.get(name='Resource Editor')
