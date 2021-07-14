@@ -56,7 +56,13 @@ class LoginView(View):
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
-        next = request.POST.get("next", reverse("home"))
+
+        if login_type == "landmanager":
+            next = request.POST.get("next", reverse("state_home"))
+        if login_type == "scout":
+            next = request.POST.get("next", reverse("hms_home"))
+        else:
+            next = request.POST.get("next", reverse("search"))
 
         login_fail = render(request, "login.htm", {
             "auth_failed": True,
@@ -68,8 +74,6 @@ class LoginView(View):
 
             # these conditionals ensure that scouts and land managers must
             # use the correct login portals
-            print(user_is_land_manager(user))
-            print(login_type)
             if user_is_land_manager(user) and login_type != "landmanager":
                 return login_fail
 
