@@ -135,22 +135,26 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
     {% block content %}
     {% endblock %}
 
+    {% comment %}
     {% if debug %}
         {% include "fpan/partials/_test-section.htm" %}
     {% endif %}
+    {% endcomment %}
     </div>
     <!-- Contact Section -->
-    <div class="container"  style="">
     {% block footer %}
     <section id="footer" class="footer">
         <div class="row" style="margin: 10px 0px;">
             <div class="col-xs-12">
-                <span>&copy; {% now "Y" %} | powered by <a class="a-{{user_type}}" href="http://archesproject.org">Arches v5</a> | source code &mdash; <a class="a-{{user_type}}" href="https://github.com/legiongis/arches/tree/fpan_master">arches</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan">fpan</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan-data">fpan-data</a> | admin contact &mdash; <a id="email-contact" class="a-{{user_type}}"></a></span>
+                {% if login_type %}
+                <span>&copy; {% now "Y" %} | powered by <a class="a-{{login_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{login_type}}" href="https://github.com/legiongis/arches/tree/fpan_master">arches</a>, <a class="a-{{login_type}}" href="https://github.com/legiongis/fpan">fpan</a>, <a class="a-{{login_type}}" href="https://github.com/legiongis/fpan-data">fpan-data</a> | admin contact &mdash; <a id="email-contact" class="a-{{login_type}}"></a></span>
+                {% else %}
+                <span>&copy; {% now "Y" %} | powered by <a class="a-{{user_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{user_type}}" href="https://github.com/legiongis/arches/tree/fpan_master">arches</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan">fpan</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan-data">fpan-data</a> | admin contact &mdash; <a id="email-contact" class="a-{{user_type}}"></a></span>
+                {% endif %}
             </div>
         </div>
     </section>
     {% endblock %}
-    </div>
 </body>
 
 <script>
