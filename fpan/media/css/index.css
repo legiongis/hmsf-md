@@ -274,15 +274,15 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
         color: #eee;
     }
-    .navbar-collapse {
-        width: 800px;
-    }
 }
 
 @media (max-width: 1000px) {
-    .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
+    .one-page-header .fa-chevron-circle-down {
         padding-left: 12px;
         margin-top: 14px;
+    }
+    .navbar-nav>li>a>h3 {
+        padding: 0px 15px;
     }
 }
 
