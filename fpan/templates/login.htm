@@ -25,7 +25,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% endif %}
 {% endblock %}
 {% block bodytag %}
-<body id="body" style=""  data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery body-{{login_type}}">
+<body id="body" data-spy="scroll" data-target=".one-page-header" class="demo-lightbox-gallery body-{{login_type}}">
 {% endblock %}
 {% block loading_mask %}
 {% endblock loading_mask %}
@@ -33,19 +33,18 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 {% block content %}
 
 <div class="row" style="height:20px;"></div>
-<div class="row">
     <div class="col-xs-12 col-sm-6 col-sm-offset-3">
         <div class="cls-content">
-            <div class="cls-content-sm login-panel fpan-panel-{{login_type}}" style="">
+            <div class="cls-content-sm login-panel fpan-panel-{{login_type}}">
                 <div class="panel-body">
                     {% if login_type == "scout" %}
                     <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:100%">
                     <h3 class="login-panel-header">{% trans "Sign in to your HMS account with your <strong>Scout ID</strong> and <strong>password</strong>." %}</h3>
                     {% elif login_type == "landmanager" %}
                     <img src="{% static 'img/state/dhr logo.png' %}" style="width:100%">
-                    <h3 class="login-panel-header">{% trans "Sign in to record site condition assessments with your <strong>State Agency ID</strong> and <strong>password</strong>." %}</h3>
+                    <h3 class="login-panel-header">{% trans "Sign in to record site condition assessments with your <strong>Land Manager ID</strong> and <strong>password</strong>." %}</h3>
                     {% endif %}
-                    <p><em>{% trans "Note that both ID and password are case-sensitive." %}</em></p>
+                    <p><em>{% trans "Both ID and password are case-sensitive." %}</em></p>
                     <form id="login-form"
                           action=''
                           method='POST' {% if auth_failed %}
@@ -54,7 +53,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div class="form-group">
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="text-lg ion-log-in"></i></div>
-                                <input type="text" class="form-control input-lg" placeholder="{% if login_type == 'hms' %}Scout ID{% elif login_type == 'state' %}State Agency ID{% endif %}" name='username' autofocus>
+                                <input type="text" class="form-control input-lg" placeholder="{% if login_type == 'scout' %}Scout ID{% elif login_type == 'landmanager' %}Land Manager ID{% endif %}" name='username' autofocus>
                             </div>
                         </div>
                         <div class="form-group">
@@ -73,11 +72,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                             <br>
                             {% if login_type == "scout" %}
                             <a class="a-{{login_type}}" href="{% url 'auth' %}?t=landmanager" style="float:right; padding-right:0px">
-                                {% trans "Switch to Land Manager Portal" %}
+                                {% trans "Switch to Land Manager Portal" %} &rarr;
                             </a>
                             {% elif login_type == "landmanager" %}
                             <a class="a-{{login_type}}" href="{% url 'auth' %}?t=scout" style="float:right; padding-right:0px">
-                                {% trans "Switch to Scout Portal" %}
+                                {% trans "Switch to Scout Portal" %} &rarr;
                             </a>
                             {% endif %}
                             </div>
