@@ -27,14 +27,13 @@ logger = logging.getLogger(__name__)
 
 class LoginView(View):
     def get(self, request):
-        login_type = request.GET.get("t", "landmanager")
-        next = request.GET.get("next", reverse("search_home"))
 
+        login_type = request.GET.get("t", "landmanager")
         if request.GET.get("logout", None) is not None:
 
             if user_is_scout(request.user):
                 login_type = "scout"
-            # send land managers and admin to the landmanager login
+            # send land managers and admin back to the landmanager login
             else:
                 login_type = "landmanager"
 
@@ -42,7 +41,7 @@ class LoginView(View):
             # need to redirect to 'auth' so that the user is set to anonymous via the middleware
             return redirect(f"/auth/?t={login_type}")
         else:
-
+            next = request.GET.get("next", None)
             return render(request, "login.htm", {
                 "auth_failed": False,
                 "next": next,
@@ -50,42 +49,45 @@ class LoginView(View):
             })
 
     def post(self, request):
-        login_type = request.GET.get("t", "anonymous")
         # POST request is taken to mean user is logging in
-        auth_attempt_success = None
+
+        login_type = request.GET.get("t", "anonymous")
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
 
-        if login_type == "landmanager":
-            next = request.POST.get("next", reverse("state_home"))
-        if login_type == "scout":
-            next = request.POST.get("next", reverse("hms_home"))
-        else:
-            next = request.POST.get("next", reverse("search_home"))
+        # set next redirect based on user type if not previously specified
+        next = request.POST.get("next", None)
+        if next is None:
+            if login_type == "landmanager":
+                next = request.POST.get("next", reverse("state_home"))
+            elif login_type == "scout":
+                next = request.POST.get("next", reverse("hms_home"))
+            else:
+                next = request.POST.get("next", reverse("search_home"))
 
-        login_fail = render(request, "login.htm", {
-            "auth_failed": True,
-            "next": next,
-            "login_type": login_type
-        }, status=401)
-
+        auth_attempt_success = True
         if user is not None and user.is_active:
 
             # these conditionals ensure that scouts and land managers must
             # use the correct login portals
             if user_is_land_manager(user) and login_type != "landmanager":
-                return login_fail
+                auth_attempt_success = False
 
             if user_is_scout(user) and login_type != "scout":
-                return login_fail
+                auth_attempt_success = False
+            
+            # if user survives above checks, login
+            if auth_attempt_success is True:
+                login(request, user)
+                user.password = ""
+                return redirect(next)
 
-            login(request, user)
-            user.password = ""
-            auth_attempt_success = True
-            return redirect(next)
-
-        return login_fail
+        return render(request, "login.htm", {
+            "auth_failed": not auth_attempt_success,
+            "next": next,
+            "login_type": login_type
+        }, status=401)
 
 
 @never_cache
