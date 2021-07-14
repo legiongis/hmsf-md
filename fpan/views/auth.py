@@ -1,6 +1,7 @@
 import logging
 from django.shortcuts import render, redirect
 from django.views.decorators.cache import never_cache
+from django.views.generic import View
 from django.http import HttpResponse, Http404
 from django.urls import reverse
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
@@ -23,9 +24,69 @@ from hms.forms import ScoutForm, ScoutProfileForm
 
 logger = logging.getLogger(__name__)
 
+
+class LoginView(View):
+    def get(self, request):
+        login_type = request.GET.get("t", "landmanager")
+        next = request.GET.get("next", reverse("search_home"))
+
+        if request.GET.get("logout", None) is not None:
+
+            if user_is_scout(request.user):
+                login_type = "scout"
+            # send land managers and admin to the landmanager login
+            else:
+                login_type = "landmanager"
+
+            logout(request)
+            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
+            return redirect(f"/auth/?t={login_type}")
+        else:
+
+            return render(request, "login.htm", {
+                "auth_failed": False,
+                "next": next,
+                "login_type": login_type,
+            })
+
+    def post(self, request):
+        login_type = request.GET.get("t", "anonymous")
+        # POST request is taken to mean user is logging in
+        auth_attempt_success = None
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
+        user = authenticate(username=username, password=password)
+        next = request.POST.get("next", reverse("home"))
+
+        login_fail = render(request, "login.htm", {
+            "auth_failed": True,
+            "next": next,
+            "login_type": login_type
+        }, status=401)
+
+        if user is not None and user.is_active:
+
+            # these conditionals ensure that scouts and land managers must
+            # use the correct login portals
+            print(user_is_land_manager(user))
+            print(login_type)
+            if user_is_land_manager(user) and login_type != "landmanager":
+                return login_fail
+
+            if user_is_scout(user) and login_type != "scout":
+                return login_fail
+
+            login(request, user)
+            user.password = ""
+            auth_attempt_success = True
+            return redirect(next)
+
+        return login_fail
+
+
 @never_cache
 @csrf_exempt
-def auth(request, login_type):
+def old_auth(request, login_type):
 
     if not login_type in ['hms','state','logout']:
         raise Http404("not found")
