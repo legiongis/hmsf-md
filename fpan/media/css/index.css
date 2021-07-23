@@ -426,3 +426,6 @@ input[type='text'] {
 .rr-splash-description {
     padding-bottom: 20px;
 }
+.calendar.picker {
+    position: relative;
+}
