@@ -57,7 +57,7 @@ def widget_data(request):
     # only collect this information for a few specific views
     widget_views = ["resource", "graph_designer", "report", "add-resource"]
     if any([True for i in widget_views if i in request.path.split("/")]):
-        data = make_widget_data()
+        return make_widget_data()
     else:
         return { 'lists': {} }
 
