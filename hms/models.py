@@ -275,7 +275,12 @@ class ManagementArea(models.Model):
     geom = models.MultiPolygonField()
 
     def __str__(self):
-        return self.display_name
+        if self.display_name:
+            return self.display_name
+        elif self.name:
+            return self.name
+        else:
+            return super(ManagementArea, self).__str__()
 
 
     def save(self, *args, **kwargs):
