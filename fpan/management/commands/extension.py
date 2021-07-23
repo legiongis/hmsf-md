@@ -40,12 +40,24 @@ class Command(BaseCommand):
 
         parser.add_argument(
             "extension_type",
-            choices=["widget", "datatype"]
+            choices=["widget", "datatype", "search"]
         )
 
-        parser.add_argument("-s", "--source", action="store", dest="source", default="", help="Widget json file to be loaded")
+        parser.add_argument(
+            "-s", "--source",
+            action="store",
+            dest="source",
+            default="",
+            help="Widget json file to be loaded",
+        )
 
-        parser.add_argument("-n", "--name", action="store", dest="name", default="", help="The name of the widget to unregister")
+        parser.add_argument(
+            "-n", "--name",
+            action="store",
+            dest="name",
+            default="",
+            help="The name of the widget to unregister"
+        )
 
     def handle(self, *args, **options):
 
@@ -88,12 +100,14 @@ class Command(BaseCommand):
             exit()
 
 
-    def get_orm_entity(self, extension_type):
+    def get_model(self, extension_type):
 
         if extension_type == "widget":
             return models.Widget
         elif extension_type == "datatype":
             return models.DDataType
+        elif extension_type == "search":
+            return models.SearchComponent
 
     def register(self, extension_type, source):
         """
@@ -102,6 +116,7 @@ class Command(BaseCommand):
         """
 
         details = self.get_source_details(source)
+        model = self.get_model(extension_type)
 
         if extension_type == "widget":
 
@@ -109,9 +124,9 @@ class Command(BaseCommand):
                 uuid.UUID(details["widgetid"])
             except:
                 details["widgetid"] = str(uuid.uuid4())
-                print("Registering widget with widgetid: {}".format(details["widgetid"]))
+            print("Registering widget with widgetid: {}".format(details["widgetid"]))
 
-            instance = models.Widget(
+            instance = model(
                 widgetid=details["widgetid"],
                 name=details["name"],
                 datatype=details["datatype"],
@@ -124,7 +139,8 @@ class Command(BaseCommand):
 
         elif extension_type == "datatype":
 
-            dt = models.DDataType(
+            print(f"Registering datatype {details['datatype']}")
+            dt = model(
                 datatype=details["datatype"],
                 iconclass=details["iconclass"],
                 modulename=os.path.basename(source),
@@ -137,10 +153,33 @@ class Command(BaseCommand):
                 issearchable=details.get("issearchable", False),
             )
 
-            if len(models.DDataType.objects.filter(datatype=dt.datatype)) == 0:
+            if len(model.objects.filter(datatype=dt.datatype)) == 0:
                 dt.save()
             else:
                 print("{0} already exists".format(dt.datatype))
+
+        elif extension_type == "search":
+
+            try:
+                uuid.UUID(details["searchcomponentid"])
+            except:
+                details["searchcomponentid"] = str(uuid.uuid4())
+            print("Registering the search component, %s, with componentid: %s" % (details["name"], details["searchcomponentid"]))
+
+            instance = model(
+                searchcomponentid=details["searchcomponentid"],
+                name=details["name"],
+                icon=details["icon"],
+                modulename=details["modulename"],
+                classname=details["classname"],
+                type=details["type"],
+                componentpath=details["componentpath"],
+                componentname=details["componentname"],
+                sortorder=details["sortorder"],
+                enabled=details["enabled"],
+            )
+
+            instance.save()
 
     def update(self, extension_type, source):
         """
@@ -148,10 +187,10 @@ class Command(BaseCommand):
 
         """
         details = self.get_source_details(source)
-        entity = self.get_orm_entity(extension_type)
+        model = self.get_model(extension_type)
 
         if extension_type == "widget":
-            instance = entity.objects.get(name=details["name"])
+            instance = model.objects.get(name=details["name"])
             instance.datatype = details["datatype"]
             instance.helptext = details["helptext"]
             instance.defaultconfig = details["defaultconfig"]
@@ -163,12 +202,14 @@ class Command(BaseCommand):
         Removes an extension of the specified type from the database
 
         """
-        entity = self.get_orm_entity(extension_type)
+        print(f"unregistering {extension_type}: \"{name}\"")
+
+        model = self.get_model(extension_type)
         try:
             if extension_type == "datatype":
-                instance = entity.objects.get(datatype=name)
+                instance = model.objects.get(datatype=name)
             else:
-                instance = entity.objects.get(name=name)
+                instance = model.objects.get(name=name)
             instance.delete()
         except Exception as e:
             print(e)
@@ -179,9 +220,9 @@ class Command(BaseCommand):
 
         """
 
-        entity = self.get_orm_entity(extension_type)
+        model = self.get_model(extension_type)
         try:
-            instances = entity.objects.all()
+            instances = model.objects.all()
             for instance in instances:
                 if extension_type == "datatype":
                     print(instance.datatype)
