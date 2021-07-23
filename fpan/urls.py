@@ -31,8 +31,6 @@ urlpatterns = [
     url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
     url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
-    url(r'^management_areas/$', scout.management_areas_dropdown, name='management_areas_dropdown'),
-    url(r'^management_agencies/$', scout.management_agencies_dropdown, name='management_agencies_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
     #url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
     url(
@@ -40,13 +38,7 @@ urlpatterns = [
         api.MVT.as_view(),
         name="mvt",
     ),
-    url(r'^auth/user_profile$', UserProfileView.as_view(), name='user_profile'),
-    url(r'^auth/get_client_id$', GetClientIdView.as_view(), name='get_client_id'),
-    url(r'^auth/password$', auth.change_password, name='change_password'),
-    url(r'^auth/(?P<login_type>[\w-]+)', auth.auth, name='auth'),
-    url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
-        auth.activate, name='activate'),
-    url(r'^auth/', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
+
     url(r"api/lookup$", api.ResourceIdLookup.as_view(), name="resource_lookup"),
 
     # the following are just pass through views so FPAN can add custom permissions
@@ -57,6 +49,10 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, FPANResourceTiles.as_view(), name="resource_tiles"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
+
+    url(r"^auth/", auth.LoginView.as_view(), name="auth"),
+    url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
+        auth.activate, name='activate'),
 
     url(r'^', include('arches.urls')),
 ]
