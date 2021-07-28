@@ -51,14 +51,14 @@ a, li a, .search-candidate-title, .search-candidate-link, .btn-link, a.a-anonymo
     color: #273675;
 }
 a:hover, li a:hover, .btn-link:hover, a.a-anonymous:hover, li a.a-anonymous:hover, .btn-link-anonymous:hover, a.a-admin:hover, li a.a-admin:hover, .btn-link-admin:hover {
-    color: #0059b3;
+    color: #007fff;
     text-decoration: underline;
 }
 a.a-scout:hover, li a.ascout:hover, .btn-link-scout:hover {
-    color: #5ec5b9;
+    color: #F26422;
 }
 a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
-    color: #525e91;
+    color: #273675;
 }
 .body-scout .btn-success, .body-hms .btn-success {
     background-color:#f26422;
@@ -409,12 +409,7 @@ input[type='text'] {
 .footer {
     text-align: center;
 }
-#footer a.a-scout, .body-hms #footer a.a-anonymous {
-    color: white;
-}
-#footer a.a-scout:hover, .body-hms #footer a.a-anonymous:hover {
-    color: white;
-}
+
 .title-v1 {
     margin-bottom: 0px;
 }
