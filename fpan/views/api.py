@@ -11,7 +11,8 @@ from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.utils.response import JSONResponse
 
-from hms.utils import get_resource_instance_access
+from hms.models import UserXResourceInstanceAccess
+from fpan.search.components.site_filter import SiteFilter
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class MVT(APIBase):
                 models.UserProfile.objects.create(user=request.user)
             except IntegrityError as e:
                 logger.warning(e)
-                #raise Http404()
+                raise Http404()
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         try:
             node = models.Node.objects.get(nodeid=nodeid, nodegroup_id__in=viewable_nodegroups)
@@ -47,23 +48,21 @@ class MVT(APIBase):
             #     geom = rules["geometry"]
             #     # ST_SetSRID({geom}, 4236)
             #     resid_where = f"ST_Intersects(geom, ST_Transform('{geom}', 3857))"
-            # else:
 
-            access_info = get_resource_instance_access(
-                request.user,
-                graphid=str(node.graph_id)
-            )
-
+            access_info = SiteFilter().get_rules(request.user, str(node.graph_id))
             if access_info["access_level"] == "full_access":
                 # set extra where clause to match everything
                 resid_where = "NULL IS NULL"
             elif access_info["access_level"] == "no_access":
                 return self.EMPTY_TILE
             else:
-                resids = access_info["id_list"]
+                resids = UserXResourceInstanceAccess.objects.filter(
+                        user=request.user,
+                        resource__graph_id=str(node.graph_id),
+                    ).values_list("resource__resourceinstanceid", flat=True)
                 if len(resids) == 0:
                     return self.EMPTY_TILE
-                resid_str = "','".join(resids)
+                resid_str = "','".join([str(i) for i in ok])
                 resid_where = f"resourceinstanceid IN ('{resid_str}')"
 
             with connection.cursor() as cursor:
@@ -75,10 +74,6 @@ class MVT(APIBase):
                     'y': y,
                     'resid_where': resid_where,
                 }
-
-                # TODO: when we upgrade to PostGIS 3, we can get feature state
-                # working by adding the feature_id_name arg:
-                # https://github.com/postgis/postgis/pull/303
 
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)

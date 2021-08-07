@@ -190,7 +190,7 @@ if not DEBUG:
     # seemed to fix the infamous logout issue - July 2021
     #SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     #SESSION_SAVE_EVERY_REQUEST = True
-    SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+    #SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 # set log level to info, unless debug is true (which would be set in settings_local.py
 LOG_LEVEL = 'INFO'
