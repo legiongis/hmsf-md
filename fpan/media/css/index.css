@@ -429,3 +429,16 @@ input[type='text'] {
 .calendar.picker {
     position: relative;
 }
+.fpan-related-report .rp-section-title {
+  padding-left: 15px;
+}
+.fpan-related-report .rp-report-tile {
+  padding-left: 95px;
+}
+.fpan-related-report .rp-report-tile .dl-horizontal dt {
+  text-align: left;
+}
+.fpan-related-report a.btn {
+  margin-left: 80px;
+  margin-top: 10px;
+}
