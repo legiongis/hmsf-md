@@ -35,21 +35,17 @@ details = {
 
 class SiteFilter(BaseSearchFilter):
 
-    def __init__(self, request=None):
-
-        self.request = request
-        self.existing_query = False
-        self.doc_types = []
-        self.paramount = Bool()
-
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+
+        self.paramount = Bool()
 
         ## set some class properties here, as this is the access method Arches uses
         ## to instantiate this object.
         self.doc_types = self.get_doc_types(self.request)
 
-        original_dsl = search_results_object["query"]._dsl
         ## manual test to see if any criteria have been added to the query yet
+        self.existing_query = False
+        original_dsl = search_results_object["query"]._dsl
         try:
             if original_dsl['query']['match_all'] == {}:
                 self.existing_query = True
@@ -473,6 +469,8 @@ class SiteFilter(BaseSearchFilter):
         ids that the user is NOT allowed to access.
         """
 
+        self.paramount = Bool()
+
         response = {
             "access_level": "partial_access",
             "id_list": []
@@ -488,7 +486,25 @@ class SiteFilter(BaseSearchFilter):
             response["access_level"] = "no_access"
             return response
 
-        results = self.quick_query(rules, graphid)
+        try:
+            if rules["access_level"] == "attribute_filter":
+                self.add_attribute_filter_clause(graphid, rules["filter_config"])
+
+            elif rules["access_level"] == "geo_filter":
+                self.add_geo_filter_clause(graphid, rules["filter_config"]["geometry"])
+
+            se = SearchEngineFactory().create()
+            query = Query(se, start=0, limit=10000)
+            query.include('graph_id')
+            query.include('resourceinstanceid')
+            query.add_query(self.paramount)
+
+            ## doc_type is deprecated, must use a filter for graphid instead (i think)
+            results = query.search(index='resources', doc_type=graphid)
+
+        except Exception as e:
+            print(e)
+            results = self.quick_query(rules, graphid)
 
         resourceids = list(set([i['_source']['resourceinstanceid'] for i in results['hits']['hits']]))
 
