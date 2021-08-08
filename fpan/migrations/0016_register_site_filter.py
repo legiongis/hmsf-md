@@ -7,14 +7,14 @@ from django.core import management
 def load_site_filter(apps, schema_editor):
 
     management.call_command(
-        "extension", "register", "search",
+        "extension", "search", "register",
         source="fpan/search/components/site_filter.py"
     )
 
 def remove_site_filter(apps, schema_editor):
 
     management.call_command(
-        "extension", "unregister", "search",
+        "extension", "search", "unregister",
         name="Site Filter"
     )
 
