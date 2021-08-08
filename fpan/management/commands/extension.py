@@ -34,13 +34,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
 
         parser.add_argument(
-            "operation",
-            choices=["register", "unregister", "list", "update"]
+            "extension_type",
+            choices=["widget", "datatype", "search"]
         )
 
         parser.add_argument(
-            "extension_type",
-            choices=["widget", "datatype", "search"]
+            "operation",
+            choices=["register", "unregister", "list", "update"]
         )
 
         parser.add_argument(
