@@ -20,6 +20,7 @@ class Command(BaseCommand):
 
     matched = {}
     no_match = {}
+    missing_res_list = []
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run",
@@ -32,15 +33,25 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        self.region_lookup = {
+            "Central": str(ManagementArea.objects.get(name="FPAN Central Region").pk),
+            "East Central": str(ManagementArea.objects.get(name="FPAN East Central Region").pk),
+            "North Central": str(ManagementArea.objects.get(name="FPAN North Central Region").pk),
+            "Northeast": str(ManagementArea.objects.get(name="FPAN Northeast Region").pk),
+            "Northwest": str(ManagementArea.objects.get(name="FPAN Northwest Region").pk),
+            "Southeast": str(ManagementArea.objects.get(name="FPAN Southeast Region").pk),
+            "Southwest": str(ManagementArea.objects.get(name="FPAN Southwest Region").pk),
+            "West Central": str(ManagementArea.objects.get(name="FPAN West Central Region").pk), 
+        }
+
         for graph_name in ["Archaeological Site", "Historic Cemetery", "Historic Structure"]:
-            self.process_graph(graph_name)
+            self.process_graph(graph_name, dry_run=options['dry_run'], resourceid=options["resourceid"])
 
         self.report()
 
     def value_to_pk(self, value_uuid):
 
         v = Value.objects.get(pk=value_uuid)
-        # print(v.__dict__)
         print(f"{value_uuid} --> {v.value}")
         try:
             ma = ManagementArea.objects.get(name=v.value)
@@ -48,110 +59,126 @@ class Command(BaseCommand):
             ma = None    
         return ma
 
-    def process_graph(self, graph_name):
+    def values_to_strings(self, value_uuid_list):
 
+        if value_uuid_list is None:
+            return list()
+        if not isinstance(value_uuid_list, list):
+            value_uuid_list = [value_uuid_list]
+        if len(value_uuid_list) == 0:
+            return list()
+
+        outlist = list()
+        for value in value_uuid_list:
+            v = Value.objects.get(pk=value)
+            outlist.append(v.value)
+ 
+        return outlist
+
+    def process_graph(self, graph_name, dry_run=False, resourceid=None):
         print(f"\n -- {graph_name} --")
 
-        old_node = Node.objects.get(name="Managed Area Name", graph__name=graph_name)
-        old_nodeid = str(old_node.nodeid)
-        tiles = Tile.objects.filter(nodegroup_id=old_node.nodegroup)
+        g = Graph.objects.get(name=graph_name)
 
+        self.node_lookup = {
+            # old nodes
+            "Managing Agency": Node.objects.get(name="Managing Agency", graph=g), 
+            "Managed Area Name": Node.objects.get(name="Managed Area Name", graph=g),
+            "HMS-Region": Node.objects.get(name="HMS-Region", graph=g),
+             # new node
+            "Management Area": Node.objects.get(name="Management Area", graph=g),
+            "Management Agency": Node.objects.get(name="Management Agency", graph=g),
+            "FPAN Region": Node.objects.get(name="FPAN Region", graph=g),
+            "County": Node.objects.get(name="County", graph=g),
+        }
+
+        tiles = Tile.objects.filter(nodegroup_id=self.node_lookup["Managing Agency"].nodegroup)
         tiles_ct = tiles.count()
         print(tiles_ct)
 
         for n, tile in enumerate(tiles, start=1):
+            
+            resid = str(tile.resourceinstance_id)
+            if resourceid and resid != resourceid:
+                continue
+
             if n % 1000 == 0:
                 print(f"{n}, ", end="", flush=True)
             if n == tiles_ct:
                 print(f"{n} - done")
-            resid = str(tile.resourceinstance_id)
-            old_value = tile.data.get(old_nodeid, None)
 
-            if old_value is not None:
-                # if not isinstance(old_value, list):
-                #     print(type(old_value))
-                #     print(old_value)
-                for value_uuid in old_value:
+            self.process_tile(tile, dry_run=dry_run)
+    
+    def process_tile(self, tile, dry_run=False):
 
-                    area_name = Value.objects.get(pk=value_uuid).value
-                    mas = ManagementArea.objects.filter(name=area_name)
-                    if len(mas) >= 1:
-                        ma = mas[0]
-                        self.matched.update({area_name: self.matched.get(area_name, 0) + 1})
-                    else:
-                        self.no_match.update({area_name: self.no_match.get(area_name, 0) + 1})
+        resid = str(tile.resourceinstance_id)
+
+        area_old = tile.data.get(str(self.node_lookup["Managed Area Name"].nodeid), [])
+        agency_old = tile.data.get(str(self.node_lookup["Managing Agency"].nodeid), [])
+        region_old = tile.data.get(str(self.node_lookup["HMS-Region"].nodeid), [])
+
+        area_old_s = self.values_to_strings(area_old)
+        agency_old_s = self.values_to_strings(agency_old)
+        region_old_s = self.values_to_strings(region_old)
+
+        area_new = self.translate_management_areas(area_old_s, resid)
+        agency_new = self.translate_management_agency(agency_old_s)
+        region_new = self.translate_region(region_old_s)
+
+        if dry_run is False:
+
+            new_ngid = self.node_lookup["Management Area"].nodegroup_id
+            try:
+                new_tile = Tile.objects.get(nodegroup_id=new_ngid, resourceinstance_id=resid)
+            except Tile.DoesNotExist:
+                new_tile = Tile().get_blank_tile_from_nodegroup_id(new_ngid, resourceid=resid)
+            
+            new_tile.data = {
+                str(self.node_lookup["Management Area"].nodeid): area_new,
+                str(self.node_lookup["Management Agency"].nodeid): agency_new,
+                str(self.node_lookup["FPAN Region"].nodeid): region_new,
+                str(self.node_lookup["County"].nodeid): [],
+            }
+            new_tile.save(log=False)
+
+    def translate_management_areas(self, old_value, resid):
+
+        output = list()
+        for ma_name in old_value:
+            mas = ManagementArea.objects.filter(name=ma_name)
+            if len(mas) >= 1:
+                ma = mas[0]
+                output.append(str(ma.pk))
+                self.matched.update({ma_name: self.matched.get(ma_name, 0) + 1})
+            else:
+                self.no_match.update({ma_name: self.no_match.get(ma_name, 0) + 1})
+                self.missing_res_list.append((ma_name, resid))
+
+        return output
+
+    def translate_management_agency(self, old_value):
+        agency_lookup = {
+            "FL Dept. of Environmental Protection, Div. of Recreation and Parks": "FSP",
+            "FL Dept. of Agriculture and Consumer Services, Florida Forest Service": "FFS",
+            "FL Fish and Wildlife Conservation Commission": "FWCC",
+            "FL Dept. of Environmental Protection, Florida Coastal Office": "FCO",
+            "FL Dept. of Environmental Protection, Office of Water Policy": "OWP",
+        }
+
+        return [agency_lookup[i] for i in old_value]
+
+    def translate_region(self, old_value):
+
+        return [self.region_lookup[i] for i in old_value]
 
     def report(self):
 
+        print(f"matched: {len(self.matched)}")
         print("NO MATCH FOUND:")
         for k, v in self.no_match.items():
             print(f"{k}")
         print(f"unmatched: {len(self.no_match)}")
-        print(f"matched: {len(self.matched)}")
-
-                # break
-
-            ## split by , then by - and ; to extract names
-        #     unames1 = [i.lstrip().rstrip().lower() for i in old_value.split(",")]
-        #     unames = []
-        #     for un in unames1:
-        #         if "-" in un:
-        #             unames += un.split("-")
-        #         elif ";" in un:
-        #             unames += un.split(";")
-        #         else:
-        #             unames.append(un)
-        #
-        #     matched_users = []
-        #     for uname in unames:
-        #         uname = uname.lstrip().rstrip()
-        #         if uname in lookups_flat:
-        #             uname = lookups_flat[uname]
-        #         try:
-        #             u = User.objects.get(username__lower=uname)
-        #             matched_users.append(u)
-        #         except User.DoesNotExist:
-        #             if not uname in unmatched:
-        #                 unmatched[uname] = 1
-        #             else:
-        #                 unmatched[uname] += 1
-        #
-        #     new_value = [str(i.pk) for i in matched_users]
-        #     if len(unames) == len(new_value):
-        #         match = "Full"
-        #         full_matched += 1
-        #     elif len(new_value) > 0:
-        #         match = "Partial"
-        #         partial_matched += 1
-        #     else:
-        #         unmatched_ct += 1
-        #
-        #     if options['dry_run'] is True:
-        #         print(f"{resid}: {old_value} --> {','.join([str(i.username) for i in matched_users])}")
-        #     else:
-        #         Tile().update_node_value(new_nodeid, new_value, tileid=tile.tileid)
-        #         if match == "Full" and options['erase'] is True:
-        #             Tile().update_node_value(old_nodeid, None, tileid=tile.tileid)
-        #
-        #         rows.append((
-        #             resid,
-        #             old_value,
-        #             ",".join([str(i.username) for i in matched_users]),
-        #             match
-        #         ))
-        #
-        # unmatched_frequency = sorted(unmatched.items(), key=lambda x:x[1])
-        # for k in unmatched_frequency:
-        #     print(k)
-        #
-        # print(f"full matches: {full_matched}")
-        # print(f"partial matches: {partial_matched}")
-        # print(f"unmatched: {unmatched_ct}")
-        #
-        # if len(rows) > 0:
-        #     timestamp = datetime.now().strftime("%m-%d-%Y")
-        #     filename = f"scout_id_transfer-{timestamp}.csv"
-        #     outfile = os.path.join(settings.LOG_DIR, filename)
-        #     with open(outfile, "w") as out:
-        #         writer = csv.writer(out)
-        #         writer.writerows(rows)
+        print("unmatched details:")
+        self.missing_res_list.sort()
+        for i in self.missing_res_list:
+            print(i)
