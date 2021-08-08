@@ -17,8 +17,6 @@ def make_widget_data():
         "selected": "false",
         "text": i[1]
     } for i in general_areas.order_by("display_name").values_list("pk", "display_name") ]
-    for i in general_areas:
-        print(i)
 
     fpan_regions = [{
         "id": str(i[0]),
