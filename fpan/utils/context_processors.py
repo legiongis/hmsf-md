@@ -17,7 +17,6 @@ except ImportError:
 from .permission_backend import user_is_land_manager, user_is_scout
 
 def widget_data(request):
-    print(f"starting request: {request.path}")
 
     widget_views = ["resource", "graph_designer", "report", "add-resource"]
 
