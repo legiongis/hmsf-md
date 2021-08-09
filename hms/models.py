@@ -109,6 +109,12 @@ class LandManager(models.Model):
         related_name="landmanager",
         on_delete=models.CASCADE
     )
+    username = models.CharField(
+        null=True,
+        blank=True,
+        max_length=200,
+        editable=False,
+    )
     management_agency = models.ForeignKey(
         "ManagementAgency",
         null=True,
@@ -138,6 +144,10 @@ class LandManager(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    def save(self, *args, **kwargs):
+        self.username = self.user.username
+        super(LandManager, self).save(*args, **kwargs)
 
     @property
     def all_areas(self):

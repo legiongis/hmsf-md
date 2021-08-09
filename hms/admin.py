@@ -30,6 +30,8 @@ admin.site.register(Scout, ScoutProfileAdmin)
 
 class LandManagerAdmin(admin.ModelAdmin):
     filter_horizontal = ('individual_areas', 'grouped_areas')
+    search_fields = ('username', )
+    readonly_fields = ('username', )
 
     # this is how the allowed resources table is updated on save()
     # it needs to be here so that the m2m field is properly updated before the
