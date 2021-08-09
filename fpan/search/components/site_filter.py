@@ -470,6 +470,7 @@ class SiteFilter(BaseSearchFilter):
         """
 
         self.paramount = Bool()
+        self.existing_query = False
 
         response = {
             "access_level": "partial_access",
