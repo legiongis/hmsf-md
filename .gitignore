@@ -10,6 +10,8 @@ fpan/logs/*.json
 fpan/logs/*.csv
 CACHE
 
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,8 @@
+{
+    "widgetid":"2d29abba-cbd9-11e7-b225-94659cf754d0",
+    "name": "county-widget",
+    "component": "views/components/widgets/county-widget",
+    "defaultconfig": {"placeholder": "Select an option", "defaultValue": ""},
+    "helptext": "",
+    "datatype": "management-area-datatype"
+}

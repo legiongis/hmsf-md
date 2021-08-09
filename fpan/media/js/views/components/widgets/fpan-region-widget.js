@@ -14,7 +14,7 @@ define([
      * @param {string} params.config.placeholder - default text to show in the select input
      * @param {string} params.config.options -
      */
-    return ko.components.register('management-area-widget', {
+    return ko.components.register('fpan-region-widget', {
         viewModel: function(params) {
             params.configKeys = ['placeholder', 'defaultValue'];
 
@@ -24,7 +24,7 @@ define([
             if (!params.node.configKeys) {
               params.node.configKeys = {};
             }
-            params.node.config.options = ko.observableArray(widgetData.dropdownLists.generalAreas)
+            params.node.config.options = ko.observableArray(widgetData.dropdownLists.fpanRegions)
 
             DomainWidgetViewModel.apply(this, [params]);
 

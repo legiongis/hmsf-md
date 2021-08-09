@@ -1,0 +1,8 @@
+{
+    "widgetid":"2d298980-abba-11e7-b225-94659cf754d0",
+    "name": "fpan-region-widget",
+    "component": "views/components/widgets/fpan-region-widget",
+    "defaultconfig": {"placeholder": "Select an option", "defaultValue": ""},
+    "helptext": "",
+    "datatype": "management-area-datatype"
+}

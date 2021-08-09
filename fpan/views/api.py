@@ -62,7 +62,7 @@ class MVT(APIBase):
                     ).values_list("resource__resourceinstanceid", flat=True)
                 if len(resids) == 0:
                     return self.EMPTY_TILE
-                resid_str = "','".join([str(i) for i in ok])
+                resid_str = "','".join([str(i) for i in resids])
                 resid_where = f"resourceinstanceid IN ('{resid_str}')"
 
             with connection.cursor() as cursor:

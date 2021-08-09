@@ -1,0 +1,8 @@
+{
+    "widgetid":"2d298980-cbd9-abba-b225-94659cf754d0",
+    "name": "management-agency-widget",
+    "component": "views/components/widgets/management-agency-widget",
+    "defaultconfig": {"placeholder": "Select an option", "defaultValue": ""},
+    "helptext": "",
+    "datatype": "management-area-datatype"
+}

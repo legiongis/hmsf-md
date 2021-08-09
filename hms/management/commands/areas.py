@@ -1,8 +1,10 @@
 import os
+import psycopg2
 from datetime import datetime
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.geos import MultiPolygon, Polygon
+from django.contrib.gis.geos import MultiPolygon
 
 from hms.models import (
     ManagementArea,
@@ -19,7 +21,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             'operation',
-            choices=["load", "remove", "load-ids", "migrate-legacy-areas"],
+            choices=["load", "remove", "load-ids", "migrate-legacy-areas",
+                     "make-views", "refresh-views", "drop-views"],
             help="Specify the operation to carry out.",
         )
         parser.add_argument(
@@ -40,7 +43,8 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             '--category',
-            help='Category of these areas. Allows creation of new category on load.',
+            help='Category of these areas. Allows creation of new category on load. '\
+                 'If operation is make-views, only the view for this category will be made. ',
         )
         parser.add_argument(
             '--level',
@@ -59,13 +63,22 @@ class Command(BaseCommand):
             self.quiet = True
 
         if options['operation'] == "load":
-            self.load_areas(options['source'], options['group_names'], options['level'], options['category'])
+            self.load_areas(options['source'],
+                            options['group_names'],
+                            options['level'],
+                            options['category'])
         if options['operation'] == "remove":
             self.remove_areas(options['load_id'])
         if options['operation'] == "load-ids":
             self.list_load_ids()
         if options['operation'] == "migrate-legacy-areas":
             self.migrate_legacy_areas()
+        if options['operation'] == "make-views":
+            self.make_views(category=options["category"])
+        if options['operation'] == "refresh-views":
+            self.refresh_views(category=options["category"])
+        if options['operation'] == "drop-views":
+            self.drop_views(category=options["category"])
 
     def load_areas(self, source, group_names, level="", category=""):
 
@@ -131,6 +144,10 @@ class Command(BaseCommand):
 
         print(f"{load_ct} Management Areas loaded.")
         print(f"load id: {load_id}")
+
+        print("recreating materialized views")
+        self.make_views()
+
         print(f"to undo to this load, run:")
         print(f"\n    python manage.py areas remove --load-id {load_id}\n")
 
@@ -169,6 +186,9 @@ class Command(BaseCommand):
         if response.lower().startswith("n"):
             exit()
         ma.delete()
+    
+        print("recreating materialized views")
+        self.make_views()
 
     def list_load_ids(self):
 
@@ -285,3 +305,93 @@ class Command(BaseCommand):
             print(f"load id: {load_id}")
             print(f"to undo to this load, run:")
             print(f"\n    python manage.py areas remove --load-id {load_id}\n")
+    
+    def make_hms_viewname(self, basename):
+
+        prefix = "mv_hms"
+        name = basename.lower().replace(" ", "_").replace("-", "_")
+        view_name = f"{prefix}_{name}"
+
+        return view_name
+
+    def make_views(self, category=""):
+
+        db = settings.DATABASES['default']
+        db_conn = "dbname = {} port = {} user = {} host = {} password = {}".format(
+            db['NAME'],db['PORT'],db['USER'],db['HOST'],db['PASSWORD'])
+        conn = psycopg2.connect(db_conn)
+
+        for cat in ManagementAreaCategory.objects.all():
+
+            if category and cat.name != category:
+                continue
+
+            view_name = self.make_hms_viewname(cat.name)
+
+            print(f"category: {cat.name}")
+            print(f"creating materialized view {view_name}")
+            
+            sql = f"""
+            DROP MATERIALIZED VIEW IF EXISTS {view_name};
+            CREATE MATERIALIZED VIEW {view_name}
+            AS
+            SELECT * FROM hms_managementarea
+            WHERE category_id = {cat.pk};
+            """
+
+            with conn.cursor() as cursor:
+                cursor.execute(sql)
+            conn.commit()
+
+    def refresh_views(self, category=""):
+
+        db = settings.DATABASES['default']
+        db_conn = "dbname = {} port = {} user = {} host = {} password = {}".format(
+            db['NAME'],db['PORT'],db['USER'],db['HOST'],db['PASSWORD'])
+        conn = psycopg2.connect(db_conn)
+
+        for cat in ManagementAreaCategory.objects.all():
+
+            if category and cat.name != category:
+                continue
+            
+            view_name = self.make_hms_viewname(cat.name)
+
+            print(f"refreshing materialized view {view_name}")
+
+            with conn.cursor() as cursor:
+                cursor.execute(f"REFRESH MATERIALIZED VIEW {view_name};")
+            conn.commit()
+
+        conn.close()
+            
+    def drop_views(self, category=""):
+
+        db = settings.DATABASES['default']
+        db_conn = "dbname = {} port = {} user = {} host = {} password = {}".format(
+            db['NAME'],db['PORT'],db['USER'],db['HOST'],db['PASSWORD'])
+        conn = psycopg2.connect(db_conn)
+
+        mv_sql = """
+        SELECT relname FROM pg_class
+        WHERE relkind = 'm' AND relname LIKE 'mv_hms_%';
+        """
+
+        with conn.cursor() as cursor:
+            cursor.execute(mv_sql)
+            rows = cursor.fetchall()
+        
+            for row in rows:
+
+                view_name = row[0]
+                
+                if category:
+                    cat_view_name = self.make_hms_viewname(category)
+                    if not cat_view_name == view_name:
+                        continue
+                
+                print(f"dropping materialized view {view_name}")
+                cursor.execute(f"DROP MATERIALIZED VIEW {view_name}")
+                conn.commit()
+
+        conn.close()
