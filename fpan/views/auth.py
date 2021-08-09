@@ -50,25 +50,15 @@ class LoginView(View):
 
     def post(self, request):
         # POST request is taken to mean user is logging in
-
-        login_type = request.GET.get("t", "anonymous")
+        login_type = request.GET.get("t", "landmanager")
+        next = request.GET.get("next", None)
         username = request.POST.get("username", None)
         password = request.POST.get("password", None)
         user = authenticate(username=username, password=password)
 
-        # set next redirect based on user type if not previously specified
-        next = request.POST.get("next", None)
-        if next is None:
-            if login_type == "landmanager":
-                next = request.POST.get("next", reverse("state_home"))
-            elif login_type == "scout":
-                next = request.POST.get("next", reverse("hms_home"))
-            else:
-                next = request.POST.get("next", reverse("search_home"))
-
-        auth_attempt_success = True
         if user is not None and user.is_active:
 
+            auth_attempt_success = True
             # these conditionals ensure that scouts and land managers must
             # use the correct login portals
             if user_is_land_manager(user) and login_type != "landmanager":
@@ -81,6 +71,18 @@ class LoginView(View):
             if auth_attempt_success is True:
                 login(request, user)
                 user.password = ""
+
+                    # set next redirect based on user type if not previously set
+                if next is None:
+                    if user.is_superuser:
+                        next = request.POST.get("next", reverse("search_home"))
+                    elif user_is_land_manager(user):
+                        next = request.POST.get("next", reverse("state_home"))
+                    elif user_is_scout(user):
+                        next = request.POST.get("next", reverse("hms_home"))
+                    else:
+                        next = request.POST.get("next", reverse("search_home"))
+
                 return redirect(next)
 
         return render(request, "login.htm", {
