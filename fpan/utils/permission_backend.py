@@ -15,19 +15,14 @@ logger = logging.getLogger(__name__)
 def user_is_anonymous(user):
     return user.username == 'anonymous'
 
+def user_is_old_landmanager(user):
+    return user.groups.filter(name="Land Manager").exists()
+
+def user_is_new_landmanager(user):
+    return hasattr(user, "landmanager")
 
 def user_is_land_manager(user):
-
-    state_user = False
-
-    if hasattr(user, "landmanager"):
-        state_user = True
-
-    elif user.groups.filter(name="Land Manager").exists():
-        state_user = True
-
-    return state_user
-
+    return any([user_is_old_landmanager(user), user_is_new_landmanager(user)])
 
 def user_is_scout(user):
     return hasattr(user, "scout")
