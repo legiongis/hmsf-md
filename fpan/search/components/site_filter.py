@@ -7,7 +7,7 @@ from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, GeoShape, Nested, Match, Query
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.models.system_settings import settings
-from arches.app.models.models import GraphModel, Node
+from arches.app.models.models import GraphModel, Node, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 from fpan.utils.permission_backend import (
@@ -634,3 +634,40 @@ class SiteFilter(BaseSearchFilter):
         response["id_list"] = resourceids
 
         return response
+
+    def get_resource_list_from_es_query(self, rules, graphid, invert=False):
+        """
+        Returns the resourceinstanceids for all resources for a given graph
+        that match a set of rules. Set invert=True to return
+        ids that do NOT match this query.
+        """
+
+        self.paramount = Bool()
+        self.existing_query = False
+
+        if rules["access_level"] in ["full_access", "no_access"]:
+            return list()
+
+        if rules["access_level"] == "attribute_filter":
+            self.add_attribute_filter_clause(graphid, rules["filter_config"])
+
+        elif rules["access_level"] == "geo_filter":
+            self.add_geo_filter_clause(graphid, rules["filter_config"]["geometry"])
+
+        se = SearchEngineFactory().create()
+        query = Query(se, start=0, limit=10000)
+        query.include('graph_id')
+        query.include('resourceinstanceid')
+        query.add_query(self.paramount)
+
+        results = query.search(index='resources')
+
+        resourceids = list(set([i['_source']['resourceinstanceid'] for i in results['hits']['hits']]))
+
+        if invert is True:
+            i_resids = ResourceInstance.objects.filter(
+                graph_id=graphid
+            ).exclude(resourceinstanceid__in=resourceids).values_list("resourceinstanceid", flat=True)
+            resourceids = [str(i) for i in i_resids]
+
+        return resourceids
