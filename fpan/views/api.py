@@ -49,17 +49,14 @@ class MVT(APIBase):
             #     # ST_SetSRID({geom}, 4236)
             #     resid_where = f"ST_Intersects(geom, ST_Transform('{geom}', 3857))"
 
-            access_info = SiteFilter().get_rules(request.user, str(node.graph_id))
-            if access_info["access_level"] == "full_access":
-                # set extra where clause to match everything
+            graphid = str(node.graph_id)
+            graph_rules = SiteFilter().compile_rules(request.user, graph=graphid)
+            if graph_rules["access_level"] == "full_access":
                 resid_where = "NULL IS NULL"
-            elif access_info["access_level"] == "no_access":
+            elif graph_rules["access_level"] == "no_access":
                 return self.EMPTY_TILE
             else:
-                resids = UserXResourceInstanceAccess.objects.filter(
-                        user=request.user,
-                        resource__graph_id=str(node.graph_id),
-                    ).values_list("resource__resourceinstanceid", flat=True)
+                resids = SiteFilter().get_resource_list_from_es_query(graph_rules, graphid)
                 if len(resids) == 0:
                     return self.EMPTY_TILE
                 resid_str = "','".join([str(i) for i in resids])
