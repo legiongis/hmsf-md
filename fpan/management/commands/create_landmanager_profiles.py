@@ -29,12 +29,11 @@ class Command(BaseCommand):
         for u in users:
             if name and u.username != name:
                 continue
-            if hasattr(u, "landmanager"):
-                if overwrite is True:
-                    u.landmanager.delete()
-                else:
-                    continue
-            p = LandManager.objects.create(user=u)
+            p, created = LandManager.objects.get_or_create(user=u)
+            if not created and overwrite is False:
+                continue
+
+            self.set_agency(p)
 
             if u.groups.filter(name="FL_BAR").exists():
                 self.set_full_access(p)
@@ -43,26 +42,19 @@ class Command(BaseCommand):
                 self.set_full_access(p)
 
             elif u.groups.filter(name="FL_AquaticPreserve").exists():
-                self.set_agency_filter(p, "FCO")
+                self.set_agency_filter(p)
 
             elif u.username == "SPAdmin":
-                self.set_agency_filter(p, "FSP")
+                self.set_agency_filter(p)
 
             elif u.username == "SFAdmin":
-                self.set_agency_filter(p, "FFS")
-            
+                self.set_agency_filter(p)
+
             elif u.username.startswith("SPDistrict"):
                 m = ManagementAreaGroup.objects.get(name=f"SP District {u.username[-1]}")
-                p.apply_area_filter = True
-                p.save()
-                p.grouped_areas.add(m)
+                self.set_area_filter(p, grouped_areas=[m])
 
-                self.matched.append((p.user.username, "grouped area = " + m.name))
-            
             elif u.username.startswith("SJRWMD"):
-
-                p.apply_area_filter = True
-                p.save()
 
                 wmd_n = ManagementAreaGroup.objects.get(name="Water Management District - North")
                 wmd_nc = ManagementAreaGroup.objects.get(name="Water Management District - North Central")
@@ -72,59 +64,74 @@ class Command(BaseCommand):
                 wmd_w = ManagementAreaGroup.objects.get(name="Water Management District - West")
 
                 if u.username == "SJRWMD":
-                    p.grouped_areas.add(wmd_n) 
-                    p.grouped_areas.add(wmd_nc)
-                    p.grouped_areas.add(wmd_s)
-                    p.grouped_areas.add(wmd_sw)
-                    p.grouped_areas.add(wmd_sc)
-                    p.grouped_areas.add(wmd_w)
-                    self.matched.append((p.user.username, "grouped area = all WMD districts"))
+                    self.set_area_filter(p, grouped_areas=[wmd_sw, wmd_n, wmd_nc, wmd_s, wmd_sc, wmd_w])
                 elif u.username == "SJRWMD_NorthRegion" or u.username == "SJRWMD_North":
-                    p.grouped_areas.add(wmd_n)
-                    self.matched.append((p.user.username, "grouped area = " + wmd_n.name))
+                    self.set_area_filter(p, grouped_areas=[wmd_n])
                 elif u.username == "SJRWMD_NorthCentral":
-                    p.grouped_areas.add(wmd_nc)
-                    self.matched.append((p.user.username, "grouped area = " + wmd_nc.name))
+                    self.set_area_filter(p, grouped_areas=[wmd_nc])
                 elif u.username == "SJRWMD_West":
-                    p.grouped_areas.add(wmd_w)
-                    self.matched.append((p.user.username, "grouped area = " + wmd_w.name))
+                    self.set_area_filter(p, grouped_areas=[wmd_w])
                 elif u.username == "SJRWMD_South" or u.username == "SJRWMD_SouthRegion":
-                    p.grouped_areas.add(wmd_s)
-                    self.matched.append((p.user.username, "grouped area = " + wmd_s.name))
+                    self.set_area_filter(p, grouped_areas=[wmd_s])
                 elif u.username == "SJRWMD_Southwest":
-                    p.grouped_areas.add(wmd_sw)
-                    self.matched.append((p.user.username, "grouped area = " + wmd_sw.name))
+                    self.set_area_filter(p, grouped_areas=[wmd_sw])
                 elif u.username == "SJRWMD_SouthCentral":
-                    p.grouped_areas.add(wmd_sc)
-                    self.matched.append((p.user.username, "grouped area = " + wmd_sc.name))
+                    self.set_area_filter(p, grouped_areas=[wmd_sc])
 
             else:
                 try:
                     # if there is a single area matching this username,
                     # assume area permissions with that single area.
                     m = ManagementArea.objects.get(nickname=u.username)
-                    p.apply_area_filter = True
-                    p.save()
-                    p.individual_areas.add(m)
-
-                    self.matched.append((p.user.username, "area = " + m.name))
+                    self.set_area_filter(p, areas=[m])
 
                 except ManagementArea.DoesNotExist:
                     self.unmatched.append(p.user.username)
 
-    def set_agency_filter(self, profile, agency_code):
+    def set_agency(self, profile):
 
-        profile.agency = ManagementAgency.objects.get(pk=agency_code)
-        profile.apply_agency_filter = True
+        if profile.user.groups.filter(name="FL_AquaticPreserve").exists():
+            profile.management_agency_id = "FCO"
+        elif profile.user.groups.filter(name="FWC").exists():
+            profile.management_agency_id = "FWCC"
+        elif profile.user.groups.filter(name="FL_Forestry").exists():
+            profile.management_agency_id = "FFS"
+        elif profile.user.groups.filter(name="StatePark").exists():
+            profile.management_agency_id = "FSP"
+        elif profile.user.groups.filter(name="FL_WMD").exists():
+            profile.management_agency_id = "OWP"
+
         profile.save()
 
-        self.matched.append((profile.user.username, "agency = " + agency_code))
+    def set_area_filter(self, profile, areas=[], grouped_areas=[]):
+
+        profile.site_access_mode = "AREA"
+        profile.save()
+
+        if len(areas) > 0:
+            for area in areas:
+                profile.individual_areas.add(area)
+            l_str = " | ".join([i.name for i in areas])
+            self.matched.append((profile.user.username, "areas = " + l_str))
+
+        if len(grouped_areas) > 0:
+            for grouped_area in grouped_areas:
+                profile.grouped_areas.add(grouped_area)
+            l_str = " | ".join([i.name for i in grouped_areas])
+            self.matched.append((profile.user.username, "grouped areas = " + l_str))
+
+        profile.save()
+
+    def set_agency_filter(self, profile):
+
+        profile.site_access_mode = "AGENCY"
+        profile.save()
+        self.matched.append((profile.user.username, "agency = " + profile.management_agency.pk))
 
     def set_full_access(self, profile):
 
-        profile.full_access = True
+        profile.site_access_mode = "FULL"
         profile.save()
-
         self.matched.append((profile.user.username, "full"))
 
     def report(self):
