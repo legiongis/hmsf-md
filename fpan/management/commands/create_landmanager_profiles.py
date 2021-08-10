@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     help = 'Aug 9th 2021 - command to add LandManager profiles for all existing'\
         'Land Manager accounts (during transition to proper profiles'
-    
+
     matched = []
     unmatched = []
 
@@ -24,6 +24,10 @@ class Command(BaseCommand):
         self.report()
 
     def add_profiles(self, overwrite=False, name=None):
+
+        mock_nicknames = {}
+        for i in ManagementArea.objects.all():
+            mock_nicknames[self.attempt_nickname(i.name)] = i
 
         users = User.objects.filter(groups__name="Land Manager")
         for u in users:
@@ -86,7 +90,44 @@ class Command(BaseCommand):
                     self.set_area_filter(p, areas=[m])
 
                 except ManagementArea.DoesNotExist:
-                    self.unmatched.append(p.user.username)
+                    # final attempt to mock up nicknames if they don't exist
+                    if u.username in mock_nicknames:
+                        self.set_area_filter(p, areas=[mock_nicknames[u.username]])
+                    else:
+                        self.unmatched.append(p.user.username)
+
+    def attempt_nickname(self, name):
+
+        abbreviations = [
+            ("HistoricStatePark", "HSP"),
+            ("StateForestandPark", "SFP"),
+            ("StateForest", "SF"),
+            ("StatePark", "SP"),
+            ("StateTrail", "ST"),
+            ("NationalEstuarineResearchReserve", "NERR"),
+            ("AgriculturalandConservationEasement", "ACE"),
+            ("Wildlife Management Area", "WMA"),
+            ("WildlifeManagementArea", "WMA"),
+            ("WaterfowlManagementArea", "WMA"),
+            ("WildlifeandEnvironmentalArea", "WEA"),
+            ("ConservationBankConservationEasements", "CBCE"),
+            ("GopherTortoiseRecipientSites", "GTRS"),
+            ("Preserve", "Pres"),
+            ("GopherTortoiseRecipientSite", "GTRS"),
+            ("ConservationBankConservationEasement", "CBCE"),
+            ("ConservationEasement", "CE"),
+            ("PublicShootingRange", "PSR"),
+            ("JohnCandMarianaJones", "JCandMJ"),
+        ]
+
+        strip_chars = [" ",".","#","-","'"]
+        name = "".join([i for i in name if not i in strip_chars])
+
+        for o, a in abbreviations:
+            if o in name:
+                name = name.replace(o, a)
+
+        return name
 
     def set_agency(self, profile):
 
@@ -137,10 +178,12 @@ class Command(BaseCommand):
     def report(self):
 
         print("MATCHED")
+        self.matched.sort()
         for i in self.matched:
             print(i)
         print(f"{len(self.matched)} profiles added")
         print("\nUNMATCHED")
+        self.unmatched.sort()
         for i in self.unmatched:
             print(i)
         print(f"{len(self.unmatched)} still need profiles")
