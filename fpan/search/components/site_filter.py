@@ -78,14 +78,12 @@ class SiteFilter(BaseSearchFilter):
 
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
 
-        self.paramount = Bool()
-
         ## set some class properties here, as this is the access method Arches uses
         ## to instantiate this object.
-        self.doc_types = self.get_doc_types(self.request)
+        self.paramount = Bool()
+        self.existing_query = False
 
         ## manual test to see if any criteria have been added to the query yet
-        self.existing_query = False
         original_dsl = search_results_object["query"]._dsl
         try:
             if original_dsl['query']['match_all'] == {}:
@@ -119,7 +117,7 @@ class SiteFilter(BaseSearchFilter):
                 elif rule["access_level"] == "attribute_filter":
                     self.add_attribute_filter_clause(graphid, rule["filter_config"])
 
-                if rule["access_level"] == "geo_filter":
+                elif rule["access_level"] == "geo_filter":
                     self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
 
                 else:
@@ -247,6 +245,12 @@ class SiteFilter(BaseSearchFilter):
             self.paramount.must(nested)
 
     def add_attribute_filter_clause(self, graphid, filter_config):
+
+        if "value_list" not in filter_config:
+            if isinstance(filter_config["value"], list):
+                filter_config["value_list"] = filter_config["value"]
+            else:
+                filter_config["value_list"] = filter_config["value"]
 
         nested = self.create_nested_attribute_filter(
             graphid,
@@ -501,10 +505,13 @@ class SiteFilter(BaseSearchFilter):
         else:
             return no_access
 
-    def get_doc_types(self, request):
+    def get_doc_types(self, request=None):
         """ This is a more robust version of the analogous method in core Arches.
         It was moved here a long time ago, it's possible that current core Arches
         has been updated and this method could be removed to use that one."""
+
+        if request is None:
+            request = self.request
 
         all_resource_graphids = (
             GraphModel.objects.filter(isresource=True, isactive=True)
