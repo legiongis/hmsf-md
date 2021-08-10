@@ -33,6 +33,47 @@ details = {
 }
 
 
+def generate_no_access_filter():
+    return {"access_level": "no_access"}
+
+def generate_full_access_filter():
+    return {"access_level": "full_access"}
+
+def generate_attribute_filter(graph_name="", node_name="", value=[]):
+
+    nodegroup_id = None
+    if node_name and graph_name:
+        node = Node.objects.filter(
+            graph__name=graph_name,
+            name=node_name,
+        )
+        if len(node) == 1:
+            nodegroup_id = str(node[0].nodegroup_id)
+        else:
+            logger.warning(f"Error finding single node '{node_name}' in {graph_name}.")
+            return generate_no_access_filter(graph_name)
+
+    if not isinstance(value, list):
+        value = [value]
+
+    return {
+        "access_level": "attribute_filter",
+        "filter_config": {
+            "node_name": node_name,
+            "nodegroup_id": nodegroup_id,
+            "value": value
+        }
+    }
+
+def generate_geo_filter(geometry=None):
+    return {
+        "access_level": "geo_filter",
+        "filter_config": {
+            "geometry": geometry
+        }
+    }
+
+
 class SiteFilter(BaseSearchFilter):
 
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
