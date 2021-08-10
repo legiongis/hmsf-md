@@ -1,5 +1,10 @@
 from __future__ import unicode_literals
 
+import json
+from pygments import highlight
+from pygments.formatters.html import HtmlFormatter
+from pygments.lexers.data import JsonLexer
+
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User, Group
 from fpan.models import Region
@@ -7,9 +12,33 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.gis.geos import MultiPolygon
+from django.utils.safestring import mark_safe
 
 from arches.app.models.resource import Resource
-from arches.app.models.models import GraphModel
+from arches.app.models.graph import Graph
+
+from fpan.search.components.site_filter import (
+    SiteFilter,
+    generate_no_access_filter,
+    generate_attribute_filter,
+    generate_geo_filter,
+    generate_full_access_filter,
+)
+
+def format_json_display(data):
+    """very nice from here:
+    https://www.laurencegellert.com/2018/09/django-tricks-for-processing-and-storing-json/"""
+
+    content = json.dumps(data, indent=2)
+
+    # format it with pygments and highlight it
+    formatter = HtmlFormatter(style='colorful')
+    response = highlight(content, JsonLexer(), formatter)
+
+        # include the style sheet
+    style = "<style>" + formatter.get_style_defs() + "</style><br/>"
+
+    return mark_safe(style + response)
 
 class UserXResourceInstanceAccess(models.Model):
 
@@ -62,6 +91,34 @@ class ScoutProfile(models.Model):
 
     def regions(self):
         return self.region_choices
+
+    @property
+    def site_access_rules(self):
+
+        rules = {}
+        rules["Archaeological Site"] = generate_attribute_filter(
+            graph_name="Archaeological Site",
+            node_name="Assigned To",
+            value=self.user.username
+        )
+        return rules
+
+    @property
+    def accessible_sites(self):
+        graphid = str(Graph.objects.get(name="Archaeological Site").graphid)
+        arch_rules = self.site_access_rules["Archaeological Site"]
+        resids = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid)
+        return resids
+
+    def site_access_rules_formatted(self):
+        return format_json_display(self.site_access_rules)
+
+    site_access_rules_formatted.short_description = 'Derived Access Rules'
+
+    def accessible_sites_formatted(self):
+        return format_json_display(self.accessible_sites)
+
+    accessible_sites_formatted.short_description = 'Accessible Sites'
 
 
 @receiver(post_save, sender=Scout)
@@ -169,9 +226,63 @@ class LandManager(models.Model):
         return full_multi
 
     @property
+    def accessible_sites(self):
+        graphid = str(Graph.objects.get(name="Archaeological Site").graphid)
+        arch_rules = self.site_access_rules["Archaeological Site"]
+        resids = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid)
+        return resids
+
+    @property
     def filter_rules(self):
 
         rules = {"access_level": "", "":""}
+
+    @property
+    def site_access_rules(self):
+
+        rules = {}
+
+        if self.site_access_mode == "FULL":
+            rules["Archaeological Site"] = generate_full_access_filter()
+
+        elif self.site_access_mode == "AREA":
+            ## this was supposed to be a proper geo_filter as below, but
+            ## that doesn't allow for arbitrary assignment of nearby
+            ## management areas that don't spatially intersect.
+            # multipolygon = user.landmanager.areas_as_multipolygon
+            # rules["Archaeological Site"] = generate_geo_filter(
+            #   graph_name="Archaeological Site"
+            #   geometry=multipolygon,
+            # )
+
+            ## instead, apply attribute filter based on the names of
+            ## of associated areas.
+            value = ["<no area set>"]
+            if len(self.all_areas) > 0:
+                value = [i.name for i in self.all_areas]
+            rules["Archaeological Site"] = generate_attribute_filter(
+                graph_name="Archaeological Site",
+                node_name="Management Area",
+                value=value
+            )
+
+        elif self.site_access_mode == "AGENCY":
+
+            value = ["<no agency set>"]
+            if self.management_agency:
+                value = [self.management_agency.name]
+
+            rules["Archaeological Site"] = generate_attribute_filter(
+                graph_name="Archaeological Site",
+                node_name="Management Agency",
+                value=value
+            )
+        elif self.site_access_mode == "NONE":
+            rules["Archaeological Site"] = generate_no_access_filter()
+        else:
+            rules["Archaeological Site"] = generate_no_access_filter()
+
+        return rules
 
     def set_allowed_resources(self):
         """very confusingly, this method must be called from admin.LandManagerAdmin.save_related().
@@ -180,6 +291,16 @@ class LandManager(models.Model):
 
         from hms.utils import update_hms_permissions_table
         update_hms_permissions_table(user=self.user)
+
+    def site_access_rules_formatted(self):
+        return format_json_display(self.site_access_rules)
+
+    site_access_rules_formatted.short_description = 'Derived Access Rules'
+
+    def accessible_sites_formatted(self):
+        return format_json_display(self.accessible_sites)
+
+    accessible_sites_formatted.short_description = 'Accessible Sites'
 
 
 @receiver(post_save, sender=LandManager)
