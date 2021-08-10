@@ -103,41 +103,43 @@ class LandManager(models.Model):
     class Meta:
         verbose_name = "Land Manager"
         verbose_name_plural = "Land Managers"
+    
+    ACCESS_MODE_CHOICES = [
+        ("NONE", "NONE"),
+        ("AREA", "AREA"),
+        ("AGENCY", "AGENCY"),
+        ("FULL", "FULL"),
+    ]
+    ACCESS_MODE_HELP_TEXT = "<strong>NONE</strong> no access, "\
+        "<strong>AREA</strong> sites within specified areas or grouped areas, "\
+        "<strong>AGENCY</strong> sites managed by land manager's agency, "\
+        "<strong>FULL</strong> all sites"
 
     user = models.OneToOneField(
         User,
         related_name="landmanager",
         on_delete=models.CASCADE
     )
+    # this username field is only here to allow search within the admin interface
     username = models.CharField(
         null=True,
         blank=True,
         max_length=200,
         editable=False,
     )
+    site_access_mode = models.CharField(
+        max_length=20,
+        choices=ACCESS_MODE_CHOICES,
+        default="NONE",
+        help_text=ACCESS_MODE_HELP_TEXT,
+        blank=True,
+        null=True,
+    )
     management_agency = models.ForeignKey(
         "ManagementAgency",
         null=True,
         blank=True,
         on_delete=models.CASCADE
-    )
-    full_access = models.BooleanField(
-        default=False,
-        help_text="Give this user access to all Archaeological Sites.",
-    )
-    apply_agency_filter = models.BooleanField(
-        default=False,
-        help_text="Give this user access to all Archaeological Sites managed"\
-            "by their Agency (as defined above).",
-        blank=True,
-        null=True,
-    )
-    apply_area_filter = models.BooleanField(
-        default=False,
-        help_text="Give this user access to all Archaeological Sites within "\
-            "any of the specified areas or groups of areas below.",
-        blank=True,
-        null=True,
     )
     individual_areas = models.ManyToManyField("ManagementArea", blank=True)
     grouped_areas = models.ManyToManyField("ManagementAreaGroup", blank=True)
