@@ -105,10 +105,7 @@ class SiteFilter(BaseSearchFilter):
 
         try:
 
-            ## collect all of the graph-specific rules for this user
-            collected_rules = {}
-            for graphid in self.doc_types:
-                collected_rules[graphid] = self.get_rules(self.request.user, graphid)
+            collected_rules = self.compile_rules(self.request.user, graphlist=self.get_doc_types())
 
             ## iterate rules and generate a composite query based on them
             for graphid, rule in collected_rules.items():
@@ -174,6 +171,66 @@ class SiteFilter(BaseSearchFilter):
             print(e)
             logger.debug(e)
             raise(e)
+    
+    def compile_rules(self, user, graph=None, graphlist=[]):
+
+        ## handle input of single graphid or multiple graphids
+        if graph is not None:
+            graphids = [graph]
+        elif len(graphlist) > 0:
+            graphids = graphlist
+        else:
+            return {}
+
+        compiled_rules = {}
+        for graphid in graphids:
+            graph_name = GraphModel.objects.get(graphid=graphid).name
+
+            if user.is_superuser:
+                compiled_rules[graphid] = generate_full_access_filter()
+                continue
+
+            elif user_is_new_landmanager(user):
+                rule = user.landmanager.site_access_rules.get(graph_name)
+                if rule is None:
+                    rule = generate_full_access_filter()
+                compiled_rules[graphid] = rule
+
+            elif user_is_old_landmanager(user):
+                ## must retain old logic here until original land manager
+                ## system is fully deprecated.
+                compiled_rules[graphid] = self.get_rules(user, graphid)
+
+            elif user_is_scout(user):
+                rule = user.scout.scoutprofile.site_access_rules.get(graph_name)
+                if rule is None:
+                    rule = generate_full_access_filter()
+                compiled_rules[graphid] = rule
+
+            elif user_is_anonymous(user):
+                ## manual handling of public users here
+                if graph_name == "Archaeological Site":
+                    compiled_rules[graphid] = generate_attribute_filter(
+                        graph_name=graph_name,
+                        node_name="Assigned To",
+                        value=[user.username],
+                    )
+
+                elif graph_name == "Scout Report":
+                    compiled_rules[graphid] = generate_no_access_filter()
+
+                else:
+                    compiled_rules[graphid] = generate_full_access_filter()
+
+            else:
+                compiled_rules[graphid] = generate_no_access_filter()
+
+        ## return single ruleset if graph was provided, full dict
+        ## if graphlist was provided
+        if graph is not None:
+            return compiled_rules[graph]
+        else:
+            return compiled_rules
 
     def add_full_access_clause(self, graphid):
         self.paramount.should(Terms(field="graph_id", terms=graphid))
