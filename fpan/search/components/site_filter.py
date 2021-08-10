@@ -13,9 +13,9 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from fpan.utils.permission_backend import (
     user_is_anonymous,
     user_is_scout,
-    user_is_land_manager,
+    user_is_new_landmanager,
+    user_is_old_landmanager,
 )
-from hms.models import UserXResourceInstanceAccess
 
 logger = logging.getLogger(__name__)
 
@@ -78,7 +78,16 @@ class SiteFilter(BaseSearchFilter):
                 elif rule["access_level"] == "no_access":
                     self.add_no_access_clause(graphid)
 
+                elif rule["access_level"] == "attribute_filter":
+                    self.add_attribute_filter_clause(graphid, rule["filter_config"])
+
+                if rule["access_level"] == "geo_filter":
+                    self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
+
                 else:
+                    raise(Exception("Invalid rules for filter."))
+
+                # else:
                     # make called to access table and if under 1500 resources are
                     # allowed, then push all of these resource ids directly to
                     # the ES query. Otherwise, revert to using the actual
@@ -102,20 +111,16 @@ class SiteFilter(BaseSearchFilter):
                         # else:
                             # raise(Exception("Invalid rules for filter."))
 
-                    if hasattr(self.request.user, 'landmanager'):
-                        self.add_resourceid_filter_clause(graphid, self.request.user)
+                    # if hasattr(self.request.user, 'landmanager'):
+                    #     self.add_resourceid_filter_clause(graphid, self.request.user)
 
-                    else:
-                        if rule["access_level"] == "geo_filter":
-                            self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
-                            # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
+                    # else:
+                    #     if rule["access_level"] == "geo_filter":
+                    #         self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
+                    #         # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
 
-                        elif rule["access_level"] == "attribute_filter":
-                            # self.create_attribute_filter(graphid, rule["filter_config"])
-                            self.add_attribute_filter_clause(graphid, rule["filter_config"])
-
-                        else:
-                            raise(Exception("Invalid rules for filter."))
+                    #     else:
+                    #         raise(Exception("Invalid rules for filter."))
 
             search_results_object["query"].add_query(self.paramount)
 
@@ -157,19 +162,19 @@ class SiteFilter(BaseSearchFilter):
 
 
     def add_resourceid_filter_clause(self, graphid, user):
+        """incomplete at this time, but would pull a list of resource ids
+        from somewhere and put it in the query."""
 
-        allowed = UserXResourceInstanceAccess.objects.filter(
-            user=user,
-            resource__graph_id=graphid,
-        )
-        resids = [str(i.resource.resourceinstanceid) for i in allowed]
+        # resids = [str(i.resource.resourceinstanceid) for i in allowed]
 
-        new_resid_filter = Bool()
-        new_resid_filter.should(Terms(field='resourceinstanceid', terms=resids))
-        if self.existing_query:
-            self.paramount.should(new_resid_filter)
-        else:
-            self.paramount.must(new_resid_filter)
+        # new_resid_filter = Bool()
+        # new_resid_filter.should(Terms(field='resourceinstanceid', terms=resids))
+        # if self.existing_query:
+        #     self.paramount.should(new_resid_filter)
+        # else:
+        #     self.paramount.must(new_resid_filter)
+
+        pass
 
     def get_rules(self, user, doc_id):
 
@@ -209,23 +214,38 @@ class SiteFilter(BaseSearchFilter):
                 rules = copy.deepcopy(settings_perms[doc_id]['default'])
 
             # special handling of the state land manager permissions here
-            if user_is_land_manager(user):
-                ## TEMPORARY extra check to see if this is a 1.0 or 2.0 land manager
-                ## In the case of 2.0, don't use any settings. perms, handle it all
-                ## in here.
-                if hasattr(user, "landmanager"):
-                    if user.landmanager.full_access is True:
-                        rules = full_access
+            if user_is_old_landmanager(user):
+                rules = self.get_state_node_match(user)
 
-                    elif user.landmanager.apply_area_filter is True:
-                        multipolygon = user.landmanager.areas_as_multipolygon
-                        geo_filter["filter_config"]["geometry"] = multipolygon
-                        rules = geo_filter
+            elif user_is_new_landmanager(user):
 
-                    else:
-                        rules = no_access
+                if user.landmanager.full_access is True:
+                    rules = full_access
+
+                elif user.landmanager.apply_area_filter is True:
+                    ## this was supposed to be a proper geo_filter as below, but
+                    ## that doesn't allow for arbitrary assignment of nearby
+                    ## management areas.
+                    # multipolygon = user.landmanager.areas_as_multipolygon
+                    # geo_filter["filter_config"]["geometry"] = multipolygon
+                    # rules = geo_filter
+
+                    ## instead, apply attribute filter based on the names of
+                    ## of associated areas.
+                    attribute_filter["filter_config"]["node_name"] = "Management Area"
+                    attribute_filter["filter_config"]["value"] = [i.name for i in user.landmanager.all_areas]
+                    rules = attribute_filter
+
+                elif user.landmanager.apply_agency_filter is True:
+                    attribute_filter["filter_config"]["node_name"] = "Management Agency"
+                    attribute_filter["filter_config"]["value"] = [user.landmanager.management_agency.name]
+                    rules = attribute_filter
+
                 else:
-                    rules = self.get_state_node_match(user)
+                    rules = no_access
+
+            else:
+                rules = no_access
 
         ## do a little bit of processing on attribute filters to standardize
         ## their configs 1) change node name to nodegroupids 2) handle <username>
