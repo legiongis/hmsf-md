@@ -429,6 +429,9 @@ input[type='text'] {
 .calendar.picker {
     position: relative;
 }
+.fpan-related-report {
+  width: 100%;
+}
 .fpan-related-report .rp-section-title {
   padding-left: 15px;
 }
@@ -437,6 +440,7 @@ input[type='text'] {
 }
 .fpan-related-report .rp-report-tile .dl-horizontal dt {
   text-align: left;
+  width: 100%;
 }
 .fpan-related-report a.btn {
   margin-left: 80px;
