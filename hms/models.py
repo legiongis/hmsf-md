@@ -67,7 +67,22 @@ SITE_INTEREST_CHOICES = (
     ('Other', 'Other'),)
 
 class ScoutProfile(models.Model):
+
+    ACCESS_MODE_CHOICES = [
+        ("USERNAME=ASSIGNEDTO", "USERNAME=ASSIGNEDTO"),
+        ("FULL", "FULL"),
+    ]
+    ACCESS_MODE_HELP_SCOUT = "<strong>USERNAME=ASSIGNEDTO</strong> sites "\
+        "to which the scout has been assigned<br>"\
+        "<strong>FULL</strong> all sites"
+
     user = models.OneToOneField(Scout, on_delete=models.CASCADE)
+    site_access_mode = models.CharField(
+        max_length=20,
+        choices=ACCESS_MODE_CHOICES,
+        default="USERNAME=ASSIGNEDTO",
+        help_text=ACCESS_MODE_HELP_SCOUT,
+    )
     street_address = models.CharField(max_length=30)
     city = models.CharField(max_length=30)
     state = models.CharField(max_length=30, default='Florida')
@@ -96,11 +111,14 @@ class ScoutProfile(models.Model):
     def site_access_rules(self):
 
         rules = {}
-        rules["Archaeological Site"] = generate_attribute_filter(
-            graph_name="Archaeological Site",
-            node_name="Assigned To",
-            value=self.user.username
-        )
+        if self.site_access_mode == "FULL":
+            rules["Archaeological Site"] = generate_full_access_filter()
+        else:
+            rules["Archaeological Site"] = generate_attribute_filter(
+                graph_name="Archaeological Site",
+                node_name="Assigned To",
+                value=self.user.username
+            )
         return rules
 
     @property
@@ -167,9 +185,9 @@ class LandManager(models.Model):
         ("AGENCY", "AGENCY"),
         ("FULL", "FULL"),
     ]
-    ACCESS_MODE_HELP_TEXT = "<strong>NONE</strong> no access, "\
-        "<strong>AREA</strong> sites within specified areas or grouped areas, "\
-        "<strong>AGENCY</strong> sites managed by land manager's agency, "\
+    ACCESS_MODE_HELP_TEXT = "<strong>NONE</strong> no access<br>"\
+        "<strong>AREA</strong> sites within specified areas or grouped areas<br>"\
+        "<strong>AGENCY</strong> sites managed by land manager's agency<br>"\
         "<strong>FULL</strong> all sites"
 
     user = models.OneToOneField(
