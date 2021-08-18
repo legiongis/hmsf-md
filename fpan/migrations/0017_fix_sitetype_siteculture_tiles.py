@@ -2,6 +2,7 @@
 
 from django.db import migrations
 from arches.app.models.tile import Tile
+from arches.app.models.resource import Resource
 
 def fix_tiles(apps, schema_editor):
 
