@@ -4,6 +4,7 @@ fpan/uploadedfiles
 fpan/settings_local.py
 private_logs/
 fpan/static/
+fpan/management/commands/refdata/profile_migration_lists-Aug2021.json
 static/
 exports/
 fpan/logs/*.json

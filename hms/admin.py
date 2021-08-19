@@ -16,6 +16,7 @@ class ScoutProfileInline(admin.StackedInline):
     model = ScoutProfile
     verbose_name_plural = "Scout Profile"
     fk_name = 'user'
+    readonly_fields = ('site_access_rules_formatted', 'accessible_sites_formatted')
 
 class ScoutProfileAdmin(admin.ModelAdmin):
     search_fields = ["username", "first_name", "last_name"]
@@ -30,6 +31,9 @@ admin.site.register(Scout, ScoutProfileAdmin)
 
 class LandManagerAdmin(admin.ModelAdmin):
     filter_horizontal = ('individual_areas', 'grouped_areas')
+    search_fields = ('username', )
+    exclude = ('username', )
+    readonly_fields = ('site_access_rules_formatted', 'accessible_sites_formatted')
 
     # this is how the allowed resources table is updated on save()
     # it needs to be here so that the m2m field is properly updated before the

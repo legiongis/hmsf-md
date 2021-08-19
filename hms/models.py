@@ -1,5 +1,10 @@
 from __future__ import unicode_literals
 
+import json
+from pygments import highlight
+from pygments.formatters.html import HtmlFormatter
+from pygments.lexers.data import JsonLexer
+
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User, Group
 from fpan.models import Region
@@ -7,9 +12,33 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.gis.geos import MultiPolygon
+from django.utils.safestring import mark_safe
 
 from arches.app.models.resource import Resource
-from arches.app.models.models import GraphModel
+from arches.app.models.graph import Graph
+
+from fpan.search.components.site_filter import (
+    SiteFilter,
+    generate_no_access_filter,
+    generate_attribute_filter,
+    generate_geo_filter,
+    generate_full_access_filter,
+)
+
+def format_json_display(data):
+    """very nice from here:
+    https://www.laurencegellert.com/2018/09/django-tricks-for-processing-and-storing-json/"""
+
+    content = json.dumps(data, indent=2)
+
+    # format it with pygments and highlight it
+    formatter = HtmlFormatter(style='colorful')
+    response = highlight(content, JsonLexer(), formatter)
+
+        # include the style sheet
+    style = "<style>" + formatter.get_style_defs() + "</style><br/>"
+
+    return mark_safe(style + response)
 
 class UserXResourceInstanceAccess(models.Model):
 
@@ -38,7 +67,22 @@ SITE_INTEREST_CHOICES = (
     ('Other', 'Other'),)
 
 class ScoutProfile(models.Model):
+
+    ACCESS_MODE_CHOICES = [
+        ("USERNAME=ASSIGNEDTO", "USERNAME=ASSIGNEDTO"),
+        ("FULL", "FULL"),
+    ]
+    ACCESS_MODE_HELP_SCOUT = "<strong>USERNAME=ASSIGNEDTO</strong> sites "\
+        "to which the scout has been assigned<br>"\
+        "<strong>FULL</strong> all sites"
+
     user = models.OneToOneField(Scout, on_delete=models.CASCADE)
+    site_access_mode = models.CharField(
+        max_length=20,
+        choices=ACCESS_MODE_CHOICES,
+        default="USERNAME=ASSIGNEDTO",
+        help_text=ACCESS_MODE_HELP_SCOUT,
+    )
     street_address = models.CharField(max_length=30)
     city = models.CharField(max_length=30)
     state = models.CharField(max_length=30, default='Florida')
@@ -62,6 +106,37 @@ class ScoutProfile(models.Model):
 
     def regions(self):
         return self.region_choices
+
+    @property
+    def site_access_rules(self):
+
+        rules = {}
+        if self.site_access_mode == "FULL":
+            rules["Archaeological Site"] = generate_full_access_filter()
+        else:
+            rules["Archaeological Site"] = generate_attribute_filter(
+                graph_name="Archaeological Site",
+                node_name="Assigned To",
+                value=self.user.username
+            )
+        return rules
+
+    @property
+    def accessible_sites(self):
+        graphid = str(Graph.objects.get(name="Archaeological Site").graphid)
+        arch_rules = self.site_access_rules["Archaeological Site"]
+        resids = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid)
+        return resids
+
+    def site_access_rules_formatted(self):
+        return format_json_display(self.site_access_rules)
+
+    site_access_rules_formatted.short_description = 'Derived Access Rules'
+
+    def accessible_sites_formatted(self):
+        return format_json_display(self.accessible_sites)
+
+    accessible_sites_formatted.short_description = 'Accessible Sites'
 
 
 @receiver(post_save, sender=Scout)
@@ -103,11 +178,37 @@ class LandManager(models.Model):
     class Meta:
         verbose_name = "Land Manager"
         verbose_name_plural = "Land Managers"
+    
+    ACCESS_MODE_CHOICES = [
+        ("NONE", "NONE"),
+        ("AREA", "AREA"),
+        ("AGENCY", "AGENCY"),
+        ("FULL", "FULL"),
+    ]
+    ACCESS_MODE_HELP_TEXT = "<strong>NONE</strong> no access<br>"\
+        "<strong>AREA</strong> sites within specified areas or grouped areas<br>"\
+        "<strong>AGENCY</strong> sites managed by land manager's agency<br>"\
+        "<strong>FULL</strong> all sites"
 
     user = models.OneToOneField(
         User,
         related_name="landmanager",
         on_delete=models.CASCADE
+    )
+    # this username field is only here to allow search within the admin interface
+    username = models.CharField(
+        null=True,
+        blank=True,
+        max_length=200,
+        editable=False,
+    )
+    site_access_mode = models.CharField(
+        max_length=20,
+        choices=ACCESS_MODE_CHOICES,
+        default="NONE",
+        help_text=ACCESS_MODE_HELP_TEXT,
+        blank=True,
+        null=True,
     )
     management_agency = models.ForeignKey(
         "ManagementAgency",
@@ -115,29 +216,15 @@ class LandManager(models.Model):
         blank=True,
         on_delete=models.CASCADE
     )
-    full_access = models.BooleanField(
-        default=False,
-        help_text="Give this user access to all Archaeological Sites.",
-    )
-    apply_agency_filter = models.BooleanField(
-        default=False,
-        help_text="Give this user access to all Archaeological Sites managed"\
-            "by their Agency (as defined above).",
-        blank=True,
-        null=True,
-    )
-    apply_area_filter = models.BooleanField(
-        default=False,
-        help_text="Give this user access to all Archaeological Sites within "\
-            "any of the specified areas or groups of areas below.",
-        blank=True,
-        null=True,
-    )
     individual_areas = models.ManyToManyField("ManagementArea", blank=True)
     grouped_areas = models.ManyToManyField("ManagementAreaGroup", blank=True)
 
     def __str__(self):
         return self.user.username
+
+    def save(self, *args, **kwargs):
+        self.username = self.user.username
+        super(LandManager, self).save(*args, **kwargs)
 
     @property
     def all_areas(self):
@@ -157,9 +244,63 @@ class LandManager(models.Model):
         return full_multi
 
     @property
+    def accessible_sites(self):
+        graphid = str(Graph.objects.get(name="Archaeological Site").graphid)
+        arch_rules = self.site_access_rules["Archaeological Site"]
+        resids = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid)
+        return resids
+
+    @property
     def filter_rules(self):
 
         rules = {"access_level": "", "":""}
+
+    @property
+    def site_access_rules(self):
+
+        rules = {}
+
+        if self.site_access_mode == "FULL":
+            rules["Archaeological Site"] = generate_full_access_filter()
+
+        elif self.site_access_mode == "AREA":
+            ## this was supposed to be a proper geo_filter as below, but
+            ## that doesn't allow for arbitrary assignment of nearby
+            ## management areas that don't spatially intersect.
+            # multipolygon = user.landmanager.areas_as_multipolygon
+            # rules["Archaeological Site"] = generate_geo_filter(
+            #   graph_name="Archaeological Site"
+            #   geometry=multipolygon,
+            # )
+
+            ## instead, apply attribute filter based on the names of
+            ## of associated areas.
+            value = ["<no area set>"]
+            if len(self.all_areas) > 0:
+                value = [i.name for i in self.all_areas]
+            rules["Archaeological Site"] = generate_attribute_filter(
+                graph_name="Archaeological Site",
+                node_name="Management Area",
+                value=value
+            )
+
+        elif self.site_access_mode == "AGENCY":
+
+            value = ["<no agency set>"]
+            if self.management_agency:
+                value = [self.management_agency.name]
+
+            rules["Archaeological Site"] = generate_attribute_filter(
+                graph_name="Archaeological Site",
+                node_name="Management Agency",
+                value=value
+            )
+        elif self.site_access_mode == "NONE":
+            rules["Archaeological Site"] = generate_no_access_filter()
+        else:
+            rules["Archaeological Site"] = generate_no_access_filter()
+
+        return rules
 
     def set_allowed_resources(self):
         """very confusingly, this method must be called from admin.LandManagerAdmin.save_related().
@@ -168,6 +309,16 @@ class LandManager(models.Model):
 
         from hms.utils import update_hms_permissions_table
         update_hms_permissions_table(user=self.user)
+
+    def site_access_rules_formatted(self):
+        return format_json_display(self.site_access_rules)
+
+    site_access_rules_formatted.short_description = 'Derived Access Rules'
+
+    def accessible_sites_formatted(self):
+        return format_json_display(self.accessible_sites)
+
+    accessible_sites_formatted.short_description = 'Accessible Sites'
 
 
 @receiver(post_save, sender=LandManager)
