@@ -7,6 +7,7 @@ from arches.app.views.resource import (
     ResourceCards,
     ResourceReportView,
     RelatedResourcesView,
+    ResourceEditorView,
 )
 from arches.app.utils.decorators import (
     can_edit_resource_instance,
@@ -55,4 +56,9 @@ class FPANResourceReportView(ResourceReportView):
 @method_decorator(can_access_site_or_report, name="dispatch")
 @method_decorator(can_read_resource_instance, name="dispatch")
 class FPANRelatedResourcesView(RelatedResourcesView):
+    pass
+
+@method_decorator(can_access_site_or_report, name="dispatch")
+@method_decorator(can_read_resource_instance, name="dispatch")
+class FPANResourceEditorView(ResourceEditorView):
     pass

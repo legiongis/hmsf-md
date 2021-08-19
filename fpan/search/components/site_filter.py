@@ -189,6 +189,7 @@ class SiteFilter(BaseSearchFilter):
                 continue
 
             elif user_is_new_landmanager(user):
+                logger.debug(f"new land manager: {user.username}")
                 rule = user.landmanager.site_access_rules.get(graph_name)
                 if rule is None:
                     rule = generate_full_access_filter()
@@ -197,6 +198,7 @@ class SiteFilter(BaseSearchFilter):
             elif user_is_old_landmanager(user):
                 ## must retain old logic here until original land manager
                 ## system is fully deprecated.
+                logger.debug(f"old land manager: {user.username}")
                 compiled_rules[graphid] = self.get_rules(user, graphid)
 
             elif user_is_scout(user):
