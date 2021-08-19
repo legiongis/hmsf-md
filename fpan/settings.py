@@ -1,25 +1,31 @@
-"""
-Django settings for fpan project.
-"""
-
 import os
-import sys
-import arches
 import inspect
+from django.utils.translation import gettext_lazy as _
 
 try:
     from arches.settings import *
 except ImportError as e:
     pass
 
+DEBUG = False
+HTTPS = False
+MODE = "PROD"
+
 DOMAIN = "hms.fpan.us"
 GOOGLE_ANALYTICS_TRACKING_ID = None
 
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-STATICFILES_DIRS =  (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 LOG_DIR = os.path.join(APP_ROOT, "logs")
+
+MEDIA_ROOT = os.path.join(APP_ROOT)
+STATIC_ROOT = os.path.join(APP_ROOT, 'static')
+
+ROOT_URLCONF = 'fpan.urls'
+WSGI_APPLICATION = 'fpan.wsgi.application'
+
+STATICFILES_DIRS += (os.path.join(APP_ROOT, 'media'),)
 
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
@@ -33,6 +39,9 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_process
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.widget_data')
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
+
+INSTALLED_APPS += ('fpan', 'hms')
+
 ELASTICSEARCH_PREFIX = 'fpan'
 
 # manually disable the shapefile exporter class. This creates a 500 error if
@@ -41,13 +50,6 @@ RESOURCE_FORMATTERS['shp'] = None
 
 DISABLE_PROVISIONAL_EDITING = True
 HIDE_EMPTY_NODES_IN_REPORT = True
-
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-#         'LOCATION': 'fpan_cachetable',
-#     }
-# }
 
 ## example of the default filter that is applied to anonymous and Scout users.
 ## the land manager accounts don't reference this setting at all, their permissions
@@ -71,22 +73,27 @@ RESOURCE_MODEL_USER_RESTRICTIONS = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator', #Passwords cannot be entirely numeric
+        #Passwords cannot be entirely numeric
+        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
     },
     # {
-        # 'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator', #Passwords must contain special characters
+        # Passwords must contain special characters
+        # 'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
         # 'OPTIONS': {
             # 'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
         # }
     # },
     {
-        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator', #Passwords must contain 1 or more numbers
+        #Passwords must contain 1 or more numbers
+        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
     },
     {
-        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator', #Passwords must contain upper and lower characters
+        #Passwords must contain upper and lower characters
+        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
     },
     {
-        'NAME': 'arches.app.utils.password_validation.MinLengthValidator', #Passwords must meet minimum length requirement
+        #Passwords must meet minimum length requirement
+        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
         'OPTIONS': {
             'min_length': 6,
         }
@@ -96,53 +103,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '&cu1l36s)wxa@5yxefgdd-wkwpyw3tz2vru*ja@nh*r4*47^15'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-DATABASES = {
-    "default": {
-        "ATOMIC_REQUESTS": False,
-        "AUTOCOMMIT": True,
-        "CONN_MAX_AGE": 0,
-        "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "HOST": "localhost",
-        "USER": "postgres",
-        "PASSWORD": "postgis",
-        "NAME": "fpan",
-        "OPTIONS": {},
-        "PORT": "5432",
-        "POSTGIS_TEMPLATE": "template_postgis_20",
-        "TEST": {
-            "CHARSET": None,
-            "COLLATION": None,
-            "MIRROR": None,
-            "NAME": None
-        },
-        "TIME_ZONE": None
-    }
-}
-
-INSTALLED_APPS+=('fpan', 'hms')
-
-# the code should be refactored to not even use SECRET_LOG anymore...
-SECRET_LOG = LOG_DIR
-PACKAGE_PATH = os.path.join(os.path.dirname(os.path.dirname(APP_ROOT)), "fpan-data")
+# project-specific database settings, inherit the rest from Arches.settings
+DATABASES["default"]["NAME"] = "fpan"
+DATABASES["default"]["POSTGIS_TEMPLATE"] = "template_postgis_20"
 
 ALLOWED_HOSTS = []
 
-ROOT_URLCONF = 'fpan.urls'
-
-SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, 'system_settings', 'System_Settings.json')
-WSGI_APPLICATION = 'fpan.wsgi.application'
-STATIC_ROOT = '/var/www/media'
-
+## this should be changed in core Arches so the log is just in LOG_DIR
 from datetime import datetime
 timestamp = datetime.now().strftime("%m%d%y-%H%M%S")
 RESOURCE_IMPORT_LOG = os.path.join(LOG_DIR, 'resource_import-{}.log'.format(timestamp))
-
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-
-MEDIA_ROOT = os.path.join(APP_ROOT)
 
 DEFAULT_FROM_EMAIL = 'no-reply@fpan.us'
 EMAIL_SUBJECT_PREFIX = '[HMS] '
@@ -160,42 +130,44 @@ FPAN_ADMINS = (
     # ('Your Name', 'your_email@Example.com'),
 )
 
-# Use Nose for running tests - errors occur unless you run test modules individually
-if len(sys.argv) > 1 and sys.argv[1] == "test":
-    import logging
-    logging.disable(logging.CRITICAL)
+LOG_LEVEL = 'INFO'
 
-INSTALLED_APPS += ('django_nose', )
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-NOSE_ARGS = [
-    '--with-coverage',
-    '--nologcapture',
-    '--cover-package=fpan',
-    '--verbosity=3',
-    '--cover-erase',
-]
-
+## make sure this stays False
+SESSION_SAVE_EVERY_REQUEST = False
 
 try:
     from .settings_local import *
 except ImportError as e:
     pass
 
-if not DEBUG:
-    SESSION_COOKIE_SECURE = True
+# Use Nose for running tests - errors occur unless you run test modules individually
+if MODE == "DEV":
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "test":
+        import logging
+        logging.disable(logging.CRITICAL)
+
+    INSTALLED_APPS += ('django_nose', )
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+    NOSE_ARGS = [
+        '--with-coverage',
+        '--nologcapture',
+        '--cover-package=fpan',
+        '--verbosity=3',
+        '--cover-erase',
+    ]
+
+    LOG_LEVEL = 'DEBUG'
+
+if MODE == "PROD":
     SESSION_COOKIE_SAMESITE = 'Strict'
     SESSION_COOKIE_AGE = 1800 #auto logout after 1/2 hour
 
-    # disabling these settings and changing SESSION_ENGINE to cached_db
-    # seemed to fix the infamous logout issue - July 2021
-    #SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-    #SESSION_SAVE_EVERY_REQUEST = True
-    #SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
-
-# set log level to info, unless debug is true (which would be set in settings_local.py
-LOG_LEVEL = 'INFO'
-if DEBUG is True:
-    LOG_LEVEL = 'DEBUG'
+if HTTPS:
+    SESSION_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_SESSION_REDIRECT = True
+    CSRF_COOKIE_SECURE = True
 
 LOGGING = {
     'version': 1,
@@ -242,7 +214,7 @@ LOGGING = {
 }
 
 # support localization
-from django.utils.translation import gettext_lazy as _
+
 
 MIDDLEWARE = [
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
