@@ -244,7 +244,7 @@ def load_fpan_state_auth(fake_passwords=False):
     ## only write the log with passwords in it if real passwords were created.
     ## this is especially important to accommodate test running
     if fake_passwords is False:
-        with open(os.path.join(settings.SECRET_LOG,"initial_user_info.csv"), "w", newline="") as outcsv:
+        with open(os.path.join(settings.LOG_DIR,"initial_user_info.csv"), "w", newline="") as outcsv:
             write = csv.writer(outcsv)
             write.writerow(("username", "password"))
             for user_pw in created_users:
@@ -390,7 +390,7 @@ def make_managed_area_nicknames():
     print(len(join_dict))
     names = join_dict.keys()
     names.sort()
-    with open(os.path.join(settings.SECRET_LOG,"nicknames.csv"),"wb") as csvout:
+    with open(os.path.join(settings.LOG_DIR,"nicknames.csv"),"wb") as csvout:
         writer = csv.writer(csvout)
         writer.writerow(['name','nickname'])
         for n in names:

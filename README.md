@@ -26,10 +26,7 @@ With your virtual environment activated, enter a new directory and
        
 - make settings_local.py in the project (place in `fpan/fpan`)
 
-    this should contain all of your normal environment-specific variables, like database credentials, as well as two new variables:
-   
-       SECRET_LOG = "path/to/some/dir/outside/of/version/control"
-       PACKAGE_PATH = "full/local/path/to/the/location/of/fpan-data/repo"
+    this should contain all of your normal environment-specific variables, like database credentials.
        
 - enter the project directory and load the package (make sure elasticsearch is running)
     
