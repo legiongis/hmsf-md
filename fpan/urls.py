@@ -33,7 +33,6 @@ urlpatterns = [
     url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
-    #url(r'^search$', search.FPANSearchView.as_view(), name="search_home"),
     url(
         r"^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$" % uuid_regex,
         api.MVT.as_view(),
@@ -42,7 +41,7 @@ urlpatterns = [
 
     url(r"api/lookup$", api.ResourceIdLookup.as_view(), name="resource_lookup"),
 
-    # the following are just pass through views so FPAN can add custom permissions
+    # the following are just pass through views so HMS can apply an additional permissions-based decorator
     url(r"^resource$", FPANResourceListView.as_view(), name="resource"),
     url(r"^resource/(?P<resourceid>%s)$" % uuid_regex, FPANResourceEditorView.as_view(), name="resource_editor"),
     url(r"^resource/(?P<resourceid>%s)/history$" % uuid_regex, FPANResourceEditLogView.as_view(), name="resource_edit_log"),
@@ -52,7 +51,7 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
 
-    url(r"^auth/", auth.LoginView.as_view(), name="auth"),
+    url(r"^auth/$", auth.LoginView.as_view(), name="auth"),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         auth.activate, name='activate'),
 
