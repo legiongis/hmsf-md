@@ -11,8 +11,6 @@ DEBUG = False
 HTTPS = False
 MODE = "PROD"
 
-DOMAIN = "hms.fpan.us"
-
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
