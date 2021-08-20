@@ -103,7 +103,7 @@ def activate(request, uidb64, token):
         user = authenticate(username=user.username, password=user.password)
         scout_form = ScoutForm(instance=user)
         scout_profile_form = ScoutProfileForm()
-        return redirect('auth',login_type='hms')
+        return redirect(f"/auth/?t=scout")
     else:
         return HttpResponse('Activation link is invalid!')
 

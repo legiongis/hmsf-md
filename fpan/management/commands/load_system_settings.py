@@ -20,7 +20,7 @@ class Command(BaseCommand):
         settings_data = os.path.join(settings.ROOT_DIR, 'db', 'system_settings', 'Arches_System_Settings.json')
         management.call_command("packages", operation="import_business_data", source=settings_data, overwrite=True)
 
-        settings_data_local = settings.SYSTEM_SETTINGS_LOCAL_PATH
+        settings_data_local = os.path.join(settings.APP_ROOT, 'system_settings', 'System_Settings.json')
 
         if os.path.isfile(settings_data_local):
             management.call_command("packages", operation="import_business_data", source=settings_data_local,
