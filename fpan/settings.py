@@ -12,7 +12,6 @@ HTTPS = False
 MODE = "PROD"
 
 DOMAIN = "hms.fpan.us"
-GOOGLE_ANALYTICS_TRACKING_ID = None
 
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -72,38 +71,21 @@ RESOURCE_MODEL_USER_RESTRICTIONS = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        #Passwords cannot be entirely numeric
-        'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator',
-    },
-    # {
-        # Passwords must contain special characters
-        # 'NAME': 'arches.app.utils.password_validation.SpecialCharacterValidator',
-        # 'OPTIONS': {
-            # 'special_characters': ('!','@','#',')','(','*','&','^','%','$'),
-        # }
-    # },
-    {
-        #Passwords must contain 1 or more numbers
-        'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator',
-    },
-    {
-        #Passwords must contain upper and lower characters
-        'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator',
-    },
-    {
-        #Passwords must meet minimum length requirement
-        'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
-        'OPTIONS': {
-            'min_length': 6,
-        }
-    },
+    #Passwords cannot be entirely numeric
+    {'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator'},
+    #Passwords must contain 1 or more numbers
+    {'NAME': 'arches.app.utils.password_validation.HasNumericCharacterValidator'},
+    #Passwords must contain upper and lower characters
+    {'NAME': 'arches.app.utils.password_validation.HasUpperAndLowerCaseValidator'},
+    #Passwords must meet minimum length requirement
+    {'NAME': 'arches.app.utils.password_validation.MinLengthValidator',
+     'OPTIONS': {'min_length': 6}},
 ]
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '&cu1l36s)wxa@5yxefgdd-wkwpyw3tz2vru*ja@nh*r4*47^15'
 
-# project-specific database settings, inherit the rest from Arches.settings
+# project-specific database settings, inherit the rest from arches.settings
 DATABASES["default"]["NAME"] = "fpan"
 DATABASES["default"]["POSTGIS_TEMPLATE"] = "template_postgis_20"
 
@@ -114,7 +96,7 @@ from datetime import datetime
 timestamp = datetime.now().strftime("%m%d%y-%H%M%S")
 RESOURCE_IMPORT_LOG = os.path.join(LOG_DIR, 'resource_import-{}.log'.format(timestamp))
 
-DEFAULT_FROM_EMAIL = 'no-reply@fpan.us'
+DEFAULT_FROM_EMAIL = 'no-reply@hms.fpan.us'
 EMAIL_SUBJECT_PREFIX = '[HMS] '
 
 # put ADMINS and MANAGERS contact info in settings_local.py
