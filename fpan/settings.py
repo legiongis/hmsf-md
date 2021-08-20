@@ -24,7 +24,7 @@ STATIC_ROOT = os.path.join(APP_ROOT, 'static')
 ROOT_URLCONF = 'fpan.urls'
 WSGI_APPLICATION = 'fpan.wsgi.application'
 
-STATICFILES_DIRS += (os.path.join(APP_ROOT, 'media'),)
+STATICFILES_DIRS = (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
