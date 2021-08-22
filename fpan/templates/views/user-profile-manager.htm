@@ -197,7 +197,7 @@
                             <!-- Section Title -->
                             <div class="col-sm-3">
                                 <div class="profile-header">
-                                    {% trans 'Archaeological Site Access' %}
+                                    {% trans 'Site Access Rules' %}
                                 </div>
                             </div>
 
@@ -205,12 +205,32 @@
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <p class="profile-label-shim">mode: {{ site_access }}</p>
+                                            <p class="profile-label-shim">{{ site_access_rules }}</p>
                                         </div>
                                     </div>
                                 </div>
                               
                             </div>
+
+                            <!-- Section Title -->
+                            <div class="col-sm-3">
+                                <div class="profile-header">
+                                    <!-- if Scout, maybe this should be something like "sites assigned to you"-->
+                                    {% trans 'Accessible Sites' %}
+                                </div>
+                            </div>
+
+                            <div class="col-sm-9">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <p class="profile-label-shim">{{ accessible_sites }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
                         </div>
 
                     </div>
@@ -289,6 +309,8 @@
 -->
 
                 <!-- Notification Settings -->
+                <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
+                {% comment %}
                 <section>
                     <div class="profile-list">
                         <div class="profile-header">
@@ -340,6 +362,7 @@
                         </div>
                     </div>
                 </section>
+                {% endcomment %}
 
                 <section>
                     <div class="profile-list">
@@ -348,7 +371,7 @@
                         </div>
                         <!--ko if: mobilesurveys.length === 0 -->
                         <div id="default-mobile-projects" class="profile-default-message-panel">
-                            {% trans "Sorry, but you haven't been invited to a project yet..." %}
+                            {% trans "You haven't been added to a project yet." %}
                         </div>
                         <!--/ko-->
 

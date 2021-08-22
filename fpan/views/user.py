@@ -4,7 +4,7 @@ from django.http import Http404
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -15,7 +15,12 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.views.user import UserManagerView
 
 from fpan.search.components.site_filter import SiteFilter
-
+from fpan.utils.permission_backend import (
+    user_is_scout,
+    user_is_new_landmanager,
+    user_is_old_landmanager,
+)
+from fpan.models import FMSFResource
 
 class FPANUserManagerView(UserManagerView):
 
@@ -24,7 +29,22 @@ class FPANUserManagerView(UserManagerView):
         # get rule for Archaeological Site resource model
         rule = SiteFilter().compile_rules(user, graph="f212980f-d534-11e7-8ca8-94659cf754d0")
 
-        return rule
+        if user.is_superuser:
+            sites = []
+        if user_is_scout(user):
+            sites = user.scout.scoutprofile.accessible_sites
+        elif user_is_new_landmanager(user):
+            sites = user.landmanager.accessible_sites
+        elif user_is_old_landmanager(user):
+            # not worth the time to implement this condition, old lms will be deprecated soon
+            sites = []
+        else:
+            sites = []
+
+        site_list = [FMSFResource(i).serialize() for i in sites]
+        site_info = sorted(site_list, key=lambda k: k["display_name"])
+
+        return {"site_access_rules": rule, "accessible_sites": site_info}
 
     def get(self, request):
 
@@ -49,12 +69,13 @@ class FPANUserManagerView(UserManagerView):
 
             ## new, additional call to local method to get more HMS info
             hms_details = self.get_hms_details(request.user)
-            context["site_access"] = hms_details
+            context["site_access_rules"] = hms_details['site_access_rules']
+            context["accessible_sites"] = hms_details['accessible_sites']
 
             return render(request, "views/user-profile-manager.htm", context)
         
         else:
-            raise Http404("not found")
+            return redirect("/auth/")
 
     def post(self, request):
 
