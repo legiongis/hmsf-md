@@ -1,3 +1,5 @@
+import time
+import logging
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -8,6 +10,7 @@ from arches.app.models.tile import Tile
 
 from fpan.utils.helpers import get_node_value
 
+logger = logging.getLogger(__name__)
 
 ## this model will be deprecated in favor of ManagementArea and ManagementAreaGroup
 class Region(models.Model):
@@ -79,19 +82,25 @@ class FMSFResource(object):
         self.assigned_to = self.set_assigned_to()
 
     def get_reports(self):
-
+        start = time.time()
         if self.resource.graph.name == "Scout Report":
             return None
 
         siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
-        tiles = Tile.objects.filter(nodegroup=siteid_node.nodegroup)
+        t_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values("data", "resourceinstance_id")
 
         reports = []
-        for tile in tiles:
-            # this is the obtaining the resource id from the resource-instance-list node
-            resid = tile.data[str(siteid_node.pk)][0]["resourceId"]
+        for content in t_datas:
+            # this is obtaining the resource id from the resource-instance-list node
+            try:
+                resid = content['data'][str(siteid_node.pk)][0]["resourceId"]
+            except IndexError as e:
+                logger.debug(f"{content['resourceinstance_id']} - Scout Report without FMSF Site ID")
+                continue
             if resid == self.id:
-                reports.append(ScoutReport(tile.resourceinstance_id))
+                reports.append(ScoutReport(content['resourceinstance_id']))
+
+        logger.debug(f"getting reports: {time.time() - start} seconds elapsed")
 
         return reports
 
@@ -107,7 +116,7 @@ class FMSFResource(object):
             sitename = get_node_value(self.resource, "FMSF Name")
             siteid = get_node_value(self.resource, "FMSF ID")
             display_name = f"{siteid} - {sitename}"
-        
+
         return display_name
 
     def set_link(self):
