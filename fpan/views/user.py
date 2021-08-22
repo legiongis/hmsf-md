@@ -1,4 +1,6 @@
+import time
 import json
+import logging
 from datetime import datetime
 from django.http import Http404
 from django.core.exceptions import ValidationError
@@ -7,6 +9,9 @@ import django.contrib.auth.password_validation as validation
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
+from arches.app.models.models import Node
+from arches.app.models.tile import Tile
+
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.forms import ArchesUserProfileForm
 from arches.app.utils.response import JSONResponse
@@ -20,11 +25,14 @@ from fpan.utils.permission_backend import (
     user_is_new_landmanager,
     user_is_old_landmanager,
 )
-from fpan.models import FMSFResource
+
+logger = logging.getLogger(__name__)
 
 class FPANUserManagerView(UserManagerView):
 
     def get_hms_details(self, user):
+
+        start = time.time()
 
         # get rule for Archaeological Site resource model
         rule = SiteFilter().compile_rules(user, graph="f212980f-d534-11e7-8ca8-94659cf754d0")
@@ -32,18 +40,39 @@ class FPANUserManagerView(UserManagerView):
         if user.is_superuser:
             sites = []
         if user_is_scout(user):
-            sites = user.scout.scoutprofile.accessible_sites
+            sites = user.scout.scoutprofile.accessible_sites_es
         elif user_is_new_landmanager(user):
-            sites = user.landmanager.accessible_sites
+            sites = user.landmanager.accessible_sites_es
         elif user_is_old_landmanager(user):
             # not worth the time to implement this condition, old lms will be deprecated soon
             sites = []
         else:
             sites = []
 
-        site_list = [FMSFResource(i).serialize() for i in sites]
-        site_info = sorted(site_list, key=lambda k: k["display_name"])
+        site_lookup = {}
+        for i in sites:
+            i["scout_report_ct"] = 0
+            i["scout_reports"] = []
+            site_lookup[i["resourceinstanceid"]] = i
 
+        siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
+        siteid_nodeid = str(siteid_node.pk)
+        rep_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values("data", "resourceinstance_id")
+
+        # iterate the report data objects and if they match sites in the lookup,
+        # add the report ids to that site object
+        for rd in rep_datas:
+            try:
+                fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
+            except IndexError as e:
+                logger.debug(f"{rd['resourceinstance_id']} - Scout Report has no FMSF Site ID")
+                continue
+            if fmsfid in site_lookup:
+                site_lookup[fmsfid]["scout_report_ct"] += 1
+                site_lookup[fmsfid]["scout_reports"].append(fmsfid)
+
+        site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
+        logger.debug(f"getting hms_details for {user.username}: {time.time()-start} seconds elapsed")
         return {"site_access_rules": rule, "accessible_sites": site_info}
 
     def get(self, request):
