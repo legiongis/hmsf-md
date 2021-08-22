@@ -39,6 +39,8 @@ SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
 INSTALLED_APPS += ('fpan', 'hms')
 
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, "system_settings", "System_Settings.json")
+
 ELASTICSEARCH_PREFIX = 'fpan'
 
 # manually disable the shapefile exporter class. This creates a 500 error if
