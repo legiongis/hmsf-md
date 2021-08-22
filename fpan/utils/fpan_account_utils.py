@@ -18,6 +18,17 @@ def check_duplicate_username(newusername):
         print(newusername)
     return newusername
 
+def generate_username(firstname, middleinitial, lastname, overwrite=False):
+    """combines the first name, middle initial, and last name into a username,
+    if overwrite=False (default) a number will be added if a user with this
+    name already exists."""
+
+    name = f"{firstname[0].lower()}{middleinitial.lower()}{lastname.lower()}"
+    if overwrite:
+        return name
+    else:
+        return check_duplicate_username(name)
+
 def add_fwcc_nicknames():
     """this function is used after all of the fixtures have been loaded
     to add nicknames to the FWC areas, because they are not included in

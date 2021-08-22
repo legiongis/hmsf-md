@@ -9,9 +9,9 @@ import string
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from arches.app.models.resource import Resource
-from hms.models import Scout
+from hms.models import ManagementAgency, LandManager, ManagementArea, Scout
 from fpan.models import ManagedArea, Region
-
+from .fpan_account_utils import generate_username
 
 def create_accounts_from_json(json_file):
     '''currently not in use. The idea was to allow the json definition of users
@@ -53,71 +53,103 @@ def create_accounts_from_json(json_file):
                 newuser.last_name = info['last_name']
             newuser.save()
 
+def create_mock_scout(firstname, middleinitial, lastname, pk):
+
+    TEST_PASSWORD = "Testaccount1!"
+
+    username = generate_username(firstname, middleinitial, lastname, overwrite=True)
+    s, created = Scout.objects.get_or_create(pk=pk, username=username)
+    s.first_name = firstname
+    s.last_name = lastname
+    s.middle_initial = middleinitial
+    s.set_password(TEST_PASSWORD)
+    s.save()
+
+    cs_grp = Group.objects.get(name="Crowdsource Editor")
+    s.groups.add(cs_grp)
+
+    s.scoutprofile.region_choices.clear()
+
+    return s
 
 def create_mock_scout_accounts():
 
-    print("----------------")
-    scout_grp = Group.objects.get_or_create(name="Scout")[0]
-    scouts = Scout.objects.all()
-    print(f"deleting existing scouts: {scouts}")
-    for s in scouts:
-        s.delete()
+    print("making Frank D. Hardy: Northeast & Northwest regions, and ASSIGNEDTO=USERNAME permissions")
+    s = create_mock_scout("Frank", "D", "Hardy", 5000)
+    s.scoutprofile.region_choices.add(Region.objects.get(name="Northwest"))
+    s.scoutprofile.region_choices.add(Region.objects.get(name="Northeast"))
+    s.scoutprofile.site_interest_type = ["Prehistoric","Historic"]
+    s.save()
+    print(f"  scout created: {s.username}")
 
-    print("creating new scouts:")
-    cen_region = Region.objects.get(name="Central")
-    ec_region = Region.objects.get(name="East Central")
-    ne_region = Region.objects.get(name="Northeast")
-    nw_region = Region.objects.get(name="Northwest")
-    sw_region = Region.objects.get(name="Southwest")
-    se_region = Region.objects.get(name="Southeast")
+    print("making Joe B. Hardy: Central & East Central regions, and ASSIGNEDTO=USERNAME permissions")
+    s = create_mock_scout("Joe", "B", "Hardy", 5001)
+    s.scoutprofile.region_choices.add(Region.objects.get(name="Central"))
+    s.scoutprofile.region_choices.add(Region.objects.get(name="East Central"))
+    s.scoutprofile.site_interest_type = ["Underwater"]
+    s.save()
+    print(f"  scout created: {s.username}")
 
-    ## make a few scouts for testing
-    frank = Scout.objects.create_user("fdhardy","","frank")
-    frank.first_name = "Frank"
-    frank.last_name = "Hardy"
-    frank.middle_initial = "D"
-    frank.scoutprofile.region_choices.add(cen_region)
-    frank.scoutprofile.region_choices.add(ec_region)
-    frank.scoutprofile.site_interest_type = ["Prehistoric","Historic"]
-    frank.save()
-    print("  scout created: Frank Hardy")
+    print("making Biff A. Hooper: Southwest & Southeast regions, and ASSIGNEDTO=USERNAME permissions")
+    s = create_mock_scout("Biff", "A", "Hooper", 5002)
+    s.scoutprofile.region_choices.add(Region.objects.get(name="Southwest"))
+    s.scoutprofile.region_choices.add(Region.objects.get(name="Southeast"))
+    s.scoutprofile.site_interest_type = ["Prehistoric","Cemeteries"]
+    s.save()
+    print(f"  scout created: {s.username}")
 
-    joe = Scout.objects.create_user("jbhardy","","joe")
-    joe.first_name = "Joe"
-    joe.last_name = "Hardy"
-    joe.middle_initial = "B"
-    joe.scoutprofile.region_choices.add(ne_region)
-    joe.scoutprofile.site_interest_type = ["Cemeteries"]
-    joe.save()
-    print("  scout created: Joe Hardy")
+    print("making Chet J. Morton: Northwest region, and FULL permissions")
+    s = create_mock_scout("Chet", "J", "Morton", 5003)
+    s.scoutprofile.region_choices.add(Region.objects.get(name="Northwest"))
+    s.scoutprofile.site_access_mode = "FULL"
+    s.scoutprofile.site_interest_type = ["Prehistoric"]
+    s.save()
+    print(f"  scout created: {s.username}")
 
-    chet = Scout.objects.create_user("cjmorton","","chet")
-    chet.first_name = "Chet"
-    chet.last_name = "Morton"
-    chet.middle_initial = "J"
-    chet.scoutprofile.region_choices.add(cen_region)
-    chet.scoutprofile.region_choices.add(nw_region)
-    chet.scoutprofile.site_interest_type = ["Historic"]
-    chet.save()
-    print("  scout created: Chet Morton")
+def create_mock_landmanagers():
+    """create a few land managers to demo different permissions levels"""
 
-    biff = Scout.objects.create_user("bahooper","","biff")
-    biff.first_name = "Biff"
-    biff.last_name = "Hooper"
-    biff.middle_initial = "A"
-    biff.scoutprofile.region_choices.add(sw_region)
-    biff.scoutprofile.region_choices.add(se_region)
-    biff.scoutprofile.region_choices.add(ec_region)
-    biff.scoutprofile.site_interest_type = ["Historic","Cemeteries","Prehistoric"]
-    biff.save()
-    print("  scout created: Biff Hooper")
+    TEST_PASSWORD = "Testaccount1!"
 
-    ## add to the Scout group and Heritage Manager group
-    cs_grp = Group.objects.get_or_create(name="Crowdsource Editor")[0]
-    for scout in Scout.objects.all():
-        scout.groups.add(cs_grp)
-        scout.groups.add(scout_grp)
+    u, created = User.objects.get_or_create(pk=5004, username="TestMatanzasSF")
+    u.set_password(TEST_PASSWORD)
+    u.save()
+    p, created = LandManager.objects.get_or_create(user=u)
+    p.management_agency = ManagementAgency.objects.get(code="FFS")
+    p.site_access_mode = "AREA"
+    p.save()
+    p.individual_areas.add(ManagementArea.objects.get(name="Matanzas State Forest"))
+    
+    u, created = User.objects.get_or_create(pk=5005, username="TestAdminSF")
+    u.set_password(TEST_PASSWORD)
+    u.save()
+    p, created = LandManager.objects.get_or_create(user=u)
+    p.management_agency = ManagementAgency.objects.get(code="FFS")
+    p.site_access_mode = "AGENCY"
+    p.save()
 
+    u, created = User.objects.get_or_create(pk=5006, username="TestFaverDykesSP")
+    u.set_password(TEST_PASSWORD)
+    u.save()
+    p, created = LandManager.objects.get_or_create(user=u)
+    p.management_agency = ManagementAgency.objects.get(code="FSP")
+    p.site_access_mode = "AREA"
+    p.save()
+    p.individual_areas.add(ManagementArea.objects.get(name="Faver-Dykes State Park"))
+
+    u, created = User.objects.get_or_create(pk=5007, username="TestFPANOffice")
+    u.set_password(TEST_PASSWORD)
+    u.save()
+    p, created = LandManager.objects.get_or_create(user=u)
+    p.site_access_mode = "FULL"
+    p.save()
+
+    u, created = User.objects.get_or_create(pk=5008, username="TestBanishedLM")
+    u.set_password(TEST_PASSWORD)
+    u.save()
+    p, created = LandManager.objects.get_or_create(user=u)
+    p.site_access_mode = "NONE"
+    p.save()
 
 def create_single_account_and_group(agency_name, fake_passwords):
 
