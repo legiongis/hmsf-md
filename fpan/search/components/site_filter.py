@@ -604,7 +604,7 @@ class SiteFilter(BaseSearchFilter):
             "id_list": []
         }
 
-        rules = self.get_rules(user, graphid)
+        rules = self.compile_rules(user, graphid)
 
         if rules["access_level"] == "full_access":
             response["access_level"] = "full_access"
