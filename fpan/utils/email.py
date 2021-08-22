@@ -4,6 +4,7 @@ import uuid
 import json
 from django.conf import settings
 from django.shortcuts import render, HttpResponse
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMultiAlternatives
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
@@ -32,11 +33,12 @@ def send_weekly_summary(use_date=None):
     edate = list(counts.keys())[-1].strftime("%m/%d")
     startend_date_str = f"{sdate} - {edate}"
 
+    current_site = get_current_site(request)
     msg_vars = {
         'total_reports_ct': total_reports_ct,
         'new_sites_visited_ct': new_sites_visited_ct,
         'count_data': formatted_counts,
-        'domain': settings.DOMAIN,
+        'domain': current_site.domain,
     }
     message_txt = render_to_string('email/weekly_report_email_text.htm', msg_vars)
     message_html = render_to_string('email/weekly_report_email_html.htm', msg_vars)

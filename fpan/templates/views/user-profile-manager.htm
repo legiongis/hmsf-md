@@ -1,20 +1,3 @@
-<!--
-ARCHES - a program developed to inventory and manage immovable cultural heritage.
-Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <http://www.gnu.org/licenses/>.
--->
 {% extends "base-manager.htm" %} {% load staticfiles %} {% load i18n %} {% block title %} {{ block.super }} {% trans "Account Settings" %} {% endblock title %} {% block main_content %}
 <div class="scroll-y">
 
@@ -109,7 +92,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
                                         <div class="col-sm-5">
                                             <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Arches user name' %}</label>
+                                                <label class="control-label account-label">{% trans 'HMS/Scout ID' %}</label>
                                                 <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
                                             </div>
                                         </div>
@@ -117,7 +100,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                                         <!-- Password -->
                                         <div class="col-sm-5">
                                             <p class="account-tips">
-                                                {% trans 'This is the unique email or name that you use to log on to Arches.' %}
+                                                {% trans 'This is account login name.' %}
                                             </p>
                                         </div>
 
@@ -206,6 +189,53 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                     </div>
                 </section>
 
+                <!-- NEW SECTION FOR HMS INFO-->
+                <section id="permission summary" class="profile-list">
+                    <div class="account-wrapper">
+                        <div class="row relative">
+
+                            <!-- Section Title -->
+                            <div class="col-sm-3">
+                                <div class="profile-header">
+                                    {% trans 'Site Access Rules' %}
+                                </div>
+                            </div>
+
+                            <div class="col-sm-9">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <p class="profile-label-shim">{{ site_access_rules }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                              
+                            </div>
+
+                            <!-- Section Title -->
+                            <div class="col-sm-3">
+                                <div class="profile-header">
+                                    <!-- if Scout, maybe this should be something like "sites assigned to you"-->
+                                    {% trans 'Accessible Sites' %}
+                                </div>
+                            </div>
+
+                            <div class="col-sm-9">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <p class="profile-label-shim">{{ accessible_sites }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                </section>
+
 
 <!-- commenting this section out as it's not implemented as of Feb 19th - AC -->
                 <!-- My Devices -->
@@ -279,6 +309,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 -->
 
                 <!-- Notification Settings -->
+                <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
+                {% comment %}
                 <section>
                     <div class="profile-list">
                         <div class="profile-header">
@@ -330,6 +362,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                     </div>
                 </section>
+                {% endcomment %}
 
                 <section>
                     <div class="profile-list">
@@ -338,7 +371,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         </div>
                         <!--ko if: mobilesurveys.length === 0 -->
                         <div id="default-mobile-projects" class="profile-default-message-panel">
-                            {% trans "Sorry, but you haven't been invited to a project yet..." %}
+                            {% trans "You haven't been added to a project yet." %}
                         </div>
                         <!--/ko-->
 

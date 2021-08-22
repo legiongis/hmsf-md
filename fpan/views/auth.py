@@ -106,11 +106,3 @@ def activate(request, uidb64, token):
         return redirect(f"/auth/?t=scout")
     else:
         return HttpResponse('Activation link is invalid!')
-
-
-class FPANUserManagerView(UserManagerView):
-    """ this view powers the modified profile manager, and is built from the analogous
-        view in core arches. The main difference is that different forms are passed
-        to the view based on what type of user (land manager or scout) is logged
-        in, and different templates are used to render."""
-    pass

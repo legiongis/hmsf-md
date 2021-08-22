@@ -11,8 +11,6 @@ DEBUG = False
 HTTPS = False
 MODE = "PROD"
 
-DOMAIN = "hms.fpan.us"
-
 APP_NAME = "FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -24,7 +22,7 @@ STATIC_ROOT = os.path.join(APP_ROOT, 'static')
 ROOT_URLCONF = 'fpan.urls'
 WSGI_APPLICATION = 'fpan.wsgi.application'
 
-STATICFILES_DIRS += (os.path.join(APP_ROOT, 'media'),)
+STATICFILES_DIRS = (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
@@ -40,6 +38,8 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_process
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
 INSTALLED_APPS += ('fpan', 'hms')
+
+SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, "system_settings", "System_Settings.json")
 
 ELASTICSEARCH_PREFIX = 'fpan'
 
