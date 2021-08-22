@@ -6,14 +6,14 @@ This web app is an implementation of [Arches](http://archesproject.org/) designe
 
 This [Arches project](https://arches.readthedocs.io/en/stable/projects-and-packages/) works in conjunction with two other repos, [legiongis/arches](https://github.com/legiongis/arches) and [legiongis/fpan-data](https://github.com/legiongis/fpan-data). The former is a fork of the core Arches codebase with a few small changes, and the latter is an Arches package that defines the database schema and contains some initial data. To install locally, first [install the Arches dependencies](https://arches.readthedocs.io/en/stable/requirements-and-dependencies/)). After you have all dependencies installed, come back here. The following steps are basically the same as the recommended [Arches developer installation](https://arches.readthedocs.io/en/stable/creating-a-development-environment/).
 
-- create and activate a virtual environment.
+- Create and activate a virtual environment:
 
     ```
     python3 -m venv env
     source env/bin/activate
     ```
 
- - clone our fork of the core Arches repo [legiongis/arches](https://github.com/legiongis/arches) and checkout the `stable/5.1.x-fpan` branch
+ - Clone our fork of the core Arches repo [legiongis/arches](https://github.com/legiongis/arches) and checkout the `stable/5.1.x-fpan` branch:
 
     ```
     git clone https://github.com/legiongis/arches
@@ -23,50 +23,71 @@ This [Arches project](https://arches.readthedocs.io/en/stable/projects-and-packa
     cd ..
     ```
 
-- clone this project repo
+- Clone this project repo:
 
     ```
     git clone https://github.com/legiongis/fpan
     ```
 
-- clone the package repo
+- Clone the package repo:
 
     ```
     git clone https://github.com/legiongis/fpan-data
     ```
 
-- install the python dependencies into your virtual environment
+- Install the python dependencies into your virtual environment:
 
-        python -m pip install --upgrade pip
-        pip install -r arches/arches/install/requirements.txt
-        pip install -r arches/arches/install/requirements_dev.txt
-        pip install -e arches
-        pip install -r fpan/requirements.txt
+    ```
+    python -m pip install --upgrade pip
+    pip install -r arches/arches/install/requirements.txt
+    pip install -r arches/arches/install/requirements_dev.txt
+    pip install -e arches
+    pip install -r fpan/requirements.txt
+    ```
 
-- enter the project and install js dependencies
+- Enter the project and install js dependencies:
 
-        cd fpan/fpan
-        yarn install
-        cd ..
+    ```
+    cd fpan/fpan
+    yarn install
+    cd ..
+    ```
 
-- create `settings_local.py` in `fpan/fpan/`
+- Create `settings_local.py` in `fpan/fpan/`, alongside the existing `settings.py`:
 
-    this should contain all of your normal Django environment-specific variables, like database credentials.
+    This should contain all of your normal Django environment-specific variables, like database credentials. A basic example would be:
 
-- initialize the database
+    ```
+    from .settings import DATABASES
 
-        python manage.py setup_db
+    DATABASES['default']['USER'] = "username"
+    DATABASES['default']['PASSWORD'] = "password"
+    DATABASES['default']['POSTGIS_TEMPLATE'] = "template_postgis"
+    ```
 
-- add the test hms user accounts (helpful for development purposes)
 
-        python manage.py create_test_hms_accounts
+- Initialize the database:
 
-- load the package (which includes test data for development purposes)
+    ```
+    python manage.py setup_db
+    ```
 
-        python manage.py packages -o load_package -s ../fpan-data -ow overwrite
+- Add the test hms user accounts (helpful for development purposes):
 
-    say yes to overriding settings
+    ```
+    python manage.py create_test_hms_accounts
+    ```
 
-- run the development server to view at http://localhost:8000
+- Load the package (which includes test data for development purposes):
 
-        python manage.py runserver
+    ```
+    python manage.py packages -o load_package -s ../fpan-data -ow overwrite
+    ```
+
+    Say yes to overriding settings.
+
+- Run the development server to view at http://localhost:8000.
+
+    ```
+    python manage.py runserver
+    ```
