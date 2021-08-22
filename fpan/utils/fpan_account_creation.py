@@ -111,6 +111,7 @@ def create_mock_landmanagers():
 
     TEST_PASSWORD = "Testaccount1!"
 
+    print("making TestMatanzasSF: AREA permissions (Matanzas State Forest)")
     u, created = User.objects.get_or_create(pk=5004, username="TestMatanzasSF")
     u.set_password(TEST_PASSWORD)
     u.save()
@@ -119,7 +120,9 @@ def create_mock_landmanagers():
     p.site_access_mode = "AREA"
     p.save()
     p.individual_areas.add(ManagementArea.objects.get(name="Matanzas State Forest"))
+    print(f"  land manager created: {u.username}")
     
+    print("making TestMatanzasSF: AGENCY permissions (Florida Forest Service)")
     u, created = User.objects.get_or_create(pk=5005, username="TestAdminSF")
     u.set_password(TEST_PASSWORD)
     u.save()
@@ -127,7 +130,9 @@ def create_mock_landmanagers():
     p.management_agency = ManagementAgency.objects.get(code="FFS")
     p.site_access_mode = "AGENCY"
     p.save()
+    print(f"  land manager created: {u.username}")
 
+    print("making TestFaverDykesSP: AREA permissions (Faver-Dykes State Park)")
     u, created = User.objects.get_or_create(pk=5006, username="TestFaverDykesSP")
     u.set_password(TEST_PASSWORD)
     u.save()
@@ -136,20 +141,25 @@ def create_mock_landmanagers():
     p.site_access_mode = "AREA"
     p.save()
     p.individual_areas.add(ManagementArea.objects.get(name="Faver-Dykes State Park"))
+    print(f"  land manager created: {u.username}")
 
+    print("making TestFPANOffice: permissions set to FULL")
     u, created = User.objects.get_or_create(pk=5007, username="TestFPANOffice")
     u.set_password(TEST_PASSWORD)
     u.save()
     p, created = LandManager.objects.get_or_create(user=u)
     p.site_access_mode = "FULL"
     p.save()
+    print(f"  land manager created: {u.username}")
 
+    print("making TestBanishedLM: permissions set to NONE)")
     u, created = User.objects.get_or_create(pk=5008, username="TestBanishedLM")
     u.set_password(TEST_PASSWORD)
     u.save()
     p, created = LandManager.objects.get_or_create(user=u)
     p.site_access_mode = "NONE"
     p.save()
+    print(f"  land manager created: {u.username}")
 
 def create_single_account_and_group(agency_name, fake_passwords):
 
