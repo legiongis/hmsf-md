@@ -128,6 +128,13 @@ class ScoutProfile(models.Model):
         resids = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid)
         return resids
 
+    @property
+    def accessible_sites_es(self):
+        graphid = str(Graph.objects.get(name="Archaeological Site").graphid)
+        arch_rules = self.site_access_rules["Archaeological Site"]
+        hits = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid, full_results=True)
+        return hits
+
     def site_access_rules_formatted(self):
         return format_json_display(self.site_access_rules)
 
@@ -249,6 +256,13 @@ class LandManager(models.Model):
         arch_rules = self.site_access_rules["Archaeological Site"]
         resids = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid)
         return resids
+
+    @property
+    def accessible_sites_es(self):
+        graphid = str(Graph.objects.get(name="Archaeological Site").graphid)
+        arch_rules = self.site_access_rules["Archaeological Site"]
+        hits = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid, full_results=True)
+        return hits
 
     @property
     def filter_rules(self):

@@ -644,7 +644,7 @@ class SiteFilter(BaseSearchFilter):
 
         return response
 
-    def get_resource_list_from_es_query(self, rules, graphid, invert=False):
+    def get_resource_list_from_es_query(self, rules, graphid, invert=False, full_results=False):
         """
         Returns the resourceinstanceids for all resources for a given graph
         that match a set of rules. Set invert=True to return
@@ -667,9 +667,13 @@ class SiteFilter(BaseSearchFilter):
         query = Query(se, start=0, limit=10000)
         query.include('graph_id')
         query.include('resourceinstanceid')
+        query.include('displayname')
         query.add_query(self.paramount)
 
         results = query.search(index='resources')
+
+        if full_results is True:
+            return [i['_source'] for i in results['hits']['hits']]
 
         resourceids = list(set([i['_source']['resourceinstanceid'] for i in results['hits']['hits']]))
 
