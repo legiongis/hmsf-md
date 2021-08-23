@@ -11,14 +11,12 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 
 from arches.app.utils.response import JSONResponse
-from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-from arches.app.models.models import Node, Value
+from arches.app.models.models import Node
 
-from fpan.models import Region
 from fpan.utils.permission_backend import user_is_anonymous
 from fpan.utils.tokens import account_activation_token
-from fpan.utils.fpan_account_utils import check_duplicate_username
+from fpan.utils.accounts import generate_username
 from hms.models import Scout, ScoutProfile, ManagementArea, ManagementAgency
 from hms.forms import ScoutForm, ScoutProfileForm
 
@@ -29,13 +27,10 @@ def scout_signup(request):
             firstname = form.cleaned_data.get('first_name')
             middleinitial = form.cleaned_data.get('middle_initial')
             lastname = form.cleaned_data.get('last_name')
+            newusername = generate_username(firstname, middleinitial, lastname)
             user = form.save(commit=False)
             user.is_active = False
-            user.username = check_duplicate_username(
-                firstname[0].lower() 
-                + middleinitial.lower() 
-                + lastname.lower())
-
+            user.username = newusername
             user.save()
             current_site = get_current_site(request)
             msg_vars = {
