@@ -319,7 +319,7 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
     margin-left:auto;
 }
 
-#id_region_choices, #id-site-type-choices {
+#id_region_choices, #id-site-type-choices, .form-list-multiselect {
     list-style: none;
     padding-top: 10px;
 }
