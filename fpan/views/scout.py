@@ -57,64 +57,51 @@ def scouts_dropdown(request):
     resourceid = request.GET.get('resourceid', None)
 
     ## get all scouts right off the bat
-    all_scouts = ScoutProfile.objects.all()
+    if resourceid is None:
+        matched_scouts = ScoutProfile.objects.all()
+    else:
+        matched_scouts = []
+
+        site_regions = []
+        n = Node.objects.get(name="FPAN Region", graph__name="Archaeological Site")
+        region_tiles = Tile.objects.filter(resourceinstance=resourceid, nodegroup=n.nodegroup)
+        for t in region_tiles:
+            for pk in t.data[str(n.nodeid)]:
+                site_regions.append(ManagementArea.objects.get(pk=pk).name)
+
+        ## this lookup is needed to translate between the names of the fpan.models.Region
+        ## objects, which is what the ScoutProfile is related to, and the
+        ## hms.models.ManagementArea objects, which is the content now stored in the 
+        ## FPAN Region node. Ultimately, the ScoutProfile model should be related to
+        ## ManagementArea and Region can be completely removed.
+        lookup = {
+            "Northwest": "FPAN Northwest Region",
+            "Northeast": "FPAN Northeast Region",
+            "Central": "FPAN Central Region",
+            "East Central": "FPAN East Central Region",
+            "Southwest": "FPAN Southwest Region",
+            "Southeast": "FPAN Southeast Region",
+        }
+
+        ## as the scout list gets big this may need some optimizing!
+        for scout in ScoutProfile.objects.all():
+            for region_choice in scout.region_choices.all():
+                if lookup[region_choice.name] in site_regions:
+                    matched_scouts.append(scout)
+
+    # iterate scouts and create a list of objects to return for the dropdown
     return_scouts = []
-
-    ## this should be improved with a big refactoring of this view. DRY...
-    if not resourceid:
-        for scout in all_scouts:
-            display_name = scout.user.username + " | " + ", ".join(scout.site_interest_type)
-            return_scouts.append({
-                'id': scout.user_id,
-                'username': scout.user.username,
-                'display_name': display_name,
-                'site_interest_type': scout.site_interest_type,
-                'region_choices': [region.name for region in scout.region_choices.all()],
-            })
-        return JSONResponse(return_scouts)
-
-    ## use the resource instance id to find the graphid
-    resource = Resource.objects.get(resourceinstanceid=resourceid)
-    graphid = resource.graph_id
-
-    ## use the graphid to figure out which HMS-Region node is the one in
-    ## this particular resource model
-    region_node = Node.objects.get(name="HMS-Region",graph_id=graphid)
-
-    ## get the tiles for this resource instance and specifically those
-    ## saved for the HMS-Region node
-    tiles = Tile.objects.filter(resourceinstance=resourceid,nodegroup_id=region_node.nodegroup_id)
-
-    ## iterate through all of the tiles (though in this case there should
-    ## only be one) and make a list of the individual values stored for the 
-    ## region node
-    region_val_uuids = []
-    for t in tiles:
-        for tt in t.data[str(region_node.nodeid)]:
-            region_val_uuids.append(tt)
-
-    ## iterate through the values retrieved (which are UUIDs for Value
-    ## instances of preflabels) and turn the values which are the actual
-    ## labels of the HMS-Region node into Region objects and make a list
-    regions = []
-    for t in region_val_uuids:
-        v = Value.objects.get(valueid=t)
-        regions.append(Region.objects.get(name=v.value))
-
-    ## as the scout list gets big this may need some optimizing!
-    for scout in all_scouts:
-        for region in regions:
-            if region in scout.region_choices.all():
-                display_name = scout.user.username + " | " + ", ".join(scout.site_interest_type)
-                obj = {
-                    'id': scout.user_id,
-                    'username': scout.user.username,
-                    'display_name': display_name,
-                    'site_interest_type': scout.site_interest_type,
-                    'region_choices': [region.name for region in scout.region_choices.all()],
-                }
-                if not obj in return_scouts:
-                    return_scouts.append(obj)
+    for scout in matched_scouts:
+        display_name = f"{scout.user.username} | {', '.join(scout.site_interest_type)}"
+        if scout.site_access_mode == "FULL":
+            display_name += " | already has FULL access to sites"
+        return_scouts.append({
+            'id': scout.user_id,
+            'username': scout.user.username,
+            'display_name': display_name,
+            'site_interest_type': scout.site_interest_type,
+            'region_choices': [region.name for region in scout.region_choices.all()],
+        })
 
     return JSONResponse(return_scouts)
 
