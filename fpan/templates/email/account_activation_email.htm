@@ -5,11 +5,11 @@ Welcome to the Heritage Monitoring Scouts, we're excited to have you! To grant y
 
 To Activate Your Account:
 
-     1.  Paste this link into your browser address bar to verify your email: https://{{ domain }}{% url 'activate' uidb64=uid token=token %}
+     1.  Paste this link into your browser address bar to verify your email: {{ baseurl }}{% url 'activate' uidb64=uid token=token %}
 
      2. The link above will take you to the Scout Login page. Use your scout ID ({{ user.username }}) and password to log in. Once you are logged in, scroll down to fill in the rest of your Scout Profile. Your account is not active until you fill in this information.
 
-*If the above link is broken or expired, simply go to the "Scout Portal" located here (https://{{domain}}/auth/hms) and log in to your account there to complete your profile. You will be able to access the database from this portal for all future visits.
+*If the above link is broken or expired, simply go to the "Scout Portal" located here ({{ baseurl }}/auth/?t=scout) and log in to your account there to complete your profile. You will be able to access the database from this portal for all future visits.
 
 Thanks for Signing Up and Welcome Aboard!
 

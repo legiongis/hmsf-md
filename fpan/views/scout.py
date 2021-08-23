@@ -44,9 +44,12 @@ def scout_signup(request):
             s.scoutprofile.save()
 
             current_site = get_current_site(request)
+            baseurl = f"http://{current_site.domain}"
+            if settings.HTTPS:
+                baseurl = f"https://{current_site.domain}"
             msg_vars = {
                 'user': s,
-                'domain': current_site.domain,
+                'baseurl': baseurl,
                 'uid': urlsafe_base64_encode(force_bytes(s.pk)),
                 'token': account_activation_token.make_token(s),
             }
