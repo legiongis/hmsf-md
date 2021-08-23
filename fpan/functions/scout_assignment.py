@@ -36,7 +36,11 @@ class ScoutAssignment(BaseFunction):
     def save(self,tile,request):
         # u, r = self.get_user_and_resource(tile, request)
         # UserXResourceInstanceAccess.objects.get_or_create(user=u, resource=r)
-        update_hms_permissions_table(user=request.user)
+        if request:
+            user = request.user
+        else:
+            user = None
+        update_hms_permissions_table(user=user)
 
     def post_save(self, tile, request):
         raise NotImplementedError
@@ -51,4 +55,8 @@ class ScoutAssignment(BaseFunction):
 
         # u, r = self.get_user_and_resource(tile, request)
         # UserXResourceInstanceAccess.objects.get(user=u, resource=r).delete()
-        update_hms_permissions_table(user=request.user)
+        if request:
+            user = request.user
+        else:
+            user = None
+        update_hms_permissions_table(user=user)
