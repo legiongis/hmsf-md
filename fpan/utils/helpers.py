@@ -13,6 +13,7 @@ weekday_lookup = {
 
 
 def get_node_value(resource, node_name):
+    """this just flattens the response from Resource().get_node_values()"""
 
     values = resource.get_node_values(node_name)
     if len(values) == 0:
