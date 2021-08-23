@@ -17,6 +17,7 @@ from arches.app.models.models import Node
 from fpan.utils.permission_backend import user_is_anonymous
 from fpan.utils.tokens import account_activation_token
 from fpan.utils.accounts import generate_username
+from fpan.models import Region
 from hms.models import Scout, ScoutProfile, ManagementArea, ManagementAgency
 from hms.forms import ScoutForm, ScoutProfileForm
 
@@ -28,16 +29,26 @@ def scout_signup(request):
             middleinitial = form.cleaned_data.get('middle_initial')
             lastname = form.cleaned_data.get('last_name')
             newusername = generate_username(firstname, middleinitial, lastname)
-            user = form.save(commit=False)
-            user.is_active = False
-            user.username = newusername
-            user.save()
+            s = form.save(commit=False)
+            s.is_active = False
+            s.username = newusername
+            s.save()
+
+            # now add some ScoutProfile info from the same form
+            s.scoutprofile.region_choices.set(form.cleaned_data.get('region_choices', []))
+            s.scoutprofile.zip_code = form.cleaned_data.get('zip_code')
+            s.scoutprofile.background = form.cleaned_data.get('background')
+            s.scoutprofile.relevant_experience = form.cleaned_data.get('relevant_experience')
+            s.scoutprofile.interest_reason = form.cleaned_data.get('interest_reason')
+            s.scoutprofile.site_interest_type = form.cleaned_data.get('site_interest_type')
+            s.scoutprofile.save()
+
             current_site = get_current_site(request)
             msg_vars = {
-                'user': user,
+                'user': s,
                 'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': account_activation_token.make_token(user),
+                'uid': urlsafe_base64_encode(force_bytes(s.pk)),
+                'token': account_activation_token.make_token(s),
             }
             message_txt = render_to_string('email/account_activation_email.htm', msg_vars)
             message_html = render_to_string('email/account_activation_email_html.htm', msg_vars)
