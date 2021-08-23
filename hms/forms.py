@@ -1,5 +1,8 @@
 from django import forms
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.utils.translation import ugettext as _
+from django.utils.safestring import mark_safe
 from .models import Scout, ScoutProfile
 
 
@@ -19,6 +22,11 @@ class ScoutForm(UserCreationForm):
         required=True,
         help_text='Required',
         widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
+    zip_code = forms.CharField(
+        max_length=5,
+        required=True,
+        help_text='Required',
+        widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
     email = forms.EmailField(
         max_length=200,
         help_text='Required',
@@ -31,7 +39,23 @@ class ScoutForm(UserCreationForm):
         label="Re-enter Password")
     class Meta:
         model = Scout
-        fields = ('first_name', 'middle_initial', 'last_name', 'email', 'password1', 'password2')
+        fields = ('first_name', 'middle_initial', 'last_name', 'zip_code', 'email', 'password1', 'password2')
+    
+    def clean(self):
+        """disallow new accounts with the same e-mail as existing accounts."""
+        cleaned_data = super(ScoutForm, self).clean()
+        if "email" in cleaned_data:
+            if User.objects.filter(email=cleaned_data["email"]).count() > 0:
+                self.add_error(
+                    "email",
+                    forms.ValidationError(
+                        mark_safe(_(
+                            "This email address has already been registered with the system. \
+                            <a href='/password_reset/'>Cilck here</a> to reset your password."
+                        )),
+                        code="unique",
+                    ),
+                )
 
 
 class ScoutProfileForm(forms.ModelForm):
