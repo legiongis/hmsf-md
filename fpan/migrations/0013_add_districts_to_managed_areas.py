@@ -4,16 +4,13 @@ from __future__ import unicode_literals
 from django.db import migrations
 from django.core import management
 from fpan.models import ManagedArea
-from fpan.utils.fpan_account_utils import add_fwcc_nicknames
+from fpan.utils.legacy_utils import add_state_park_districts, add_water_management_districts
 
 
 def add_districts(apps, schema_editor):
 
-    management.call_command("add_districts_to_managed_areas")
-
-def remove_wmds(apps, schema_editor):
-
-    ManagedArea.objects.all().delete()
+    add_state_park_districts()
+    add_water_management_districts()
 
 class Migration(migrations.Migration):
 
