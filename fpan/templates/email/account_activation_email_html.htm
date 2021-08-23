@@ -3,11 +3,11 @@
 <p>Welcome to the Heritage Monitoring Scouts, we're excited to have you! To grant you access to the database and connect you with resources in your area, we need to learn a bit more about you. Please follow the instructions below to complete your registration.</p>
 <p>To Activate Your Account:</p>
 <ol>
-    <li>Click <a href="https://{{ domain }}{% url 'activate' uidb64=uid token=token %}">https://{{ domain }}{% url 'activate' uidb64=uid token=token %}</a> to verify your email.</li>
+    <li>Click <a href="{{ baseurl }}{% url 'activate' uidb64=uid token=token %}">{{ baseurl }}{% url 'activate' uidb64=uid token=token %}</a> to verify your email.</li>
     <li>The link above will take you to the Scout Login page. Use your scout ID ({{ user.username }}) and password to log in. Once you are logged in, scroll down to fill in the rest of your Scout Profile. Your account is not active until you fill in this information.</li>
 </ol>
-<p>*If the above link is broken or expired, simply go to the "Scout Portal" located <a href="https://{{domain}}/auth/hms">here</a> and log in to your account there to complete your profile. You will be able to access the database from this portal for all future visits.
+<p>*If the above link is broken or expired, simply go to the "Scout Portal" located <a href="{{ baseurl }}/auth/?t=scout">here</a> and log in to your account there to complete your profile. You will be able to access the database from this portal for all future visits.
 </p>
 <h4>Thanks for Signing Up and Welcome Aboard!</h4>
-<img src="https://{{domain}}/media/img/fpan/HMSflorida_option3long.png" alt="Logo" style="width:200px;display:block;margin-left:auto;margin-right:auto;">
+<img src="{{ baseurl }}/media/img/fpan/HMSflorida_option3long.png" alt="Logo" style="width:200px;display:block;margin-left:auto;margin-right:auto;">
 {% endautoescape %}

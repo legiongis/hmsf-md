@@ -29,7 +29,6 @@ urlpatterns = [
     url(r'^dashboard', main.fpan_dashboard, name='fpan_dashboard'),
     url(r'^index.htm', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
     url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
-    url(r'^scout/profile', scout.scout_profile, name='scout_profile'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
     url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
     url(

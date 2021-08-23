@@ -33,12 +33,12 @@ def send_weekly_summary(use_date=None):
     edate = list(counts.keys())[-1].strftime("%m/%d")
     startend_date_str = f"{sdate} - {edate}"
 
-    current_site = get_current_site(request)
+    # current_site = get_current_site(request)
     msg_vars = {
         'total_reports_ct': total_reports_ct,
         'new_sites_visited_ct': new_sites_visited_ct,
         'count_data': formatted_counts,
-        'domain': current_site.domain,
+        'domain': settings.DEFAULT_FROM_EMAIL.split("@")[1],
     }
     message_txt = render_to_string('email/weekly_report_email_text.htm', msg_vars)
     message_html = render_to_string('email/weekly_report_email_html.htm', msg_vars)

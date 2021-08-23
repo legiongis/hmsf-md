@@ -1,36 +1,85 @@
+{% load staticfiles %}
+{% load i18n %}
+
 <section id="scout-signup" class="scout-signup-section">
-    <div class="fpan-panel-{{user_type}}" style="padding-bottom: 15px;">
+    <div class="fpan-panel-{{user_type}}" style="padding: 15px;">
         <form action="{% url 'scout_signup' %}" method="post">
             {% csrf_token %}
             <div class="row">
-                <div class="col-xs-12"><h2 style="text-align:center">Sign up to be a Heritage Monitoring Scout!</h2></div>
+                <div class="col-xs-12">
+                    <h2 style="text-align:center; margin-bottom: 30px;">Sign up to be a Heritage Monitoring Scout!</h2>
+                </div>
             </div>
+            {% if scout_form.errors %}
             <div class="row">
                 <div class="col-md-4 col-md-offset-1">
-
-                    {% for field in scout_form %}
+                    <p style="color:red;">Please find and fix the errors below to continue.</p>
+                </div>
+            </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-4 col-md-offset-1">
+                    <!-- manually create this form field by field to split the fields into -->
+                    <!-- a couple of different sections -->
                     <div class="form-group">
-                        {{ field.label_tag }}
-                        {{ field }}
 
-                        {% if field.help_text %}
-                            <small class="help-block">{{ field.help_text }}</small>
+                        {{ scout_form.first_name.label_tag }}
+                        {{ scout_form.first_name }}
+                        {% if scout_form.first_name.help_text %}
+                            <small class="help-block">{{ scout_form.first_name.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.first_name.errors %}
+                            {% for error in scout_form.first_name.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
                         {% endif %}
 
-                        {% if field.errors %}
-                            {% for error in field.errors %}
-                                <span style="color:red" > {{ error }} </span>
-                            {% endfor %}
+                        {{ scout_form.middle_initial.label_tag }}
+                        {{ scout_form.middle_initial }}
+                        {% if scout_form.first_name.help_text %}
+                            <small class="help-block">{{ scout_form.first_name.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.middle_initial.errors %}
+                            {% for error in scout_form.middle_initial.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
                         {% endif %}
 
-                    </div>
-                    {% endfor %}
-                    <div class="">
-                        <button type="submit" class="btn btn-default" id="scout_submit" disabled>Signup</button>
+                        {{ scout_form.last_name.label_tag }}
+                        {{ scout_form.last_name }}
+                        {% if scout_form.first_name.help_text %}
+                            <small class="help-block">{{ scout_form.first_name.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.last_name.errors %}
+                            {% for error in scout_form.last_name.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                        {{ scout_form.email.label_tag }}
+                        {{ scout_form.email }}
+                        {% if scout_form.email.help_text %}
+                            <small class="help-block">{{ scout_form.email.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.email.errors %}
+                            {% for error in scout_form.email.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                        {{ scout_form.password1.label_tag }}
+                        {{ scout_form.password1 }}
+                        {% if scout_form.password1.help_text %}
+                            <small class="help-block">{{ scout_form.password1.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.password1.errors %}
+                            {% for error in scout_form.password1.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                        {{ scout_form.password2.label_tag }}
+                        {{ scout_form.password2 }}
+                        {% if scout_form.password2.help_text %}
+                            <small class="help-block">{{ scout_form.password2.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.password2.errors %}
+                            {% for error in scout_form.password2.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="panel panel-default" style="margin-top:25px;box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);">
+                    <div class="panel panel-default" style="box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);">
                         <div class="panel-heading">
                             Ethics Agreement
                         </div>
@@ -51,7 +100,87 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12"><hr></div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-md-offset-1">
+                    <div class="form-group">
 
+                        {{ scout_form.region_choices.label_tag }}
+                        <p><em>{{ scout_form.region_choices.help_text }}</em></p>
+                        {{ scout_form.region_choices }}
+                        {% if scout_form.region_choices.errors %}
+                            {% for error in scout_form.region_choices.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                        {{ scout_form.zip_code.label_tag }}
+                        {{ scout_form.zip_code }}
+                        {% if scout_form.zip_code.help_text %}
+                            <small class="help-block">{{ scout_form.zip_code.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.zip_code.errors %}
+                            {% for error in scout_form.zip_code.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <img src="{% static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12"><hr></div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="form-group">
+                        {{ scout_form.background.label_tag }}
+                        {{ scout_form.background }}
+                        {% if scout_form.background.help_text %}
+                            <small class="help-block">{{ scout_form.background.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.background.errors %}
+                            {% for error in scout_form.background.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                        {{ scout_form.relevant_experience.label_tag }}
+                        {{ scout_form.relevant_experience }}
+                        {% if scout_form.relevant_experience.help_text %}
+                            <small class="help-block">{{ scout_form.relevant_experience.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.relevant_experience.errors %}
+                            {% for error in scout_form.relevant_experience.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                        {{ scout_form.interest_reason.label_tag }}
+                        {{ scout_form.interest_reason }}
+                        {% if scout_form.interest_reason.help_text %}
+                            <small class="help-block">{{ scout_form.interest_reason.help_text }}</small>
+                        {% endif %}
+                        {% if scout_form.interest_reason.errors %}
+                            {% for error in scout_form.background.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+
+                        {{ scout_form.site_interest_type.label_tag }}
+                        <p><em>{{ scout_form.site_interest_type.help_text }}</em></p>
+                        {{ scout_form.site_interest_type }}
+                        {% if scout_form.site_interest_type.errors %}
+                            {% for error in scout_form.background.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12"><hr></div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-12 col-md-offset-2 col-md-8" style="display:grid; align-content:center;">
+                    <button type="submit" style="font-size: 1.5em;" class="btn btn-default" id="scout_submit" disabled>Sign me up!</button>
+                </div>
             </div>
         </form>
     </div>
