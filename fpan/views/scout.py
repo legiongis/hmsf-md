@@ -163,21 +163,3 @@ def scout_list_download(request):
         writer.writerow(row)
 
     return response
-
-@user_passes_test(user_is_anonymous)
-def scout_profile(request):
-    if request.method == "POST":
-        scout_profile_form = ScoutProfileForm(
-            request.POST,
-            instance=request.user.scout.scoutprofile)
-        if scout_profile_form.is_valid():
-            scout_profile_form.save()
-            messages.add_message(request, messages.INFO, 'Your profile has been updated.')
-        else:
-            messages.add_message(request, messages.ERROR, 'Form was invalid.')
-
-    else:
-        scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
-
-    return render(request, "fpan/scout-profile.htm", {
-        'scout_profile': scout_profile_form})
