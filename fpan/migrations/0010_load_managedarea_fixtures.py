@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 from django.db import migrations
 from django.core import management
 from fpan.models import ManagedArea
-from fpan.utils.fpan_account_utils import add_fwcc_nicknames
+from fpan.utils.legacy_utils import add_fwcc_nicknames
 
 
 def load_managedareas(apps, schema_editor):
