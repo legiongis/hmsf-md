@@ -83,21 +83,44 @@ class ScoutProfile(models.Model):
         default="USERNAME=ASSIGNEDTO",
         help_text=ACCESS_MODE_HELP_SCOUT,
     )
-    street_address = models.CharField(max_length=30)
-    city = models.CharField(max_length=30)
-    state = models.CharField(max_length=30, default='Florida')
-    zip_code = models.CharField(max_length=5)
-    phone = models.CharField(max_length=12)
+    street_address = models.CharField(
+        max_length=30,
+        blank=True, null=True,
+    )
+    city = models.CharField(
+        max_length=30,
+        blank=True, null=True,
+    )
+    state = models.CharField(
+        max_length=30,
+        blank=True, null=True,
+    )
+    zip_code = models.CharField(
+        max_length=5,
+        blank=True, null=True,
+    )
+    phone = models.CharField(
+        max_length=12,
+        blank=True, null=True,
+    )
     background = models.TextField(
-        "Please let us know a little about your education and occupation.", blank=True)
+        "Please let us know a little about your education and occupation.",
+        blank=True, null=True,
+    )
     relevant_experience = models.TextField(
-        "Please let us know about any relevant experience.", blank=True)
+        "Please let us know about any relevant experience.",
+        blank=True, null=True,
+    )
     interest_reason = models.TextField(
-        "Why are you interested in becoming a Heritage Monitoring Scout?", blank=True)
+        "Why are you interested in becoming a Heritage Monitoring Scout?",
+        blank=True, null=True,
+    )
     site_interest_type = ArrayField(models.CharField(
-            max_length=30,
-            blank=True,
-            choices=SITE_INTEREST_CHOICES), default=list, blank=True)
+        max_length=30,
+        blank=True,
+        choices=SITE_INTEREST_CHOICES),
+        default=list
+    )
     region_choices = models.ManyToManyField(Region)
     ethics_agreement = models.BooleanField(default=True)
 
