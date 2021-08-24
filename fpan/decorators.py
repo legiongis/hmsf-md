@@ -8,7 +8,7 @@ from arches.app.models.resource import Resource
 
 from hms.utils import user_can_access_resource
 from fpan.search.components.site_filter import SiteFilter
-from fpan.utils.permission_backend import user_is_new_landmanager
+from fpan.utils.permission_backend import user_is_land_manager, user_is_new_landmanager
 
 logger = logging.getLogger(__name__)
 
@@ -38,12 +38,13 @@ def can_access_site_or_report(function):
             raise Http404
 
         # kick back to old function for old land managers for now
-        if not user_is_new_landmanager(request.user):
-            logger.debug("can_access_site_or_report: processing old land manager")
-            if user_can_access_resource(request.user, resourceid):
-                return function(request, *args, **kwargs)
-            else:
-                raise Http404
+        if user_is_land_manager(request.user):
+            if not user_is_new_landmanager(request.user):
+                logger.debug("can_access_site_or_report: processing old land manager")
+                if user_can_access_resource(request.user, resourceid):
+                    return function(request, *args, **kwargs)
+                else:
+                    raise Http404
 
         graphid = str(ResourceInstance.objects.get(pk=resourceid).graph_id)
         allowed = False
@@ -58,7 +59,7 @@ def can_access_site_or_report(function):
             resids = SiteFilter().get_resource_list_from_es_query(graph_rules, graphid)
             allowed = resourceid in resids
 
-        logger.debug(f"can_access_site_or_report complete: {time.time()-start}")
+        logger.debug(f"can_access_site_or_report {allowed}: {time.time()-start}")
         if allowed:
             return function(request, *args, **kwargs)
         else:
@@ -78,11 +79,8 @@ def can_edit_scout_report(function):
         if ResourceInstance.objects.get(pk=resourceid).graph.name == "Scout Report":
             if request.user.is_superuser:
                 allowed = True
-            elif user_is_new_landmanager(request.user):
-                print(request.user.landmanager.site_access_mode)
-                if request.user.landmanager.site_access_mode == "FULL":
-                ## this is for the FPAN offices
-                    allowed = True
+            elif user_is_new_landmanager(request.user) and request.user.landmanager.site_access_mode == "FULL":
+                allowed = True
             else:
                 res = Resource.objects.get(pk=resourceid)
                 allowed = str(request.user.pk) in res.get_node_values("Scout ID(s)")
