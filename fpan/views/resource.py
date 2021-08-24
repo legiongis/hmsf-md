@@ -14,8 +14,10 @@ from arches.app.utils.decorators import (
     can_read_resource_instance,
 )
 
-from fpan.decorators import can_access_site_or_report
-
+from fpan.decorators import (
+    can_access_site_or_report,
+    can_edit_scout_report,
+)
 
 @method_decorator(can_access_site_or_report, name="dispatch")
 @method_decorator(can_edit_resource_instance, name="dispatch")
@@ -58,6 +60,7 @@ class FPANResourceReportView(ResourceReportView):
 class FPANRelatedResourcesView(RelatedResourcesView):
     pass
 
+@method_decorator(can_edit_scout_report, name="dispatch")
 @method_decorator(can_access_site_or_report, name="dispatch")
 @method_decorator(can_read_resource_instance, name="dispatch")
 class FPANResourceEditorView(ResourceEditorView):
