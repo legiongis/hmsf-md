@@ -65,6 +65,14 @@ def generate_attribute_filter(graph_name="", node_name="", value=[]):
         }
     }
 
+def generate_resourceid_filter(resourceids=[]):
+    return {
+        "access_level": "resourceid_filter",
+        "filter_config": {
+            "resourceids": resourceids
+        }
+    }
+
 def generate_geo_filter(geometry=None):
     return {
         "access_level": "geo_filter",
@@ -119,6 +127,9 @@ class SiteFilter(BaseSearchFilter):
 
                 elif rule["access_level"] == "geo_filter":
                     self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
+
+                elif rule["access_level"] == "resourceid_filter":
+                    self.add_resourceid_filter_clause(rule["filter_config"]["resourceids"])
 
                 else:
                     raise(Exception("Invalid rules for filter."))
@@ -190,9 +201,9 @@ class SiteFilter(BaseSearchFilter):
 
             elif user_is_new_landmanager(user):
                 logger.debug(f"new land manager: {user.username}")
-                rule = user.landmanager.site_access_rules.get(graph_name)
-                if rule is None:
-                    rule = generate_full_access_filter()
+                # rule = user.landmanager.site_access_rules.get(graph_name)
+                rule = user.landmanager.get_graph_filter(graph_name)
+                # print(user.landmanager.visible_reports)
                 compiled_rules[graphid] = rule
 
             elif user_is_old_landmanager(user):
@@ -265,18 +276,16 @@ class SiteFilter(BaseSearchFilter):
             self.paramount.must(nested)
 
 
-    def add_resourceid_filter_clause(self, graphid, user):
+    def add_resourceid_filter_clause(self, resourceids):
         """incomplete at this time, but would pull a list of resource ids
         from somewhere and put it in the query."""
 
-        # resids = [str(i.resource.resourceinstanceid) for i in allowed]
-
-        # new_resid_filter = Bool()
-        # new_resid_filter.should(Terms(field='resourceinstanceid', terms=resids))
-        # if self.existing_query:
-        #     self.paramount.should(new_resid_filter)
-        # else:
-        #     self.paramount.must(new_resid_filter)
+        new_resid_filter = Bool()
+        new_resid_filter.should(Terms(field='resourceinstanceid', terms=resourceids))
+        if self.existing_query:
+            self.paramount.should(new_resid_filter)
+        else:
+            self.paramount.must(new_resid_filter)
 
         pass
 

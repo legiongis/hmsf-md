@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import time
 import json
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
@@ -16,6 +17,8 @@ from django.utils.safestring import mark_safe
 
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
+from arches.app.models.models import Node
+from arches.app.models.tile import Tile
 
 from fpan.search.components.site_filter import (
     SiteFilter,
@@ -23,6 +26,7 @@ from fpan.search.components.site_filter import (
     generate_attribute_filter,
     generate_geo_filter,
     generate_full_access_filter,
+    generate_resourceid_filter,
 )
 
 def format_json_display(data):
@@ -286,6 +290,25 @@ class LandManager(models.Model):
         arch_rules = self.site_access_rules["Archaeological Site"]
         hits = SiteFilter().get_resource_list_from_es_query(arch_rules, graphid, full_results=True)
         return hits
+    
+    # @property
+    # def visible_reports(self):
+    #     # sites = 
+
+    #     siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
+    #     siteid_nodeid = str(siteid_node.pk)
+    #     rep_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values("data", "resourceinstance_id")
+
+    #     reportids = []
+    #     for rd in rep_datas:
+    #         try:
+    #             fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
+    #         except IndexError as e:
+    #             pass
+    #         if fmsfid in self.accessible_sites:
+    #             reportids.append(rd["resourceinstance_id"])
+    #     return reportids
+
 
     @property
     def filter_rules(self):
@@ -337,7 +360,93 @@ class LandManager(models.Model):
         else:
             rules["Archaeological Site"] = generate_no_access_filter()
 
+        rules["Scout Report"] = generate_full_access_filter()
+
+        # set the list of visible Scout Reports based on the Archeaological Site
+        # filter derived above.
+        start = time.time()
+        graphid = str(Graph.objects.get(name="Archaeological Site").pk)
+        resids = SiteFilter().get_resource_list_from_es_query(rules["Archaeological Site"], graphid)
+        print(resids)
+        print(f"getting accessible sites: {time.time() - start}")
+
         return rules
+    
+    def get_graph_filter(self, graph_name):
+
+        print("calling new method")
+
+        if graph_name == "Archaeological Site":
+            if self.site_access_mode == "FULL":
+                rule = generate_full_access_filter()
+
+            elif self.site_access_mode == "AREA":
+                ## this was supposed to be a proper geo_filter as below, but
+                ## that doesn't allow for arbitrary assignment of nearby
+                ## management areas that don't spatially intersect.
+                # multipolygon = user.landmanager.areas_as_multipolygon
+                # rules["Archaeological Site"] = generate_geo_filter(
+                #   graph_name="Archaeological Site"
+                #   geometry=multipolygon,
+                # )
+
+                ## instead, apply attribute filter based on the names of
+                ## of associated areas.
+                value = ["<no area set>"]
+                if len(self.all_areas) > 0:
+                    value = [i.name for i in self.all_areas]
+                rule = generate_attribute_filter(
+                    graph_name="Archaeological Site",
+                    node_name="Management Area",
+                    value=value
+                )
+
+            elif self.site_access_mode == "AGENCY":
+
+                value = ["<no agency set>"]
+                if self.management_agency:
+                    value = [self.management_agency.name]
+
+                rule = generate_attribute_filter(
+                    graph_name="Archaeological Site",
+                    node_name="Management Agency",
+                    value=value
+                )
+            elif self.site_access_mode == "NONE":
+                rule = generate_no_access_filter()
+            else:
+                rule = generate_no_access_filter()
+
+        elif graph_name == "Scout Report":
+            ## need to get the arch site rules in order to find the accessible reports
+            arch_rule = self.get_graph_filter("Archaeological Site")
+            graphid = str(Graph.objects.get(name="Archaeological Site").pk)
+            resids = SiteFilter().get_resource_list_from_es_query(arch_rule, graphid)
+
+            start = time.time()
+            siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
+            siteid_nodeid = str(siteid_node.pk)
+            rep_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values("data", "resourceinstance_id")
+
+            reportids = []
+            for rd in rep_datas:
+                try:
+                    fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
+                except IndexError as e:
+                    pass
+                if fmsfid in resids:
+                    reportids.append(str(rd["resourceinstance_id"]))
+            
+            print(reportids)
+            print(len(reportids))
+            print(f"getting accessible sites: {time.time() - start}")
+
+            rule = generate_resourceid_filter(resourceids=reportids)
+        
+        else:
+            rule = generate_full_access_filter()
+
+        return rule
 
     def set_allowed_resources(self):
         """very confusingly, this method must be called from admin.LandManagerAdmin.save_related().
