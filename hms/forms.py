@@ -8,7 +8,6 @@ from fpan.models import Region
 
 
 class ScoutForm(UserCreationForm):
-    REGION_CHOICES = [(i.name, i.name) for i in Region.objects.all()]
     first_name = forms.CharField(
         max_length=30,
         help_text='Required',
