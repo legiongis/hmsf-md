@@ -19,7 +19,7 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 
 from arches.app.views.user import UserManagerView
 
-from fpan.search.components.site_filter import SiteFilter
+from fpan.search.components.rule_filter import RuleFilter
 
 logger = logging.getLogger(__name__)
 
@@ -31,8 +31,8 @@ class FPANUserManagerView(UserManagerView):
 
         # get rule for Archaeological Site resource model
         graphid = str(GraphModel.objects.get(name="Archaeological Site").pk)
-        rule = SiteFilter().compile_rules(user, graphids=[graphid], single=True)
-        sites = SiteFilter().get_resource_list_from_es_query(rule)
+        rule = RuleFilter().compile_rules(user, graphids=[graphid], single=True)
+        sites = RuleFilter().get_resource_list_from_es_query(rule)
 
         site_lookup = {}
         for i in sites:

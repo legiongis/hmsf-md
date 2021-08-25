@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 
-from fpan.search.components.site_filter import SiteFilter
+from fpan.search.components.rule_filter import RuleFilter
 from fpan.utils.permission_backend import user_is_land_manager
 
 logger = logging.getLogger(__name__)
@@ -24,14 +24,14 @@ def can_access_site_or_report(function):
         graphid = str(ResourceInstance.objects.get(pk=resourceid).graph_id)
         allowed = False
 
-        rule = SiteFilter().compile_rules(request.user, graphids=[graphid], single=True)
+        rule = RuleFilter().compile_rules(request.user, graphids=[graphid], single=True)
 
         if rule["access_level"] == "full_access":
             allowed = True
         elif rule["access_level"] == "no_access":
             allowed = False
         else:
-            resids = SiteFilter().get_resource_list_from_es_query(rule, ids_only=True)
+            resids = RuleFilter().get_resource_list_from_es_query(rule, ids_only=True)
             allowed = resourceid in resids
 
         logger.debug(f"can_access_site_or_report {allowed}: {time.time()-start}")

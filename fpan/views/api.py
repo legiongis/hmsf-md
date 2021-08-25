@@ -11,7 +11,7 @@ from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.utils.response import JSONResponse
 
-from fpan.search.components.site_filter import SiteFilter
+from fpan.search.components.rule_filter import RuleFilter
 
 logger = logging.getLogger(__name__)
 
@@ -49,13 +49,13 @@ class MVT(APIBase):
             #     resid_where = f"ST_Intersects(geom, ST_Transform('{geom}', 3857))"
 
             graphid = str(node.graph_id)
-            rule = SiteFilter().compile_rules(request.user, graphids=[graphid], single=True)
+            rule = RuleFilter().compile_rules(request.user, graphids=[graphid], single=True)
             if rule["access_level"] == "full_access":
                 resid_where = "NULL IS NULL"
             elif rule["access_level"] == "no_access":
                 return self.EMPTY_TILE
             else:
-                resids = SiteFilter().get_resource_list_from_es_query(rule, ids_only=True)
+                resids = RuleFilter().get_resource_list_from_es_query(rule, ids_only=True)
                 if len(resids) == 0:
                     return self.EMPTY_TILE
                 resid_str = "','".join([str(i) for i in resids])

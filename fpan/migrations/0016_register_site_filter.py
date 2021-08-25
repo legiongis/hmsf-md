@@ -4,18 +4,18 @@ from __future__ import unicode_literals
 from django.db import migrations
 from django.core import management
 
-def load_site_filter(apps, schema_editor):
+def load_rule_filter(apps, schema_editor):
 
     management.call_command(
         "extension", "search", "register",
-        source="fpan/search/components/site_filter.py"
+        source="fpan/search/components/rule_filter.py"
     )
 
-def remove_site_filter(apps, schema_editor):
+def remove_rule_filter(apps, schema_editor):
 
     management.call_command(
         "extension", "search", "unregister",
-        name="Site Filter"
+        name="Rule Filter"
     )
 
 class Migration(migrations.Migration):
@@ -25,5 +25,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(load_site_filter, remove_site_filter)
+        migrations.RunPython(load_rule_filter, remove_rule_filter)
     ]
