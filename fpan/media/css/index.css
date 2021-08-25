@@ -460,6 +460,12 @@ input[type='text'] {
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
   border-top: solid 8px #273675;
 }
+.profile-list {
+    width: 100%;
+    padding: 20px 100px;
+    min-height: 170px;
+    border-bottom: 0px;
+}
 .profile-list .panel {
   padding: 20px;
 }

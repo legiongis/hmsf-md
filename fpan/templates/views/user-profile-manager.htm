@@ -102,14 +102,12 @@
                 <section id="" class="profile-list">
                     <div class="panel panel fpan-panel-{{user_type}}">
                         <div class="row relative">
-
                             <!-- Section Title -->
                             <div class="col-sm-3">
                                 <div class="profile-header">
                                     {% trans 'Account' %}
                                 </div>
                             </div>
-
                             <div class="col-sm-9">
                                 <!-- ko if: showEditUserForm() === false -->
                                 <div class="row">
@@ -122,7 +120,7 @@
 
                                     <div class="col-sm-5">
                                         <h4 class="text-main">********</h4>
-                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
+                                        <button class="btn btn-lg btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
                                         {% trans 'Change password' %}</button>
                                         <div class="password-success" data-bind="text:changePasswordSuccess"></div>
                                         <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
@@ -133,7 +131,7 @@
 
                                     <div class="col-sm-2">
                                         <div>
-                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
+                                            <button class="btn btn-lg btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
                                         </div>
                                     </div>
                                 </div>
