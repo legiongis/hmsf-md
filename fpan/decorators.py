@@ -12,21 +12,6 @@ from fpan.utils.permission_backend import user_is_land_manager, user_is_new_land
 
 logger = logging.getLogger(__name__)
 
-def user_can_access_resource_instance(function):
-    @functools.wraps(function)
-    def wrapper(request, *args, **kwargs):
-
-        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
-        if resourceid is None:
-            raise Http404
-
-        if user_can_access_resource(request.user, resourceid):
-            return function(request, *args, **kwargs)
-        else:
-            raise Http404
-
-    return wrapper
-
 def can_access_site_or_report(function):
     @functools.wraps(function)
     def wrapper(request, *args, **kwargs):
