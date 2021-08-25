@@ -6,14 +6,14 @@
 
         <!-- Profile Summary -->
         <div class="profile-summary-page">
+          <div class="row">
+            <div class="profile-report profile-report-{{user_type}} relative">
 
-            <div class="profile-report relative">
-
-                <!-- Profile Top Panel Image 
+                <!-- Profile Top Panel Image
                 <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
                 -->
 
-                <div class="">
+                <div class="col-sm-9">
                     <div class="profile-full-name">
                         {{user.first_name}} {{user.last_name}}
                     </div>
@@ -21,6 +21,12 @@
                         User name: {{user.username}}
                     </div>
                 </div>
+                <div class="col-sm-3">
+                    {% if user_is_scout %}
+                        <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:292px;">
+                    {% endif %}
+                </div>
+              </div>
             </div>
 
             <!-- Profile Sections -->
@@ -209,7 +215,7 @@
                                         </div>
                                     </div>
                                 </div>
-                              
+
                             </div>
 
                             <!-- Section Title -->
@@ -228,9 +234,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
-                            
+
                         </div>
 
                     </div>
