@@ -226,299 +226,75 @@ class SiteFilter(BaseSearchFilter):
             self.apply_no_access_clause(rule["filter_config"]["graphid"])
 
         elif rule["access_level"] == "attribute_filter":
-            self.add_attribute_filter_clause(rule["filter_config"])
+            self.apply_attribute_filter_clause(rule["filter_config"])
 
         elif rule["access_level"] == "geo_filter":
-            self.add_geo_filter_clause(rule["filter_config"]["geometry"])
+            self.apply_geo_filter_clause(rule["filter_config"]["geometry"])
 
         elif rule["access_level"] == "resourceid_filter":
-            self.add_resourceid_filter_clause(rule["filter_config"]["resourceids"])
+            self.apply_resourceid_filter_clause(rule["filter_config"]["resourceids"])
 
         else:
             raise(Exception("Invalid rules for filter."))
 
     def apply_full_access_clause(self, graphid):
-        self.paramount.should(Terms(field="graph_id", terms=graphid))
+        terms = Terms(
+            field="graph_id",
+            terms=graphid,
+        )
+        self.paramount.should(terms)
 
     def apply_no_access_clause(self, graphid):
-        self.paramount.must_not(Terms(field="graph_id", terms=graphid))
-
-    def add_geo_filter_clause(self, geometry):
-
-        nested = self.create_nested_geo_filter(geometry)
-        self.apply_nested_clause(nested)
-
-    def add_attribute_filter_clause(self, filter_config):
-
-        if "value_list" not in filter_config:
-            if isinstance(filter_config["value"], list):
-                filter_config["value_list"] = filter_config["value"]
-            else:
-                filter_config["value_list"] = filter_config["value"]
-
-        nested = self.create_nested_attribute_filter(
-            filter_config["nodegroup_id"],
-            filter_config["value_list"],
+        terms = Terms(
+            field="graph_id",
+            terms=graphid,
         )
-        self.apply_nested_clause(nested)
+        self.paramount.must_not(terms)
 
-    def add_resourceid_filter_clause(self, resourceids):
+    def apply_attribute_filter_clause(self, filter_config):
+
+        attribute_bool = Bool()
+        terms = Terms(
+            field='strings.nodegroup_id',
+            terms=[filter_config["nodegroup_id"]]
+        )
+        attribute_bool.filter(terms)
+        for value in filter_config["value"]:
+            match = Match(
+                field='strings.string',
+                query=value,
+                type='phrase'
+            )
+            attribute_bool.should(match)
+
+        nested = Nested(
+            path='strings',
+            query=attribute_bool
+        )
+
+        if self.existing_query:
+            self.paramount.should(nested)
+        else:
+            self.paramount.must(nested)
+
+    def apply_resourceid_filter_clause(self, resourceids):
         """incomplete at this time, but would pull a list of resource ids
         from somewhere and put it in the query."""
 
-        new_resid_filter = Bool()
-        new_resid_filter.should(Terms(field='resourceinstanceid', terms=resourceids))
-        self.apply_nested_clause(new_resid_filter)
+        resid_bool = Bool()
+        terms = Terms(
+            field='resourceinstanceid',
+            terms=resourceids
+        )
+        resid_bool.should(terms)
 
-    def apply_nested_clause(self, clause):
-        """
-        This conditional handles situations where a new nested clause must
-        honor an existing query without overwriting or ignoring it.
-        """
         if self.existing_query:
-            self.paramount.should(clause)
+            self.paramount.should(resid_bool)
         else:
-            self.paramount.must(clause)
+            self.paramount.must(resid_bool)
 
-    def get_rules(self, user, doc_id):
+    def apply_geo_filter_clause(self, geometry):
 
-        full_access = {"access_level": "full_access"}
-        no_access = {"access_level": "no_access"}
-        attribute_filter = {
-            "access_level": "attribute_filter",
-            "filter_config": {
-                "node_name": "",
-                "value": ""
-            }
-        }
-        geo_filter = {
-            "access_level": "geo_filter",
-            "filter_config": {
-                "geometry": None
-            }
-        }
-
-        settings_perms = settings.RESOURCE_MODEL_USER_RESTRICTIONS
-
-        # assume full access if there is no condition in the settings.
-        # also, don't apply any extra filters to superuser admins.
-        if not doc_id in settings_perms or user.is_superuser:
-            return full_access
-
-        ## standard, basic check to apply restrictions to public users
-        if user_is_anonymous(user):
-            rules = copy.deepcopy(settings_perms[doc_id]['default'])
-
-        else:
-            rules = full_access
-
-        ## alternative, FPAN-specific scenarios for Archaeological Sites
-        if doc_id == "f212980f-d534-11e7-8ca8-94659cf754d0":
-            if user_is_scout(user):
-                rules = copy.deepcopy(settings_perms[doc_id]['default'])
-
-            # special handling of the state land manager permissions here
-            if user_is_old_landmanager(user):
-                rules = self.get_state_node_match(user)
-
-            elif user_is_new_landmanager(user):
-
-                if user.landmanager.full_access is True:
-                    rules = full_access
-
-                elif user.landmanager.apply_area_filter is True:
-                    ## this was supposed to be a proper geo_filter as below, but
-                    ## that doesn't allow for arbitrary assignment of nearby
-                    ## management areas.
-                    # multipolygon = user.landmanager.areas_as_multipolygon
-                    # geo_filter["filter_config"]["geometry"] = multipolygon
-                    # rules = geo_filter
-
-                    ## instead, apply attribute filter based on the names of
-                    ## of associated areas.
-                    attribute_filter["filter_config"]["node_name"] = "Management Area"
-                    attribute_filter["filter_config"]["value"] = [i.name for i in user.landmanager.all_areas]
-                    rules = attribute_filter
-
-                elif user.landmanager.apply_agency_filter is True:
-                    attribute_filter["filter_config"]["node_name"] = "Management Agency"
-                    attribute_filter["filter_config"]["value"] = [user.landmanager.management_agency.name]
-                    rules = attribute_filter
-
-                else:
-                    rules = no_access
-
-            else:
-                rules = no_access
-
-        ## do a little bit of processing on attribute filters to standardize
-        ## their configs 1) change node name to nodegroupids 2) handle <username>
-        ## directive 3) set all values to lists for later iteration.
-        if rules["access_level"] == "attribute_filter":
-
-            node_name = rules["filter_config"]["node_name"]
-            node = Node.objects.filter(
-                graph_id=doc_id,
-                name=node_name,
-            )
-            if len(node) == 1:
-                ngid = str(node[0].nodegroup_id)
-            else:
-                logger.warning(f"Error finding node '{node_name}' in {doc_id}. Check rules-filter settings.")
-                return no_access
-
-            rules["filter_config"]["nodegroup_id"] = ngid
-
-            if rules["filter_config"]["value"] == "<username>":
-                if user.username == "anonymous":
-                    rules["filter_config"]["value"] = ["anonymous"]
-                else:
-                    rules["filter_config"]["value"] = [user.username, "anonymous"]
-
-            if isinstance(rules["filter_config"]["value"], list):
-                rules["filter_config"]["value_list"] = rules["filter_config"]["value"]
-            else:
-                rules["filter_config"]["value_list"] = [rules["filter_config"]["value"]]
-
-        return rules
-
-
-    def get_state_node_match(self, user):
-        """ this method still determines Land Manager access levels. but
-        eventually it will be refactored to use the new LandManager model"""
-
-        from fpan.models import ManagedArea
-
-        full_access = {"access_level": "full_access"}
-        no_access = {"access_level": "no_access"}
-        attribute_filter = {
-            "access_level": "attribute_filter",
-            "filter_config": {
-                "node_name": "",
-                "value": ""
-            }
-        }
-
-        # The FL_BAR user gets full access to all sites
-        if user.groups.filter(name="FL_BAR").exists():
-            return full_access
-
-        # The FMSF user gets full access to all sites
-        if user.groups.filter(name="FMSF").exists():
-            return full_access
-
-        elif user.groups.filter(name="StatePark").exists():
-
-            # for the SPAdmin account, allow access to all sites in the state parks category
-            if user.username == "SPAdmin":
-                attribute_filter["filter_config"]["node_name"] = "Managed Area Category"
-                attribute_filter["filter_config"]["value"] = "State Parks"
-                return attribute_filter
-
-            # for district users, return a list of all the park names in their district
-            elif user.username.startswith("SPDistrict"):
-                try:
-                    dist_num = int(user.username[-1])
-                except:
-                    rules["access_level"] = "no_access"
-                    return no_access
-
-                parks = ManagedArea.objects.filter(sp_district=dist_num,
-                    agency="FL Dept. of Environmental Protection, Div. of Recreation and Parks")
-
-                attribute_filter["filter_config"]["node_name"] = "Managed Area Name"
-                attribute_filter["filter_config"]["value"] = [p.name for p in parks]
-                return attribute_filter
-
-            # finally, normal state park users are only allowed to see those that match their username
-            else:
-                try:
-                    park = ManagedArea.objects.get(nickname=user.username)
-                except ManagedArea.DoesNotExist:
-                    return no_access
-
-                attribute_filter["filter_config"]["node_name"] = "Managed Area Name"
-                attribute_filter["filter_config"]["value"] = park.name
-                return attribute_filter
-
-        # handle state forest access
-        elif user.groups.filter(name="FL_Forestry").exists():
-
-            # for the SFAdmin account, allow access to all sites in the state parks category
-            if user.username == "SFAdmin":
-
-                attribute_filter["filter_config"]["node_name"] = "Managed Area Category"
-                attribute_filter["filter_config"]["value"] = "State Forest"
-                return attribute_filter
-
-            else:
-                try:
-                    forest = ManagedArea.objects.get(nickname=user.username)
-                except:
-                    return no_access
-
-                attribute_filter["filter_config"]["node_name"] = "Managed Area Name"
-                attribute_filter["filter_config"]["value"] = forest.name
-                return attribute_filter
-
-        elif user.groups.filter(name="FWC").exists():
-
-            try:
-                fwc = ManagedArea.objects.get(nickname=user.username)
-            except:
-                return no_access
-
-            attribute_filter["filter_config"]["node_name"] = "Managed Area Name"
-            attribute_filter["filter_config"]["value"] = fwc.name
-            return attribute_filter
-
-        elif user.groups.filter(name="FL_AquaticPreserve").exists():
-
-            attribute_filter["filter_config"]["node_name"] = "Managing Agency"
-            attribute_filter["filter_config"]["value"] = "FL Dept. of Environmental Protection, Florida Coastal Office"
-            return attribute_filter
-
-        elif user.groups.filter(name="FL_WMD").exists():
-
-            if user.username == "SJRWMD_Admin":
-
-                attribute_filter["filter_config"]["node_name"] = "Managed Area Category"
-                attribute_filter["filter_config"]["value"] = "Water Management District"
-                return attribute_filter
-
-            elif user.username == "SJRWMD_NorthRegion":
-                districts = ["North","North Central","West"]
-                ma = ManagedArea.objects.filter(wmd_district__in=districts)
-
-            elif user.username == "SJRWMD_SouthRegion":
-                districts = ["South", "South Central", "Southwest"]
-                ma = ManagedArea.objects.filter(wmd_district__in=districts)
-
-            else:
-                districts = ["North", "North Central", "West", "South", "Southwest", "South Central"]
-                for district in districts:
-                    if user.username.startswith("SJRWMD") and district.replace(" ","") in user.username:
-                        ma = ManagedArea.objects.filter(wmd_district=district)
-
-            attribute_filter["filter_config"]["node_name"] = "Managed Area Name"
-            attribute_filter["filter_config"]["value"] = [m.name for m in ma]
-            return attribute_filter
-
-        else:
-            return no_access
-
-    def create_nested_attribute_filter(self, nodegroup_id, value_list):
-
-        new_string_filter = Bool()
-        new_string_filter.filter(Terms(field='strings.nodegroup_id', terms=[nodegroup_id]))
-        for value in value_list:
-            new_string_filter.should(Match(field='strings.string', query=value, type='phrase'))
-        nested = Nested(path='strings', query=new_string_filter)
-        return nested
-
-    def create_nested_geo_filter(self, geometry):
-
-        ## process GEOS geometry object into geojson and create ES filter
         geojson_geom = JSONDeserializer().deserialize(geometry.geojson)
         geoshape = GeoShape(
             field="geometries.geom.features.geometry",
@@ -526,84 +302,17 @@ class SiteFilter(BaseSearchFilter):
             coordinates=geojson_geom["coordinates"]
         )
 
-        new_spatial_filter = Bool()
-        new_spatial_filter.filter(geoshape)
-        nested = Nested(path='geometries', query=new_spatial_filter)
-        return nested
+        spatial_bool = Bool()
+        spatial_bool.filter(geoshape)
+        nested = Nested(
+            path='geometries',
+            query=spatial_bool
+        )
 
-    def quick_query(self, rules, doc):
-
-        if rules["access_level"] == "attribute_filter":
-            self.add_attribute_filter_clause(rules["filter_config"])
-
-        elif rules["access_level"] == "geo_filter":
-            self.add_geo_filter_clause(doc, rules["filter_config"]["geometry"])
-
-        se = SearchEngineFactory().create()
-        query = Query(se, start=0, limit=10000)
-        query.include('graph_id')
-        query.include('resourceinstanceid')
-        query.add_query(self.paramount)
-
-        ## doc_type is deprecated, must use a filter for graphid instead (i think)
-        results = query.search(index='resources', doc_type=doc)
-
-        return results
-
-    def get_resource_access_from_es_query(self, user, graphid, invert=False):
-        """
-        Returns the resourceinstanceids for all resources that a user is allowed to
-        access from a given graph. Set invert=True to return
-        ids that the user is NOT allowed to access.
-        """
-
-        self.paramount = Bool()
-        self.existing_query = False
-
-        response = {
-            "access_level": "partial_access",
-            "id_list": []
-        }
-
-        rules = self.compile_rules(user, graphids=[graphid], single=True)
-
-        if rules["access_level"] == "full_access":
-            response["access_level"] = "full_access"
-            return response
-
-        if rules["access_level"] == "no_access":
-            response["access_level"] = "no_access"
-            return response
-
-        try:
-            if rules["access_level"] == "attribute_filter":
-                self.add_attribute_filter_clause(rules["filter_config"])
-
-            elif rules["access_level"] == "geo_filter":
-                self.add_geo_filter_clause(rules["filter_config"]["geometry"])
-
-            se = SearchEngineFactory().create()
-            query = Query(se, start=0, limit=10000)
-            query.include('graph_id')
-            query.include('resourceinstanceid')
-            query.add_query(self.paramount)
-
-            ## doc_type is deprecated, must use a filter for graphid instead (i think)
-            results = query.search(index='resources', doc_type=graphid)
-
-        except Exception as e:
-            print(e)
-            results = self.quick_query(rules, graphid)
-
-        resourceids = list(set([i['_source']['resourceinstanceid'] for i in results['hits']['hits']]))
-
-        if invert is True:
-            inverted_res = ResourceInstance.objects.filter(graph_id=graphid).exclude(resourceinstanceid__in=resourceids)
-            resourceids = [str(i.resourceinstanceid) for i in inverted_res]
-
-        response["id_list"] = resourceids
-
-        return response
+        if self.existing_query:
+            self.paramount.should(nested)
+        else:
+            self.paramount.must(nested)
 
     def get_resource_list_from_es_query(self, rule, ids_only=False):
         """
