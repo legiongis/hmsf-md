@@ -460,3 +460,26 @@ input[type='text'] {
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
   border-top: solid 8px #273675;
 }
+.profile-list .panel {
+  padding: 20px;
+}
+.profile-list h2 {
+  color: #444;
+  font-size: 28px;
+  position: relative;
+  margin-bottom: 15px;
+  padding-bottom: 20px;
+  text-transform: uppercase;
+}
+.profile-list h2:after {
+  bottom: 0;
+  left: 50%;
+  height: 1px;
+  width: 70px;
+  content: " ";
+  margin-left: -35px;
+  position: absolute;
+}
+.profile-list h2:after, i.icon-bg-u {
+    background: #4765a0;
+}
