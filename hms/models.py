@@ -393,16 +393,6 @@ class LandManager(models.Model):
         logger.debug(f"get_allowed_resources: {time.time()-start}")
         return id_list
 
-
-    def set_allowed_resources(self):
-        """very confusingly, this method must be called from admin.LandManagerAdmin.save_related().
-        This is because self.save() and post_save here do not yet have the updated versions
-        of the ManyToManyFields (individual_areas and grouped_areas)"""
-
-        # from hms.utils import update_hms_permissions_table
-        # update_hms_permissions_table(user=self.user)
-        pass
-
     def site_access_rules_formatted(self):
         content = {}
         content["Archaeological Site"] = self.get_graph_filter("Archaeological Site")
