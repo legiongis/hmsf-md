@@ -11,7 +11,6 @@ from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.utils.response import JSONResponse
 
-from hms.models import UserXResourceInstanceAccess
 from fpan.search.components.site_filter import SiteFilter
 
 logger = logging.getLogger(__name__)

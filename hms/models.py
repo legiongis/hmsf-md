@@ -80,18 +80,6 @@ def report_filter_from_site_filter(site_filter):
     return report_filter
 
 
-class UserXResourceInstanceAccess(models.Model):
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-    )
-    resource = models.ForeignKey(
-        Resource,
-        on_delete=models.CASCADE,
-    )
-
-# Create your models here.
 class Scout(User):
     middle_initial = models.CharField(max_length=1)
 
