@@ -13,7 +13,7 @@
                 <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
                 -->
 
-                <div class="col-sm-9">
+                <div class="col-sm-6">
                     <div class="profile-full-name">
                         {{user.first_name}} {{user.last_name}}
                     </div>
@@ -21,7 +21,7 @@
                         User name: {{user.username}}
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-6 text-right">
                     {% if user_is_scout %}
                         <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:292px;">
                     {% endif %}

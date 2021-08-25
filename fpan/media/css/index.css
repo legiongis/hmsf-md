@@ -443,7 +443,7 @@ input[type='text'] {
 }
 /* User profile page elements */
 .profile-report-scout {
-  padding: 10px 0px;
+  padding: 10px 10px 10px 0px;
   background: url('../img/fpan/bedge_muted.png');
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
   border-top: solid 8px #F26422;
