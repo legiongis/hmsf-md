@@ -80,18 +80,6 @@ def report_filter_from_site_filter(site_filter):
     return report_filter
 
 
-class UserXResourceInstanceAccess(models.Model):
-
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-    )
-    resource = models.ForeignKey(
-        Resource,
-        on_delete=models.CASCADE,
-    )
-
-# Create your models here.
 class Scout(User):
     middle_initial = models.CharField(max_length=1)
 
@@ -182,7 +170,7 @@ class ScoutProfile(models.Model):
                     value=self.user.username
                 )
 
-        if graph_name == "Scout Report":
+        elif graph_name == "Scout Report":
             ## This is identical to the analogous section of LandManager.get_graph_filter()
             arch_rule = self.get_graph_filter("Archaeological Site")
             rule = report_filter_from_site_filter(arch_rule)
@@ -190,6 +178,7 @@ class ScoutProfile(models.Model):
         else:
             rule = generate_full_access_filter(graph_name)
 
+        # print(rule)
         return rule
 
     def get_allowed_resources(self, graph_name, ids_only=False):
@@ -392,16 +381,6 @@ class LandManager(models.Model):
         id_list = SiteFilter().get_resource_list_from_es_query(rule, ids_only=ids_only)
         logger.debug(f"get_allowed_resources: {time.time()-start}")
         return id_list
-
-
-    def set_allowed_resources(self):
-        """very confusingly, this method must be called from admin.LandManagerAdmin.save_related().
-        This is because self.save() and post_save here do not yet have the updated versions
-        of the ManyToManyFields (individual_areas and grouped_areas)"""
-
-        # from hms.utils import update_hms_permissions_table
-        # update_hms_permissions_table(user=self.user)
-        pass
 
     def site_access_rules_formatted(self):
         content = {}

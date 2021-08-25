@@ -35,15 +35,6 @@ class LandManagerAdmin(admin.ModelAdmin):
     exclude = ('username', )
     readonly_fields = ('site_access_rules_formatted', 'accessible_sites_formatted')
 
-    # this is how the allowed resources table is updated on save()
-    # it needs to be here so that the m2m field is properly updated before the
-    # operation is run.
-    def save_related(self, request, form, formsets, change):
-        form.save_m2m()
-        form.instance.set_allowed_resources()
-        super().save_related(request, form, formsets, change)
-
-
 admin.site.register(LandManager, LandManagerAdmin)
 
 ## this is registered so that a new Land Manager can be made directly from the
