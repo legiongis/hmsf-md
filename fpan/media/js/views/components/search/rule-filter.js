@@ -2,11 +2,11 @@ define([
     'knockout',
     'views/components/search/base-filter',
 ], function(ko, BaseFilter) {
-    var componentName = 'site-filter';
+    var componentName = 'rule-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
             initialize: function(options) {
-                options.name = 'Site Filter';
+                options.name = 'Rule Filter';
                 BaseFilter.prototype.initialize.call(this, options);
                 this.restoreState();
             },
@@ -18,6 +18,6 @@ define([
             },
 
         }),
-        template: { require: 'text!templates/views/components/search/site-filter.htm' }
+        template: { require: 'text!templates/views/components/search/rule-filter.htm' }
     });
 });

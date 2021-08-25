@@ -20,82 +20,70 @@ logger = logging.getLogger(__name__)
 
 details = {
     "searchcomponentid": "",
-    "name": "Site Filter",
+    "name": "Rule Filter",
     "icon": "fa fa-key",
-    "modulename": "site_filter.py",
-    "classname": "SiteFilter",
+    "modulename": "rule_filter.py",
+    "classname": "RuleFilter",
     "type": "popup",
-    "componentpath": "views/components/search/site-filter",
-    "componentname": "site-filter",
+    "componentpath": "views/components/search/rule-filter",
+    "componentname": "rule-filter",
     "sortorder": "0",
     "enabled": True,
 }
 
+class Rule(object):
 
-def generate_no_access_filter(graph_name):
-    graphid = str(GraphModel.objects.get(name=graph_name).pk)
-    return {
-        "access_level": "no_access",
-        "filter_config": {
-            "graphid": graphid,
-        }
-    }
+    def __init__(self, rule_type, **kwargs):
 
-def generate_full_access_filter(graph_name):
-    graphid = str(GraphModel.objects.get(name=graph_name).pk)
-    return {
-        "access_level": "full_access",
-        "filter_config": {
-            "graphid": graphid,
-        }
-    }
+        self.type = rule_type
+        self.graph_id = kwargs.get("graph_id")
+        self.graph_name = kwargs.get("graph_name")
+        self.config = {}
 
-def generate_attribute_filter(graph_name="", node_name="", value=[]):
+        if not self.graph_id and self.graph_name:
+            self.graph_id = str(GraphModel.objects.get(name=self.graph_name).pk)
 
-    nodegroup_id = None
-    if node_name and graph_name:
-        node = Node.objects.filter(
-            graph__name=graph_name,
-            name=node_name,
-        )
-        if len(node) == 1:
-            nodegroup_id = str(node[0].nodegroup_id)
+        if self.type in ["full_access", "no_access"]:
+            self.config["graph_id"] = self.graph_id
+
+        elif self.type == "attribute_filter":
+            node_name = kwargs.get("node_name")
+            if not node_name or not self.graph_id:
+                raise(Exception(f"Invalid params for {self.type} rule."))
+
+            node = Node.objects.filter(graph=self.graph_id, name=node_name)
+            if len(node) == 1:
+                nodegroup_id = str(node[0].nodegroup_id)
+            else:
+                raise(Exception(f"rule error: Can't find single node '{node_name}' in {self.graph_name}."))
+
+            value = kwargs.get("value", [])
+            if not isinstance(value, list):
+                value = [value]
+
+            self.config["node_name"] = node_name
+            self.config["nodegroup_id"] = nodegroup_id
+            self.config["value"] = value
+
+        elif self.type == "resourceid_filter":
+            self.config["resourceids"] = kwargs.get("resourceids", [])
+
+        elif self.type == "geo_filter":
+            self.config["geometry"] = kwargs.get("geometry")
+
         else:
-            logger.warning(f"Attribute Filter: error finding single node '{node_name}' in {graph_name}.")
-            return generate_no_access_filter(graph_name)
+            raise(Exception(f"Invalid rule type: {self.type}"))
 
-    if not isinstance(value, list):
-        value = [value]
+    def serialize(self):
 
-    return {
-        "access_level": "attribute_filter",
-        "filter_config": {
-            "node_name": node_name,
-            "nodegroup_id": nodegroup_id,
-            "value": value
+        return {
+            "type": self.type,
+            "config": self.config,
         }
-    }
-
-def generate_resourceid_filter(resourceids=[]):
-    return {
-        "access_level": "resourceid_filter",
-        "filter_config": {
-            "resourceids": resourceids
-        }
-    }
-
-def generate_geo_filter(geometry=None):
-    """Not implemented anywhere and will likely need more inputs, like a
-    graphid"""
-    return {
-        "access_level": "geo_filter",
-        "filter_config": {
-            "geometry": geometry
-        }
-    }
 
 
-class SiteFilter(BaseSearchFilter):
+
+class RuleFilter(BaseSearchFilter):
 
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
         """
@@ -153,7 +141,7 @@ class SiteFilter(BaseSearchFilter):
         ## iterate rules, applying them to self.paramount thereby generating
         ## a composite query.
         for rule in collected_rules:
-            self.apply_graph_filter(rule)
+            self.apply_rule(rule)
 
         search_results_object["query"].add_query(self.paramount)
 
@@ -177,37 +165,37 @@ class SiteFilter(BaseSearchFilter):
             graph_name = GraphModel.objects.get(graphid=graphid).name
 
             if user.is_superuser:
-                rule = generate_full_access_filter(graph_name)
+                rule = Rule("full_access", graph_name=graph_name)
 
             elif user_is_land_manager(user):
-                rule = user.landmanager.get_graph_filter(graph_name)
+                rule = user.landmanager.get_graph_rule(graph_name)
 
             elif user_is_scout(user):
-                rule = user.scout.scoutprofile.get_graph_filter(graph_name)
+                rule = user.scout.scoutprofile.get_graph_rule(graph_name)
 
             elif user_is_anonymous(user):
                 ## manual handling of public users here
                 if graph_name == "Archaeological Site":
-                    rule = generate_attribute_filter(
+                    rule = Rule("attribute_filter",
                         graph_name=graph_name,
                         node_name="Assigned To",
                         value=[user.username],
                     )
 
                 elif graph_name == "Scout Report":
-                    rule = generate_no_access_filter(graph_name)
+                    rule = Rule("no_access", graph_name=graph_name)
 
                 else:
-                    rule = generate_full_access_filter(graph_name)
+                    rule = Rule("full_access", graph_name=graph_name)
 
             else:
                 # this will catch old land managers before their profiles
                 # have been created.
                 logger.debug(f"compile_rules: user {user.username} is adrift.")
                 if graph_name in ["Archaeological Site", "Scout Report"]:
-                    rule = generate_no_access_filter(graph_name)
+                    rule = Rule("no_access", graph_name=graph_name)
                 else:
-                    rule = generate_full_access_filter(graph_name)
+                    rule = Rule("full_access", graph_name=graph_name)
 
             compiled_rules.append(rule)
 
@@ -216,27 +204,27 @@ class SiteFilter(BaseSearchFilter):
         else:
             return compiled_rules
 
-    def apply_graph_filter(self, rule):
+    def apply_rule(self, rule):
 
-        if rule["access_level"] == "full_access":
-            self.apply_full_access_clause(rule["filter_config"]["graphid"])
+        if rule.type == "full_access":
+            self.add_full_access_clause(rule.config["graph_id"])
 
-        elif rule["access_level"] == "no_access":
-            self.apply_no_access_clause(rule["filter_config"]["graphid"])
+        elif rule.type == "no_access":
+            self.add_no_access_clause(rule.config["graph_id"])
 
-        elif rule["access_level"] == "attribute_filter":
-            self.apply_attribute_filter_clause(rule["filter_config"])
+        elif rule.type == "attribute_filter":
+            self.add_attribute_filter_clause(rule.config)
 
-        elif rule["access_level"] == "geo_filter":
-            self.apply_geo_filter_clause(rule["filter_config"]["geometry"])
+        elif rule.type == "geo_filter":
+            self.add_geo_filter_clause(rule.config["geometry"])
 
-        elif rule["access_level"] == "resourceid_filter":
-            self.apply_resourceid_filter_clause(rule["filter_config"]["resourceids"])
+        elif rule.type == "resourceid_filter":
+            self.add_resourceid_filter_clause(rule.config["resourceids"])
 
         else:
             raise(Exception("Invalid rules for filter."))
 
-    def apply_full_access_clause(self, graphid):
+    def add_full_access_clause(self, graphid):
 
         terms = Terms(
             field="graph_id",
@@ -245,7 +233,7 @@ class SiteFilter(BaseSearchFilter):
 
         self.paramount.should(terms)
 
-    def apply_no_access_clause(self, graphid):
+    def add_no_access_clause(self, graphid):
 
         terms = Terms(
             field="graph_id",
@@ -254,15 +242,15 @@ class SiteFilter(BaseSearchFilter):
 
         self.paramount.must_not(terms)
 
-    def apply_attribute_filter_clause(self, filter_config):
+    def add_attribute_filter_clause(self, rule_config):
 
         attribute_bool = Bool()
         terms = Terms(
             field='strings.nodegroup_id',
-            terms=[filter_config["nodegroup_id"]]
+            terms=[rule_config["nodegroup_id"]]
         )
         attribute_bool.filter(terms)
-        for value in filter_config["value"]:
+        for value in rule_config["value"]:
             match = Match(
                 field='strings.string',
                 query=value,
@@ -280,7 +268,7 @@ class SiteFilter(BaseSearchFilter):
         else:
             self.paramount.must(nested)
 
-    def apply_resourceid_filter_clause(self, resourceids):
+    def add_resourceid_filter_clause(self, resourceids):
         """incomplete at this time, but would pull a list of resource ids
         from somewhere and put it in the query."""
 
@@ -296,7 +284,7 @@ class SiteFilter(BaseSearchFilter):
         else:
             self.paramount.must(resid_bool)
 
-    def apply_geo_filter_clause(self, geometry):
+    def add_geo_filter_clause(self, geometry):
 
         geojson_geom = JSONDeserializer().deserialize(geometry.geojson)
         geoshape = GeoShape(
@@ -317,7 +305,7 @@ class SiteFilter(BaseSearchFilter):
         else:
             self.paramount.must(nested)
 
-    def get_resource_list_from_es_query(self, rule, ids_only=False):
+    def get_resources_from_rule(self, rule, ids_only=False):
         """
         Returns a list of resources for single graph_filter rule. This
         can be used in other parts of the app, like MVT() or decorators.
@@ -332,10 +320,10 @@ class SiteFilter(BaseSearchFilter):
         self.paramount = Bool()
         self.existing_query = False
 
-        if rule["access_level"] in ["full_access", "no_access"]:
+        if rule.type in ["full_access", "no_access"]:
             return list()
 
-        self.apply_graph_filter(rule)
+        self.apply_rule(rule)
 
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
