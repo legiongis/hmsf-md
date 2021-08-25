@@ -12,7 +12,7 @@ body, body.body-anonymous, body.body-admin {
 body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {
     background: url('../img/fpan/ricepaper-hms.png');
 }
-body.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager {
+body.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager, .profile-sections-landmanager {
     background: url('../img/fpan/ricepaper-state.png');
 }
 
@@ -453,4 +453,10 @@ input[type='text'] {
 }
 .profile-e-mail {
   color: #555;
+}
+.profile-report-landmanager {
+  padding: 10px 10px 10px 0px;
+  background: url('../img/fpan/bedge_muted.png');
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+  border-top: solid 8px #273675;
 }
