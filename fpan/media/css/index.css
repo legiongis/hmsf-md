@@ -442,17 +442,17 @@ input[type='text'] {
   margin-top: 10px;
 }
 /* User profile page elements */
-.profile-report-scout {
-  padding: 10px 10px 10px 0px;
-  background: url('../img/fpan/bedge_muted.png');
-  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-  border-top: solid 8px #F26422;
-}
 .profile-full-name {
   color: black;
 }
 .profile-e-mail {
   color: #555;
+}
+.profile-report-scout {
+  padding: 10px 10px 10px 0px;
+  background: url('../img/fpan/bedge_muted.png');
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+  border-top: solid 8px #F26422;
 }
 .profile-report-landmanager {
   padding: 10px 10px 10px 0px;
@@ -462,6 +462,19 @@ input[type='text'] {
 }
 .profile-list .panel {
   padding: 20px;
+}
+.profile-list .scout-panel {
+  padding: 0px;
+}
+.scout-panel .panel-title {
+  color: white;
+  font-size: 1em;
+  margin-top: -1px;
+}
+.profile-list h1 {
+  color: #555;
+  font-size: 2.441em;
+  font-weight: 400;
 }
 .profile-list h2 {
   color: #444;
