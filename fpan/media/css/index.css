@@ -9,7 +9,7 @@ body, body.body-anonymous, body.body-admin {
     font-size: 16px;
     line-height: 1.65;
 }
-body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout {
+body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {
     background: url('../img/fpan/ricepaper-hms.png');
 }
 body.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager {
