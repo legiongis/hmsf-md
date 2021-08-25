@@ -50,26 +50,6 @@ RESOURCE_FORMATTERS['shp'] = None
 DISABLE_PROVISIONAL_EDITING = True
 HIDE_EMPTY_NODES_IN_REPORT = True
 
-## example of the default filter that is applied to anonymous and Scout users.
-## the land manager accounts don't reference this setting at all, their permissions
-## are all handled in the site_filter component.
-RESOURCE_MODEL_USER_RESTRICTIONS = {
-    'f212980f-d534-11e7-8ca8-94659cf754d0': {
-        'default': {
-            'access_level':'attribute_filter',
-            'filter_config': {
-                'node_name':'Assigned To',
-                'value':"<username>"
-            }
-        }
-    },
-    '14578901-bd5d-11e9-822a-94659cf754d0': {
-        'default': {
-            'access_level':'no_access'
-        }
-    }
-}
-
 AUTH_PASSWORD_VALIDATORS = [
     #Passwords cannot be entirely numeric
     {'NAME': 'arches.app.utils.password_validation.NumericPasswordValidator'},

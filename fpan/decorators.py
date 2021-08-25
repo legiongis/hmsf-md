@@ -6,26 +6,10 @@ from django.core.exceptions import PermissionDenied
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 
-from hms.utils import user_can_access_resource
-from fpan.search.components.site_filter import SiteFilter
-from fpan.utils.permission_backend import user_is_land_manager, user_is_new_landmanager
+from fpan.search.components.rule_filter import RuleFilter
+from fpan.utils.permission_backend import user_is_land_manager
 
 logger = logging.getLogger(__name__)
-
-def user_can_access_resource_instance(function):
-    @functools.wraps(function)
-    def wrapper(request, *args, **kwargs):
-
-        resourceid = kwargs["resourceid"] if "resourceid" in kwargs else None
-        if resourceid is None:
-            raise Http404
-
-        if user_can_access_resource(request.user, resourceid):
-            return function(request, *args, **kwargs)
-        else:
-            raise Http404
-
-    return wrapper
 
 def can_access_site_or_report(function):
     @functools.wraps(function)
@@ -37,26 +21,17 @@ def can_access_site_or_report(function):
         if resourceid is None:
             raise Http404
 
-        # kick back to old function for old land managers for now
-        if user_is_land_manager(request.user):
-            if not user_is_new_landmanager(request.user):
-                logger.debug("can_access_site_or_report: processing old land manager")
-                if user_can_access_resource(request.user, resourceid):
-                    return function(request, *args, **kwargs)
-                else:
-                    raise Http404
-
         graphid = str(ResourceInstance.objects.get(pk=resourceid).graph_id)
         allowed = False
 
-        rule = SiteFilter().compile_rules(request.user, graphids=[graphid], single=True)
+        rule = RuleFilter().compile_rules(request.user, graphids=[graphid], single=True)
 
-        if rule["access_level"] == "full_access":
+        if rule.type == "full_access":
             allowed = True
-        elif rule["access_level"] == "no_access":
+        elif rule.type == "no_access":
             allowed = False
         else:
-            resids = SiteFilter().get_resource_list_from_es_query(rule, ids_only=True)
+            resids = RuleFilter().get_resources_from_rule(rule, ids_only=True)
             allowed = resourceid in resids
 
         logger.debug(f"can_access_site_or_report {allowed}: {time.time()-start}")
@@ -79,7 +54,7 @@ def can_edit_scout_report(function):
         if ResourceInstance.objects.get(pk=resourceid).graph.name == "Scout Report":
             if request.user.is_superuser:
                 allowed = True
-            elif user_is_new_landmanager(request.user) and request.user.landmanager.site_access_mode == "FULL":
+            elif user_is_land_manager(request.user) and request.user.landmanager.site_access_mode == "FULL":
                 allowed = True
             else:
                 res = Resource.objects.get(pk=resourceid)
