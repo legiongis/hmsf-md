@@ -13,8 +13,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializ
 from fpan.utils.permission_backend import (
     user_is_anonymous,
     user_is_scout,
-    user_is_new_landmanager,
-    user_is_old_landmanager,
+    user_is_land_manager,
 )
 
 logger = logging.getLogger(__name__)
@@ -180,14 +179,8 @@ class SiteFilter(BaseSearchFilter):
             if user.is_superuser:
                 rule = generate_full_access_filter(graph_name)
 
-            elif user_is_new_landmanager(user):
+            elif user_is_land_manager(user):
                 rule = user.landmanager.get_graph_filter(graph_name)
-
-            elif user_is_old_landmanager(user):
-                ## must retain old logic here until original land manager
-                ## system is fully deprecated.
-                logger.warning(f"old land manager: {user.username}")
-                rule = self.get_rules(user, graphid)
 
             elif user_is_scout(user):
                 rule = user.scout.scoutprofile.get_graph_filter(graph_name)
@@ -208,7 +201,13 @@ class SiteFilter(BaseSearchFilter):
                     rule = generate_full_access_filter(graph_name)
 
             else:
-                rule = generate_no_access_filter(graph_name)
+                # this will catch old land managers before their profiles
+                # have been created.
+                logger.debug(f"compile_rules: user {user.username} is adrift.")
+                if graph_name in ["Archaeological Site", "Scout Report"]:
+                    rule = generate_no_access_filter(graph_name)
+                else:
+                    rule = generate_full_access_filter(graph_name)
 
             compiled_rules.append(rule)
 
@@ -238,17 +237,21 @@ class SiteFilter(BaseSearchFilter):
             raise(Exception("Invalid rules for filter."))
 
     def apply_full_access_clause(self, graphid):
+
         terms = Terms(
             field="graph_id",
             terms=graphid,
         )
+
         self.paramount.should(terms)
 
     def apply_no_access_clause(self, graphid):
+
         terms = Terms(
             field="graph_id",
             terms=graphid,
         )
+
         self.paramount.must_not(terms)
 
     def apply_attribute_filter_clause(self, filter_config):

@@ -20,11 +20,6 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.views.user import UserManagerView
 
 from fpan.search.components.site_filter import SiteFilter
-from fpan.utils.permission_backend import (
-    user_is_scout,
-    user_is_new_landmanager,
-    user_is_old_landmanager,
-)
 
 logger = logging.getLogger(__name__)
 

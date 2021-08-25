@@ -182,7 +182,7 @@ class ScoutProfile(models.Model):
                     value=self.user.username
                 )
 
-        if graph_name == "Scout Report":
+        elif graph_name == "Scout Report":
             ## This is identical to the analogous section of LandManager.get_graph_filter()
             arch_rule = self.get_graph_filter("Archaeological Site")
             rule = report_filter_from_site_filter(arch_rule)
@@ -190,6 +190,7 @@ class ScoutProfile(models.Model):
         else:
             rule = generate_full_access_filter(graph_name)
 
+        # print(rule)
         return rule
 
     def get_allowed_resources(self, graph_name, ids_only=False):
