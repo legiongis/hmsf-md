@@ -33,11 +33,23 @@ details = {
 }
 
 
-def generate_no_access_filter():
-    return {"access_level": "no_access"}
+def generate_no_access_filter(graph_name):
+    graphid = str(GraphModel.objects.get(name=graph_name).pk)
+    return {
+        "access_level": "no_access",
+        "filter_config": {
+            "graphid": graphid,
+        }
+    }
 
-def generate_full_access_filter():
-    return {"access_level": "full_access"}
+def generate_full_access_filter(graph_name):
+    graphid = str(GraphModel.objects.get(name=graph_name).pk)
+    return {
+        "access_level": "full_access",
+        "filter_config": {
+            "graphid": graphid,
+        }
+    }
 
 def generate_attribute_filter(graph_name="", node_name="", value=[]):
 
@@ -50,7 +62,7 @@ def generate_attribute_filter(graph_name="", node_name="", value=[]):
         if len(node) == 1:
             nodegroup_id = str(node[0].nodegroup_id)
         else:
-            logger.warning(f"Error finding single node '{node_name}' in {graph_name}.")
+            logger.warning(f"Attribute Filter: error finding single node '{node_name}' in {graph_name}.")
             return generate_no_access_filter(graph_name)
 
     if not isinstance(value, list):
@@ -74,6 +86,8 @@ def generate_resourceid_filter(resourceids=[]):
     }
 
 def generate_geo_filter(geometry=None):
+    """Not implemented anywhere and will likely need more inputs, like a
+    graphid"""
     return {
         "access_level": "geo_filter",
         "filter_config": {
@@ -85,9 +99,17 @@ def generate_geo_filter(geometry=None):
 class SiteFilter(BaseSearchFilter):
 
     def append_dsl(self, search_results_object, permitted_nodegroups, include_provisional):
+        """
+        This is the method that Arches calls, and ultimately all it does is
 
-        ## set some class properties here, as this is the access method Arches uses
-        ## to instantiate this object.
+          search_results_object["query"].add_query(some_new_es_dsl)
+        
+        Many other methods of this class are used as helpers for generating
+        the new dsl content, which is stored in self.paramount.
+        """
+
+        ## set some properties here, as this is the access method Arches uses
+        ## to instantiate this class.
         self.paramount = Bool()
         self.existing_query = False
 
@@ -103,161 +125,130 @@ class SiteFilter(BaseSearchFilter):
             with open(os.path.join(settings.LOG_DIR, "dsl_before_fpan.json"), "w") as output:
                 json.dump(original_dsl, output, indent=1)
 
-        querystring_params = self.request.GET.get(details["componentname"], "")
-
         ## Should always be enabled. If not (like someone typed in a different URL) raise exception.
+        querystring_params = self.request.GET.get(details["componentname"])
         if querystring_params != "enabled":
-            raise(Exception("Site filter is registered but not shown as enabled."))
+            raise(Exception("Error: Site filter is registered but not shown as enabled."))
 
-        try:
+        ## first list all graph ids so rules will be made for each one
+        graphids_uuid = (
+            GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
+            .exclude(isresource=False)
+            .exclude(isactive=False).values_list('graphid', flat=True)
+        )
+        graphids = [str(i) for i in graphids_uuid]
 
-            collected_rules = self.compile_rules(self.request.user, graphlist=self.get_doc_types())
+        ## then honor the resource-type-filter if it exists
+        type_filter = self.request.GET.get("resource-type-filter")
+        if type_filter:
+            type_filter_params = JSONDeserializer().deserialize(type_filter)[0]
+            if type_filter_params["inverted"] is True:
+                graphids.remove(type_filter_params["graphid"])
+            else:
+                graphids = [type_filter_params["graphid"]]
 
-            ## iterate rules and generate a composite query based on them
-            for graphid, rule in collected_rules.items():
+        ## now create a user-determined rule for each graph in the request.
+        ## collected rules are created with the rule generators above.
+        collected_rules = self.compile_rules(self.request.user, graphids=graphids)
 
-                if rule["access_level"] == "full_access":
-                    self.add_full_access_clause(graphid)
+        ## iterate rules, applying them to self.paramount thereby generating
+        ## a composite query.
+        for rule in collected_rules:
+            self.apply_graph_filter(rule)
 
-                elif rule["access_level"] == "no_access":
-                    self.add_no_access_clause(graphid)
+        search_results_object["query"].add_query(self.paramount)
 
-                elif rule["access_level"] == "attribute_filter":
-                    self.add_attribute_filter_clause(graphid, rule["filter_config"])
-
-                elif rule["access_level"] == "geo_filter":
-                    self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
-
-                elif rule["access_level"] == "resourceid_filter":
-                    self.add_resourceid_filter_clause(rule["filter_config"]["resourceids"])
-
-                else:
-                    raise(Exception("Invalid rules for filter."))
-
-                # else:
-                    # make called to access table and if under 1500 resources are
-                    # allowed, then push all of these resource ids directly to
-                    # the ES query. Otherwise, revert to using the actual
-                    # query rules.
-
-                    #allowed = UserXResourceInstanceAccess.objects.filter(
-                    #    user=self.request.user,
-                    #    resource__graph_id=graphid,
-                    #)
-                    # if len(allowed) < 1500:
-                    #     # this should be altered to take the resids as an arg 
-                    #     self.add_resourceid_filter_clause(graphid, self.request.user)
-                    #else:
-                        # if rule["access_level"] == "geo_filter":
-                        #     self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
-                        #     # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
-                        #
-                        # elif rule["access_level"] == "attribute_filter":
-                        #     # self.create_attribute_filter(graphid, rule["filter_config"])
-                        #     self.add_attribute_filter_clause(graphid, rule["filter_config"])
-                        # else:
-                            # raise(Exception("Invalid rules for filter."))
-
-                    # if hasattr(self.request.user, 'landmanager'):
-                    #     self.add_resourceid_filter_clause(graphid, self.request.user)
-
-                    # else:
-                    #     if rule["access_level"] == "geo_filter":
-                    #         self.add_geo_filter_clause(graphid, rule["filter_config"]["geometry"])
-                    #         # self.create_geo_filter(graphid, rules["filter_config"]["geometry"])
-
-                    #     else:
-                    #         raise(Exception("Invalid rules for filter."))
-
-            search_results_object["query"].add_query(self.paramount)
-
-            if settings.LOG_LEVEL == "DEBUG":
-                with open(os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w") as output:
-                    json.dump(search_results_object["query"]._dsl, output, indent=1)
-
-        except Exception as e:
-            print("\n\n")
-            print(e)
-            logger.debug(e)
-            raise(e)
+        if settings.LOG_LEVEL == "DEBUG":
+            with open(os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w") as output:
+                json.dump(search_results_object["query"]._dsl, output, indent=1)
     
-    def compile_rules(self, user, graph=None, graphlist=[]):
+    def compile_rules(self, user, graphids=[], single=False):
+        """
+        Pass in a user and a list of graphids to generate filters for each graph
+        based on user characteristics. If a single graphid is passed in, then
+        you can add single=True to return a single rule, instead of a list
+        containing only one rule.
 
-        ## handle input of single graphid or multiple graphids
-        if graph is not None:
-            graphids = [graph]
-        elif len(graphlist) > 0:
-            graphids = graphlist
-        else:
-            return {}
+        Potentially, user-defined settings could be pulled in here to extrapolate
+        this logic to the front-end.
+        """
 
-        compiled_rules = {}
+        compiled_rules = []
         for graphid in graphids:
             graph_name = GraphModel.objects.get(graphid=graphid).name
 
             if user.is_superuser:
-                compiled_rules[graphid] = generate_full_access_filter()
-                continue
+                rule = generate_full_access_filter(graph_name)
 
             elif user_is_new_landmanager(user):
-                logger.debug(f"new land manager: {user.username}")
-                # rule = user.landmanager.site_access_rules.get(graph_name)
                 rule = user.landmanager.get_graph_filter(graph_name)
-                # print(user.landmanager.visible_reports)
-                compiled_rules[graphid] = rule
 
             elif user_is_old_landmanager(user):
                 ## must retain old logic here until original land manager
                 ## system is fully deprecated.
-                logger.debug(f"old land manager: {user.username}")
-                compiled_rules[graphid] = self.get_rules(user, graphid)
+                logger.warning(f"old land manager: {user.username}")
+                rule = self.get_rules(user, graphid)
 
             elif user_is_scout(user):
-                rule = user.scout.scoutprofile.site_access_rules.get(graph_name)
-                if rule is None:
-                    rule = generate_full_access_filter()
-                compiled_rules[graphid] = rule
+                rule = user.scout.scoutprofile.get_graph_filter(graph_name)
 
             elif user_is_anonymous(user):
                 ## manual handling of public users here
                 if graph_name == "Archaeological Site":
-                    compiled_rules[graphid] = generate_attribute_filter(
+                    rule = generate_attribute_filter(
                         graph_name=graph_name,
                         node_name="Assigned To",
                         value=[user.username],
                     )
 
                 elif graph_name == "Scout Report":
-                    compiled_rules[graphid] = generate_no_access_filter()
+                    rule = generate_no_access_filter(graph_name)
 
                 else:
-                    compiled_rules[graphid] = generate_full_access_filter()
+                    rule = generate_full_access_filter(graph_name)
 
             else:
-                compiled_rules[graphid] = generate_no_access_filter()
+                rule = generate_no_access_filter(graph_name)
 
-        ## return single ruleset if graph was provided, full dict
-        ## if graphlist was provided
-        if graph is not None:
-            return compiled_rules[graph]
+            compiled_rules.append(rule)
+
+        if len(compiled_rules) == 1 and single is True:
+            return compiled_rules[0]
         else:
             return compiled_rules
 
-    def add_full_access_clause(self, graphid):
+    def apply_graph_filter(self, rule):
+
+        if rule["access_level"] == "full_access":
+            self.apply_full_access_clause(rule["filter_config"]["graphid"])
+
+        elif rule["access_level"] == "no_access":
+            self.apply_no_access_clause(rule["filter_config"]["graphid"])
+
+        elif rule["access_level"] == "attribute_filter":
+            self.add_attribute_filter_clause(rule["filter_config"])
+
+        elif rule["access_level"] == "geo_filter":
+            self.add_geo_filter_clause(rule["filter_config"]["geometry"])
+
+        elif rule["access_level"] == "resourceid_filter":
+            self.add_resourceid_filter_clause(rule["filter_config"]["resourceids"])
+
+        else:
+            raise(Exception("Invalid rules for filter."))
+
+    def apply_full_access_clause(self, graphid):
         self.paramount.should(Terms(field="graph_id", terms=graphid))
 
-    def add_no_access_clause(self, graphid):
+    def apply_no_access_clause(self, graphid):
         self.paramount.must_not(Terms(field="graph_id", terms=graphid))
 
-    def add_geo_filter_clause(self, graphid, geometry):
+    def add_geo_filter_clause(self, geometry):
 
         nested = self.create_nested_geo_filter(geometry)
-        if self.existing_query:
-            self.paramount.should(nested)
-        else:
-            self.paramount.must(nested)
+        self.apply_nested_clause(nested)
 
-    def add_attribute_filter_clause(self, graphid, filter_config):
+    def add_attribute_filter_clause(self, filter_config):
 
         if "value_list" not in filter_config:
             if isinstance(filter_config["value"], list):
@@ -266,15 +257,10 @@ class SiteFilter(BaseSearchFilter):
                 filter_config["value_list"] = filter_config["value"]
 
         nested = self.create_nested_attribute_filter(
-            graphid,
             filter_config["nodegroup_id"],
             filter_config["value_list"],
         )
-        if self.existing_query:
-            self.paramount.should(nested)
-        else:
-            self.paramount.must(nested)
-
+        self.apply_nested_clause(nested)
 
     def add_resourceid_filter_clause(self, resourceids):
         """incomplete at this time, but would pull a list of resource ids
@@ -282,12 +268,17 @@ class SiteFilter(BaseSearchFilter):
 
         new_resid_filter = Bool()
         new_resid_filter.should(Terms(field='resourceinstanceid', terms=resourceids))
-        if self.existing_query:
-            self.paramount.should(new_resid_filter)
-        else:
-            self.paramount.must(new_resid_filter)
+        self.apply_nested_clause(new_resid_filter)
 
-        pass
+    def apply_nested_clause(self, clause):
+        """
+        This conditional handles situations where a new nested clause must
+        honor an existing query without overwriting or ignoring it.
+        """
+        if self.existing_query:
+            self.paramount.should(clause)
+        else:
+            self.paramount.must(clause)
 
     def get_rules(self, user, doc_id):
 
@@ -516,46 +507,7 @@ class SiteFilter(BaseSearchFilter):
         else:
             return no_access
 
-    def get_doc_types(self, request=None):
-        """ This is a more robust version of the analogous method in core Arches.
-        It was moved here a long time ago, it's possible that current core Arches
-        has been updated and this method could be removed to use that one."""
-
-        if request is None:
-            request = self.request
-
-        all_resource_graphids = (
-            GraphModel.objects.filter(isresource=True, isactive=True)
-            .exclude(name="Arches System Settings")
-        ).values_list('graphid', flat=True)
-
-        type_filter = request.GET.get('typeFilter', '')
-        use_ids = []
-
-        if type_filter != '':
-            type_filters = JSONDeserializer().deserialize(type_filter)
-
-            ## add all positive filters to the list of good ids
-            pos_filters = [i['graphid'] for i in type_filters if not i['inverted']]
-            for pf in pos_filters:
-                use_ids.append(pf)
-
-            ## if there are negative filters, make a list of all possible ids and
-            ## subtract the negative filter ids from it.
-            neg_filters = [i['graphid'] for i in type_filters if i['inverted']]
-            if len(neg_filters) > 0:
-                use_ids = [str(i) for i in all_resource_graphids if not str(i) in neg_filters]
-
-        else:
-            use_ids = [str(i) for i in all_resource_graphids]
-
-        if len(use_ids) == 0:
-            ret = []
-        else:
-            ret = list(set(use_ids))
-        return ret
-
-    def create_nested_attribute_filter(self, doc_id, nodegroup_id, value_list):
+    def create_nested_attribute_filter(self, nodegroup_id, value_list):
 
         new_string_filter = Bool()
         new_string_filter.filter(Terms(field='strings.nodegroup_id', terms=[nodegroup_id]))
@@ -582,7 +534,7 @@ class SiteFilter(BaseSearchFilter):
     def quick_query(self, rules, doc):
 
         if rules["access_level"] == "attribute_filter":
-            self.add_attribute_filter_clause(doc, rules["filter_config"])
+            self.add_attribute_filter_clause(rules["filter_config"])
 
         elif rules["access_level"] == "geo_filter":
             self.add_geo_filter_clause(doc, rules["filter_config"]["geometry"])
@@ -613,7 +565,7 @@ class SiteFilter(BaseSearchFilter):
             "id_list": []
         }
 
-        rules = self.compile_rules(user, graphid)
+        rules = self.compile_rules(user, graphids=[graphid], single=True)
 
         if rules["access_level"] == "full_access":
             response["access_level"] = "full_access"
@@ -625,10 +577,10 @@ class SiteFilter(BaseSearchFilter):
 
         try:
             if rules["access_level"] == "attribute_filter":
-                self.add_attribute_filter_clause(graphid, rules["filter_config"])
+                self.add_attribute_filter_clause(rules["filter_config"])
 
             elif rules["access_level"] == "geo_filter":
-                self.add_geo_filter_clause(graphid, rules["filter_config"]["geometry"])
+                self.add_geo_filter_clause(rules["filter_config"]["geometry"])
 
             se = SearchEngineFactory().create()
             query = Query(se, start=0, limit=10000)
@@ -653,24 +605,25 @@ class SiteFilter(BaseSearchFilter):
 
         return response
 
-    def get_resource_list_from_es_query(self, rules, graphid, invert=False, full_results=False):
+    def get_resource_list_from_es_query(self, rule, ids_only=False):
         """
-        Returns the resourceinstanceids for all resources for a given graph
-        that match a set of rules. Set invert=True to return
-        ids that do NOT match this query.
+        Returns a list of resources for single graph_filter rule. This
+        can be used in other parts of the app, like MVT() or decorators.
+        Note the 10000 item limit. If you are trying to get a list of resource
+        ids larger than 10000 you may need to rethink this strategy.
+
+        Use ids_only=True to get a flat list of ids, otherwise each item in
+        the returned list is a small dictionary with 'resourceid', 'graph_id'
+        and 'displayname'. 
         """
 
         self.paramount = Bool()
         self.existing_query = False
 
-        if rules["access_level"] in ["full_access", "no_access"]:
+        if rule["access_level"] in ["full_access", "no_access"]:
             return list()
 
-        if rules["access_level"] == "attribute_filter":
-            self.add_attribute_filter_clause(graphid, rules["filter_config"])
-
-        elif rules["access_level"] == "geo_filter":
-            self.add_geo_filter_clause(graphid, rules["filter_config"]["geometry"])
+        self.apply_graph_filter(rule)
 
         se = SearchEngineFactory().create()
         query = Query(se, start=0, limit=10000)
@@ -681,15 +634,8 @@ class SiteFilter(BaseSearchFilter):
 
         results = query.search(index='resources')
 
-        if full_results is True:
-            return [i['_source'] for i in results['hits']['hits']]
+        if ids_only is True:
+            ids = [i['_source']['resourceinstanceid'] for i in results['hits']['hits']]
+            return ids
 
-        resourceids = list(set([i['_source']['resourceinstanceid'] for i in results['hits']['hits']]))
-
-        if invert is True:
-            i_resids = ResourceInstance.objects.filter(
-                graph_id=graphid
-            ).exclude(resourceinstanceid__in=resourceids).values_list("resourceinstanceid", flat=True)
-            resourceids = [str(i) for i in i_resids]
-
-        return resourceids
+        return [i['_source'] for i in results['hits']['hits']]
