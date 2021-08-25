@@ -9,7 +9,7 @@ import django.contrib.auth.password_validation as validation
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext as _
 from arches.app.models.system_settings import settings
-from arches.app.models.models import Node
+from arches.app.models.models import Node, GraphModel
 from arches.app.models.tile import Tile
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
@@ -35,19 +35,9 @@ class FPANUserManagerView(UserManagerView):
         start = time.time()
 
         # get rule for Archaeological Site resource model
-        rule = SiteFilter().compile_rules(user, graph="f212980f-d534-11e7-8ca8-94659cf754d0")
-
-        if user.is_superuser:
-            sites = []
-        if user_is_scout(user):
-            sites = user.scout.scoutprofile.accessible_sites_es
-        elif user_is_new_landmanager(user):
-            sites = user.landmanager.accessible_sites_es
-        elif user_is_old_landmanager(user):
-            # not worth the time to implement this condition, old lms will be deprecated soon
-            sites = []
-        else:
-            sites = []
+        graphid = str(GraphModel.objects.get(name="Archaeological Site").pk)
+        rule = SiteFilter().compile_rules(user, graphids=[graphid], single=True)
+        sites = SiteFilter().get_resource_list_from_es_query(rule)
 
         site_lookup = {}
         for i in sites:
@@ -73,6 +63,7 @@ class FPANUserManagerView(UserManagerView):
 
         site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
         logger.debug(f"getting hms_details for {user.username}: {time.time()-start} seconds elapsed")
+
         return {"site_access_rules": rule, "accessible_sites": site_info}
 
     def get(self, request):

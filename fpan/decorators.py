@@ -49,14 +49,14 @@ def can_access_site_or_report(function):
         graphid = str(ResourceInstance.objects.get(pk=resourceid).graph_id)
         allowed = False
 
-        graph_rules = SiteFilter().compile_rules(request.user, graph=graphid)
+        rule = SiteFilter().compile_rules(request.user, graphids=[graphid], single=True)
 
-        if graph_rules["access_level"] == "full_access":
+        if rule["access_level"] == "full_access":
             allowed = True
-        elif graph_rules["access_level"] == "no_access":
+        elif rule["access_level"] == "no_access":
             allowed = False
         else:
-            resids = SiteFilter().get_resource_list_from_es_query(graph_rules, graphid)
+            resids = SiteFilter().get_resource_list_from_es_query(rule, ids_only=True)
             allowed = resourceid in resids
 
         logger.debug(f"can_access_site_or_report {allowed}: {time.time()-start}")
