@@ -50,13 +50,13 @@ class MVT(APIBase):
             #     resid_where = f"ST_Intersects(geom, ST_Transform('{geom}', 3857))"
 
             graphid = str(node.graph_id)
-            graph_rules = SiteFilter().compile_rules(request.user, graph=graphid)
-            if graph_rules["access_level"] == "full_access":
+            rule = SiteFilter().compile_rules(request.user, graphids=[graphid], single=True)
+            if rule["access_level"] == "full_access":
                 resid_where = "NULL IS NULL"
-            elif graph_rules["access_level"] == "no_access":
+            elif rule["access_level"] == "no_access":
                 return self.EMPTY_TILE
             else:
-                resids = SiteFilter().get_resource_list_from_es_query(graph_rules, graphid)
+                resids = SiteFilter().get_resource_list_from_es_query(rule, ids_only=True)
                 if len(resids) == 0:
                     return self.EMPTY_TILE
                 resid_str = "','".join([str(i) for i in resids])
