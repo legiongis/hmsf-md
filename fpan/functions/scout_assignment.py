@@ -1,10 +1,4 @@
-from django.contrib.auth.models import User
-
 from arches.app.functions.base import BaseFunction
-from arches.app.models.resource import Resource
-
-from hms.utils import update_hms_permissions_table
-
 
 details = {
     'functionid':'4a1da8f0-dddd-11e7-a700-94659cf754d0',
@@ -18,29 +12,8 @@ details = {
 
 class ScoutAssignment(BaseFunction):
 
-    # def get_user_and_resource(self, tile, request):
-    #
-    #     node_id = self.config['assignment_node_id']
-    #     username = tile.data[node_id]
-    #     try:
-    #         user = User.objects.get(username=username)
-    #     except User.DoesNotExist:
-    #         user = None
-    #
-    #     user = request.user
-    #     resource = Resource.objects.get(resourceinstanceid=tile.resourceinstance_id)
-    #
-    #     return (user, resource)
-
-
     def save(self,tile,request):
-        # u, r = self.get_user_and_resource(tile, request)
-        # UserXResourceInstanceAccess.objects.get_or_create(user=u, resource=r)
-        if request:
-            user = request.user
-        else:
-            user = None
-        update_hms_permissions_table(user=user)
+        pass
 
     def post_save(self, tile, request):
         raise NotImplementedError
@@ -52,11 +25,4 @@ class ScoutAssignment(BaseFunction):
         raise NotImplementedError
 
     def delete(self, tile, request):
-
-        # u, r = self.get_user_and_resource(tile, request)
-        # UserXResourceInstanceAccess.objects.get(user=u, resource=r).delete()
-        if request:
-            user = request.user
-        else:
-            user = None
-        update_hms_permissions_table(user=user)
+        pass
