@@ -21,14 +21,7 @@ from arches.app.models.graph import Graph
 from arches.app.models.models import Node
 from arches.app.models.tile import Tile
 
-from fpan.search.components.rule_filter import (
-    RuleFilter,
-    generate_no_access_rule,
-    generate_full_access_rule,
-    generate_attribute_rule,
-    generate_resourceid_rule,
-    generate_geo_rule,
-)
+from fpan.search.components.rule_filter import RuleFilter, Rule
 
 logger = logging.getLogger("fpan")
 
@@ -54,12 +47,12 @@ def report_rule_from_arch_rule(arch_rule):
     that fit the specified archaeological site filter.
     """
     start = time.time()
-    if arch_rule["access_level"] == "full_access":
-        return generate_full_access_rule("Scout Report")
-    if arch_rule["access_level"] == "no_access":
-        return generate_no_access_rule("Scout Report")
+    if arch_rule.type == "full_access":
+        return Rule("full_access", graph_name="Scout Report")
+    if arch_rule.type == "no_access":
+        return Rule("no_access", graph_name="Scout Report")
 
-    resids = RuleFilter().get_resource_list_from_es_query(arch_rule, ids_only=True)
+    resids = RuleFilter().get_resources_from_rule(arch_rule, ids_only=True)
 
     start = time.time()
     siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
@@ -75,7 +68,7 @@ def report_rule_from_arch_rule(arch_rule):
         if fmsfid in resids:
             reportids.append(str(rd["resourceinstance_id"]))
 
-    report_rule = generate_resourceid_rule(resourceids=reportids)
+    report_rule = Rule("resourceid_filter", resourceids=reportids)
     logger.debug(f"report_rule_from_arch_rule: {time.time() - start}")
     return report_rule
 
@@ -162,12 +155,12 @@ class ScoutProfile(models.Model):
 
         if graph_name == "Archaeological Site":
             if self.site_access_mode == "FULL":
-                rule = generate_full_access_rule(graph_name)
+                rule = Rule("full_access", graph_name=graph_name)
             else:
-                rule = generate_attribute_rule(
+                rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
                     node_name="Assigned To",
-                    value=self.user.username
+                    value=[self.user.username]
                 )
 
         elif graph_name == "Scout Report":
@@ -176,7 +169,7 @@ class ScoutProfile(models.Model):
             rule = report_rule_from_arch_rule(arch_rule)
 
         else:
-            rule = generate_full_access_rule(graph_name)
+            rule = Rule("full_access", graph_name=graph_name)
 
         # print(rule)
         return rule
@@ -190,15 +183,15 @@ class ScoutProfile(models.Model):
         """
 
         rule = self.get_graph_rule(graph_name)
-        if rule["access_level"] in ["full_access", "no_access"]:
+        if rule.type in ["full_access", "no_access"]:
             return []
 
-        return RuleFilter().get_resource_list_from_es_query(rule, ids_only=ids_only)
+        return RuleFilter().get_resources_from_rule(rule, ids_only=ids_only)
 
     def site_access_rules_formatted(self):
         content = {}
-        content["Archaeological Site"] = self.get_graph_rule("Archaeological Site")
-        content["Scout Report"] = self.get_graph_rule("Scout Report")
+        content["Archaeological Site"] = self.get_graph_rule("Archaeological Site").serialize()
+        content["Scout Report"] = self.get_graph_rule("Scout Report").serialize()
         return format_json_display(content)
 
     site_access_rules_formatted.short_description = 'Derived Access Rules'
@@ -318,14 +311,14 @@ class LandManager(models.Model):
 
         if graph_name == "Archaeological Site":
             if self.site_access_mode == "FULL":
-                rule = generate_full_access_rule(graph_name)
+                rule = Rule("full_access", graph_name=graph_name)
 
             elif self.site_access_mode == "AREA":
                 ## this was supposed to be a proper geo rule as below, but
                 ## that doesn't allow for arbitrary assignment of nearby
                 ## management areas that don't spatially intersect.
                 # multipolygon = user.landmanager.areas_as_multipolygon
-                # rules["Archaeological Site"] = generate_geo_rule(
+                # rules["Archaeological Site"] = Rule(
                 #   graph_name="Archaeological Site"
                 #   geometry=multipolygon,
                 # )
@@ -335,7 +328,7 @@ class LandManager(models.Model):
                 value = ["<no area set>"]
                 if len(self.all_areas) > 0:
                     value = [i.name for i in self.all_areas]
-                rule = generate_attribute_rule(
+                rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
                     node_name="Management Area",
                     value=value
@@ -347,15 +340,15 @@ class LandManager(models.Model):
                 if self.management_agency:
                     value = [self.management_agency.name]
 
-                rule = generate_attribute_rule(
+                rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
                     node_name="Management Agency",
                     value=value
                 )
             elif self.site_access_mode == "NONE":
-                rule = generate_no_access_rule(graph_name)
+                rule = Rule("no_access", graph_name=graph_name)
             else:
-                rule = generate_no_access_rule(graph_name)
+                rule = Rule("no_access", graph_name=graph_name)
 
         elif graph_name == "Scout Report":
 
@@ -363,7 +356,7 @@ class LandManager(models.Model):
             rule = report_rule_from_arch_rule(arch_rule)
 
         else:
-            rule = generate_full_access_rule(graph_name)
+            rule = Rule("full_access", graph_name=graph_name)
 
         return rule
     
@@ -376,16 +369,16 @@ class LandManager(models.Model):
         """
         start = time.time()
         rule = self.get_graph_rule(graph_name)
-        if rule["access_level"] in ["full_access", "no_access"]:
+        if rule.type in ["full_access", "no_access"]:
             return []
-        id_list = RuleFilter().get_resource_list_from_es_query(rule, ids_only=ids_only)
+        id_list = RuleFilter().get_resources_from_rule(rule, ids_only=ids_only)
         logger.debug(f"get_allowed_resources: {time.time()-start}")
         return id_list
 
     def site_access_rules_formatted(self):
         content = {}
-        content["Archaeological Site"] = self.get_graph_rule("Archaeological Site")
-        content["Scout Report"] = self.get_graph_rule("Scout Report")
+        content["Archaeological Site"] = self.get_graph_rule("Archaeological Site").serialize()
+        content["Scout Report"] = self.get_graph_rule("Scout Report").serialize()
         return format_json_display(content)
 
     site_access_rules_formatted.short_description = 'Derived Access Rules'

@@ -26,12 +26,12 @@ def can_access_site_or_report(function):
 
         rule = RuleFilter().compile_rules(request.user, graphids=[graphid], single=True)
 
-        if rule["access_level"] == "full_access":
+        if rule.type == "full_access":
             allowed = True
-        elif rule["access_level"] == "no_access":
+        elif rule.type == "no_access":
             allowed = False
         else:
-            resids = RuleFilter().get_resource_list_from_es_query(rule, ids_only=True)
+            resids = RuleFilter().get_resources_from_rule(rule, ids_only=True)
             allowed = resourceid in resids
 
         logger.debug(f"can_access_site_or_report {allowed}: {time.time()-start}")
