@@ -506,3 +506,10 @@ input[type='text'] {
   background-color: #F26422;
   border-color: #F26422;
 }
+.profile-list .btn-landmanager {
+  background-color: #273675;
+  border-color: #273675;    
+}
+.profile-label-shim {
+  color: #555;
+}
