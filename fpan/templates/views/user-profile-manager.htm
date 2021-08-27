@@ -369,8 +369,8 @@
                 <!-- Notification Settings -->
                 <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
                 {% comment %}
-                <section>
-                    <div class="profile-list">
+                <section class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
                         <div class="profile-header">
                             {% trans 'Notification Settings' %}
                         </div>
@@ -422,8 +422,8 @@
                 </section>
                 {% endcomment %}
 
-                <section>
-                    <div class="profile-list">
+                <section class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
                         <div class="profile-header">
                             {% trans 'Arches Collector Projects' %}
                         </div>
