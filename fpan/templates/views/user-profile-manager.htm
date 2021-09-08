@@ -297,7 +297,22 @@
                             <div class="col-sm-9">
                                 <div class="relative">
                                     <p class="profile-label-shim">{{ accessible_sites }}</p>
-
+                                    {% if site_access_rules.type == 'no_access' %}
+                                        <p class="profile-label-shim">(No sites currently accessible.)<p>
+                                    {% elif site_access_rules.type == 'full_access' %}
+                                        <p class="profile-label-shim">(All archaeological sites.)<p>
+                                    {% else %}
+                                        <ul>
+                                        {% for site in accessible_sites %}
+                                            <li><a href="/report/{{ site.resourceinstanceid }}" target="_blank"> {{ site.displayname }} </a></li>
+                                            {% if site.scout_report_ct > 0 %}
+                                              <ul>
+                                                {{ site.scout_reports|unordered_list }}
+                                              </ul>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </ul>
+                                    {% endif %}
                                 </div>
                             </div>
                           </div>
