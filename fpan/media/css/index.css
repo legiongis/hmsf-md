@@ -469,12 +469,6 @@ input[type='text'] {
    background: #431825;
    color: #fff;
 }
-.profile-full-name {
-  color: black;
-}
-.profile-e-mail {
-  color: #555;
-}
 .profile-report-scout {
   padding: 10px 10px 10px 0px;
   background: url('../img/fpan/bedge_muted.png');

@@ -313,15 +313,11 @@
                 </div>
             </a>
         </div>
-
         <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
             <div class="ep-edits-content">
                 {% include 'views/provisional-history-list.htm' %}
             </div>
         </div>
-
-
-
     </div>
 
     <!-- Help Panel -->
@@ -354,32 +350,6 @@
 
         <!-- Profile Summary -->
         <div class="profile-summary-page">
-          <div class="row">
-            <div class="profile-report profile-report-{{user_type}} relative">
-
-                <!-- Profile Top Panel Image
-                <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
-                -->
-
-                <div class="col-sm-6">
-                    <div class="profile-full-name">
-                        {{user.first_name}} {{user.last_name}}
-                    </div>
-                    <div class="profile-e-mail">
-                        User name: {{user.username}}
-                    </div>
-                </div>
-                <div class="col-sm-6 text-right">
-                    {% if user_is_scout %}
-                        <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:292px;">
-                    {% endif %}
-                    {% if user_is_state %}
-                        <img src="{% static 'img/state/dhr%20logo.png' %}" style="width:292px;">
-                    {% endif %}
-                </div>
-              </div>
-            </div>
-
             <!-- Profile Sections -->
             <div class="profile-sections-{{user_type}}">
                 <!-- FPAN Panel for State Landmanagers -->
