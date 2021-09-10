@@ -3,7 +3,7 @@
   src: url("../fonts/Helsing.otf");
 }
 
-body, body.body-anonymous, body.body-admin {
+body, body.body-anonymous, body.body-admin, .profile-sections-admin {
     font-family: 'Kreon',sans-serif;
     background: url('../img/fpan/ricepaper.png');
     font-size: 16px;
