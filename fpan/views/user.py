@@ -22,6 +22,13 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.views.user import UserManagerView
 
 from fpan.search.components.rule_filter import RuleFilter
+from fpan.utils.permission_backend import (
+    generate_site_access_html,
+    user_is_land_manager,
+    user_is_scout,
+)
+
+from .scout import scouts_dropdown
 
 logger = logging.getLogger(__name__)
 
@@ -65,18 +72,33 @@ class FPANUserManagerView(UserManagerView):
                     "url": reverse("resource_report", args=(report_id,)),
                 })
 
+        
         site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
+        access_summary = generate_site_access_html(user)
         logger.debug(f"getting hms_details for {user.username}: {time.time()-start} seconds elapsed")
 
-        return {"site_access_rules": rule.serialize(), "accessible_sites": site_info}
+        all_info = {
+            "site_access_rules": rule.serialize(), 
+            "accessible_sites": site_info,
+            "site_access_html": access_summary,
+        }
+        return all_info
 
     def get(self, request):
 
         if self.request.user.is_authenticated and self.request.user.username != "anonymous":
             context = self.get_context_data(main_script="views/user-profile-manager", )
 
+            title = "User Home"
+            if request.user.is_superuser:
+                title = "Admin - " + title
+            elif user_is_land_manager(request.user):
+                title = "Land Manager - " + title
+            elif user_is_scout(request.user):
+                title = "Scout - " + title
+
             context["nav"]["icon"] = "fa fa-user"
-            context["nav"]["title"] = _("Profile Manager")
+            context["nav"]["title"] = title
             context["nav"]["login"] = True
             context["nav"]["help"] = {
                 "title": _("Profile Editing"),
@@ -95,6 +117,12 @@ class FPANUserManagerView(UserManagerView):
             hms_details = self.get_hms_details(request.user)
             context["site_access_rules"] = hms_details['site_access_rules']
             context["accessible_sites"] = hms_details['accessible_sites']
+            context["site_access_html"] = hms_details['site_access_html']
+
+            if request.user.is_superuser:
+                scouts_unsorted = json.loads(scouts_dropdown(request).content)
+                scouts = sorted(scouts_unsorted, key=lambda k: k['username'])
+                context["scout_list"] = scouts
 
             return render(request, "views/user-profile-manager.htm", context)
 
