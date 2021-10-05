@@ -26,7 +26,6 @@ urlpatterns = [
     url(r'^hms/home', main.hms_home, name='hms_home'),
     url(r'^state/home', main.state_home, name='state_home'),
     url(r'^regions/$', main.show_regions, name='show_regions'),
-    url(r'^dashboard', main.fpan_dashboard, name='fpan_dashboard'),
     url(r'^index.htm', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
     url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),

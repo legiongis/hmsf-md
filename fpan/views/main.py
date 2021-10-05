@@ -10,7 +10,6 @@ from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel
 from fpan.utils.permission_backend import user_is_anonymous, user_is_land_manager
 from fpan.models import Region
-from fpan.views.scout import scouts_dropdown
 from hms.models import Scout, ScoutProfile
 from hms.forms import ScoutForm, ScoutProfileForm
 
@@ -67,10 +66,3 @@ def server_error(request, template_name='500.html'):
 
     t = get_template(template_name)
     return HttpResponseServerError(t.render(RequestContext(request).__dict__))
-
-@user_passes_test(lambda u: u.is_superuser)
-def fpan_dashboard(request):
-
-    scouts_unsorted = json.loads(scouts_dropdown(request).content)
-    scouts = sorted(scouts_unsorted, key=lambda k: k['username'])
-    return render(request,'fpan-dashboard.htm',context={'scouts':scouts})
