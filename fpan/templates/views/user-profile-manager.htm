@@ -626,6 +626,36 @@
                     </div>
                 </section>
 
+                {% if user_type == "admin" %}
+                <section id="scout-list-section" class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
+                        <div class="row relative">
+                            <div class="col-sm-3">
+                                <div class="profile-header">
+                                    {% trans 'Scout Summary' %}
+                                </div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="relative" style="padding-top:5px;">
+                                    <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}">click to download full list</a></p>
+                                    <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px;background:url({% static 'img/fpan/ricepaper.png' %});">
+                                        {% for scout in scout_list %}
+                                        <li><strong>{{scout.username}}</strong> | <em>regions:</em>
+                                            {% for region in scout.region_choices %}
+                                                {{ region }}{% if not forloop.last %},{% endif %}
+                                            {% endfor %} | <em>interests:</em>
+                                            {% for interest in scout.site_interest_type %}
+                                                {{ interest }}{% if not forloop.last %},{% endif %}
+                                            {% endfor %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
 
 <!-- commenting this section out as it's not implemented as of Feb 19th - AC -->
                 <!-- My Devices -->
