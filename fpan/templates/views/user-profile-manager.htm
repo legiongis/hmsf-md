@@ -229,7 +229,7 @@
         <div class="ep-tools-title">
             <h1 class="page-header text-overflow ep-graph-title">
                 <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap" style="background: none;"></i>
-                <span>{% trans 'HMS Program' %} - {% trans nav.title %}</span>
+                <span>{% trans nav.title %}</span>
             </h1>
         </div>
         {% endblock graph_title %}
@@ -580,28 +580,17 @@
                 </section>
 
                 <!-- NEW SECTION FOR HMS INFO-->
-                <section id="permission summary" class="profile-list">
+                <section id="permission-summary" class="profile-list">
                     <div class="panel fpan-panel-{{user_type}}">
                         <div class="row relative">
-                            <!-- Section Title -->
                             <div class="col-sm-3">
                                 <div class="profile-header">
                                     {% trans 'Site Access Rules' %}
                                 </div>
                             </div>
-
                             <div class="col-sm-9">
-                                <div class="relative">
-                                    <!-- <p class="profile-label-shim">{{ site_access_rules }}</p> -->
-                                    {% if site_access_rules.type == 'no_access' %}
-                                        <p class="profile-label-shim">You currently do not have access to any archaeological site data.<p>
-                                    {% elif site_access_rules.type == 'full_access' %}
-                                        <p class="profile-label-shim">You currently have access to all archaeological site data.<p>
-                                    {% elif user_is_state %}
-                                        <p class="profile-label-shim">Your access to archaeological sites is based on {{ site_access_rules.config.node_name }}. You can view any sites managed by {{ site_access_rules.config.value|join:", " }}.</p>
-                                    {% elif user_is_scout %}
-                                        <p class="profile-label-shim">Your access to archaeological sites is based on your scout site assignments.<p>
-                                    {% endif %}
+                                <div class="relative" style="padding-top:5px;">
+                                    {{ site_access_html|safe }}
                                 </div>
                             </div>
                         </div>
