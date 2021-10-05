@@ -8,9 +8,11 @@ from django.contrib.auth.models import User, Group
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render, redirect
 from django.utils.translation import ugettext as _
+from django.urls import reverse
 from arches.app.models.system_settings import settings
 from arches.app.models.models import Node, GraphModel
 from arches.app.models.tile import Tile
+from arches.app.models.resource import Resource
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.forms import ArchesUserProfileForm
@@ -47,14 +49,21 @@ class FPANUserManagerView(UserManagerView):
         # iterate the report data objects and if they match sites in the lookup,
         # add the report ids to that site object
         for rd in rep_datas:
+            report_id = rd['resourceinstance_id']
             try:
                 fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
             except IndexError as e:
-                logger.debug(f"{rd['resourceinstance_id']} - Scout Report has no FMSF Site ID")
+                logger.debug(f"{report_id} - Scout Report has no FMSF Site ID")
                 continue
             if fmsfid in site_lookup:
                 site_lookup[fmsfid]["scout_report_ct"] += 1
-                site_lookup[fmsfid]["scout_reports"].append(fmsfid)
+                res = Resource.objects.get(pk=report_id)
+                
+                print(reverse("resource_report", args=(report_id,)))
+                site_lookup[fmsfid]["scout_reports"].append({
+                    "displayname": res.displayname,
+                    "url": reverse("resource_report", args=(report_id,)),
+                })
 
         site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
         logger.debug(f"getting hms_details for {user.username}: {time.time()-start} seconds elapsed")
@@ -137,7 +146,7 @@ class FPANUserManagerView(UserManagerView):
                         "Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s."
                         % (admin_info)
                     )
-                    user.email_user(_("You're Arches Profile Has Changed"), message)
+                    user.email_user(_("Your HMS profile has changed"), message)
                 except Exception as e:
                     print(e)
                 request.user = user
