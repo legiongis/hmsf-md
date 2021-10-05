@@ -52,11 +52,6 @@ def hms_home(request):
         'scout_profile': scout_profile_form,
         'page':'home-hms'})
 
-@user_passes_test(user_is_land_manager)
-def state_home(request):
-
-    return render(request, 'home-state.htm', {'page':'home-state'})
-
 def show_regions(request):
 
     regions = Region.objects.all()
