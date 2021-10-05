@@ -19,10 +19,16 @@ def index(request):
         'main_script': 'index',
         'active_page': 'Home',
         'app_title': '{0} | HMS'.format(settings.APP_NAME),
-        'copyright_text': settings.COPYRIGHT_TEXT,
-        'copyright_year': settings.COPYRIGHT_YEAR,
         'scout_form': scout_form,
         'page':'index'
+    })
+
+def about(request):
+    return render(request, 'about.htm', {
+        'main_script': 'about',
+        'active_page': 'About',
+        'app_title': '{0} | HMS'.format(settings.APP_NAME),
+        'page':'about'
     })
 
 def hms_home(request):

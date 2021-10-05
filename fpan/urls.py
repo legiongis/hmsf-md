@@ -22,6 +22,7 @@ handler500 = main.server_error
 
 urlpatterns = [
     url(r'^$', main.index, name='fpan_home'),
+    url(r'^about$', main.about, name='about'),
     url(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
     url(r'^hms/home', main.hms_home, name='hms_home'),
     url(r'^state/home', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
