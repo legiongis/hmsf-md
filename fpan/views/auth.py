@@ -72,16 +72,12 @@ class LoginView(View):
                 login(request, user)
                 user.password = ""
 
-                    # set next redirect based on user type if not previously set
+                # set next redirect based on user type if not previously set
                 if next is None:
-                    if user.is_superuser:
-                        next = request.POST.get("next", reverse("search_home"))
-                    elif user_is_land_manager(user):
-                        next = request.POST.get("next", reverse("state_home"))
-                    elif user_is_scout(user):
+                    if user_is_scout(user):
                         next = request.POST.get("next", reverse("hms_home"))
                     else:
-                        next = request.POST.get("next", reverse("search_home"))
+                        next = request.POST.get("next", reverse("user_profile_manager"))
 
                 return redirect(next)
 
