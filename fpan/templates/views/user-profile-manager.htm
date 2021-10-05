@@ -596,16 +596,17 @@
                         </div>
                         {% if site_access_rules.type != 'no_access' and site_access_rules.type != 'full_access' %}
                         <div class="row relative">
-                            <!-- Section Title -->
                             <div class="col-sm-3">
                                 <div class="profile-header">
-                                    <!-- if Scout, maybe this should be something like "sites assigned to you"-->
                                     {% trans 'Accessible Sites' %}
                                 </div>
                             </div>
                             <div class="col-sm-9">
-                                <div class="relative">
-                                    <ul style="list-style: none">
+                                <div class="relative" style="padding-top:5px;">
+                                    {% if accessible_sites|length == 0 %}
+                                    <p><em>No sites are accessible based on your access rules.</em></p>
+                                    {% else %}
+                                    <ul style="list-style:none; padding-left:0px;">
                                     {% for site in accessible_sites %}
                                         <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
                                         {% if site.scout_report_ct > 0 %}
@@ -617,6 +618,7 @@
                                         </ul>
                                     {% endfor %}
                                     </ul>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
