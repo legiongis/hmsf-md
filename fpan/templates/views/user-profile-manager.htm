@@ -1,4 +1,13 @@
-{% extends "base-manager.htm" %} {% load staticfiles %} {% load template_tags %} {% load i18n %} {% block title %} {{ block.super }} {% trans "Account Settings" %} {% endblock title %}
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+{% block title %}
+{{ block.super }}
+{% trans "Account Settings" %}
+{% endblock title %}
+
 {% block navheader %}
 <header id="navbar">
 
@@ -15,6 +24,7 @@
 
 </header>
 {% endblock navheader %}
+
 
 {% block mainnav %}
     <nav id="mainnav-container" class="mainnav-container-admin">
@@ -784,6 +794,8 @@
                 </section>
                 {% endcomment %}
 
+                {% comment %}
+                <!-- commenting the Arches Collector section out because it is not yet active -->
                 <section class="profile-list">
                     <div class="panel fpan-panel-{{user_type}}">
                         <div class="profile-header">
@@ -906,6 +918,7 @@
                         <!--/ko-->
                     </div>
                 </section>
+                {% endcomment %}
             </div>
 
         </div>
