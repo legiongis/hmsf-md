@@ -635,7 +635,7 @@
                                         {% if site.scout_report_ct > 0 %}
                                         <ul style="list-style-type:'\21B3';">
                                         {% for report in site.scout_reports %}
-                                            <li><a class="a-{{user_type}}" href="{{site.url}}">&nbsp;&nbsp;{{ report.displayname }}</a></li>
+                                            <li><a class="a-{{user_type}}" href="{{report.url}}">&nbsp;&nbsp;{{ report.displayname }}</a></li>
                                         {% endfor %}
                                         </ul>
                                         {% endif %}
