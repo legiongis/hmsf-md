@@ -65,8 +65,6 @@ class FPANUserManagerView(UserManagerView):
             if fmsfid in site_lookup:
                 site_lookup[fmsfid]["scout_report_ct"] += 1
                 res = Resource.objects.get(pk=report_id)
-                
-                print(reverse("resource_report", args=(report_id,)))
                 site_lookup[fmsfid]["scout_reports"].append({
                     "displayname": res.displayname,
                     "url": reverse("resource_report", args=(report_id,)),
@@ -91,11 +89,11 @@ class FPANUserManagerView(UserManagerView):
 
             title = "User Home"
             if request.user.is_superuser:
-                title = "Admin - " + title
+                title = "Admin: " + request.user.username
             elif user_is_land_manager(request.user):
-                title = "Land Manager - " + title
+                title = "Land Manager: " + request.user.username
             elif user_is_scout(request.user):
-                title = "Scout - " + title
+                title = "Scout: " + request.user.username
 
             context["nav"]["icon"] = "fa fa-user"
             context["nav"]["title"] = title

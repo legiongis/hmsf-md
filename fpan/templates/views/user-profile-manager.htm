@@ -261,8 +261,7 @@
             {% else %}
             <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Logout">
-
-                <h5 class="hidden-xs">{{ user.username }} - {% trans "logout" %}</h5>
+                <h5 class="hidden-xs">{% trans "Logout" %}</h5>
                 </div>
             </a>
             {% endif %}
@@ -458,7 +457,7 @@
                                 <div class="row">
                                     <div class="col-sm-5">
                                         <div class="relative">
-                                            <p>{{ user.username }}</p>
+                                            <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
                                             <p class="profile-label-shim">{% trans 'User name' %}</p>
                                         </div>
                                     </div>
