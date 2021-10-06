@@ -121,8 +121,7 @@ class FPANUserManagerView(UserManagerView):
 
             if request.user.is_superuser:
                 scouts_unsorted = json.loads(scouts_dropdown(request).content)
-                scouts = sorted(scouts_unsorted, key=lambda k: k['username'])
-                context["scout_list"] = scouts
+                context["scout_list"] = sorted(scouts_unsorted, key=lambda k: k['username'])
 
             return render(request, "views/user-profile-manager.htm", context)
 
@@ -151,8 +150,8 @@ class FPANUserManagerView(UserManagerView):
             }
             context["validation_help"] = validation.password_validators_help_texts()
 
-            ## retain this user_details acquisition as it pulls upstream Arches information.
-            ## make sure it is all passed to the context variable as below.
+            # retain this user_details acquisition as it pulls upstream Arches information.
+            # make sure it is all passed to the context variable as below.
             user_details = self.get_user_details(request.user)
             context["user_surveys"] = JSONSerializer().serialize(user_details["user_surveys"])
             context["identities"] = JSONSerializer().serialize(user_details["identities"])
@@ -171,7 +170,7 @@ class FPANUserManagerView(UserManagerView):
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else ""
                     message = _(
-                        "Your arches profile was just changed.  If this was unexpected, please contact your Arches administrator at %s."
+                        "Your HMS profile was just changed.  If this was unexpected, please contact your Arches administrator at %s."
                         % (admin_info)
                     )
                     user.email_user(_("Your HMS profile has changed"), message)
@@ -179,5 +178,15 @@ class FPANUserManagerView(UserManagerView):
                     print(e)
                 request.user = user
             context["form"] = form
+
+            ## new, additional call to local method to get more HMS info
+            hms_details = self.get_hms_details(request.user)
+            context["site_access_rules"] = hms_details['site_access_rules']
+            context["accessible_sites"] = hms_details['accessible_sites']
+            context["site_access_html"] = hms_details['site_access_html']
+
+            if request.user.is_superuser:
+                scouts_unsorted = json.loads(scouts_dropdown(request).content)
+                context["scout_list"] = sorted(scouts_unsorted, key=lambda k: k['username'])
 
             return render(request, "views/user-profile-manager.htm", context)
