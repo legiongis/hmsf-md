@@ -74,10 +74,7 @@ class LoginView(View):
 
                 # set next redirect based on user type if not previously set
                 if next is None:
-                    if user_is_scout(user):
-                        next = request.POST.get("next", reverse("hms_home"))
-                    else:
-                        next = request.POST.get("next", reverse("user_profile_manager"))
+                    next = request.POST.get("next", reverse("user_profile_manager"))
 
                 return redirect(next)
 

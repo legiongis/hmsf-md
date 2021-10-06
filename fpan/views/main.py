@@ -7,8 +7,7 @@ from django.http import HttpResponseServerError
 from django.contrib import messages
 from arches.app.utils.response import JSONResponse
 from arches.app.models.system_settings import settings
-from arches.app.models.models import GraphModel
-from fpan.utils.permission_backend import user_is_anonymous, user_is_land_manager
+from fpan.utils.permission_backend import user_is_scout
 from fpan.models import Region
 from hms.models import Scout, ScoutProfile
 from hms.forms import ScoutForm, ScoutProfileForm
@@ -31,6 +30,7 @@ def about(request):
         'page':'about'
     })
 
+@user_passes_test(user_is_scout)
 def hms_home(request):
 
     if request.method == "POST":
