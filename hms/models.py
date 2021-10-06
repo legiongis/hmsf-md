@@ -49,24 +49,29 @@ def report_rule_from_arch_rule(arch_rule):
     start = time.time()
     if arch_rule.type == "full_access":
         return Rule("full_access", graph_name="Scout Report")
-    if arch_rule.type == "no_access":
-        return Rule("no_access", graph_name="Scout Report")
+    elif arch_rule.type == "no_access":
+        arch_ids = []
+    else:
+        ## get ids only for the sites this user has access to
+        arch_ids = RuleFilter().get_resources_from_rule(arch_rule, ids_only=True)
 
-    resids = RuleFilter().get_resources_from_rule(arch_rule, ids_only=True)
+    ## now add all ids for all Historic Cemeteries and Historic Structures
+    cem_ids = list(Resource.objects.filter(graph__name="Historic Cemetery").values_list("pk", flat=True))
+    struct_ids = list(Resource.objects.filter(graph__name="Historic Structure").values_list("pk", flat=True))
 
-    start = time.time()
+    resids = [str(i) for i in arch_ids+cem_ids+struct_ids]
+
     siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
     siteid_nodeid = str(siteid_node.pk)
     rep_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values("data", "resourceinstance_id")
-
     reportids = []
     for rd in rep_datas:
         try:
             fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
-        except IndexError as e:
+            if fmsfid in resids:
+                reportids.append(str(rd["resourceinstance_id"]))
+        except IndexError:
             pass
-        if fmsfid in resids:
-            reportids.append(str(rd["resourceinstance_id"]))
 
     report_rule = Rule("resourceid_filter", resourceids=reportids)
     logger.debug(f"report_rule_from_arch_rule: {time.time() - start}")
