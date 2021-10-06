@@ -72,7 +72,7 @@ class LoginView(View):
                 login(request, user)
                 user.password = ""
 
-                # set next redirect based on user type if not previously set
+                # set next redirect if not previously set
                 if next is None:
                     next = request.POST.get("next", reverse("user_profile_manager"))
 
