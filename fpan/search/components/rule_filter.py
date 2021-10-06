@@ -183,7 +183,13 @@ class RuleFilter(BaseSearchFilter):
                     )
 
                 elif graph_name == "Scout Report":
-                    rule = Rule("no_access", graph_name=graph_name)
+                    from hms.models import report_rule_from_arch_rule
+                    arch_rule = Rule("attribute_filter",
+                        graph_name="Archaeological Site",
+                        node_name="Assigned To",
+                        value=[user.username],
+                    )
+                    rule = report_rule_from_arch_rule(arch_rule)
 
                 else:
                     rule = Rule("full_access", graph_name=graph_name)
