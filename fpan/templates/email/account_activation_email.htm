@@ -1,16 +1,13 @@
 {% autoescape off %}
 Hello {{ user.username }}!
 
-Welcome to the Heritage Monitoring Scouts, we're excited to have you! To grant you access to the database and connect you with resources in your area, we need to learn a bit more about you. Please follow the instructions below to complete your registration.
+Welcome to the Heritage Monitoring Scouts, we're excited to have you! Your new HMS Scout ID is {{ user.username }}.
 
-To Activate Your Account:
+To activate your account and verify your email address, please click this link: {{ baseurl }}{% url 'activate' uidb64=uid token=token %}
 
-     1.  Paste this link into your browser address bar to verify your email: {{ baseurl }}{% url 'activate' uidb64=uid token=token %}
+*If the above link is broken or expired, please email hmsflorida@fpan.us for assistance.
 
-     2. The link above will take you to the Scout Login page. Use your scout ID ({{ user.username }}) and password to log in. Once you are logged in, scroll down to fill in the rest of your Scout Profile. Your account is not active until you fill in this information.
-
-*If the above link is broken or expired, simply go to the "Scout Portal" located here ({{ baseurl }}/auth/?t=scout) and log in to your account there to complete your profile. You will be able to access the database from this portal for all future visits.
+We will contact you soon to provide next steps and more details about the program.
 
 Thanks for Signing Up and Welcome Aboard!
-
 {% endautoescape %}

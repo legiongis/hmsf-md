@@ -106,7 +106,7 @@ class ScoutForm(UserCreationForm):
                     forms.ValidationError(
                         mark_safe(_(
                             "This email address has already been registered with the system. \
-                            <a href='/password_reset/'>Cilck here</a> to reset your password."
+                            <a href='/password_reset/'>Click here</a> to reset your password."
                         )),
                         code="unique",
                     ),

@@ -81,7 +81,8 @@ def scouts_dropdown(request):
         region_tiles = Tile.objects.filter(resourceinstance=resourceid, nodegroup=n.nodegroup)
         for t in region_tiles:
             for pk in t.data[str(n.nodeid)]:
-                site_regions.append(ManagementArea.objects.get(pk=pk).name)
+                ma = ManagementArea.objects.get(pk=pk)
+                site_regions.append(ma.name)
 
         ## this lookup is needed to translate between the names of the fpan.models.Region
         ## objects, which is what the ScoutProfile is related to, and the
@@ -93,6 +94,8 @@ def scouts_dropdown(request):
             "Northeast": "FPAN Northeast Region",
             "Central": "FPAN Central Region",
             "East Central": "FPAN East Central Region",
+            "West Central": "FPAN West Central Region",
+            "North Central": "FPAN North Central Region",
             "Southwest": "FPAN Southwest Region",
             "Southeast": "FPAN Southeast Region",
         }

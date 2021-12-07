@@ -1,43 +1,457 @@
-{% extends "base-manager.htm" %} {% load staticfiles %} {% load i18n %} {% block title %} {{ block.super }} {% trans "Account Settings" %} {% endblock title %} {% block main_content %}
-<div class="scroll-y">
+{% extends "base-manager.htm" %}
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
 
+{% block title %}
+{{ block.super }}
+{% trans "Account Settings" %}
+{% endblock title %}
+
+{% block navheader %}
+<header id="navbar">
+
+    <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
+        <div class="navbar-header">
+            <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
+                <img src="{{ STATIC_URL }}img/fpan/fpan_sun.png" alt="FPAN logo" class="brand-icon">
+                <div class="brand-title brand-title-admin">
+                    <span class="brand-text">{{ app_name }}</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+</header>
+{% endblock navheader %}
+
+
+{% block mainnav %}
+    <nav id="mainnav-container" class="mainnav-container-admin">
+        <div id="mainnav" class="mainnav-admin">
+            {% block navbar %}
+            <div id="mainnav-menu-wrap">
+                <div class="nano">
+                    <div class="nano-content" tabindex="0">
+                        <ul id="mainnav-menu" class="list-group mainnav-menu-admin">
+
+                            <!-- Tools -->
+                            <li class="list-header">{% trans "Tools" %}</li>
+
+                            <!-- System Settings list item -->
+                            {% if request.user|has_group:"System Administrator" %}
+                            <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %}>
+                                <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
+                                    <i class="ti-alarm-clock"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Manage System Settings" %}</strong>
+                                    </span>
+                                </a>
+                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
+                                    </li>
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            <li{% if "views/search" in main_script %} class="active-sub"{% endif %}>
+                                <a href="{% url 'search_home' %}" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                                    <i class="fa fa-search"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Search" %}</strong>
+                                    </span>
+                                </a>
+                            </li>
+
+                            <!--Menu list item-->
+                            {% if request.user|can_edit_resource_instance %}
+                            <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %}>
+                                <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
+                                    <i class="fa fa-building-o"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Add New Resource" %}</strong>
+                                    </span>
+                                </a>
+                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
+                                    <!-- ko foreach: createableResources -->
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
+                                            css: { 'arches-menu-item-disabled': disable_instance_creation },
+                                            attr: {
+                                                href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
+                                            }">
+                                            <i class="fa arches-menu-icon" data-bind="css: iconclass || 'fa fa-question'"></i> <span data-bind="text:name"></span></a>
+                                    </li>
+                                    <!-- /ko -->
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            <!--Menu list item-->
+                            {% if request.user|has_group:"Graph Editor" %}
+                            <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
+                                <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
+                                    <i class="fa fa-bookmark"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Arches Designer" %}</strong>
+                                    </span>
+                                </a>
+                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu"  href="{% url 'graph' '' %}" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
+                                    </li>
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu" href="{% url 'graph' '' %}#branches" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}#branches')">{% trans "Branches" %}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            {% endif %}
+
+                            <!--Menu list item-->
+                            {% if request.user|has_group:"Application Administrator" %}
+                            <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
+                                <a href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}') ">
+                                    <i class="fa fa-server"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Map Layer Manager" %}</strong>
+                                    </span>
+                                </a>
+                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu" href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
+                                    </li>
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu" href="{% url 'map_layer_manager' %}#basemaps" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#basemaps')">{% trans "Basemaps" %}</a>
+                                    </li>
+                                    <li class="link-submenu-item-admin">
+                                        <a class="link-submenu" href="{% url 'map_layer_manager' %}#overlays" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#overlays')">{% trans "Overlays" %}</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li{% if "views/mobile-survey-manager" in main_script %} class="active-sub"{% endif %}>
+                                <a href="{% url 'collector_manager' %}" data-bind="click: navigate.bind(this, '{% url 'collector_manager' %}') ">
+                                    <i class="fa fa-globe"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Arches Collector Manager" %}</strong>
+                                    </span>
+                                </a>
+                            </li>
+                            {% endif %}
+
+
+                            <!-- Recently Added -->
+                            {% if request.user|can_edit_resource_instance %}
+                            <li{% if 'edit-history' in main_script %} class="active-sub"{% endif %}>
+                                <a href="{% url 'edit_history' %}" data-bind="click: navigate.bind(this, '{% url 'edit_history' %}') ">
+                                    <i class="ti-ticket"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Recent Edits" %}</strong>
+                                    </span>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            <!-- Profile Manager -->
+                            {% if user.is_authenticated and request.user.username != 'anonymous' %}
+                            <!--
+                            <li{% if "user-profile-manager" in main_script %} class="active-sub"{% endif %}>
+                                <a href="{% url 'user_profile_manager' %}" data-bind="click: navigate.bind(this, '{% url 'user_profile_manager' %}') ">
+                                    <i class="fa fa-user"></i>
+                                    <span class="menu-title">
+                                        <strong>{% trans "Profile Manager" %}</strong>
+                                    </span>
+                                </a>
+                            </li>
+                            -->
+                            {% endif %}
+
+                            <li class="list-divider-dark"></li>
+
+                            <!-- Tools -->
+                            <li class="list-header">{% trans "Modules" %}</li>
+
+                            {% if request.user|has_group:"RDM Administrator" %}
+                            <!--Menu list item-->
+                            <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
+                                <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
+                                    <i class="fa fa-align-left"></i>
+                                    <span class="menu-title">
+                                        {% trans "Reference Data Manager" %}
+                                    </span>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for p in plugins %}
+                            <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
+                                {% if p.slug is not None %}
+                                <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
+                                {% else %}
+                                <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
+                                {% endif %}
+                                    <i class="{{p.icon}}"></i>
+                                    <span class="menu-title">
+                                        {{p.name}}
+                                    </span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endblock navbar %}
+        </div>
+    </nav>
+{% endblock mainnav %}
+
+{% block header %}
+    <div class="ep-toolbar-profile">
+
+        <!-- Tools Menu -->
+        {% if nav.menu %}
+        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+            <div class="">{% trans "Manage" %}
+                <i class="ion-more"></i>
+            </div>
+        </a>
+            {% if main_script == 'views/resource/editor' %}
+                {% include 'navbar/resource-manage-menu.htm' %}
+            {% elif main_script == 'views/resource/new-editor' %}
+                {% include 'navbar/new-resource-manage-menu.htm' %}
+            {% elif main_script == 'views/graph/function-manager' %}
+                {% include 'navbar/function-manage-menu.htm' %}
+            {% elif main_script == 'views/mobile-survey-designer' %}
+                {% include 'navbar/mobile-survey-manage-menu.htm' %}
+            {% else %}
+                {% include 'navbar/graph-designer-menu.htm' %}
+            {% endif %}
+        {% endif %}
+
+
+        {% block graph_title %}
+        <!-- Page Title and Icon -->
+        <div class="ep-tools-title">
+            <h1 class="page-header text-overflow ep-graph-title">
+                <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap" style="background: none;"></i>
+                <span>{% trans nav.title %}</span>
+            </h1>
+        </div>
+        {% endblock graph_title %}
+
+        <!-- Login -->
+        {% if nav.login %}
+            {% if user.username == 'anonymous' %}
+            <a href="{% url 'auth' %}?t=scout" class="ep-tools ep-tools-login">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Scout Login">
+                <h5 class="hidden-xs">{% trans "Scout Login" %}</h5>
+                </div>
+            </a>
+            <a href="{% url 'auth' %}?t=landmanager" class="ep-tools ep-tools-login">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Land Manager Login">
+
+                <h5 class="hidden-xs">{% trans "Land Manager Login" %}</h5>
+                </div>
+            </a>
+            {% else %}
+            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Logout">
+                <h5 class="hidden-xs">{% trans "Logout" %}</h5>
+                </div>
+            </a>
+            {% endif %}
+        {% endif %}
+
+        <!-- Search Bar -->
+        {% if nav.search %}
+        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-login" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
+              <h5 class="hidden-xs">Explore the Database</h5>
+            </div>
+        </a>
+        {% endif %}
+
+        <!-- Prov edit history-->
+        {% if user_is_reviewer == False and user|can_edit_resource_instance %}
+        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
+              <i class="ion-clock"></i>
+            </div>
+        </a>
+        {% endif %}
+
+        {% if nav.res_edit and user|can_edit_resource_instance %}
+        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit" %}'>
+              <i class="ion-edit"></i>
+            </div>
+        </a>
+        {% endif %}
+
+        {% if nav.print %}
+        <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
+              <i class="ion-printer"></i>
+            </div>
+        </a>
+        {% endif %}
+
+        {% if nav.help %}
+        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
+            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
+              <i class="ion-help"></i>
+            </div>
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Help Panel -->
+    <div id="ep-edits-panel" class="ep-edits" style="display:none;">
+        <div class="ep-edits-header" style="padding-right:0px">
+            <div class="ep-edits-title">
+                <span>{% trans 'My Edit History' %}</span>
+            </div>
+            <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
+                  <i class="fa fa-times-circle fa-lg"></i>
+                </div>
+            </a>
+        </div>
+        <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
+            <div class="ep-edits-content">
+                {% include 'views/provisional-history-list.htm' %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Panel -->
+    <div id="ep-help-panel" class="ep-help" style="display: none" data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
+        <div class="ep-help-header" style="padding-right:0px">
+            <div class="ep-help-title">
+                <span>{% trans nav.help.title %}</span>
+            </div>
+            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none" data-bind="click: function(){helpOpen(false)}">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
+                  <i class="fa fa-times-circle fa-lg"></i>
+                </div>
+            </a>
+        </div>
+
+        <!-- help content loaded from contextually referenced template -->
+        <div class="ep-help-body" data-bind="css: {'loading-mask': helploading()}">
+            <!-- content gets inserted into this div -->
+            <div class="ep-help-content"></div>
+            <hr>
+            <h5>{% trans "for more documentation, visit" %} <a href="https://arches.readthedocs.io/" target="_blank">arches.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
+        </div>
+    </div>
+{% endblock header %}
+
+
+{% block main_content %}
     <!-- Main Editor -->
     <div id="">
 
         <!-- Profile Summary -->
         <div class="profile-summary-page">
-
-            <div class="profile-report relative">
-
-                <!-- Profile Top Panel Image 
-                <img class="widget-bg img-responsive" src='{{ STATIC_URL }}img/user/profile_background.png'>
-                -->
-
-                <div class="">
-                    <div class="profile-full-name">
-                        {{user.first_name}} {{user.last_name}}
-                    </div>
-                    <div class="profile-e-mail">
-                        User name: {{user.username}}
-                    </div>
-                </div>
-            </div>
-
             <!-- Profile Sections -->
-            <div class="profile-sections">
+            <div class="profile-sections-{{user_type}}">
+                <!-- FPAN Panel for State Landmanagers -->
+                {% if user_is_state %}
+                    <section id="" class="profile-list">
+                        <div class="panel fpan-panel-{{user_type}}">
+                          <div class="row">
+                              <div class="col-md-3">
+                                  <img src="{% static 'img/state/DHR transparent - NO WWW.png' %}" alt="Logo" style="width:250px;"">
+                              </div>
+                              <div class="col-md-9 text-center">
+                                  <h2>{% trans "ARCHAEOLOGICAL AND HISTORIC SITE CONDITION ASSESSMENTS" %}</h2>
+                                  <p>{% trans "The purpose of condition assessments or “annual monitoring” of archaeological sites is to evaluate threats on a regular basis. The assessments submitted through this system populate a database which the Division of Historical Resources uses to track site condition and provide feedback for Land Management Reviews, per 259, Florida Statutes." %}</p>
+                              </div>
+                          </div>
+                    </section>
+                {% endif %}
+                {% if user_is_scout %}
+                  <section id="" class="profile-list">
+                      <div class="panel fpan-panel-{{user_type}}">
+                        <div class="row">
+                          <div class="col-md-4" >
+                              <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" alt="Logo" style="width:100%;max-width:200px;">
+                          </div>
+                          <div class="col-md-8 hidden">
+                              <h1 style="">{% trans "HMS Florida" %}</h1>
+                          </div>
+                          <div class="col-md-8">
+                              <p>{% trans "Heritage Monitoring Scouts (HMS Florida) is a public engagement program focused on tracking changes to archaeological sites at risk, particularly those impacted by climate change in the form of erosion and sea level rise." %}</p>
+                              {% if not user_is_scout %}
+                              <p>{% trans "If you are already a Heritage Monitoring Scout," %} <a class="a-{{user_type}}" href='{% url "auth" %}?t=scout'>{% trans "sign in" %}</a>. {% trans "Otherwise, why not" %} <a class="a-{{user_type}}" href='{% url "fpan_home" %}#scout-signup'>{% trans "join us" %}</a>!</p>
+                              {% endif %}
+                          </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-xs-12"><hr style="border-top:solid #676761 1px;"></div>
+                        <div class="col-xs-12 col-sm-6">
+                            <h1>{% trans "How does it work?" %}</h1>
+                            <ul>
+                                <li>Citizens sign up as Heritage Monitoring Scouts, and can begin monitoring Historic Cemeteries and Historic Structures right away!</li>
+                                <li>To monitor Archaeological Sites, Scouts must first choose a region of interest, and then wait until an administrator assigns a site to them.</li>
+                                <li>Once an Archaeological Site has been assigned to a Scout, that Scout can view the site's location, and log a Scout Visit!</li>
+                            </ul>
+                            <div class="panel panel-bordered scout-panel">
+                                <div class="panel-heading">
+                                    <div class="panel-title"><i class="fa fa-download" aria-hidden="true"></i>
+                                        {% trans "Would you like a monitoring form to take with you in the field?" %}
+                                    </div>
+                                </div>
+                                <div class="panel-body">
+                                <ul>
+                                    <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Archaeological_Sites.pdf' %}">Download the Archaeological Site form</a></li>
+                                    <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Historic_Structures.pdf' %}">Download the Historic Structure form</a></li>
+                                </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <h1>{% trans "How do I log a visit?" %}</h1>
+                            <ol>
+                                <li>To log a scout visit for a Cemetery or Historic Structure, click <a class="a-{{user_type}}" href="{% url 'search_home' %}">“Explore the Database”</a>, then in the Menu Pane on the far left of the main map page, hover over the <i class="fa fa-building-o"></i> building icon and click on <i class="fa fa-binoculars"></i> “Scout Report” under the “Add New Resource” heading. Then, follow the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a> to log a visit.</li>
+                                <li>To monitor an Archaeological Site, you must first request access to that site. Please email us at <a class="a-{{user_type}}" href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a> to request access or get suggestions on sites you can monitor in your area.</li>
+                                <li>Once an Archaeological Site has been assigned, you can view the site's location and log a Scout Visit by following the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a>.</li>
+                            </ol>
+                        </div>
+                      </div>
+                  </section>
+                {% endif %}
 
-                <!-- My Account Info -->
+                <!-- My Account Info Panel -->
                 <section id="" class="profile-list">
-                    <div class="account-wrapper">
+                    <div class="panel panel fpan-panel-{{user_type}}">
                         <div class="row relative">
-
                             <!-- Section Title -->
                             <div class="col-sm-3">
                                 <div class="profile-header">
-                                    {% trans 'Account' %}
+                                    {% trans 'Profile Actions' %}
                                 </div>
+                                <div class="add-popover" data-bind='click: toggleChangePasswordForm'>
+                                    <a href="#" class="a-{{user_type}}">{% trans 'Change Password' %}</a>
+                                </div>
+                                <div class="password-success" data-bind="text:changePasswordSuccess"></div>
+                                <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
+                                    <div class="arrow" style="left: 50%;"></div>
+                                    {% include 'change_password.htm' %}
+                                </div>
+                                <div data-bind='click: toggleEditUserForm'>
+                                    <a href="#" class="a-{{user_type}}">{% trans 'Edit Basic Profile' %}</a>
+                                </div>
+                                {% if user_is_scout %}
+                                <p><a class="a-{{user_type}}" href="{% url 'scout_profile_manager' %}">{% trans 'Update Scout Profile' %} <i class="fa fa-external-link"></i></a></p>
+                                {% endif %}
                             </div>
-
                             <div class="col-sm-9">
                                 <!-- ko if: showEditUserForm() === false -->
                                 <div class="row">
@@ -47,21 +461,20 @@
                                             <p class="profile-label-shim">{% trans 'User name' %}</p>
                                         </div>
                                     </div>
-
+                                </div>
+                                <div class="row">
                                     <div class="col-sm-5">
-                                        <h4 class="text-main">********</h4>
-                                        <button class="btn btn-default btn-active-success btn-profile-password add-popover" data-bind='click: toggleChangePasswordForm'>
-                                        {% trans 'Change password' %}</button>
-                                        <div class="password-success" data-bind="text:changePasswordSuccess"></div>
-                                        <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
-                                            <div class="arrow" style="left: 50%;"></div>
-                                            {% include 'change_password.htm' %}
+                                        <div class="relative">
+                                            <h4 class="text-main" style="font-weight: 500;">{{ user.first_name }}</h4>
+                                            <p class="profile-label-shim">{% trans 'First Name' %}</p>
                                         </div>
                                     </div>
-
-                                    <div class="col-sm-2">
-                                        <div>
-                                            <button class="btn btn-primary btn-active-purple btn-profile" data-bind='click: toggleEditUserForm'>{% trans 'Edit' %}</button>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="relative">
+                                            <h4 class="text-main" style="font-weight: 500;">{{ user.last_name }}</h4>
+                                            <p class="profile-label-shim">{% trans 'Last Name' %}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -70,7 +483,7 @@
                                     <div class="col-sm-5">
                                         <div class="relative">
                                             <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Contact email' %}</p>
+                                            <p class="profile-label-shim">{% trans 'Email' %}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -86,10 +499,9 @@
                                 <!-- /ko -->
 
                                 <!-- ko if: showEditUserForm() === true -->
-                                <form method="post">
+                                <form id="profile-update-form" action="{% url 'user_profile_manager' %}" method="post">
                                     {% csrf_token %}
                                     <div class="row">
-
                                         <div class="col-sm-5">
                                             <div class="form-group">
                                                 <label class="control-label account-label">{% trans 'HMS/Scout ID' %}</label>
@@ -100,13 +512,13 @@
                                         <!-- Password -->
                                         <div class="col-sm-5">
                                             <p class="account-tips">
-                                                {% trans 'This is account login name.' %}
+                                                {% trans 'This is your account login, which cannot be changed.' %}
                                             </p>
                                         </div>
 
                                         <div class="col-sm-2">
                                             <div>
-                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit" formaction="{% url 'user_profile_manager' %}">{% trans 'Save' %}</button>
+                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit">{% trans 'Save' %}</button>
                                                 <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
                                             </div>
                                         </div>
@@ -126,9 +538,6 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-5">
-                                            <p class="account-tips">
-                                                {% trans 'Arches uses your name and phone number to make it easier for other users to find and work with you.' %}
-                                            </p>
                                         </div>
                                     </div>
 
@@ -176,9 +585,6 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-5">
-                                            <p class="account-tips">
-                                                {% trans 'Arches uses your e-maill to alert you to projects and tasks assigned to you.' %}
-                                            </p>
                                         </div>
                                     </div>
                                 </form>
@@ -190,52 +596,82 @@
                 </section>
 
                 <!-- NEW SECTION FOR HMS INFO-->
-                <section id="permission summary" class="profile-list">
-                    <div class="account-wrapper">
+                <section id="permission-summary" class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
                         <div class="row relative">
-
-                            <!-- Section Title -->
                             <div class="col-sm-3">
                                 <div class="profile-header">
                                     {% trans 'Site Access Rules' %}
                                 </div>
                             </div>
-
                             <div class="col-sm-9">
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <p class="profile-label-shim">{{ site_access_rules }}</p>
-                                        </div>
-                                    </div>
+                                <div class="relative" style="padding-top:5px;">
+                                    {{ site_access_html|safe }}
                                 </div>
-                              
                             </div>
-
-                            <!-- Section Title -->
+                        </div>
+                        {% if site_access_rules.type != 'no_access' and site_access_rules.type != 'full_access' %}
+                        <div class="row relative">
                             <div class="col-sm-3">
                                 <div class="profile-header">
-                                    <!-- if Scout, maybe this should be something like "sites assigned to you"-->
-                                    {% trans 'Accessible Sites' %}
+                                    {% trans 'Accessible Sites' %} ({{ accessible_sites|length }})
                                 </div>
                             </div>
-
                             <div class="col-sm-9">
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <p class="profile-label-shim">{{ accessible_sites }}</p>
-                                        </div>
-                                    </div>
+                                <div class="relative" style="padding-top:5px;">
+                                    {% if accessible_sites|length == 0 %}
+                                    <p><em>No sites are accessible based on your access rules.</em></p>
+                                    {% else %}
+                                    <ul style="list-style:none; padding-left:0px;">
+                                    {% for site in accessible_sites %}
+                                        <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
+                                        {% if site.scout_report_ct > 0 %}
+                                        <ul style="list-style-type:'\21B3';">
+                                        {% for report in site.scout_reports %}
+                                            <li><a class="a-{{user_type}}" href="{{report.url}}">&nbsp;&nbsp;{{ report.displayname }}</a></li>
+                                        {% endfor %}
+                                        </ul>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </ul>
+                                    {% endif %}
                                 </div>
-                                
                             </div>
-                            
                         </div>
-
+                        {% endif %}
                     </div>
                 </section>
 
+                {% if user_type == "admin" %}
+                <section id="scout-list-section" class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
+                        <div class="row relative">
+                            <div class="col-sm-3">
+                                <div class="profile-header">
+                                    {% trans 'Scout Summary' %}
+                                </div>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="relative" style="padding-top:5px;">
+                                    <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}">click to download full list</a></p>
+                                    <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px;background:url({% static 'img/fpan/ricepaper.png' %});">
+                                        {% for scout in scout_list %}
+                                        <li><strong>{{scout.username}}</strong> | <em>regions:</em>
+                                            {% for region in scout.region_choices %}
+                                                {{ region }}{% if not forloop.last %},{% endif %}
+                                            {% endfor %} | <em>interests:</em>
+                                            {% for interest in scout.site_interest_type %}
+                                                {{ interest }}{% if not forloop.last %},{% endif %}
+                                            {% endfor %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
 
 <!-- commenting this section out as it's not implemented as of Feb 19th - AC -->
                 <!-- My Devices -->
@@ -311,8 +747,8 @@
                 <!-- Notification Settings -->
                 <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
                 {% comment %}
-                <section>
-                    <div class="profile-list">
+                <section class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
                         <div class="profile-header">
                             {% trans 'Notification Settings' %}
                         </div>
@@ -364,8 +800,10 @@
                 </section>
                 {% endcomment %}
 
-                <section>
-                    <div class="profile-list">
+                {% comment %}
+                <!-- commenting the Arches Collector section out because it is not yet active -->
+                <section class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
                         <div class="profile-header">
                             {% trans 'Arches Collector Projects' %}
                         </div>
@@ -486,6 +924,7 @@
                         <!--/ko-->
                     </div>
                 </section>
+                {% endcomment %}
             </div>
 
         </div>
@@ -493,8 +932,6 @@
 
     </div>
     <!--END  Main Editor -->
-
-</div>
 
 <!-- SCROLL TOP BUTTON -->
 <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>

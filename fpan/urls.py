@@ -22,11 +22,12 @@ handler500 = main.server_error
 
 urlpatterns = [
     url(r'^$', main.index, name='fpan_home'),
+    url(r'^about$', main.about, name='about'),
     url(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
-    url(r'^hms/home', main.hms_home, name='hms_home'),
-    url(r'^state/home', main.state_home, name='state_home'),
+    url(r"^user/scout-profile$", main.hms_home, name="scout_profile_manager"),
+    url(r'^hms/home', RedirectView.as_view(pattern_name='scout_profile_manager', permanent=True)),
+    url(r'^state/home', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
     url(r'^regions/$', main.show_regions, name='show_regions'),
-    url(r'^dashboard', main.fpan_dashboard, name='fpan_dashboard'),
     url(r'^index.htm', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
     url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
     url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),

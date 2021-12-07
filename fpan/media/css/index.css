@@ -3,16 +3,16 @@
   src: url("../fonts/Helsing.otf");
 }
 
-body, body.body-anonymous, body.body-admin {
+body, body.body-anonymous, body.body-admin, .profile-sections-admin {
     font-family: 'Kreon',sans-serif;
     background: url('../img/fpan/ricepaper.png');
     font-size: 16px;
     line-height: 1.65;
 }
-body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout {
+body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {
     background: url('../img/fpan/ricepaper-hms.png');
 }
-body.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager {
+body.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager, .profile-sections-landmanager {
     background: url('../img/fpan/ricepaper-state.png');
 }
 
@@ -440,4 +440,97 @@ input[type='text'] {
 .fpan-related-report a.btn {
   margin-left: 80px;
   margin-top: 10px;
+}
+/* User profile page elements */
+.ep-toolbar-profile {
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+    width: 100%;
+    height: 50px;
+    background: #431825;
+    border-bottom: 0px;
+    z-index: 3000;
+    color: white;
+}
+.ep-toolbar-profile .ep-tools-login {
+    background: #431825;
+    border-bottom: 0px;
+    border-left: 1px solid #000;
+    color: white;
+}
+.ep-toolbar-profile .ep-tools-right {
+   border-right: none;
+   border-bottom: 1px solid #000;
+   border-left: 1px solid #000;
+   background: #431825;
+   color: #fff;
+}
+.profile-report-scout {
+  padding: 10px 10px 10px 0px;
+  background: url('../img/fpan/bedge_muted.png');
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+  border-top: solid 8px #F26422;
+}
+.profile-report-landmanager {
+  padding: 10px 10px 10px 0px;
+  background: url('../img/fpan/bedge_muted.png');
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+  border-top: solid 8px #273675;
+}
+.profile-list {
+    width: 100%;
+    padding: 20px 100px;
+    min-height: 170px;
+    border-bottom: 0px;
+}
+.profile-list .panel {
+  padding: 20px;
+}
+.profile-list .scout-panel {
+  padding: 0px;
+}
+.scout-panel .panel-title {
+  color: white;
+  font-size: 1em;
+  margin-top: -1px;
+}
+.profile-list h1 {
+  color: #555;
+  font-size: 2.441em;
+  font-weight: 400;
+}
+.profile-list h2 {
+  color: #444;
+  font-size: 28px;
+  position: relative;
+  margin-bottom: 15px;
+  padding-bottom: 20px;
+  text-transform: uppercase;
+}
+.profile-list h2:after {
+  bottom: 0;
+  left: 50%;
+  height: 1px;
+  width: 70px;
+  content: " ";
+  margin-left: -35px;
+  position: absolute;
+}
+.profile-list h2:after, i.icon-bg-u {
+    background: #4765a0;
+}
+.profile-list .btn-scout {
+  background-color: #F26422;
+  border-color: #F26422;
+}
+.profile-list .btn-landmanager {
+  background-color: #273675;
+  border-color: #273675;
+}
+.profile-label-shim {
+  color: #555;
 }
