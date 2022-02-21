@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import time
 import json
 import logging
+from html5lib import serialize
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
@@ -84,6 +85,28 @@ class Scout(User):
     class Meta:
         verbose_name = "Scout"
         verbose_name_plural = "Scouts"
+
+    def serialize(self):
+
+        serialized = {
+            'username': self.username,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'street_address': self.scoutprofile.street_address,
+            'city': self.scoutprofile.city,
+            'state': self.scoutprofile.state,
+            'zip_code': self.scoutprofile.zip_code,
+            'phone': self.scoutprofile.phone,
+            'background': self.scoutprofile.background,
+            'relevant_experience': self.scoutprofile.relevant_experience,
+            'interest_reason': self.scoutprofile.interest_reason,
+            'site_interest_type': ";".join(self.scoutprofile.site_interest_type),
+            'region_choices': ";".join([r.name for r in self.scoutprofile.region_choices.all()]),
+            'date_joined': self.date_joined.strftime("%Y-%m-%d"),
+        }
+
+        return serialized
 
 SITE_INTEREST_CHOICES = (
     ('Prehistoric', 'Prehistoric'),

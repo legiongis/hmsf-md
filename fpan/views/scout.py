@@ -131,38 +131,30 @@ def scout_list_download(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename={}'.format(csvname)
 
-    ## create writer object
-    writer = csv.writer(response)
+    # the keys here must match those returned by the Scout().serialize() method
+    field_mapping = {
+        'username': "Scout ID",
+        'first_name': "First Name",
+        'last_name': "Last Name",
+        'email': "Email",
+        'street_address': "Street Address",
+        'city': "City",
+        'state': "State",
+        'zip_code': "Zip Code",
+        'phone': "Phone",
+        'background': "Education/Occupation",
+        'relevant_experience': "Relevant Experience",
+        'interest_reason': "Interest Reason",
+        'site_interest_type': "Site Types",
+        'region_choices': "Regions",
+        'date_joined': "Signup Date",
+    }
 
-    header_row = ['scoutid','first_name','last_name','email','street address',
-                    'city','state','zip','phone','interests','region_choices',
-                    'date_joined',
-                 ]
-    writer.writerow(header_row)
-
-    rows = []
-    all_scouts = Scout.objects.all()
-    for scout in all_scouts:
-
-        id = scout.username
-        first_name = scout.first_name
-        last_name = scout.last_name
-        email = scout.email
-        addr = scout.scoutprofile.street_address
-        city = scout.scoutprofile.city
-        state = scout.scoutprofile.state
-        zip = scout.scoutprofile.zip_code
-        phone = scout.scoutprofile.phone
-        interests = ";".join(scout.scoutprofile.site_interest_type)
-        regions = scout.scoutprofile.region_choices.all()
-        region_names = ";".join([r.name for r in regions])
-        joined = scout.date_joined.strftime("%Y-%m-%d")
-
-        srow = [id,first_name,last_name,email,addr,city,state,zip,phone,
-                    interests,region_names,joined]
-        rows.append(srow)
-
-    for row in rows:
-        writer.writerow(row)
+    writer = csv.DictWriter(response, fieldnames=list(field_mapping.values()))
+    writer.writeheader()
+    for scout in Scout.objects.all():
+        serialized = scout.serialize()
+        translate_row = {field_mapping[k]: serialized[k] for k in serialized.keys()}        
+        writer.writerow(translate_row)
 
     return response
