@@ -27,6 +27,7 @@ urlpatterns = [
     url(r"^user/scout-profile$", main.hms_home, name="scout_profile_manager"),
     url(r'^hms/home', RedirectView.as_view(pattern_name='scout_profile_manager', permanent=True)),
     url(r'^state/home', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
+    url(r'^dashboard', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
     url(r'^regions/$', main.show_regions, name='show_regions'),
     url(r'^index.htm', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
     url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
