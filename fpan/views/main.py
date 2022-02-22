@@ -1,10 +1,11 @@
 import json
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import user_passes_test
 from django.template import RequestContext
 from django.template.loader import get_template
 from django.http import HttpResponseServerError
 from django.contrib import messages
+from django.urls import reverse
 from arches.app.utils.response import JSONResponse
 from arches.app.models.system_settings import settings
 from fpan.utils.permission_backend import user_is_scout
@@ -43,9 +44,7 @@ def hms_home(request):
         else:
             messages.add_message(request, messages.ERROR, 'Form was invalid.')
 
-        return render(request, "home-hms.htm", {
-            'scout_profile': scout_profile_form,
-            'page':'home-hms'})
+        return redirect(reverse('user_profile_manager'))
 
     else:
         scout_profile_form = None
@@ -53,10 +52,9 @@ def hms_home(request):
             scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
         except Scout.DoesNotExist:
             pass
-
-    return render(request, "home-hms.htm", {
-        'scout_profile': scout_profile_form,
-        'page':'home-hms'})
+        return render(request, "home-hms.htm", {
+            'scout_profile': scout_profile_form,
+            'page':'home-hms'})
 
 def show_regions(request):
 
