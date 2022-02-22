@@ -123,7 +123,7 @@ if MODE == "DEV":
 
 if MODE == "PROD":
     SESSION_COOKIE_SAMESITE = 'Strict'
-    SESSION_COOKIE_AGE = 1800 #auto logout after 1/2 hour
+    SESSION_COOKIE_AGE = 28800 # auto logout after 8 hrs
 
 if HTTPS:
     SESSION_COOKIE_SECURE = True

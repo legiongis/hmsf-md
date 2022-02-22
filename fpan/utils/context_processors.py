@@ -40,7 +40,7 @@ def make_widget_data():
         "id": str(i[0]),
         "selected": "false",
         "text": i[1]
-    } for i in User.objects.all().values_list("pk", "username")]
+    } for i in User.objects.all().order_by("username").values_list("pk", "username")]
 
     return {
         "lists" : {
