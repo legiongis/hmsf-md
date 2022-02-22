@@ -199,7 +199,6 @@ class ScoutProfile(models.Model):
         else:
             rule = Rule("full_access", graph_name=graph_name)
 
-        # print(rule)
         return rule
 
     def get_allowed_resources(self, graph_name, ids_only=False):

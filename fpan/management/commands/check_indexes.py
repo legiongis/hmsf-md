@@ -1,10 +1,13 @@
 import os
 import csv
+import logging
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
+
+logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
 

@@ -1,8 +1,10 @@
+import logging
 import datetime
 from arches.app.models.resource import Resource
 
 from .helpers import get_node_value, weekday_lookup
 
+logger = logging.getLogger(__name__)
 
 def get_past_week_report_counts(use_date=None):
 
@@ -61,5 +63,5 @@ def get_past_week_report_counts(use_date=None):
         for report in v['reports']:
             report["new_site"] = report["fmsfid"] in sites_with_reports_already
 
-    print("time elapsed: ", datetime.datetime.now() - start)
+    logger.info(f"report count generation completed | {datetime.datetime.now() - start} seconds")
     return count_dict
