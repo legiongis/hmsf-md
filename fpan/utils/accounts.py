@@ -3,8 +3,7 @@ import string
 from django.contrib.auth.models import User
 
 def check_duplicate_username(newusername):
-    chars = ["'", "-", "\"", "_", "."]
-    print(newusername)
+    chars = ["'", "-", "\"", "_", ".", " "]
     for x in chars:
         if x in newusername:
             newusername = newusername.replace(x, "")
