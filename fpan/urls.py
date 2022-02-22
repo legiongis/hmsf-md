@@ -1,6 +1,8 @@
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
+from django.views.generic.base import TemplateView
+from django.urls import path
 from django.conf import settings
 from arches.app.views.auth import UserProfileView, GetClientIdView
 from arches.app.views.user import UserManagerView
@@ -58,6 +60,7 @@ urlpatterns = [
         auth.activate, name='activate'),
 
     url(r'^favicon\.ico$', favicon_view),
+    path("robots.txt",TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 
     url(r'^', include('arches.urls')),
 ]

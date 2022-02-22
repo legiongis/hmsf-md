@@ -1,0 +1,8 @@
+User-agent: *
+
+Disallow: /o/
+Disallow: /api/
+Disallow: /mvt/
+Disallow: /graph/
+Disallow: /media/
+Disallow: /files/
