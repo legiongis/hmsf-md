@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import time
 import json
 import logging
-from html5lib import serialize
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
