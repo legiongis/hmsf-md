@@ -20,6 +20,8 @@ from fpan.views.resource import (
 uuid_regex = settings.UUID_REGEX
 handler500 = main.server_error
 
+favicon_view = RedirectView.as_view(url=f'{settings.STATIC_URL}img/favicon/favicon.ico', permanent=True)
+
 urlpatterns = [
     url(r'^$', main.index, name='fpan_home'),
     url(r'^about$', main.about, name='about'),
@@ -54,6 +56,8 @@ urlpatterns = [
     url(r"^auth/$", auth.LoginView.as_view(), name="auth"),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         auth.activate, name='activate'),
+
+    url(r'^favicon\.ico$', favicon_view),
 
     url(r'^', include('arches.urls')),
 ]
