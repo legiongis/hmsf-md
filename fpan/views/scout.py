@@ -142,12 +142,12 @@ def scout_list_download(request):
         'state': "State",
         'zip_code': "Zip Code",
         'phone': "Phone",
-        'background': "Education/Occupation",
-        'relevant_experience': "Relevant Experience",
-        'interest_reason': "Interest Reason",
         'site_interest_type': "Site Types",
         'region_choices': "Regions",
         'date_joined': "Signup Date",
+        'background': "Education/Occupation",
+        'relevant_experience': "Relevant Experience",
+        'interest_reason': "Interest Reasons",
     }
 
     writer = csv.DictWriter(response, fieldnames=list(field_mapping.values()))
