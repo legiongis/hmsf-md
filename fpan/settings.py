@@ -142,34 +142,63 @@ LOGGING = {
             'format': '%(message)s',
         },
     },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'handlers': {
         'arches': {
-            'level': LOG_LEVEL,  # DEBUG, INFO, WARNING, ERROR
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_DIR, 'arches.log'),
+            'filename': os.path.join(LOG_DIR, 'arches-debug.log'),
             'formatter': 'full'
         },
         'fpan': {
-            'level': LOG_LEVEL,  # DEBUG, INFO, WARNING, ERROR
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(LOG_DIR, 'fpan.log'),
+            'filename': os.path.join(LOG_DIR, 'fpan-debug.log'),
             'formatter': 'full'
         },
+        'hms': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'hms-debug.log'),
+            'formatter': 'full'
+        },
+        'error': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'error.log'),
+            'formatter': 'full',
+        },
+        'info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOG_DIR, 'info.log'),
+            'formatter': 'full',
+        },
         'console': {
-            'level': LOG_LEVEL,
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'console'
+            'formatter': 'console',
+            'filters': ['require_debug_true'],
         }
     },
     'loggers': {
         'arches': {
-            'handlers': ['arches', 'console'],
-            'level': LOG_LEVEL,
+            'handlers': ['arches', 'info', 'error', 'console'],
+            'level': 'DEBUG',
             'propagate': True
         },
         'fpan': {
-            'handlers': ['fpan', 'console'],
-            'level': LOG_LEVEL,
+            'handlers': ['fpan', 'info', 'error', 'console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+        'hms': {
+            'handlers': ['hms', 'info', 'error', 'console'],
+            'level': 'DEBUG',
             'propagate': True
         }
     }
