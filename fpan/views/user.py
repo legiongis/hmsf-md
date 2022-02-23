@@ -173,7 +173,7 @@ class FPANUserManagerView(UserManagerView):
                     )
                     user.email_user(_("Your HMS profile has changed"), message)
                 except Exception as e:
-                    print(e)
+                    logger.error(e)
                 request.user = user
             context["form"] = form
 

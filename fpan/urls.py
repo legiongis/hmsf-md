@@ -1,6 +1,8 @@
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls import include, url
 from django.views.generic import RedirectView
+from django.views.generic.base import TemplateView
+from django.urls import path
 from django.conf import settings
 from arches.app.views.auth import UserProfileView, GetClientIdView
 from arches.app.views.user import UserManagerView
@@ -20,6 +22,8 @@ from fpan.views.resource import (
 uuid_regex = settings.UUID_REGEX
 handler500 = main.server_error
 
+favicon_view = RedirectView.as_view(url=f'{settings.STATIC_URL}img/favicon/favicon.ico', permanent=True)
+
 urlpatterns = [
     url(r'^$', main.index, name='fpan_home'),
     url(r'^about$', main.about, name='about'),
@@ -27,6 +31,7 @@ urlpatterns = [
     url(r"^user/scout-profile$", main.hms_home, name="scout_profile_manager"),
     url(r'^hms/home', RedirectView.as_view(pattern_name='scout_profile_manager', permanent=True)),
     url(r'^state/home', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
+    url(r'^dashboard', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
     url(r'^regions/$', main.show_regions, name='show_regions'),
     url(r'^index.htm', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
     url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
@@ -53,6 +58,9 @@ urlpatterns = [
     url(r"^auth/$", auth.LoginView.as_view(), name="auth"),
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
         auth.activate, name='activate'),
+
+    url(r'^favicon\.ico$', favicon_view),
+    path("robots.txt",TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
 
     url(r'^', include('arches.urls')),
 ]

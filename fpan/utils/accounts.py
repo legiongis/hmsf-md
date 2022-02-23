@@ -1,14 +1,15 @@
 import random
 import string
+import logging
 from django.contrib.auth.models import User
 
+logger = logging.getLogger(__name__)
+
 def check_duplicate_username(newusername):
-    chars = ["'", "-", "\"", "_", "."]
-    print(newusername)
+    chars = ["'", "-", "\"", "_", ".", " "]
     for x in chars:
         if x in newusername:
             newusername = newusername.replace(x, "")
-    print(newusername)
     inputname = newusername
     inc = 1
     while User.objects.filter(username=newusername).exists():
@@ -16,7 +17,6 @@ def check_duplicate_username(newusername):
             offset = len(newusername) - len(inputname)
             inc = int(newusername[-offset:]) + 1
         newusername = inputname + '{}'.format(inc)
-        print(newusername)
     return newusername
 
 def generate_username(firstname, middleinitial, lastname, overwrite=False):
@@ -25,10 +25,11 @@ def generate_username(firstname, middleinitial, lastname, overwrite=False):
     name already exists."""
 
     name = f"{firstname[0].lower()}{middleinitial.lower()}{lastname.lower()}"
-    if overwrite:
-        return name
-    else:
-        return check_duplicate_username(name)
+    if overwrite is False:
+        name = check_duplicate_username(name)
+
+    logger.debug(f"username created: {firstname} {middleinitial} {lastname} --> {name} | overwrite: {overwrite}")
+    return name
 
 def generate_password():
     """not currently used, generates an 8-character random password"""

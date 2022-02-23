@@ -1,4 +1,5 @@
 import uuid
+import logging
 from django.core.exceptions import ValidationError
 from django.contrib.gis.db.models import Model
 from arches.app.functions.base import BaseFunction
@@ -8,6 +9,8 @@ from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 import json
 import psycopg2
+
+logger = logging.getLogger(__name__)
 
 details = {
     'functionid':'4a1da8f0-c32a-11e7-a700-94659cf754d0',
@@ -68,12 +71,12 @@ def get_valueid_from_preflabel(preflabel):
     vs = models.Value.objects.filter(value=preflabel)
 
     if len(vs) == 0:
-        print(f"no match for this preflabel: {preflabel}")
+        logger.warning(f"no match for this preflabel: {preflabel}")
         return None
     if len(vs) > 1:
         concept_ids = [i.concept_id for i in vs]
         if len(set(concept_ids)) > 1:
-            print(f"too many values for this preflabel: {preflabel}")
+            logger.warning(f"too many values for this preflabel: {preflabel}")
             return None
 
     return str(vs[0].valueid)
@@ -81,12 +84,6 @@ def get_valueid_from_preflabel(preflabel):
 class SpatialJoin(BaseFunction):
 
     def save(self,tile,request):
-    
-        ## variable to control verbose output. not hooked into anywhere else in the app,
-        ## but useful during development
-        verbose = False
-        if verbose:
-            print(f"verbose: {verbose}")
 
         ## return early if there is no spatial data to use for a comparison
         spatial_node_id = self.config['spatial_node_id']
@@ -106,8 +103,7 @@ class SpatialJoin(BaseFunction):
         table_field_targets = self.config['inputs']
 
         for table_field_target in table_field_targets:
-            if verbose:
-                print(f"processing input: {table_field_target}")
+            logging.debug(f"processing input: {table_field_target}")
             ## skip if the table_name.field_name input is not valid
             if not "." in table_field_target['table_field']:
                 continue
@@ -139,8 +135,7 @@ class SpatialJoin(BaseFunction):
             ## if the target node is inside of the currently edited node group,
             ## just set the new value right here
             if str(target_ng_id) == str(tile.nodegroup_id):
-                if verbose:
-                    print("  inside same nodegroup")
+                logging.debug("  inside same nodegroup")
                 ## set precedent for correlating new values with target node
                 ## datatype. the following will work on a limited basis
                 if target_node_datatype == "concept-list":
@@ -155,11 +150,9 @@ class SpatialJoin(BaseFunction):
 
             ## if the tile that is to be updated already exists, then it is easy
             ## to find and update it. this should be combined with a 
-            if verbose:
-                print("  checking for previously saved tiles with this target_ng_id")
+            logging.debug("  checking for previously saved tiles with this target_ng_id")
             previously_saved_tiles = Tile.objects.filter(nodegroup_id=target_ng_id,resourceinstance_id=tile.resourceinstance_id)
-            if verbose:
-                print(f" {len(previously_saved_tiles)} found")
+            logging.debug(f" {len(previously_saved_tiles)} found")
             if len(previously_saved_tiles) > 0:
                 for t in previously_saved_tiles:
                     if target_node_datatype == "concept-list":
@@ -171,8 +164,7 @@ class SpatialJoin(BaseFunction):
                     t.save()
                 continue
             
-            if verbose:
-                print("  must need a brand new tile")
+            logging.debug("  must need a brand new tile")
             parenttile = Tile().get_blank_tile(target_node_id,resourceid=tile.resourceinstance_id)
             existing_pts = Tile.objects.filter(nodegroup_id=parenttile.nodegroup_id,resourceinstance_id=tile.resourceinstance_id)
             
@@ -180,8 +172,7 @@ class SpatialJoin(BaseFunction):
             if len(existing_pts) == 0:
                 for ng_id,tilelist in parenttile.tiles.iteritems():
                     if ng_id == target_ng_id:
-                        if verbose:
-                            print("  creating new parent tile and tile")
+                        logging.debug("  creating new parent tile and tile")
                         for t in tilelist:
                             if target_node_datatype == "concept-list":
                                 t.data[target_node_id] = attributes
@@ -197,8 +188,7 @@ class SpatialJoin(BaseFunction):
             if len(existing_pts) == 1:
                 for ng_id,tilelist in parenttile.tiles.iteritems():
                     if ng_id == target_ng_id:
-                        if verbose:
-                            print("  creating new tile and assigning to existing parent tile")
+                        logging.debug("  creating new tile and assigning to existing parent tile")
                         for t in tilelist:
                             if target_node_datatype == "concept-list":
                                 t.data[target_node_id] = attributes
@@ -214,8 +204,7 @@ class SpatialJoin(BaseFunction):
             ## one could be saved without any problem (as in len(existing_pts) == 0 above)
             ## but this has not been tested yet.
             if len(existing_pts) > 1:
-                if verbose:
-                    print("  there are multiple existing parent tiles. this circumstance"\
+                logging.debug("  there are multiple existing parent tiles. this circumstance"\
                         "is not supported at this time.")
                 continue
             
@@ -227,10 +216,10 @@ class SpatialJoin(BaseFunction):
         return
 
     def on_import(self):
-        print('calling on import')
+        pass
 
     def get(self):
-        print('calling get')
+        pass
 
     def delete(self):
-        print('calling delete')
+        pass

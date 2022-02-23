@@ -31,12 +31,19 @@ class LoginView(View):
         login_type = request.GET.get("t", "landmanager")
         if request.GET.get("logout", None) is not None:
 
-            if user_is_scout(request.user):
+            try:
+                user = request.user
+            except Exception as e:
+                logger.warn(e)
+                return redirect(f"/")
+
+            if user_is_scout(user):
                 login_type = "scout"
             # send land managers and admin back to the landmanager login
             else:
                 login_type = "landmanager"
 
+            logger.info(f"logging out: {user.username} | redirect to /auth/ should follow")
             logout(request)
             # need to redirect to 'auth' so that the user is set to anonymous via the middleware
             return redirect(f"/auth/?t={login_type}")
