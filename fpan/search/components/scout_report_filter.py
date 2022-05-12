@@ -29,7 +29,7 @@ class ScoutReportFilter(BaseSearchFilter):
         This is the method that Arches calls, and ultimately all it does is
 
           search_results_object["query"].add_query(some_new_es_dsl)
-        
+
         Only proceed with the replacement of the query if the filter is enabled.
         """
 
@@ -47,8 +47,9 @@ class ScoutReportFilter(BaseSearchFilter):
             report_tiles = Tile.objects.filter(resourceinstance__graph__name="Scout Report", nodegroup=site_node.nodegroup)
             reportids = []
             for t in report_tiles:
-                if t.data[str(site_node.pk)][0]['resourceId'] in resids:
-                    reportids.append(str(t.resourceinstance_id))
+                if len(t.data[str(site_node.pk)]) > 0:
+                    if t.data[str(site_node.pk)][0]['resourceId'] in resids:
+                        reportids.append(str(t.resourceinstance_id))
 
             # create new query using ids for the scout reports
             se = SearchEngineFactory().create()
