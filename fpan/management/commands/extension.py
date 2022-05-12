@@ -196,6 +196,17 @@ class Command(BaseCommand):
             instance.defaultconfig = details["defaultconfig"]
             instance.component = details["component"]
             instance.save()
+        
+        if extension_type == "search":
+            instance = model.objects.get(name=details["name"])
+            instance.icon = details["icon"]
+            instance.classname = details["classname"]
+            instance.type = details["type"]
+            instance.componentpath = details["componentpath"]
+            instance.componentname = details["componentname"]
+            instance.sortorder = details["sortorder"]
+            instance.enabled = details["enabled"]
+            instance.save()
 
     def unregister(self, extension_type, name):
         """
