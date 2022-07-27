@@ -5,6 +5,6 @@
         "type": "git"
     },
     "dependencies": {
-    	"arches": "archesproject/arches#5.1.0"
+    	"arches": "archesproject/arches#6.1.0"
     }
 }
