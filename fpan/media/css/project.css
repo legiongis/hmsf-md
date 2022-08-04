@@ -27,3 +27,7 @@
 .resource_search_widget_dropdown ul .select2-disabled div span span button {
     width: 175px;
 }
+
+.main-panel {
+    height: calc(100vh - 50px);
+}
