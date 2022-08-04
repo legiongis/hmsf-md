@@ -70,7 +70,7 @@ def report_rule_from_arch_rule(arch_rule):
             fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
             if fmsfid in resids:
                 reportids.append(str(rd["resourceinstance_id"]))
-        except IndexError:
+        except (IndexError, KeyError):
             pass
 
     report_rule = Rule("resourceid_filter", resourceids=reportids)

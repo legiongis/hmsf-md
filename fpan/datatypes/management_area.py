@@ -38,6 +38,6 @@ class ManagementAreaDataType(DomainListDataType):
             else:
                 return ManagementAgency.objects.get(pk=value).__str__()
 
-    def validate(self, values, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, values, **kwargs):
 
         return []
