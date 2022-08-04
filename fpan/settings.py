@@ -24,6 +24,12 @@ WSGI_APPLICATION = 'fpan.wsgi.application'
 
 STATICFILES_DIRS = (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 
+## new setting in 6.1  -AC 07/28/2022
+EXPORT_DATA_FIELDS_IN_CARD_ORDER = True
+
+## seems to cause errors still, disabling
+##SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 4000
+
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
 
