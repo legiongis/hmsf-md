@@ -1,7 +1,11 @@
+import logging
+
 from arches.app.datatypes.datatypes import DomainListDataType
 from arches.app.models.models import Widget
 
 from django.contrib.auth.models import User
+
+logger = logging.getLogger(__name__)
 
 widget = Widget.objects.get(name='username-widget')
 
@@ -22,13 +26,21 @@ class UsernameDataType(DomainListDataType):
 
     def get_option_text(self, node, option_id):
 
-        return User.objects.get(pk=option_id).username
+        try:
+            return User.objects.get(pk=option_id).username
+        except User.DoesNotExist:
+            logger.warn(f"index error: user {option_id} not found")
+            return "<user not found>"
 
     def transform_export_values(self, value, *args, **kwargs):
 
         if value != None:
-            return User.objects.get(pk=value).username
+            try:
+                return User.objects.get(pk=value).username
+            except User.DoesNotExist:
+                logger.warn(f"index error: user {option_id} not found")
+                return "<user not found>"
 
-    def validate(self, values, row_number=None, source="", node=None, nodeid=None):
+    def validate(self, values, **kwargs):
 
         return []

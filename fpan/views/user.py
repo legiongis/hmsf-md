@@ -62,6 +62,9 @@ class FPANUserManagerView(UserManagerView):
             except IndexError as e:
                 logger.debug(f"{report_id} - Scout Report has no FMSF Site ID")
                 continue
+            except KeyError as e:
+                logger.debug(f"{report_id} - KeyError: {e}")
+                continue
             if fmsfid in site_lookup:
                 site_lookup[fmsfid]["scout_report_ct"] += 1
                 res = Resource.objects.get(pk=report_id)
