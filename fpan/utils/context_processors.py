@@ -81,4 +81,5 @@ def user_type(request):
 def debug(request):
     return {
         'debug':settings.DEBUG,
+        'plausible_site_domain': settings.PLAUSIBLE_SITE_DOMAIN,
     }

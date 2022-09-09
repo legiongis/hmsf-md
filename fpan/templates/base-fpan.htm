@@ -49,6 +49,10 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
     <link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#5bbad5">
     <meta name="theme-color" content="#ffffff">
 
+    {% if plausible_site_domain %}
+    <script defer data-domain="{{plausible_site_domain}}" src="https://plausible.io/js/plausible.js"></script>
+    {% endif %}
+
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
