@@ -167,7 +167,9 @@ class ScoutProfile(models.Model):
         max_length=30,
         blank=True,
         choices=SITE_INTEREST_CHOICES),
-        default=list
+        default=list,
+        null=True,
+        blank=True,
     )
     region_choices = models.ManyToManyField(Region)
     ethics_agreement = models.BooleanField(default=True)
