@@ -38,7 +38,7 @@ class ScoutForm(UserCreationForm):
         label="In which regions can you monitor sites?",
         queryset=Region.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
-        help_text='You can change this preference anytime after signing up, '\
+        help_text='Required. You can change this preference anytime after signing up, '\
             'but you must you pick at least one region before an archaeological site can be '\
             'assigned to you for monitoring.',
     )
