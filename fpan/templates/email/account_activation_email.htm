@@ -3,7 +3,7 @@ Hello {{ user.username }}!
 
 Welcome to the Heritage Monitoring Scouts, we're excited to have you! Your new HMS Scout ID is {{ user.username }}.
 
-To activate your account and verify your email address, please click this link: {{ baseurl }}{% url 'activate' uidb64=uid token=token %}
+To activate your account and verify your email address, please click this link: {{ baseurl }}{% url 'activate_page' uidb64=uid token=token %}
 
 *If the above link is broken or expired, please email hmsflorida@fpan.us for assistance.
 

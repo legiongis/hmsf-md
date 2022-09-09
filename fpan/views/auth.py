@@ -91,18 +91,32 @@ class LoginView(View):
             "login_type": login_type
         }, status=401)
 
-def activate(request, uidb64, token):
-    try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
-        user = Scout.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, Scout.DoesNotExist):
-        user = None
-    if user is not None and account_activation_token.check_token(user, token):
-        user.is_active = True
-        user.save()
-        user = authenticate(username=user.username, password=user.password)
-        scout_form = ScoutForm(instance=user)
-        scout_profile_form = ScoutProfileForm()
-        return redirect(f"/auth/?t=scout")
-    else:
-        return HttpResponse('Activation link is invalid!')
+def activate_page(request, uidb64, token):
+    
+    return render(request, "email/activation_page.htm", {
+        "activation_link": f"/activate/?uidb64={uidb64}&token={token}",
+    })
+
+def activate(request):
+
+    uidb64 = request.GET.get("uidb64")
+    token = request.GET.get("token")
+    if all([uidb64, token]):
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            logger.debug(f"activate user: {uid}")
+            user = Scout.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, Scout.DoesNotExist) as e:
+            logger.debug(f"error during account activation: {e}")
+            return redirect("/auth/?t=scout")
+        valid_token = account_activation_token.check_token(user, token)
+        if not valid_token:
+            logger.debug(f"token is invalid (user already activated??)")
+        if user is not None and valid_token:
+            user.is_active = True
+            user.save()
+            logger.debug(f"user set to active: {user}")
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+            return redirect(reverse("user_profile_manager"))
+
+    return redirect("/auth/?t=scout")

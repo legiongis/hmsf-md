@@ -1,0 +1,18 @@
+{% extends "base-fpan.htm" %}
+
+{% load staticfiles %}
+{% load template_tags %}
+{% load i18n %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="col-xs-12 fpan-panel-{{user_type}}" style="padding:25px;">
+                <h4>Use this link to activate and sign in to your new Scout account: <a href="{{activation_link}}">Activate Account</a></h4>
+                <h5>If your account has already been activated, you'll be taken to the standard Scout login page.</h5>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

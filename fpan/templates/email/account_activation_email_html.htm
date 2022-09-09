@@ -1,7 +1,7 @@
 {% autoescape off %}
 <h3>Hello {{ user.username }}!</h3>
 <p>Welcome to the Heritage Monitoring Scouts, we're excited to have you! Your new HMS Scout ID is <strong>{{ user.username }}</strong>.</p>
-<p>To activate your account and verify your email address, please click this link <a href="{{ baseurl }}{% url 'activate' uidb64=uid token=token %}">{{ baseurl }}{% url 'activate' uidb64=uid token=token %}</a>.</p>
+<p>To activate your account and verify your email address, please click this link <a href="{{ baseurl }}{% url 'activate_page' uidb64=uid token=token %}">{{ baseurl }}{% url 'activate_page' uidb64=uid token=token %}</a>.</p>
 <p><em>*If the above link is broken or expired, please email <a href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a> for assistance.</em></p>
 <p>We will contact you soon to provide next steps and more details about the program.</p>
 <p><strong>Thanks for Signing Up and Welcome Aboard!</strong></p>

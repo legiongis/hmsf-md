@@ -56,8 +56,8 @@ urlpatterns = [
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
 
     url(r"^auth/$", auth.LoginView.as_view(), name="auth"),
-    url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/',
-        auth.activate, name='activate'),
+    path("activate/", auth.activate, name='activate'),
+    path("activate/<str:uidb64>/<str:token>/", auth.activate_page, name='activate_page'),
 
     url(r'^favicon\.ico$', favicon_view),
     path("robots.txt",TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
