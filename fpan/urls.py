@@ -61,7 +61,7 @@ urlpatterns = [
 
     url(r'^favicon\.ico$', favicon_view),
     path("robots.txt",TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-
+    path('grappelli/', include('grappelli.urls')), # grappelli URLS
     url(r'^', include('arches.urls')),
 ]
 if settings.SHOW_LANGUAGE_SWITCH is True:
