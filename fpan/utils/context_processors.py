@@ -82,4 +82,5 @@ def debug(request):
     return {
         'debug':settings.DEBUG,
         'plausible_site_domain': settings.PLAUSIBLE_SITE_DOMAIN,
+        'plausible_embed_link': settings.PLAUSIBLE_EMBED_LINK,
     }
