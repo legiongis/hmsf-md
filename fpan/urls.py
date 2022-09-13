@@ -55,7 +55,10 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
 
-    url(r"^auth/$", auth.LoginView.as_view(), name="auth"),
+
+    path("auth/state", auth.login_patch, {'login_type':'landmanager'}, name="state_login_redirect"),
+    path("auth/scout", auth.login_patch, {'login_type':'scout'}, name="scout_login_redirect"),
+    url(r"^auth/", auth.LoginView.as_view(), name="auth"),
     path("activate/", auth.activate, name='activate'),
     path("activate/<str:uidb64>/<str:token>/", auth.activate_page, name='activate_page'),
 

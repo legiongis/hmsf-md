@@ -91,6 +91,9 @@ class LoginView(View):
             "login_type": login_type
         }, status=401)
 
+def login_patch(request, login_type):
+    return redirect(f"/auth/?t={login_type}")
+
 def activate_page(request, uidb64, token):
     
     return render(request, "email/activation_page.htm", {
