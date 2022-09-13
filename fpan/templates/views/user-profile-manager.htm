@@ -1,5 +1,5 @@
 {% extends "base-manager.htm" %}
-{% load staticfiles %}
+{% load static %}
 {% load template_tags %}
 {% load i18n %}
 
@@ -671,6 +671,18 @@
                         </div>
                     </div>
                 </section>
+
+                {% if plausible_embed_link %}
+                <section id="scout-list-section" class="profile-list">
+                    <div class="panel fpan-panel-{{user_type}}">
+                        <div class="row relative">
+                            <iframe plausible-embed src="{{plausible_embed_link}}&embed=true&theme=light" scrolling="no" frameborder="0" loading="lazy" style="width: 1px; min-width: 100%; height: 1600px;"></iframe>
+                            <div style="font-size: 14px; padding-bottom: 14px;">Stats powered by <a target="_blank" href="https://plausible.io">Plausible Analytics</a></div>
+                            <script async src="https://plausible.io/js/embed.host.js"></script>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
                 {% endif %}
 
 <!-- commenting this section out as it's not implemented as of Feb 19th - AC -->

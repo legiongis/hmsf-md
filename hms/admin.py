@@ -1,3 +1,5 @@
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 from django.contrib.gis import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
@@ -41,7 +43,12 @@ admin.site.register(LandManager, LandManagerAdmin)
 ## Land Manager Profile interface, using the green + button.
 # admin.site.register(LandManager)
 
-class ManagementAreaAdmin(admin.GeoModelAdmin):
+class ManagementAreaResource(resources.ModelResource):
+    class Meta:
+        model = ManagementArea
+
+class ManagementAreaAdminImportExport(ImportExportModelAdmin):
+    resource_class = ManagementAreaResource
     list_display = ('name', 'management_level', 'category', 'management_agency', 'load_id')
     list_filter = ('category', 'management_level', 'management_agency')
     search_fields = ("name", )
@@ -49,7 +56,7 @@ class ManagementAreaAdmin(admin.GeoModelAdmin):
 class ManagementAreaGroupAdmin(admin.ModelAdmin):
     filter_horizontal = ('areas',)
 
-admin.site.register(ManagementArea, ManagementAreaAdmin)
+admin.site.register(ManagementArea, ManagementAreaAdminImportExport)
 admin.site.register(ManagementAgency)
 admin.site.register(ManagementAreaCategory)
 admin.site.register(ManagementAreaGroup, ManagementAreaGroupAdmin)

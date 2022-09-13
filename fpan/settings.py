@@ -45,7 +45,16 @@ SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
 INSTALLED_APPS += ('fpan', 'hms')
 
+# some shenanigans because grappelli must precede the django.contrib.admin app
+INSTALLED_APPS = tuple([i for i in INSTALLED_APPS if not i == "django.contrib.admin"])
+INSTALLED_APPS += ('grappelli', 'django.contrib.admin')
+
+GRAPPELLI_ADMIN_TITLE = "HMS"
+
+INSTALLED_APPS += ('import_export', )
+
 PLAUSIBLE_SITE_DOMAIN = None
+PLAUSIBLE_EMBED_LINK = None
 
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, "system_settings", "System_Settings.json")
 
