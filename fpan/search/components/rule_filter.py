@@ -19,7 +19,7 @@ from fpan.utils.permission_backend import (
 logger = logging.getLogger(__name__)
 
 details = {
-    "searchcomponentid": "",
+    "searchcomponentid": "ade4886d-1111-4cd5-ac30-5b1eb6e3bef3",
     "name": "Rule Filter",
     "icon": "fa fa-key",
     "modulename": "rule_filter.py",

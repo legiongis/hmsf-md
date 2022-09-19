@@ -7,14 +7,15 @@ from django.core import management
 def load_rule_filter(apps, schema_editor):
 
     management.call_command(
-        "extension", "search", "register",
-        source="fpan/search/components/rule_filter.py"
+        "extension", "register", "search-filter",
+        source="fpan/search/components/rule_filter.py",
+        overwrite=True,
     )
 
 def remove_rule_filter(apps, schema_editor):
 
     management.call_command(
-        "extension", "search", "unregister",
+        "extension", "unregister", "search-filter",
         name="Rule Filter"
     )
 

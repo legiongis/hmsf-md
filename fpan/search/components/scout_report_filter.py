@@ -10,7 +10,7 @@ from arches.app.models.tile import Tile
 logger = logging.getLogger(__name__)
 
 details = {
-    "searchcomponentid": "",
+    "searchcomponentid": "ade4886d-0000-4cd5-ac30-5b1eb6e3bef3",
     "name": "Scout Report Filter",
     "icon": "fa fa-binoculars",
     "modulename": "scout_report_filter.py",
