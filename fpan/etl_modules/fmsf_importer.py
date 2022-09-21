@@ -668,7 +668,7 @@ class FMSFImporter(BaseImportModule):
 
     def import_via_cli(self, **kwargs):
 
-        elapsed = 0
+        reporter = ETLOperationResult(inspect.currentframe().f_code.co_name)
 
         truncate = kwargs.get("truncate")
         if truncate is not None:
@@ -727,7 +727,11 @@ class FMSFImporter(BaseImportModule):
         if result.success is False:
             raise Exception(result.message)
 
-        logger.info(f"total time: {elapsed} seconds")
+        reporter.message = f"load completed successfully, {len(self.fmsf_resources)} imported."
+        reporter.data = {"loaded": [(i.siteid, i.resourceid) for i in self.fmsf_resources]}
+        reporter.stop_timer()
+        logger.info(reporter.message)
+        return reporter
 
     def get_node(self, node_name):
         node = self.node_lookup.get(node_name)
