@@ -32,6 +32,7 @@ EXPORT_DATA_FIELDS_IN_CARD_ORDER = True
 
 DATATYPE_LOCATIONS.append('fpan.datatypes')
 FUNCTION_LOCATIONS.append('fpan.functions')
+ETL_MODULE_LOCATIONS.append('fpan.etl_modules')
 
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
