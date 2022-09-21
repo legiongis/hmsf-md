@@ -670,6 +670,7 @@ class FMSFImporter(BaseImportModule):
 
         reporter = ETLOperationResult(inspect.currentframe().f_code.co_name)
 
+        dry_run = kwargs.get("dry_run", False)
         truncate = kwargs.get("truncate")
         if truncate is not None:
             truncate = int(truncate)
@@ -679,17 +680,14 @@ class FMSFImporter(BaseImportModule):
 
         result = self.validate_files(file_dir)
         logger.info(result)
-        elapsed += result.seconds
         if result.success is False:
             raise Exception(result.message)
 
         result = self.start()
         logger.info(result)
-        elapsed += result.seconds
 
         result = self.read_features_from_shapefile()
         logger.info(result)
-        elapsed += result.seconds
         if len(self.new_features) == 0:
             logger.info("no new features to write")
             exit()
@@ -697,7 +695,6 @@ class FMSFImporter(BaseImportModule):
         if self.resource_type == "Historic Structure":
             result = self.apply_historical_structures_filter()
             logger.info(result)
-            elapsed += result.seconds
             if result.success is False:
                 raise Exception(result.message)
 
@@ -705,30 +702,37 @@ class FMSFImporter(BaseImportModule):
 
         result = self.generate_load_data(truncate=truncate)
         logger.info(result)
-        elapsed += result.seconds
         if result.success is False:
             raise Exception(result.message)
 
         result = self.write_data_to_load_staging()
         logger.info(result)
-        elapsed += result.seconds
         if result.success is False:
             raise Exception(result.message)
 
-        result = self.write_tiles_from_load_staging()
-        logger.info(result)
-        elapsed += result.seconds
-        if result.success is False:
-            raise Exception(result.message)
+        if dry_run is True:
+            reporter.message = f"dry-run completed successfully with {len(self.fmsf_resources)} resources."
+            reporter.data = {
+                "dry-run": dry_run,
+                "resources": [(i.siteid, i.resourceid) for i in self.fmsf_resources]
+            }
+        else:
+            result = self.write_tiles_from_load_staging()
+            logger.info(result)
+            if result.success is False:
+                raise Exception(result.message)
 
-        result = self.finalize_indexing()
-        logger.info(result)
-        elapsed += result.seconds
-        if result.success is False:
-            raise Exception(result.message)
+            result = self.finalize_indexing()
+            logger.info(result)
+            if result.success is False:
+                raise Exception(result.message)
 
-        reporter.message = f"load completed successfully, {len(self.fmsf_resources)} imported."
-        reporter.data = {"loaded": [(i.siteid, i.resourceid) for i in self.fmsf_resources]}
+            reporter.message = f"load completed successfully with {len(self.fmsf_resources)} resources."
+            reporter.data = {
+                "dry-run": dry_run,
+                "resources": [(i.siteid, i.resourceid) for i in self.fmsf_resources]
+            }
+
         reporter.stop_timer()
         logger.info(reporter.message)
         return reporter
