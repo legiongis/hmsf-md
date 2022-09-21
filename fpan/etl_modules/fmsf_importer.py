@@ -811,7 +811,8 @@ class FMSFResource():
                 values_dict["County"].append(ma)
             else:
                 values_dict["Management Area"].append(ma)
-                values_dict["Management Agency"].append(ma.management_agency)
+                if ma.management_agency is not None:
+                    values_dict["Management Agency"].append(ma.management_agency)
 
         node_objs = []
         nodegroupid = None
