@@ -519,6 +519,7 @@ class FMSFImporter(BaseImportModule):
         nr_qry = Q(load_id="nr-districts-Sept2022")
         sp_qry = Q(management_agency__name="Florida State Parks")
         filter_areas = ManagementArea.objects.filter(nr_qry | sp_qry)
+        filter_areas = ManagementArea.objects.all()
         union_results = filter_areas.aggregate(Union('geom'))
         union_geom = union_results['geom__union']
         logger.debug("union geom created")
@@ -862,7 +863,7 @@ class FMSFImporter(BaseImportModule):
 
         if dry_run is True:
             reporter.message = f"dry run completed successfully with {len(self.fmsf_resources)} resources."
-            result = self.finalize_indexing(load_details=reporter.data['Dry Run'])
+            result = self.finalize_indexing(load_details=reporter.data)
             reporter.data.update(result.data)
         else:
             result = self.write_tiles_from_load_staging()
@@ -885,8 +886,6 @@ class FMSFImporter(BaseImportModule):
 
     def abort_load(self, message="", details={}):
 
-        ## this is pretty annoying, but the status must be set to "indexed"
-        ## in order for the default UI component to display this load as completed.
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, error_message, load_details, complete, successful) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
