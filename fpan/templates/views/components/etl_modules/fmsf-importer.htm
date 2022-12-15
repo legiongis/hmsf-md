@@ -36,29 +36,53 @@
         <!-- ko if: response() -->
         <div class="branch-xl-metadata-container">
             <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px;">
-                <h3 class="branch-xl-title" style="">{% trans "FMSF Data Update" %}</h3>
+                <h3 class="branch-xl-title" style="">{% trans "FMSF File Validation Summary" %}</h3>
                 <div class="etl-module-component" style="margin-top: 0px;">
-                    <h4 class="branch-xl-title">{% trans "File validation summary" %}</h4>
                     <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
                         <div class="etl-loading-metadata-key">{% trans "Resource Model:" %}</div>
-                        <div class="etl-loading-metadata-value" data-bind="text: response().result.resource_model"></div>
+                        <div class="etl-loading-metadata-value" data-bind="text: response().result['Resource Model']"></div>
                         <div class="etl-loading-metadata-key">{% trans "Validation Message:" %}</div>
                         <div class="etl-loading-metadata-value" data-bind="text: response().result.message"></div>
                     </div>
                 </div>
+
                 <div class="branch-xl-file-contents-container">
-                    <h3 class="branch-xl-title">{% trans "Contents" %}</h3> 
+                    <h3 class="branch-xl-title">{% trans "File List" %}</h3> 
                     <div style="color: #333333">
-                    <!--ko foreach: {data: response().result.files, as: 'file'}-->
+                        <!--ko foreach: {data: response().result.Files, as: 'file'}-->
                         <div data-bind="text: file"></div>
-                    <!-- /ko -->
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div>
+                    <h3 class="branch-xl-title">{% trans "Configure Import" %}</h3>
+                    <div>
+                        <label>
+                            <strong>Truncate:</strong>
+                            <input type="number" style="line-height:unset;" step="1" data-bind="value: truncate">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Enter a number of sites to import or use 0 to import <em>all</em> new sites.</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Dry run:</strong>
+                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: dryRun">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Run this import without loading any new sites into the database.</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Note to self:</strong>
+                            <input style="width:unset; height:unset;" data-bind="value: loadDescription">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">This note will be saved as the load description (optional).</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div  class="tabbed-workflow-footer, etl-module-footer">
-           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">{% trans "Submit" %}</button>
+           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">{% trans "Begin Import" %}</button>
         </div>
         <!-- /ko -->
     </div>

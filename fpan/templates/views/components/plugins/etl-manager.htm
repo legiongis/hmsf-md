@@ -229,6 +229,10 @@
                                 <span class="etl-loading-metadata-key">{% trans 'Indexing duration:' %}</span>
                                 <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
                             </div>
+                            <div data-bind="if: selectedLoadEvent().load_description">
+                                <span class="etl-loading-metadata-key">{% trans 'Load description:' %}</span>
+                                <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent().load_description"></span>    
+                            </div>
                             <div data-bind="if: selectedLoadEvent().load_details">
                                 <h4>{% trans "Load Details" %}</h4>
                                 <!-- ko foreach: {data: Object.keys(selectedLoadEvent().load_details)} -->

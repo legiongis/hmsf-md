@@ -451,11 +451,12 @@ class FMSFImporter(BaseImportModule):
                         result.message = f"Shapefile is missing these fields: {', '.join(missing)}"
                         result.data['Missing Fields'] = missing
 
+        result.data['Resource model'] = self.resource_type
         result.stop_timer()
         result.log(logger)
         return result
 
-    def start(self, request=None):
+    def start(self, request=None, load_description=""):
 
         result = ETLOperationResult(
             inspect.currentframe().f_code.co_name,
@@ -468,13 +469,13 @@ class FMSFImporter(BaseImportModule):
         if self.userid is None:
             self.userid = 1
 
-        result.data['Load ID'] = self.loadid
-        result.data['Resource Model'] = self.resource_type
+        result.data['Load id'] = self.loadid
+        result.data['Resource model'] = self.resource_type
 
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, load_description, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "running", self.resource_type, self.moduleid, json.dumps(result.data), datetime.now(), self.userid),
+                (self.loadid, False, "running", load_description, self.moduleid, json.dumps(result.data), datetime.now(), self.userid),
             )
 
         result.message = f"etl started with loadid: {self.loadid}"
@@ -557,7 +558,7 @@ class FMSFImporter(BaseImportModule):
         self.new_features = final_features
 
         result.message = f"{len(self.new_features)} out of {original_ct} left after structure filter"
-        result.data['Filtered Structures'] = len(self.new_features)
+        result.data['Filtered structures'] = len(self.new_features)
         result.stop_timer()
         return result
 
@@ -579,8 +580,8 @@ class FMSFImporter(BaseImportModule):
             else:
                 self.new_features.append(feature)
 
-        result.data['Current Sites'] = len(self.existing_features)
-        result.data['New Sites'] = len(self.new_features)
+        result.data['Sites already in database'] = len(self.existing_features)
+        result.data['New sites in uploaded data'] = len(self.new_features)
         result.message = f"features: new - {len(self.new_features)}, existing {len(self.existing_features)}"
         result.stop_timer()
         result.log(logger)
@@ -639,9 +640,9 @@ class FMSFImporter(BaseImportModule):
 
         result.message = f"resources: {len(self.fmsf_resources)}, tiles: {len(self.tiles)}"
         result.data = {
-            "Features to Load": len(self.fmsf_resources),
-            "Tiles to Load": len(self.tiles),
-            "New FMSF Sites": [i.siteid for i in self.fmsf_resources],
+            "Features to load": len(self.fmsf_resources),
+            "Tiles to load": len(self.tiles),
+            "New FMSF site ids": [i.siteid for i in self.fmsf_resources],
         }
         csv_summary_file = Path(self.file_dir, "sites_loaded.csv")
         with open(csv_summary_file, "w") as f:
@@ -776,11 +777,18 @@ class FMSFImporter(BaseImportModule):
             inspect.currentframe().f_code.co_name,
             loadid=self.loadid,
         )
-        # this is not hooked up on the frontend, but here as a placeholder
-        truncate = request.POST.get('truncate', None)
-        truncate = 10
+        # handle values coming from frontend configuration
+        truncate = request.POST.get('truncate')
+        dry_run = request.POST.get('dryRun')
+        description = request.POST.get('loadDescription')
+        if truncate == "0":
+            truncate = None
+        if dry_run == "true":
+            dry_run = True
+        else:
+            dry_run = False
 
-        run_fmsf_import_as_task.delay(self.loadid, truncate)
+        run_fmsf_import_as_task.delay(self.loadid, truncate=truncate, dry_run=dry_run, description=description)
 
         reporter.message = "import task submitted"
         return reporter.serialize()
@@ -801,14 +809,16 @@ class FMSFImporter(BaseImportModule):
 
         return result
 
-    def run_sequence(self, truncate=None, dry_run=False, file_dir=None):
+    def run_sequence(self, truncate=None, dry_run=False, file_dir=None, description=""):
 
         reporter = ETLOperationResult(
             inspect.currentframe().f_code.co_name,
             loadid=self.loadid,
         )
 
-        dry_run = False
+        reporter.data["Dry run"] = dry_run
+        reporter.data["Truncate load"] = truncate
+
         if truncate is not None:
             truncate = int(truncate)
 
@@ -821,7 +831,7 @@ class FMSFImporter(BaseImportModule):
             self.abort_load(message=result.message, details=result.data)
             return result.serialize()
 
-        result = self.start()
+        result = self.start(load_description=description)
 
         result = self.read_features_from_shapefile()
         reporter.data.update(result.data)
@@ -851,9 +861,8 @@ class FMSFImporter(BaseImportModule):
             return result.serialize()
 
         if dry_run is True:
-            reporter.message = f"dry-run completed successfully with {len(self.fmsf_resources)} resources."
-            reporter.data['dry-run'] = dry_run
-            result = self.finalize_indexing()
+            reporter.message = f"dry run completed successfully with {len(self.fmsf_resources)} resources."
+            result = self.finalize_indexing(load_details=reporter.data['Dry Run'])
             reporter.data.update(result.data)
         else:
             result = self.write_tiles_from_load_staging()
