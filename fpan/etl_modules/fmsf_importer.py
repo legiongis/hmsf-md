@@ -1,3 +1,5 @@
+import gc
+import os
 import csv
 import copy
 import json
@@ -5,6 +7,7 @@ import time
 import uuid
 import inspect
 import logging
+import zipfile
 from datetime import datetime
 from pathlib import Path
 
@@ -14,6 +17,9 @@ from django.db import connection
 from django.db.models import Q
 from django.db.utils import IntegrityError, ProgrammingError
 from django.utils.translation import ugettext as _
+from django.core.files import File
+from django.core.files.storage import default_storage
+from django.conf import settings
 
 import arches.app.tasks as tasks
 import arches.app.utils.task_management as task_management
@@ -25,8 +31,11 @@ from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
 from arches.app.etl_modules.base_import_module import BaseImportModule
+from arches.app.utils.file_validator import FileValidator
 
 from hms.models import ManagementArea
+from fpan.tasks import run_fmsf_import_as_task
+from fpan.etl_modules.utils import ETLOperationResult
 
 logger = logging.getLogger(__name__)
 
@@ -223,37 +232,18 @@ specials = {
     }
 }
 
-class ETLOperationResult():
-
-    def __init__(self, operation, success=True, message="", data={}):
-        self.operation = operation
-        self.start_time = time.time()
-        self.success = success
-        self.message = message
-        self.data = data
-        self.seconds = 0
-
-    def __str__(self):
-        return str(self.as_dict())
-    
-    def stop_timer(self):
-        self.seconds = round(time.time() - self.start_time, 2)
-
-    def as_dict(self):
-
-        return {
-            "operation": self.operation,
-            "success": self.success,
-            "message": self.message,
-            "data": self.data,
-            "seconds": self.seconds,
-        }
 
 class FMSFImporter(BaseImportModule):
-    def __init__(self, request=None):
+    def __init__(self, request=None, loadid=None):
+
+        if request:
+            loadid = request.POST.get("load_id")
+        else:
+            loadid = loadid
+
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.loadid = request.POST.get("load_id") if request else None
+        self.loadid = loadid
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
 
@@ -262,6 +252,7 @@ class FMSFImporter(BaseImportModule):
         self.existing_features = []
         self.tiles = []
         self.fmsf_resources = []
+        self.file_dir = None
 
         self.csv_filename_lookup = {
             "AR.csv": {
@@ -285,6 +276,10 @@ class FMSFImporter(BaseImportModule):
         self.resource_lookup = {}
         self.special_label_lookups = specials
 
+    def get_uploaded_files_location(self):
+        self.file_dir = Path(settings.APP_ROOT, "fmsf-uploads", self.loadid)
+        return Path(settings.APP_ROOT, "fmsf-uploads", self.loadid)
+ 
     def set_resource_type(self, resource_type):
         self.graph = GraphModel.objects.get(name=resource_type)
         self.field_map = field_maps[resource_type]
@@ -307,6 +302,54 @@ class FMSFImporter(BaseImportModule):
                 continue
             self.resource_lookup[siteid] = resource
 
+    def delete_from_default_storage(self, directory):
+        dirs, files = default_storage.listdir(directory)
+        for dir in dirs:
+            dir_path = os.path.join(directory, dir)
+            self.delete_from_default_storage(dir_path)
+        for file in files:
+            file_path = os.path.join(directory, file)
+            default_storage.delete(file_path)
+        default_storage.delete(directory)
+
+    def read_zip(self, request):
+        """
+        Reads added zip package of shapefile and CSV file. This is the entry point
+        for the front-end generated workflow, and the loadid is generated here.
+        """
+
+        if self.loadid is None:
+            self.loadid = uuid.uuid4()
+
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
+
+        content = request.FILES.get("file")
+        upload_dir = self.get_uploaded_files_location()
+        try:
+            self.delete_from_default_storage(upload_dir)
+        except (FileNotFoundError):
+            pass
+
+        file_list = []
+        if content.content_type == "application/zip":
+            with zipfile.ZipFile(content, "r") as zip_ref:
+                files = zip_ref.infolist()
+                for file in files:
+                    file_list.append(file.filename)
+                    save_path = Path(upload_dir, Path(file.filename).name)
+                    default_storage.save(save_path, File(zip_ref.open(file)))
+        else:
+            result.success = False
+            result.message = "Uploaded file must be a .zip file."
+            return result
+
+        result.data['Files'] = file_list
+        result = self.validate_files(upload_dir, result=result)
+        return result.serialize()
+
     def _read_csv(self):
 
         data = {}
@@ -321,17 +364,129 @@ class FMSFImporter(BaseImportModule):
         """ the trick here is that the CSV data will have multiple rows per
         siteid (site forms submitted over the years. For now, just iterate these
         rows and return the last row that has a non-empty value for this field. """
-
         value = None
         if siteid in self.csv_data:
             for i in self.csv_data[siteid]:
                 form_value = i.get(field_name, "")
                 if form_value.rstrip() != "":
                     value = form_value
-
         return value
 
+    
+    def lookup_labelid_from_label(self, value, node):
+        """ This is a pretty simplistic approach, which should work for FMSF but 
+        may not with a nested RDM collection. """
+
+        collectionid = node.config['rdmCollection']
+        if not collectionid in self.concept_lookups:
+            concepts = Concept().get_child_collections(node.config['rdmCollection'])
+            self.concept_lookups[collectionid] = concepts
+
+        # Allow some special handling of certan known typos in the FMSF
+        if node.name in self.special_label_lookups:
+            if value in self.special_label_lookups[node.name]:
+                value = self.special_label_lookups[node.name][value]
+
+        labelid = None
+        for triple in self.concept_lookups[collectionid]:
+            if triple[1] == value:
+                labelid = triple[2]
+                break
+        if labelid is None:
+            logger.warn(f"Invalid prefLabel {value} for node {node.name} with collection {node.config['rdmCollection']}")
+        return labelid
+
+    
+    def validate_files(self, file_dir, result=None):
+
+        def validate_shp_fields(layer):
+            shp_fields = []
+            for fieldset in self.field_map.values():
+                for item in fieldset:
+                    if item['source'] == "shp" and not item['field'] == "geom":
+                        shp_fields.append(item['field'])
+            return [i for i in shp_fields if not i in layer.fields]
+
+        if isinstance(file_dir, str):
+            file_dir = Path(file_dir)
+
+        if result is None:
+            result = ETLOperationResult(
+                inspect.currentframe().f_code.co_name,
+                loadid=self.loadid,
+            )
+
+        csv = None
+        for i in file_dir.glob("*.csv"):
+            csv = i
+            break
+        if csv is None:
+            result.success = False
+            result.message = f"Can't find CSV in upload."
+        else:
+            if csv.name in self.csv_filename_lookup:
+                self.csv_file = csv
+                self.shp_file = Path(csv.parent, self.csv_filename_lookup[csv.name]['shp_name'])
+                if not self.shp_file.exists():
+                    result.success = False
+                    result.message = f"Shapefile is missing. Expected path: {self.shp_file}"
+                self.set_resource_type_from_csv()
+            else:
+                result.success = False
+                result.message = f"Invalid CSV file: {csv}. Must be one of {self.csv_filename_lookup.keys()}"
+
+            if result.success is True:
+                try:
+                    ds = DataSource(self.shp_file)
+                    lyr = ds[0]
+                    result.message = "All files look good!"
+                except Exception as e:
+                    result.success = False
+                    result.message = str(e)
+
+                if result.success is True:
+                    missing = validate_shp_fields(lyr)
+                    if len(missing) > 0:
+                        result.success = False
+                        result.message = f"Shapefile is missing these fields: {', '.join(missing)}"
+                        result.data['Missing Fields'] = missing
+
+        result.stop_timer()
+        result.log(logger)
+        return result
+
+    def start(self, request=None):
+
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
+        if self.loadid is None:
+            self.loadid = str(uuid.uuid4())
+        if self.moduleid is None:
+            self.moduleid = ETLModule.objects.get(classname=self.__class__.__name__).pk
+        if self.userid is None:
+            self.userid = 1
+
+        result.data['Load ID'] = self.loadid
+        result.data['Resource Model'] = self.resource_type
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """INSERT INTO load_event (loadid, complete, status, load_description, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                (self.loadid, False, "running", self.resource_type, self.moduleid, json.dumps(result.data), datetime.now(), self.userid),
+            )
+
+        result.message = f"etl started with loadid: {self.loadid}"
+        result.stop_timer()
+        return result
+
     def apply_historical_structures_filter(self):
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("filtering", self.loadid),
+            )
 
         def _feature_is_lighthouse(feature):
             vals = [feature.get(f"STRUCUSE{i}") for i in [1,2,3]]
@@ -340,7 +495,10 @@ class FMSFImporter(BaseImportModule):
         def _feature_is_destroyed(feature):
             return feature.get("DESTROYED") == "YES"
 
-        result = ETLOperationResult(inspect.currentframe().f_code.co_name)
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
 
         lighthouse_list, geom_list = [], []
         for feature in self.new_features:
@@ -389,32 +547,29 @@ class FMSFImporter(BaseImportModule):
         use_list = set(lighthouse_list + geom_matches)
 
         original_ct = len(self.new_features)
+
         self.new_features = [i for i in self.new_features if i.get("SITEID") in use_list]
+        final_features = [i for i in self.new_features if i.get("SITEID") in use_list]
+        del self.new_features
+        del union_geom
+        gc.collect()
+
+        self.new_features = final_features
 
         result.message = f"{len(self.new_features)} out of {original_ct} left after structure filter"
-        result.data = {
-            "original features": original_ct,
-            "post-filter features": len(self.new_features),
-        }
+        result.data['Filtered Structures'] = len(self.new_features)
         result.stop_timer()
         return result
-
-    def validate_shp_fields(self, layer):
-
-        shp_fields = []
-        for fieldset in self.field_map.values():
-            for item in fieldset:
-                if item['source'] == "shp" and not item['field'] == "geom":
-                    shp_fields.append(item['field'])
-
-        return [i for i in shp_fields if not i in layer.fields]
 
     def read_features_from_shapefile(self):
 
         ds = DataSource(self.shp_file)
         lyr = ds[0]
 
-        result = ETLOperationResult(inspect.currentframe().f_code.co_name)
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
 
         for feature in lyr:
             self.features.append(feature)
@@ -424,105 +579,24 @@ class FMSFImporter(BaseImportModule):
             else:
                 self.new_features.append(feature)
 
-        result.data = {
-            "new features": len(self.new_features),
-            "existing features": len(self.existing_features),
-        }
+        result.data['Current Sites'] = len(self.existing_features)
+        result.data['New Sites'] = len(self.new_features)
+        result.message = f"features: new - {len(self.new_features)}, existing {len(self.existing_features)}"
         result.stop_timer()
-        return result
-
-    def lookup_labelid_from_label(self, value, node):
-        """ This is a pretty simplistic approach, which should work for FMSF but 
-        may not with a nested RDM collection. """
-
-        collectionid = node.config['rdmCollection']
-        if not collectionid in self.concept_lookups:
-            concepts = Concept().get_child_collections(node.config['rdmCollection'])
-            self.concept_lookups[collectionid] = concepts
-
-        # Allow some special handling of certan known typos in the FMSF
-        if node.name in self.special_label_lookups:
-            if value in self.special_label_lookups[node.name]:
-                value = self.special_label_lookups[node.name][value]
-
-        labelid = None
-        for triple in self.concept_lookups[collectionid]:
-            if triple[1] == value:
-                labelid = triple[2]
-                break
-        if labelid is None:
-            logger.warn(f"Invalid prefLabel {value} for node {node.name} with collection {node.config['rdmCollection']}")
-        return labelid
-
-    def start(self, request=None):
-
-        result = ETLOperationResult(inspect.currentframe().f_code.co_name)
-        if self.loadid is None:
-            self.loadid = str(uuid.uuid4())
-        if self.moduleid is None:
-            self.moduleid = ETLModule.objects.get(classname=self.__class__.__name__).pk
-        if self.userid is None:
-            self.userid = 1
-        if request is not None:
-            graphid = request.POST.get("graphid")
-            csv_mapping = request.POST.get("fieldMapping")
-            mapping_details = {"mapping": json.loads(csv_mapping), "graph": graphid}
-        else:
-            mapping_details = {}
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """INSERT INTO load_event (loadid, complete, status, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "running", self.moduleid, json.dumps(mapping_details), datetime.now(), self.userid),
-            )
-
-        result.message = f"etl started with loadid: {self.loadid}"
-        result.data = {"loadid": self.loadid},
-        result.stop_timer()
-        return result
-
-    def validate_files(self, file_dir):
-
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            message="all files ok"
-        )
-        csv = Path()
-        for i in Path(file_dir).glob("*.csv"):
-            csv = i
-            break
-
-        if csv.name in self.csv_filename_lookup:
-            self.csv_file = csv
-            self.shp_file = Path(csv.parent, self.csv_filename_lookup[csv.name]['shp_name'])
-            if not self.shp_file.exists():
-                result.success = False
-                result.message = f"Shapefile is missing. Expected path: {self.shp_file}"
-            self.set_resource_type_from_csv()
-        else:
-            result.success = False
-            result.message = f"Invalid CSV file: {csv}. Must be one of {self.csv_filename_lookup.keys()}"
-
-        if result.success is True:
-            try:
-                ds = DataSource(self.shp_file)
-                lyr = ds[0]
-            except Exception as e:
-                result.success = False
-                result.message = str(e)
-
-            if result.success is True:
-                missing = self.validate_shp_fields(lyr)
-                if len(missing) > 0:
-                    result.success = False
-                    result.message = f"Shapefile is missing these fields: {', '.join(missing)}"
-                    result.data = {"fields": missing}
-
-        result.stop_timer()
+        result.log(logger)
         return result
 
     def generate_load_data(self, truncate=None):
 
-        result = ETLOperationResult(inspect.currentframe().f_code.co_name)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("generating", self.loadid),
+            )
+
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
 
         self.tiles = []
         self.fmsf_resources = []
@@ -564,13 +638,32 @@ class FMSFImporter(BaseImportModule):
         #     message = str(e)
 
         result.message = f"resources: {len(self.fmsf_resources)}, tiles: {len(self.tiles)}"
-        result.data = {"resource_ct": len(self.fmsf_resources), "tile_ct": len(self.tiles)}
+        result.data = {
+            "Features to Load": len(self.fmsf_resources),
+            "Tiles to Load": len(self.tiles),
+            "New FMSF Sites": [i.siteid for i in self.fmsf_resources],
+        }
+        csv_summary_file = Path(self.file_dir, "sites_loaded.csv")
+        with open(csv_summary_file, "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(("SITEID", "ResourceId"))
+            writer.writerows([(i.siteid, i.resourceid) for i in self.fmsf_resources])
+
         result.stop_timer()
+        result.log(logger)
         return result
 
     def write_data_to_load_staging(self):
 
-        result = ETLOperationResult(inspect.currentframe().f_code.co_name)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("staging", self.loadid),
+            )
+
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
         try:
             with connection.cursor() as cursor:
                 for tile in self.tiles:
@@ -598,12 +691,20 @@ class FMSFImporter(BaseImportModule):
             result.message = str(e)
 
         result.stop_timer()
+        result.log(logger)
         return result
 
     def write_tiles_from_load_staging(self):
 
-        result = ETLOperationResult(inspect.currentframe().f_code.co_name)
-        
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("writing", self.loadid),
+            )
+
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
         try:
             with connection.cursor() as cursor:
                 # cursor.execute("""CALL __arches_prepare_bulk_load();""")
@@ -622,7 +723,7 @@ class FMSFImporter(BaseImportModule):
             else:
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                        """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
                         ("failed", datetime.now(), self.loadid),
                     )
                 result.success = False
@@ -630,7 +731,7 @@ class FMSFImporter(BaseImportModule):
         except (IntegrityError, ProgrammingError) as e:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET status = %s, load_end_time = %s WHERE loadid = %s""",
+                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
             result.success = False
@@ -640,22 +741,25 @@ class FMSFImporter(BaseImportModule):
                 # cursor.execute("""CALL __arches_complete_bulk_load();""")
                 cursor.execute("""ALTER TABLE tiles enable trigger __arches_check_excess_tiles_trigger;""")
                 cursor.execute("""ALTER TABLE tiles enable trigger __arches_trg_update_spatial_attributes;""")
-            pass
 
         result.stop_timer()
+        result.log(logger)
         return result
 
-    def finalize_indexing(self):
+    def finalize_indexing(self, load_details={}):
 
-        result = ETLOperationResult(inspect.currentframe().f_code.co_name)
+        result = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
         try:
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
                 cursor.execute(f"REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET (status, indexed_time, complete, successful) = (%s, %s, %s, %s) WHERE loadid = %s""",
-                    ("indexed", datetime.now(), True, True, self.loadid),
+                    """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
+                    ("indexed", datetime.now(), True, True, json.dumps(load_details), self.loadid),
                 )
             result.message = "resources indexed and materialized view refreshed"
         except Exception as e:
@@ -663,12 +767,25 @@ class FMSFImporter(BaseImportModule):
             result.message = str(e)
 
         result.stop_timer()
+        result.log(logger)
         return result
 
+    def run_web_import(self, request):
 
-    def import_via_cli(self, **kwargs):
+        reporter = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
+        # this is not hooked up on the frontend, but here as a placeholder
+        truncate = request.POST.get('truncate', None)
+        truncate = 10
 
-        reporter = ETLOperationResult(inspect.currentframe().f_code.co_name)
+        run_fmsf_import_as_task.delay(self.loadid, truncate)
+
+        reporter.message = "import task submitted"
+        return reporter.serialize()
+
+    def run_cli_import(self, **kwargs):
 
         dry_run = kwargs.get("dry_run", False)
         truncate = kwargs.get("truncate")
@@ -677,65 +794,95 @@ class FMSFImporter(BaseImportModule):
         file_dir = kwargs.get("file_dir")
         if file_dir is None:
             raise Exception("file_dir must be provided")
+        if self.loadid is None:
+            self.loadid = str(uuid.uuid4())
+
+        result = self.run_sequence(truncate=truncate, dry_run=dry_run, file_dir=file_dir)
+
+        return result
+
+    def run_sequence(self, truncate=None, dry_run=False, file_dir=None):
+
+        reporter = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+        )
+
+        dry_run = False
+        if truncate is not None:
+            truncate = int(truncate)
+
+        if file_dir is None:
+            file_dir = self.get_uploaded_files_location()
 
         result = self.validate_files(file_dir)
-        logger.info(result)
+        reporter.data.update(result.data)
         if result.success is False:
-            raise Exception(result.message)
+            self.abort_load(message=result.message, details=result.data)
+            return result.serialize()
 
         result = self.start()
-        logger.info(result)
 
         result = self.read_features_from_shapefile()
-        logger.info(result)
+        reporter.data.update(result.data)
         if len(self.new_features) == 0:
-            logger.info("no new features to write")
-            exit()
+            self.abort_load(message=result.message, details=result.data)
+            return result.serialize()
 
         if self.resource_type == "Historic Structure":
             result = self.apply_historical_structures_filter()
-            logger.info(result)
+            reporter.data.update(result.data)
             if result.success is False:
-                raise Exception(result.message)
+                self.abort_load(message="All sites in this upload already exist in the HMS database.", details=result.data)
+                return result.serialize()
 
         self._read_csv()
 
         result = self.generate_load_data(truncate=truncate)
-        logger.info(result)
+        reporter.data.update(result.data)
         if result.success is False:
-            raise Exception(result.message)
+            self.abort_load(message=result.message, details=result.data)
+            return result.serialize()
 
         result = self.write_data_to_load_staging()
-        logger.info(result)
+        reporter.data.update(result.data)
         if result.success is False:
-            raise Exception(result.message)
+            self.abort_load(message=result.message, details=result.data)
+            return result.serialize()
 
         if dry_run is True:
             reporter.message = f"dry-run completed successfully with {len(self.fmsf_resources)} resources."
-            reporter.data = {
-                "dry-run": dry_run,
-                "resources": [(i.siteid, i.resourceid) for i in self.fmsf_resources]
-            }
+            reporter.data['dry-run'] = dry_run
+            result = self.finalize_indexing()
+            reporter.data.update(result.data)
         else:
             result = self.write_tiles_from_load_staging()
-            logger.info(result)
+            reporter.data.update(result.data)
             if result.success is False:
-                raise Exception(result.message)
+                self.abort_load(message=result.message, details=result.data)
+                return result.serialize()
 
-            result = self.finalize_indexing()
-            logger.info(result)
+            # write the cumulative reporter data to load_details in the final step
+            result = self.finalize_indexing(load_details=reporter.data)
+            reporter.data.update(result.data)
             if result.success is False:
-                raise Exception(result.message)
+                self.abort_load(message=result.message, details=result.data)
+                return result.serialize()
 
-            reporter.message = f"load completed successfully with {len(self.fmsf_resources)} resources."
-            reporter.data = {
-                "dry-run": dry_run,
-                "resources": [(i.siteid, i.resourceid) for i in self.fmsf_resources]
-            }
+            reporter.message = "completed without error"
 
         reporter.stop_timer()
-        logger.info(reporter.message)
-        return reporter
+        return reporter.serialize()
+
+    def abort_load(self, message="", details={}):
+
+        ## this is pretty annoying, but the status must be set to "indexed"
+        ## in order for the default UI component to display this load as completed.
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET (status, error_message, load_details, complete, successful) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
+                ("failed", message, json.dumps(details), True, True, self.loadid),
+            )
 
     def get_node(self, node_name):
         node = self.node_lookup.get(node_name)
@@ -867,7 +1014,7 @@ class FMSFResource():
                 if fieldset[0]['field'] == "geom":
                     geom = self.feature.geom
                     with connection.cursor() as cursor:
-                        cursor.execute(f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints('{geom.wkt}'));")
+                        cursor.execute(f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));")
                         geojson = cursor.fetchone()[0]
                     source_value = geojson
                     # also, run spatial intersection to find overlapping management areas
