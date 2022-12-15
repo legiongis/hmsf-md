@@ -3,10 +3,49 @@
 
 {% block task_details %}
 <!-- ko ifnot: loading() -->
-    <div class="fmsf-etl">
+    <div class="fmsf-etl" style="display:flex; flex-direction:column; height:calc(100vh - 100px);">
         <!-- ko ifnot: response() -->
-        <div class="file-select loader-select">
-            
+        <div style="height:50%; padding:20px; overflow-y:scroll">
+            <h2>Using the FMSF Data Importer</h2>
+            <p>Use this ETL module to sites from FMSF into the HMS database. You will run the process once per FMSF site type, creating an upload a .zip file for each import. Use the Task Status tab to view summaries of all import tasks.</p>
+            <h3>Steps</h3>
+            <ol>
+                <li>
+                    Create a .zip file with the following content and <strong>no nested directories</strong>.
+                    <ul>
+                        <li>Shapefile export from FMSF (keep default name).</li>
+                        <li>CSV export from Santa Clause MS Access database (keep default name).</li>
+                        <li>For example, an Archaeological Site upload will contain these files (plus some additional shapefile "sidecars"):</li>
+                        <ul style="font-size:.8em">
+                            <li>AR.csv</li>
+                            <li>FloridaSites.dbf</li>
+                            <li>FloridaSites.shp</li>
+                            <li>FloridaSites.shx</li>
+                        </ul>
+                    </ul>
+                </li>
+                <li>Upload the .zip file below (this may take a few seconds).</li>
+                <li>Set some configuration options (all optional)
+                    <ul>
+                        <li><strong>Truncate:</strong> Only import the first N resources in the upload files (generally this is only useful during development).</li>
+                        <li><strong>Dry run:</strong> Run a mock import that creates all necessary content behind the scenes, but stops short of loading anything into the database.</li>
+                        <li><strong>Note to self:</strong> Attach a note to this import task.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h3>More information</h3>
+            <ul>
+                <li>Historic Structures will be filtered in the following manner (these filters take over 10 minutes to run):
+                    <ul>
+                        <li>Any destroyed structures are <strong>excluded</strong>.</li>
+                        <li>Any stuctures located within any Managed Areas (parks, forests, etc) are <strong>included</strong>.</li>
+                        <li>All lighthouses are <strong>included</strong>.</li>
+                    </ul>
+                </li>
+                <li>Once started, the import runs behind the scenes, and the Task Status tab will show live status updates.</li>
+            </ul>
+        </div>
+        <div class="file-select loader-select" style="height:50%; overflow-y:scroll;">
             <div data-bind="dropzone: dropzoneOptions">
                 <div class="manifest-manager-main-menu-circle loader-button">
                     <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
