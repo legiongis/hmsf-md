@@ -283,9 +283,7 @@ class FMSFImporter(BaseImportModule):
     def set_resource_type(self, resource_type):
         self.graph = GraphModel.objects.get(name=resource_type)
         self.field_map = field_maps[resource_type]
-
         self.resource_type = resource_type
-        self.set_resource_lookup()
 
     def set_resource_type_from_csv(self):
         rt = self.csv_filename_lookup[self.csv_file.name]['resource_type']
@@ -831,6 +829,8 @@ class FMSFImporter(BaseImportModule):
         if result.success is False:
             self.abort_load(message=result.message, details=result.data)
             return result.serialize()
+
+        self.set_resource_lookup()
 
         result = self.start(load_description=description)
 
