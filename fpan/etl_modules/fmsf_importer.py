@@ -876,7 +876,7 @@ class FMSFImporter(BaseImportModule):
         result = self.read_features_from_shapefile()
         reporter.data.update(result.data)
         if len(self.new_features) == 0:
-            self.abort_load(message=result.message, details=result.data)
+            self.abort_load(message=result.message, details=result.data, status="completed")
             return result.serialize()
 
         # RUN FILTERS ON THE STRUCTURES, IF NECESSARY
@@ -925,12 +925,12 @@ class FMSFImporter(BaseImportModule):
         reporter.stop_timer()
         return reporter.serialize()
 
-    def abort_load(self, message="", details={}):
+    def abort_load(self, message="", details={}, status="failed"):
 
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, error_message, load_details, complete, successful) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
-                ("failed", message, json.dumps(details), True, True, self.loadid),
+                (status, message, json.dumps(details), True, True, self.loadid),
             )
 
     def get_node(self, node_name):
