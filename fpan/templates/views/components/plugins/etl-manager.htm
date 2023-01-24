@@ -49,7 +49,7 @@
     </div>
     <div style="height:100%" data-bind="if: activeTab() === 'details'">
         <!-- ko if: selectedModule() -->
-        <div style="width: 100%; height: inherit">
+        <div style="width: 100%; height: inherit; overflow-y:scroll;">
             <div style="height: inherit;">
                 <div style="height: inherit;" data-bind="component: {
                     name: selectedModule().componentname,
