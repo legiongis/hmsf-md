@@ -103,23 +103,14 @@
                                     <!-- /ko -->
                                 </div>
                                 <div class="status">
-                                    <!-- ko if: event.status == "completed" -->
-                                    <button class="btn btn-warning" style="width:150px;">{% trans "indexing" %}</button>
-                                    <!-- /ko -->
-                                    <!-- ko if: event.status == "indexed" -->
-                                    <button class="btn btn-success" style="width:150px;">{% trans "completed" %}</button>
-                                    <!-- /ko -->
                                     <!-- ko if: event.status == "failed" -->
-                                    <button class="btn btn-danger" style="width:150px;">{% trans "failed" %}</button>
+                                    <p style="color:darkred" data-bind="text: event.status"></p>
                                     <!-- /ko -->
-                                    <!-- ko if: event.status == "running" -->
-                                    <button class="btn btn-warning" style="width:150px;">{% trans "running" %}</button>
+                                    <!-- ko if: event.status == "completed" -->
+                                    <p style="color:green" data-bind="text: event.status"></p>
                                     <!-- /ko -->
-                                    <!-- ko if: event.status == "reversing" -->
-                                    <button class="btn btn-warning" style="width:150px;">{% trans "unloading" %}</button>
-                                    <!-- /ko -->
-                                    <!-- ko if: event.status == "unloaded" -->
-                                    <button class="btn btn-success" style="width:150px;">{% trans "unloaded" %}</button>
+                                    <!-- ko ifnot: event.status == "completed" || event.status == "failed" -->
+                                    <p style="color:orange" data-bind="text: event.status"></p>
                                     <!-- /ko -->
                                 </div>
                             </div>
@@ -201,13 +192,7 @@
                             <h4>{% trans "Load Summary" %}</h4>
                             <div>
                                 <span class="etl-loading-metadata-key">{% trans 'Loading status:' %}</span>
-                                <span class="etl-loading-metadata-value" data-bind="
-                                    text:
-                                        selectedLoadEvent().status == 'indexed' ? '{% trans "Completed" %}' 
-                                        : selectedLoadEvent().status == 'completed' ? '{% trans "Indexing" %}' 
-                                        : selectedLoadEvent().status == 'failed' ? '{% trans "Failed" %}' 
-                                        : '{% trans "Running" %}'
-                                "></span>  
+                                <span class="etl-loading-metadata-value" data-bind="text: selectedLoadEvent().status"></span>  
                             </div>
                             <div>
                                 <span class="etl-loading-metadata-key">{% trans 'Loading started:' %}</span>

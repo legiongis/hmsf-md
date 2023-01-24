@@ -18,6 +18,7 @@ define([
             this.loading = params.loading || ko.observable();
             this.data2 = ko.observable(false);
 
+            this.resourceType = ko.observable("");
             this.truncate = ko.observable(0);
             this.dryRun = ko.observable(false);
             this.loadDescription = ko.observable("");
@@ -48,10 +49,10 @@ define([
 
             this.start = async function(){
                 self.loading(true);
+                self.formData.append("resourceType", self.resourceType())
                 self.formData.append("truncate", self.truncate())
                 self.formData.append("dryRun", self.dryRun())
                 self.formData.append("loadDescription", self.loadDescription())
-                console.log(self.formData)
                 const response = await self.submit('run_web_import');
                 self.loading(false);
                 params.activeTab("import");

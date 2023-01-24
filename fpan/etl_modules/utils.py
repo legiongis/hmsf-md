@@ -32,6 +32,7 @@ class ETLOperationResult():
     def serialize(self):
 
         data = self.data
+        data['message'] = self.message
 
         return {
             "operation": self.operation,

@@ -21,17 +21,14 @@ from django.core.files import File
 from django.core.files.storage import default_storage
 from django.conf import settings
 
-import arches.app.tasks as tasks
-import arches.app.utils.task_management as task_management
 from arches.app.datatypes.datatypes import DataTypeFactory
+from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.concept import Concept
 from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
-from arches.app.etl_modules.base_import_module import BaseImportModule
-from arches.app.utils.file_validator import FileValidator
 
 from hms.models import ManagementArea
 from fpan.tasks import run_fmsf_import_as_task
@@ -232,6 +229,20 @@ specials = {
     }
 }
 
+FILENAME_LOOKUP = {
+    "Archaeological Site" : {
+        "shp_name": "FloridaSites.shp",
+        "csv_name": "AR.csv"
+    },
+    "Historic Cemetery": {
+        "shp_name": "HistoricalCemeteries.shp",
+        "csv_name": "CM.csv",
+    },
+    "Historic Structure": {
+        "shp_name": "FloridaStructures.shp",
+        "csv_name": "SS.csv",
+    },
+}
 
 class FMSFImporter(BaseImportModule):
     def __init__(self, request=None, loadid=None):
@@ -247,27 +258,24 @@ class FMSFImporter(BaseImportModule):
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
 
+        # these are passed into the two different import process methods
+        self.file_dir = None
+        self.resource_type = None
+
+        # these are set in the _set_resource_type() method
+        self.graph = None
+        self.field_map = {}
+        self.resource_csv = None
+        self.resource_shp = None
+        self.extra_structures_csv = None
+
+        # holding and managing feature content during the import process
         self.features = []
         self.new_features = []
         self.existing_features = []
         self.tiles = []
         self.fmsf_resources = []
-        self.file_dir = None
-
-        self.csv_filename_lookup = {
-            "AR.csv": {
-                "resource_type": "Archaeological Site",
-                "shp_name": "FloridaSites.shp",
-            },
-            "CM.csv": {
-                "resource_type": "Historic Cemetery",
-                "shp_name": "HistoricalCemeteries.shp",
-            },
-            "SS.csv": {
-                "resource_type": "Historic Structure",
-                "shp_name": "FloridaStructures.shp",
-            },
-        }
+        self.extra_structures = []
 
         self.blank_tile_lookup = {}
         self.concept_lookups = {}
@@ -279,18 +287,15 @@ class FMSFImporter(BaseImportModule):
     def get_uploaded_files_location(self):
         self.file_dir = Path(settings.APP_ROOT, "fmsf-uploads", self.loadid)
         return Path(settings.APP_ROOT, "fmsf-uploads", self.loadid)
- 
-    def set_resource_type(self, resource_type):
+
+    def _set_resource_type(self, resource_type):
+        self.resource_type = resource_type
+        self.resource_shp = Path(self.file_dir, FILENAME_LOOKUP[resource_type]["shp_name"])
+        self.resource_csv = Path(self.file_dir, FILENAME_LOOKUP[resource_type]["csv_name"])
         self.graph = GraphModel.objects.get(name=resource_type)
         self.field_map = field_maps[resource_type]
-        self.resource_type = resource_type
 
-    def set_resource_type_from_csv(self):
-        rt = self.csv_filename_lookup[self.csv_file.name]['resource_type']
-        self.set_resource_type(rt)
-
-    def set_resource_lookup(self):
-
+    def _set_resource_lookup(self):
         resources = Resource.objects.filter(graph=self.graph)
         for resource in resources:
             try:
@@ -315,6 +320,8 @@ class FMSFImporter(BaseImportModule):
         Reads added zip package of shapefile and CSV file. This is the entry point
         for the front-end generated workflow, and the loadid is generated here.
         """
+
+        # self._set_resource_type(request.POST.get("resourceType", "Archaeological Site"))
 
         if self.loadid is None:
             self.loadid = uuid.uuid4()
@@ -345,13 +352,13 @@ class FMSFImporter(BaseImportModule):
             return result
 
         result.data['Files'] = file_list
-        result = self.validate_files(upload_dir, result=result)
+        # result = self.validate_files(upload_dir, result=result)
         return result.serialize()
 
-    def _read_csv(self):
+    def _read_resource_csv(self):
 
         data = {}
-        with open(self.csv_file, "r") as in_csv:
+        with open(self.resource_csv, "r") as in_csv:
             reader = csv.DictReader(in_csv)
             for row in reader:
                 siteid = row['SiteID'].rstrip()
@@ -360,7 +367,7 @@ class FMSFImporter(BaseImportModule):
 
     def get_value_from_csv(self, siteid, field_name):
         """ the trick here is that the CSV data will have multiple rows per
-        siteid (site forms submitted over the years. For now, just iterate these
+        siteid (site forms submitted over the years). For now, just iterate these
         rows and return the last row that has a non-empty value for this field. """
         value = None
         if siteid in self.csv_data:
@@ -394,7 +401,6 @@ class FMSFImporter(BaseImportModule):
             logger.warn(f"Invalid prefLabel {value} for node {node.name} with collection {node.config['rdmCollection']}")
         return labelid
 
-    
     def validate_files(self, file_dir, result=None):
 
         def validate_shp_fields(layer):
@@ -405,49 +411,46 @@ class FMSFImporter(BaseImportModule):
                         shp_fields.append(item['field'])
             return [i for i in shp_fields if not i in layer.fields]
 
-        if isinstance(file_dir, str):
-            file_dir = Path(file_dir)
-
         if result is None:
             result = ETLOperationResult(
                 inspect.currentframe().f_code.co_name,
                 loadid=self.loadid,
             )
 
-        csv = None
-        for i in file_dir.glob("*.csv"):
-            csv = i
-            break
-        if csv is None:
-            result.success = False
-            result.message = f"Can't find CSV in upload."
-        else:
-            if csv.name in self.csv_filename_lookup:
-                self.csv_file = csv
-                self.shp_file = Path(csv.parent, self.csv_filename_lookup[csv.name]['shp_name'])
-                if not self.shp_file.exists():
-                    result.success = False
-                    result.message = f"Shapefile is missing. Expected path: {self.shp_file}"
-                self.set_resource_type_from_csv()
-            else:
+        if isinstance(file_dir, str):
+            file_dir = Path(file_dir)
+
+        # first make sure the SHP and CSV are present
+        for path in [self.resource_shp, self.resource_csv]:
+            if not path.is_file():
                 result.success = False
-                result.message = f"Invalid CSV file: {csv}. Must be one of {self.csv_filename_lookup.keys()}"
+                result.message = f"Expected file {self.resource_shp.name} is missing."
 
-            if result.success is True:
-                try:
-                    ds = DataSource(self.shp_file)
-                    lyr = ds[0]
-                    result.message = "All files look good!"
-                except Exception as e:
+        # next check the shapefile and its fields
+        if result.success:
+            try:
+                ds = DataSource(self.resource_shp)
+                lyr = ds[0]
+                result.message = "All files look good!"
+                missing = validate_shp_fields(lyr)
+                if len(missing) > 0:
                     result.success = False
-                    result.message = str(e)
+                    result.message = f"Shapefile is missing these fields: {', '.join(missing)}"
+                    result.data['Missing Fields'] = missing
+            except Exception as e:
+                result.success = False
+                result.message = str(e)
 
-                if result.success is True:
-                    missing = validate_shp_fields(lyr)
-                    if len(missing) > 0:
+        # finally, check the extra-structures CSV if it is present
+        if result.success:
+            extra_structures_csv = Path(file_dir, "extra-structures.csv")
+            if extra_structures_csv.is_file():
+                with open(extra_structures_csv, "r") as o:
+                    reader = csv.reader(o)
+                    headers = next(reader)
+                    if headers[0] != "SiteID":
                         result.success = False
-                        result.message = f"Shapefile is missing these fields: {', '.join(missing)}"
-                        result.data['Missing Fields'] = missing
+                        result.message = f"extra-structures.csv missing required header: SiteID"
 
         result.data['Resource model'] = self.resource_type
         result.stop_timer()
@@ -499,13 +502,26 @@ class FMSFImporter(BaseImportModule):
             loadid=self.loadid,
         )
 
-        lighthouse_list, geom_list = [], []
+        extra_ids = []
+        extra_structures_csv = Path(self.file_dir, "extra-structures.csv")
+        if extra_structures_csv.is_file():
+            with open(extra_structures_csv, "r") as openf:
+                reader = csv.reader(openf)
+                next(reader)
+                for row in reader:
+                    extra_ids.append(row[0])
+
+        extra_list, lighthouse_list, geom_list = [], [], []
         for feature in self.new_features:
-            # first skip structure marked as destroyed
+            siteid = feature.get("SITEID").rstrip()
+            # include any special ids
+            if siteid in extra_ids:
+                extra_list.append(siteid)
+                continue
+            # skip structure marked as destroyed
             if _feature_is_destroyed(feature):
                 continue
             # now, collect sites that are (or were) lighthouses
-            siteid = feature.get("SITEID").rstrip()
             if _feature_is_lighthouse(feature):
                 lighthouse_list.append(siteid)
             # for all others, collect geometry to filter by location
@@ -522,29 +538,31 @@ class FMSFImporter(BaseImportModule):
         union_geom = union_results['geom__union']
         logger.debug("union geom created")
 
-        values_str = ", ".join([f"('{i[0]}', '{i[1]}')" for i in geom_list])
-        with connection.cursor() as cursor:
-            logger.debug(f"generate table of structure geoms. geom ct: {len(geom_list)}")
-            cursor.execute(
-                f"""
-                DROP TABLE IF EXISTS historic_structures_tmp;
-                CREATE TABLE historic_structures_tmp (siteid varchar, geom geometry);
-                INSERT INTO historic_structures_tmp VALUES {values_str};
-                """
-            )
-            logger.debug(f"performing intersect operation")
-            cursor.execute(
-                f"""SELECT siteid, geom FROM historic_structures_tmp
-                    WHERE ST_Intersects(geom, '{union_geom.wkt}');"""
-            )
-            rows = cursor.fetchall()
-            geom_matches = [i[0] for i in rows]
-            cursor.execute(
-                f"""DROP TABLE IF EXISTS historic_structures_tmp;"""
-            )
+        geom_matches = []
+        if len(geom_list) > 0:
+            values_str = ", ".join([f"('{i[0]}', '{i[1]}')" for i in geom_list])
+            with connection.cursor() as cursor:
+                logger.debug(f"generate table of structure geoms. geom ct: {len(geom_list)}")
+                cursor.execute(
+                    f"""
+                    DROP TABLE IF EXISTS historic_structures_tmp;
+                    CREATE TABLE historic_structures_tmp (siteid varchar, geom geometry);
+                    INSERT INTO historic_structures_tmp VALUES {values_str};
+                    """
+                )
+                logger.debug(f"performing intersect operation")
+                cursor.execute(
+                    f"""SELECT siteid, geom FROM historic_structures_tmp
+                        WHERE ST_Intersects(geom, '{union_geom.wkt}');"""
+                )
+                rows = cursor.fetchall()
+                geom_matches = [i[0] for i in rows]
+                cursor.execute(
+                    f"""DROP TABLE IF EXISTS historic_structures_tmp;"""
+                )
+            logger.debug(f"intersect complete, {len(geom_matches)} matching features.")
 
-        logger.debug(f"intersect complete, {len(geom_matches)} matching features.")
-        use_list = set(lighthouse_list + geom_matches)
+        use_list = set(lighthouse_list + geom_matches + extra_list)
 
         original_ct = len(self.new_features)
 
@@ -563,7 +581,7 @@ class FMSFImporter(BaseImportModule):
 
     def read_features_from_shapefile(self):
 
-        ds = DataSource(self.shp_file)
+        ds = DataSource(self.resource_shp)
         lyr = ds[0]
 
         result = ETLOperationResult(
@@ -597,6 +615,8 @@ class FMSFImporter(BaseImportModule):
             inspect.currentframe().f_code.co_name,
             loadid=self.loadid,
         )
+
+        self._read_resource_csv()
 
         self.tiles = []
         self.fmsf_resources = []
@@ -718,7 +738,7 @@ class FMSFImporter(BaseImportModule):
                 with connection.cursor() as cursor:
                     cursor.execute(
                         """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                        ("completed", datetime.now(), self.loadid),
+                        ("loaded", datetime.now(), self.loadid),
                     )
             else:
                 with connection.cursor() as cursor:
@@ -753,13 +773,17 @@ class FMSFImporter(BaseImportModule):
             loadid=self.loadid,
         )
         try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """UPDATE load_event SET (status) = (%s) WHERE loadid = %s""", ("indexing", self.loadid),
+                )
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
                 cursor.execute(f"REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
-                    ("indexed", datetime.now(), True, True, json.dumps(load_details), self.loadid),
+                    ("completed", datetime.now(), True, True, json.dumps(load_details), self.loadid),
                 )
             result.message = "resources indexed and materialized view refreshed"
         except Exception as e:
@@ -777,9 +801,11 @@ class FMSFImporter(BaseImportModule):
             loadid=self.loadid,
         )
         # handle values coming from frontend configuration
+        resource_type = request.POST.get('resourceType')
         truncate = request.POST.get('truncate')
         dry_run = request.POST.get('dryRun')
         description = request.POST.get('loadDescription')
+        self.resource_type = resource_type
         if truncate == "0":
             truncate = None
         if dry_run == "true":
@@ -787,15 +813,19 @@ class FMSFImporter(BaseImportModule):
         else:
             dry_run = False
 
-        run_fmsf_import_as_task.delay(self.loadid, truncate=truncate, dry_run=dry_run, description=description)
+        run_fmsf_import_as_task.delay(self.loadid, resource_type, truncate=truncate, dry_run=dry_run, description=description)
 
         reporter.message = "import task submitted"
         return reporter.serialize()
 
     def run_cli_import(self, **kwargs):
 
+        resource_type = kwargs.get("resource_type", None)
         dry_run = kwargs.get("dry_run", False)
         truncate = kwargs.get("truncate")
+
+        if resource_type is None:
+            raise Exception("resource_type must be provided")
         if truncate is not None:
             truncate = int(truncate)
         file_dir = kwargs.get("file_dir")
@@ -804,11 +834,11 @@ class FMSFImporter(BaseImportModule):
         if self.loadid is None:
             self.loadid = str(uuid.uuid4())
 
-        result = self.run_sequence(truncate=truncate, dry_run=dry_run, file_dir=file_dir)
+        result = self.run_sequence(resource_type, truncate=truncate, dry_run=dry_run, file_dir=file_dir)
 
         return result
 
-    def run_sequence(self, truncate=None, dry_run=False, file_dir=None, description=""):
+    def run_sequence(self, resource_type, truncate=None, dry_run=False, file_dir=None, description=""):
 
         reporter = ETLOperationResult(
             inspect.currentframe().f_code.co_name,
@@ -823,23 +853,33 @@ class FMSFImporter(BaseImportModule):
 
         if file_dir is None:
             file_dir = self.get_uploaded_files_location()
+        else:
+            self.file_dir = file_dir
 
+        # use the provided resource_type to reference the proper graph and import files
+        self._set_resource_type(resource_type)
+
+        # START THE PROCESS
+        result = self.start(load_description=description)
+
+        # RUN FILE VALIDATION
         result = self.validate_files(file_dir)
         reporter.data.update(result.data)
         if result.success is False:
             self.abort_load(message=result.message, details=result.data)
             return result.serialize()
 
-        self.set_resource_lookup()
+        # create lookup of all existing resource instances for comparison
+        self._set_resource_lookup()
 
-        result = self.start(load_description=description)
-
+        # READ FEATURES FROM THE INPUT SHAPEFILE
         result = self.read_features_from_shapefile()
         reporter.data.update(result.data)
         if len(self.new_features) == 0:
             self.abort_load(message=result.message, details=result.data)
             return result.serialize()
 
+        # RUN FILTERS ON THE STRUCTURES, IF NECESSARY
         if self.resource_type == "Historic Structure":
             result = self.apply_historical_structures_filter()
             reporter.data.update(result.data)
@@ -847,20 +887,21 @@ class FMSFImporter(BaseImportModule):
                 self.abort_load(message="All sites in this upload already exist in the HMS database.", details=result.data)
                 return result.serialize()
 
-        self._read_csv()
-
+        # GENERATE THE DATA TO BE LOADED
         result = self.generate_load_data(truncate=truncate)
         reporter.data.update(result.data)
         if result.success is False:
             self.abort_load(message=result.message, details=result.data)
             return result.serialize()
 
+        # WRITE THE LOAD DATA TO THE STAGING TABLE IN ARCHES DB
         result = self.write_data_to_load_staging()
         reporter.data.update(result.data)
         if result.success is False:
             self.abort_load(message=result.message, details=result.data)
             return result.serialize()
 
+        # RUN THE FUNCTION TO TRANSLATE THE STAGING TABLE INTO REAL TILES
         if dry_run is True:
             reporter.message = f"dry run completed successfully with {len(self.fmsf_resources)} resources."
             result = self.finalize_indexing(load_details=reporter.data)
@@ -1068,7 +1109,7 @@ class FMSFResource():
                         None,
                         importer.loadid,
                         0,
-                        importer.csv_file.name,
+                        importer.resource_csv.name,
                         True,
                     ))
 
@@ -1099,7 +1140,7 @@ class FMSFResource():
                 tile_value_json,
                 importer.loadid,
                 nodegroup_depth,
-                importer.csv_file.name,
+                importer.resource_csv.name,
                 passes_validation,
             )
             tiles.append(row)

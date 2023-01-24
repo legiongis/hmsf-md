@@ -84,7 +84,6 @@
                         <div class="etl-loading-metadata-value" data-bind="text: response().result.message"></div>
                     </div>
                 </div>
-
                 <div class="branch-xl-file-contents-container">
                     <h3 class="branch-xl-title">{% trans "File List" %}</h3> 
                     <div style="color: #333333">
@@ -95,6 +94,16 @@
                 </div>
                 <div>
                     <h3 class="branch-xl-title">{% trans "Configure Import" %}</h3>
+                    <div>
+                        <label>
+                            <strong>Resource Type:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: resourceType">
+                                <option>Archaeological Site</option>
+                                <option>Historic Cemetery</option>
+                                <option>Historic Structure</option>
+                            </select>
+                        </label>
+                    </div>
                     <div>
                         <label>
                             <strong>Truncate:</strong>
