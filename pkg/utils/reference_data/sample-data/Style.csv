@@ -1,0 +1,83 @@
+4163,_,NULL VALUE,NULL,1336,0,0,0,1,1,a0580c77-b35b-45ea-bf5f-1d09fc5e2916
+1337,British Colonial,British Colonial ca. 1763-1783,BRCO,1336,10,0,0,1,1,38c3fa87-a8a3-4ccd-97e9-9a0ee69f6d0a
+1338,Brutalism,Brutalism ca. 1955-1970,BRUT,1336,20,0,0,1,1,1cfe2278-906e-4f42-9356-544d04030d48
+1339,Art Deco,Art Deco ca. 1920-1940,ARTD,1336,30,0,0,1,1,1d7da111-d282-4e4e-aa47-a2ad33cf524a
+1340,Bungalow,Bungalow ca. 1905-1930,BUNG,1336,40,0,0,1,1,c2930320-6d6b-4997-bab0-2b0ff3217b65
+1341,Byzantine Revival,Moorish Revival ca. 1880-1910,MOOR,1336,50,0,0,1,0,f8ef6999-7984-45e4-828c-945453c0e9f9
+1342,Chateauesque,French Colonial,FRCO,1336,60,0,0,1,0,469c99ac-32aa-4514-8565-46371967b8a4
+1343,Classical Revival,Neo-Classical Revival ca. 1880-1940,NEOR,1336,70,0,0,1,0,2a7484f9-ad4c-4949-bb36-ecddaf99d986
+1344,Colonial Revival,Georgian Revival ca. 1880-present,GEOR,1336,80,0,0,1,1,c0641aed-3cd4-468f-9b0b-7734e6c21b5c
+1345,Commercial,Commercial,COMM,1336,90,0,0,1,1,95c10916-5abf-4919-8f41-224b8cce13f6
+1346,Egyptian Revival,Egyptian Revival ca. 1835-1890,EGYR,1336,100,0,0,1,1,ee006a48-a062-43b7-8839-46291c9ac0fe
+1347,Frame Vernacular,Frame Vernacular,FRAM,1336,110,0,0,1,1,c95c1501-493b-4d7d-ae73-2f4ff571d967
+1348,Second Empire,Second Empire ca. 1855-1885,FR2E,1336,120,0,0,1,1,5622596e-f340-4c1b-94ec-53ad7320bc4e
+1349,Georgian Revival,Georgian Revival ca. 1880-present,GEOR,1336,130,0,0,1,0,c61010c1-cb2b-485c-a369-50f852388b9b
+1355,Masonry Vernacular,Masonry vernacular,MASO,1336,130,0,0,1,1,dc1697ec-1872-493d-b61c-29bc7616d14a
+1350,Gothic Revival,Gothic Revival ca. 1840-present,GOTR,1336,140,0,0,1,1,4eee523c-13cb-4f74-b24a-0f60b81f8310
+1351,Greek Revival,Greek Revival ca. 1825-1860,GRKR,1336,150,0,0,1,1,13df5fff-ec01-42d3-a007-a8dd08c32654
+1352,International,International ca. 1925-present,INTE,1336,160,0,0,1,1,acc2f79b-3c7a-4dc7-923e-33f62e21948e
+1353,Italianate,Italianate ca. 1840-1885,ITAL,1336,170,0,0,1,1,5e5666af-e9dc-4c41-8f0f-c8b86bc2d930
+1354,Log,Log,LOG ,1336,180,0,0,1,1,38c3daba-36b3-4819-9b6b-4fe1b0dcd4cc
+1356,Mediterranean Revival,Mediterranean Revival ca. 1880-1940,MEDR,1336,200,0,0,1,1,b94332eb-fa6c-46ed-8e29-d0452778da1c
+1357,Mission,Mission,MISS,1336,210,0,0,1,1,573fdc71-7175-42f9-bf12-899deadc19e8
+1358,Moderne,Moderne ca. 1920-1940,MODE,1336,220,0,0,1,1,c56ce96a-5d04-4955-83b0-fdda23cbbf3b
+1359,Modernistic,Moderne ca. 1920-1940,MODE,1336,230,0,0,1,0,3aef1a28-96f8-4fc6-9d55-6776deda15f7
+4055,Mid-Century Modern,Mid-Century Modern ca. 1940s-early 1960s,MIDM,1336,235,0,0,1,1,e65ab07e-c76b-4a84-af99-15fea43e361f
+1360,Neo-Classical Revival,Neo-Classical Revival ca. 1880-1940,NEOR,1336,240,0,0,1,1,ee446431-27d2-4d14-99dd-8cc53badcf3b
+1361,Prairie,Prairie ca. 1900-1920,PRAI,1336,250,0,0,1,1,ab67b7fd-afca-4c60-9180-bd9b16dc5ea7
+1362,Queen Anne (Revival),Queen Anne (Revival) ca. 1880-1910,QUEE,1336,260,0,0,1,1,e65c8c11-0080-4f51-99a8-867a9cfd7120
+1363,Italian Renaissance Revival,Italian Renaissance Rev ca. 1880-1935,ITRE,1336,270,0,0,1,0,0e7dd73b-6b96-43c9-80a7-998a008a9062
+1364,Richardsonian Romanesque,Romanesque (Revival) ca. 1880-1900,ROMR,1336,280,0,0,1,1,c0becae6-4961-476b-8a1f-a5e9abba1499
+1365,Romanesque (Revival),Romanesque (Revival) ca. 1880-1900,ROMR,1336,290,0,0,1,0,f2073bdb-a0dd-427f-8786-427602940832
+1366,Shingle,Shingle ca. 1880-1900,SHNG,1336,300,0,0,1,1,05e71bab-b092-4332-9171-e7f97b30648d
+1367,Spanish Colonial,"Spanish Colonial 1565-1763, 1783-1820",SPCO,1336,310,0,0,1,1,ab7d8f2c-7253-4752-8b15-a3a90551bd23
+1368,Stick,Stick ca. 1860-1890,STIC,1336,320,0,0,1,1,cff6df9e-4ca3-4f42-8229-278ec5899a48
+1369,Tudor Revival,Tudor Revival ca. 1890-1940,TUDR,1336,330,0,0,1,1,d1afae66-cc3f-4705-aeb7-9c45f0cc7f30
+1370,Other,Other,OTHR,1336,340,0,0,1,1,c51c15e5-4b0d-41b6-8eb2-8e4fc28b13f0
+1371,Gothic-Collegiate,Collegiate Gothic ca. 1900-1940,GOTC,1336,350,0,0,1,0,fab5137b-770d-4a4c-991b-eed3435d909c
+1372,Not applicable,Not Applicable,NA  ,1336,360,0,0,1,1,c9f5544a-5324-4679-9699-7d0c4eb518c2
+1373,Industrial Vernacular,Industrial Vernacular,INDU,1336,370,0,0,1,1,d86ffc0d-92c8-4546-b909-ce98a973d803
+1374,American Foursquare,Box (American 4 Square),BOX ,1336,380,0,0,1,1,113aa13e-d0c9-4e7c-b32e-a56bcdf5e3c3
+1375,Craftsman,Craftsman,CRAF,1336,390,0,0,1,1,9f375754-aaa6-4f69-a44e-606cfe958196
+1376,Unspecified,Unspecified by Surveyor,UNSP,1336,400,1,0,1,1,d74d1362-0d5f-4175-b616-cb744a18a6d6
+1377,Minimal Traditional,Minimal Traditional,MTRA,1336,410,0,0,1,1,80ae3468-72cd-4728-81bb-a4dd0cb30617
+1378,Ranch,Ranch,RANC,1336,420,0,0,1,1,907d9306-3b91-4b0c-a1f0-505b25137769
+1379,Victorian (Italianate),Italianate ca. 1840-1885,ITAL,1336,430,0,0,1,0,700c74cb-5658-4a6b-93c4-b55629edbf55
+1380,Mansard,Second Empire ca. 1855-1885,FR2E,1336,440,0,0,1,0,f2c4aa03-fcab-4f33-afbb-17348c51168f
+1381,Jacobean Revival,Tudor Revival ca. 1890-1940,TUDR,1336,450,0,0,1,0,af50c528-b454-48ba-a51d-b9fdc4f4aa9b
+1382,Elizabethan Revival,Tudor Revival ca. 1890-1940,TUDR,1336,460,0,0,1,0,a3577e6b-33e4-4ca0-afab-26e4343aa6a9
+1383,Beaux Arts Eclecticism,Beaux Arts Eclecticism,BEAU,1336,470,0,0,1,1,c7059476-a0b8-4c38-9496-fef58a96dabc
+1391,Pueblo,Pueblo,PUEB,1336,480,0,0,1,1,e79a5b6a-b8ca-40d1-a7f6-b1a68e9e2700
+1393,Spanish Revival,Mediterranean Revival ca. 1880-1940,MEDR,1336,490,0,0,1,0,e8bba5c7-f900-4e04-b80f-3de301402c6b
+1394,French Renaissance,French Renaissance ca. 1880-1910,FRRE,1336,500,0,0,1,1,98f2b488-d9d0-46f4-8033-802c05805967
+1395,Meisian,International ca. 1925-present,INTE,1336,510,0,0,1,0,75febeb5-0106-4900-94c4-7cd0f954590a
+1396,Bauhausian,International ca. 1925-present,INTE,1336,520,0,0,1,0,aca4599e-4af5-42b8-8fcd-85315bee5484
+1397,English Tudor Cottage,English Tudor Cottage,TUDC,1336,530,0,0,1,1,814654fb-4f69-4d83-b656-2c8c86a52ef7
+1398,Eng Cotswold Cottage,English Cotswold Cottage,COTC,1336,540,0,0,1,1,7294c7e9-8f36-4d17-9233-67cff4dc8cbe
+1399,Eng Georgian Cottage,English Georgian Cottage,GEOC,1336,550,0,0,1,1,5f68d162-ae42-4fd8-a705-e1564ea67a87
+1400,New England Cottage,New England Cottage,NENC,1336,560,0,0,1,1,79518656-fe7c-4da7-b68d-dcec162d7cf6
+1401,French Cottage,French Cottage,FREC,1336,570,0,0,1,1,3217e530-d2c5-499e-9fc4-5c395e6e6af7
+1402,Spanish Cottage,Spanish Cottage,SPNC,1336,580,0,0,1,1,a2a06f97-a523-425c-ba88-c17f8fecd965
+1403,Dutch Cottage,Dutch Cottage,DUTC,1336,590,0,0,1,1,b230bd1d-63c1-44ce-ae78-30a69c7e948f
+1404,Box (Amer 4 Square),Box (American 4 Square),BOX ,1336,600,0,0,1,0,df290486-31db-49f1-b557-6b41e7365ef7
+1405,Split Level,Split Level,SPLV,1336,610,0,0,1,1,66276f02-1de4-4c97-bfad-c0926874dcd9
+1407,French Colonial,French Colonial,FRCO,1336,620,0,0,1,1,3db2912a-80a1-4f74-9bbf-8c44157cb2a9
+1408,Octagon,Octagon,OCTA,1336,630,0,0,1,1,fa630280-275b-481a-88a6-fb471a788359
+1409,Moorish Revival,Moorish Revival ca. 1880-1910,MOOR,1336,640,0,0,1,1,49f1bc23-a387-4d49-8e51-18588d688446
+1411,Collegiate Gothic,Collegiate Gothic ca. 1900-1940,GOTC,1336,650,0,0,1,1,ee7537af-ad56-4b80-aaa8-bc06d5b5a5ff
+1412,Monterey,Monterey,MONT,1336,660,0,0,1,1,0f66219c-0ca0-49be-aa3d-40e6a7ffa0a2
+1413,Art Moderne,Moderne ca. 1920-1940,MODE,1336,670,0,0,1,0,5cb8d43c-f649-469b-8499-52d46fcd782b
+1414,Streamlined Moderne,Moderne ca. 1920-1940,MODE,1336,680,0,0,1,0,a22edd8f-6b2b-42ed-82b1-0d79c6620401
+1415,Spanish Eclectic,Mediterranean Revival ca. 1880-1940,MEDR,1336,690,0,0,1,0,c0697869-1944-4193-ab5b-31efd60442a6
+1416,Dutch Colonial Revival,Dutch Cottage,DUTC,1336,700,0,0,1,0,df66c103-3778-4256-923d-c78bf3506d1a
+1417,Span Colonial Revival,Mediterranean Revival ca. 1880-1940,MEDR,1336,710,0,0,1,0,0150ef6b-ec83-45bb-8b55-a64d26adb64f
+1418,Georgian,British Colonial ca. 1763-1783,BRCO,1336,720,0,0,1,0,7b7e661e-9acb-43d7-8e4c-7cc37535dd70
+1419,No style,No style,NOST,1336,730,0,0,1,1,ae1b19dd-8f09-4362-aecc-a595a56e5760
+1421,"Mixed, none dominant","Mixed, None Dominant",MIXD,1336,740,0,0,1,1,3fdb5bee-9f77-4b6e-9c9d-a8af2af4aebe
+1422,Renaissance Revival,Italian Renaissance Rev ca. 1880-1935,ITRE,1336,750,0,0,1,1,d3c34ed9-0754-48b2-9822-182a335b472b
+1423,Federal (Adamesque),Federal (Adamesque) ca. 1780-1840,FEDE,1336,760,0,0,1,1,78433ab5-867f-43c6-99f5-1fe87882feba
+1424,Adams/Adamesque,Federal (Adamesque) ca. 1780-1840,FEDE,1336,770,0,0,1,0,fdef15c3-bcfd-40fa-8607-91a2735ecf65
+1425,Adamesque Revival,Neo-Classical Revival ca. 1880-1940,NEOR,1336,780,0,0,1,0,ca0e45f0-69e9-4431-b0c8-b33eb0039747
+1426,Federal Revival,Neo-Classical Revival ca. 1880-1940,NEOR,1336,790,0,0,1,0,98211f88-234f-4d81-9c74-93732a145100
+1427,"Folk Victorian, Frame",Frame Vernacular,FRAM,1336,800,0,0,1,0,92cfd65c-10e0-4ae6-a2fd-c4df3204a91b
+1428,"Folk Victorian, Masonry",Masonry vernacular,MASO,1336,810,0,0,1,0,b05f6704-52a1-4a69-a5ae-d28842e132f1

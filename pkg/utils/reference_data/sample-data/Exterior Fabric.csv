@@ -1,0 +1,94 @@
+4165,_,NULL VALUE,NULL,3021,0,0,0,1,1,72a3693c-96f4-4470-8108-c006f293a48c
+3022,Aluminum,Aluminum,ALUM,3021,1,0,0,1,1,f918f65d-1a40-42d5-8715-d365c005331a
+3023,"Artbrick, artstone","Pebble dash / Artbrick, artstone",PEDA,3021,2,0,0,1,1,6a863463-27e2-42bd-a0d7-ff3052b74057
+3024,Artif masonry veneer,Artificial masonry veneer,AMAV,3021,3,0,0,1,0,e74a2a40-4121-4d13-a9ca-58858d2d0783
+3025,Asbestos,Asbestos shingles or siding,SHAS,3021,4,0,0,1,0,6478723b-4d1d-4acd-9521-aa782580381a
+3026,Asphalt-rolled,Rolled asphalt/Composition Roll,ROAS,3021,5,0,0,1,0,d7e140a9-1239-4d06-9b7e-4739f35bf2a9
+3027,Beaded weatherboard,"Weatherboard, Clapboard",WTBD,3021,6,0,0,1,0,136fb161-c170-4deb-9c9f-55c011a91f62
+3028,BEC ceiling board,BEC ceiling board,BECC,3021,7,0,0,1,1,b0c11efe-327c-48c2-aec1-5a55443f5310
+3029,Block-concrete,Concrete block,COBL,3021,8,0,0,1,0,5db86dc0-2c37-4e05-8da1-04973837ac8f
+3030,Block-concrete-mold,Concrete block-mold,COBM,3021,9,0,0,1,0,785c4410-740e-4c3d-b405-e741e384ae7d
+3031,Block-coquina,Coquina block,COQB,3021,10,0,0,1,0,35e4bf39-8f46-4353-8955-f99cd7b7f742
+3032,Board and batten,Board and batten,BDBT,3021,11,0,0,1,1,ebea92dd-0d70-46cb-9a28-c5bd32ded004
+3033,Brick,Brick,BRIC,3021,12,0,0,1,1,5b5179f7-6661-4e1f-ac30-27cf8487a993
+3034,Brick-tabby,Tabby brick,TABB,3021,13,0,0,1,0,30d1e1b7-dc0e-4c1a-aa9f-fdb8f53e33ba
+3035,Carrara glass,Pigmented structural glass,GLPS,3021,14,0,0,1,0,1204e696-7738-40f5-b6db-87b94ebde180
+3036,Cast iron,Cast iron,CAIR,3021,15,0,0,1,1,73d63bb2-6b74-4bc9-8514-f6210e3188f0
+3037,Caststone,Artificial masonry veneer,AMAV,3021,16,0,0,1,0,aafc4620-70c6-4c48-9472-a9536b15ab51
+3038,Cement-mineral fiber,Mineral fiber cement,MFCE,3021,17,0,0,1,0,05007afa-faa5-4c98-979a-dfa206d0bb8a
+3039,Clapboard,"Weatherboard, Clapboard",WTBD,3021,18,0,0,1,0,933fbeb3-e772-4c69-97dd-af1146913756
+3040,Concrete,Concrete,CONC,3021,19,0,0,1,1,59348aa5-79ee-4fda-84ac-ab6c9809baee
+3041,Concrete block,Concrete block,COBL,3021,20,0,0,1,1,ed01b6ab-107a-465f-93bc-6f6c15d8cec3
+3042,Concrete block-mold,Concrete block-mold,COBM,3021,21,0,0,1,0,8f39dbf7-c9dc-4aea-bf17-9ef4e5533de4
+3043,Concrete-poured,Concrete-poured,COPO,3021,22,0,0,1,1,b4036b8d-92c2-4470-b3fd-ea927c3d5b38
+3044,Concrete-pre-cast,Concrete-pre-cast,COPC,3021,23,0,0,1,1,2166f0f7-5507-43bb-b3cb-95579c688d15
+3045,Coquina block,Coquina block,COQB,3021,24,0,0,1,1,98c2f71e-dbed-4f76-a7c7-762f7d629b46
+3046,Drop siding,Drop siding,SDDR,3021,25,0,0,1,1,015adb7d-9f7c-4ba8-923c-7148a5e9e7b1
+3047,Fiberglass,Fiberglass,GLFI,3021,26,0,0,1,1,a57faeef-5e4a-4542-b075-04544fb9e95a
+3048,Flush wood siding,Flush wood siding,SDFW,3021,27,0,0,1,1,04187466-e554-49ac-a815-9aeedc07535a
+3049,Glass block,Glass block,GLBL,3021,28,0,0,1,1,829ffde7-ec9a-4567-b869-34f4310ef7b9
+3050,Glass-fiberglass,Fiberglass,GLFI,3021,29,0,0,1,0,80048644-a70f-4db6-953e-124cbbc287aa
+3051,Glass-pigmentd structural,Pigmented structural glass,GLPS,3021,30,0,0,1,0,a5f21e47-e5c6-46fe-a466-95eac6056c6b
+3052,Glazed masonry,Glazed masonry,MAGL,3021,31,0,0,1,1,a084a514-48d3-47d4-9107-9f03b0ff290f
+3053,Hewn log,Hewn log,LGHW,3021,32,0,0,1,1,2a2f43ae-9c14-419c-8229-b41061f17ae0
+3054,Horizontal plank,Horizontal plank,PLHO,3021,33,0,0,1,1,a028d974-9cce-4741-9941-68d69bb93ef6
+3055,Iron-cast,Cast iron,CAIR,3021,34,0,0,1,0,60142134-5eac-458d-874f-b2777dfc1973
+3056,Log-unspecified,"Log, not further specified",LOG ,3021,35,0,0,1,1,a427dbc7-94ec-4cc0-b4b9-af50e9ee94ad
+3057,Log-hewn,Hewn log,LGHW,3021,36,0,0,1,0,b5738e32-fee8-4c1c-a493-1e20ea23e2bd
+3058,Log-round,Round log,LGRO,3021,37,0,0,1,0,2467fb92-8f54-4d36-8b86-cc6869eda90f
+3059,Log-split,Split log,LGSP,3021,38,0,0,1,0,96c3a44f-bee1-4ba4-9f89-49068c9b0d40
+3060,Masonry veneer-artificial,Artificial masonry veneer,AMAV,3021,39,0,0,1,1,81206457-ad2d-4910-a0d4-67fea3b7bbde
+3061,Masonry-glazed,Glazed masonry,MAGL,3021,40,0,0,1,0,3f1d361c-75cf-425b-9bb1-a10a78773557
+3062,Metal,Metal,META,3021,41,0,0,1,1,26f75f8a-668c-47e1-a22b-9752ce80a34e
+3063,Metal-pressed,Pressed metal,PRME,3021,42,0,0,1,0,be99016d-23de-4582-9019-9ef87e60a70b
+3064,Mineral fiber cement,Mineral fiber cement,MFCE,3021,43,0,0,1,1,abc1b8f4-e73e-45a7-ae9e-97bc8c5a24c6
+3065,Molded concrete block,Concrete block-mold,COBM,3021,44,0,0,1,1,d2905799-525e-426f-b745-9ea31cf1f302
+3066,Narrow routed siding,Narrow routed siding,SDNR,3021,45,0,0,1,1,ed7fc137-3ba7-4128-8c7a-5f9fb66a9891
+3067,Novelty siding,Drop siding,SDDR,3021,46,0,0,1,0,d4876565-f734-4bd1-a626-3bd9eb1a5db6
+3068,Pebble dash,"Pebble dash / Artbrick, artstone",PEDA,3021,47,0,0,1,0,62f9cf51-ba74-497c-9302-9a146f2277d7
+3069,Pigmented structural glass,Pigmented structural glass,GLPS,3021,48,0,0,1,1,e17f9149-4735-48e9-822c-e7e2bd59ec9b
+3070,Plank-horizontal,Horizontal plank,PLHO,3021,49,0,0,1,0,6baa1555-72f3-4cd7-996d-1a0350ce07bd
+3071,Plank-vertical,Vertical plank,PLVE,3021,50,0,0,1,0,b4907d61-e3e7-4ef6-8324-f859290faee8
+3072,Plastic,Plastic,PLAS,3021,51,0,0,1,1,f0a0cfea-fbad-475d-b208-5c2ee49a85d0
+3073,Poured concrete,Concrete-poured,COPO,3021,52,0,0,1,0,971ff4f3-e367-4ed9-9e8e-f52cf70b9bdf
+3074,Poured tabby,Poured tabby,TABP,3021,53,0,0,1,1,6bbc3b94-498c-4348-9582-74d7080e8e31
+3075,Pre-cast concrete,Concrete-pre-cast,COPC,3021,54,0,0,1,0,ec4ed748-915a-4670-9d1c-a9017db6d079
+3076,Pressed metal,Pressed metal,PRME,3021,55,0,0,1,1,0da83fa1-834e-414d-bc5a-5a0e49c7f557
+3077,Pressed stone,Concrete block-mold,COBM,3021,56,0,0,1,0,e8f17500-8b2f-47ed-b530-f34dbe6c44df
+3078,Rolled asphalt,Rolled asphalt/Composition Roll,ROAS,3021,57,0,0,1,0,a42a021c-e395-42f5-abdf-e0a5a7a7e142
+3079,Round log,Round log,LGRO,3021,58,0,0,1,1,64550f14-3bb5-4bf7-b079-949d2a572d5a
+3080,Shingles-asbestos,Asbestos shingles or siding,SHAS,3021,59,0,0,1,1,3e4721e9-2093-4320-b02f-74fff91705b9
+3081,Shingles-wood,Wood shingles,SHWD,3021,60,0,0,1,0,053ac490-0f22-4262-bfec-f2fd87c7e660
+3082,Shiplap,Shiplap,SHIP,3021,61,0,0,1,1,cfe20e72-0ff6-411e-bc15-46c8c816f5d5
+3083,Siding-drop,Drop siding,SDDR,3021,62,0,0,1,0,0f92ad0b-2d7b-46d6-aa07-db0b40349ef8
+3084,Siding-narrow routed,Narrow routed siding,SDNR,3021,63,0,0,1,0,1e01c53b-4d15-443d-a025-e9d4f7eab16c
+3085,Siding-novelty,Drop siding,SDDR,3021,64,0,0,1,0,8797659b-1483-4258-ba1c-18bdca414a26
+3086,Split log,Split log,LGSP,3021,65,0,0,1,1,b6442ef3-55cd-41b8-aa1d-3debb041fd2a
+3087,Steel,Steel,STEE,3021,66,0,0,1,1,0769b053-e99f-4428-b441-65cc9c9da151
+3088,Stone,Stone,STON,3021,67,0,0,1,1,a4185775-a24b-4f2e-80f2-ab61fb256569
+3089,Structural glass-pigmented,Pigmented structural glass,GLPS,3021,68,0,0,1,0,bc956a82-fe39-43d5-a336-a78ddf5d2b42
+3090,Stucco,Stucco,STUC,3021,69,0,0,1,1,0eb14289-3f1a-4d24-807e-38cd7b4cc17d
+3091,Tabby brick,Tabby brick,TABB,3021,70,0,0,1,1,3f9b9e7d-b824-442e-97f2-1a4602bc41f0
+3092,Tabby-poured,Poured tabby,TABP,3021,71,0,0,1,0,32bfb1d5-4a97-4977-9924-09e7e6b34efa
+3093,Terra cotta,Terra cotta,TECO,3021,72,0,0,1,1,b87cdcce-261a-4954-af20-5b667ea36679
+3094,Vertical plank,Vertical plank,PLVE,3021,73,0,0,1,1,a9f95a32-e236-47bd-9f67-df9438723eca
+3095,Vinyl,Vinyl,VINY,3021,74,0,0,1,1,2dfa75f0-c2bf-4b3a-888b-2fbe90197f0b
+3096,Weatherboard,"Weatherboard, Clapboard",WTBD,3021,75,0,0,1,1,82cd1f80-189c-4b94-b47c-861cb30130b0
+3097,Weatherboard-beaded,"Weatherboard, Clapboard",WTBD,3021,76,0,0,1,0,689530ee-7f55-4bb6-85a6-501a6f8535c8
+3098,Window wall,Window wall,WINW,3021,77,0,0,1,1,e50fccab-6eb2-442c-bfdb-a832b78da484
+3099,Wood shingles,Wood shingles,SHWD,3021,78,0,0,1,1,2ce5b3fe-a050-49d9-b62e-ce5ae54fdc85
+3100,Wood siding,Wood siding,SDW ,3021,79,0,0,1,1,5387c18f-9293-469c-afdb-cf63a45b22db
+3101,Wood/Plywood,Wood/plywood,WOOD,3021,80,0,0,1,1,c3b9eadf-75e8-4434-95ee-fc909ae6b116
+3102,Other,Other,OTHR,3021,81,0,0,1,1,549e5603-4e26-4d0c-be56-198823853685
+3103,Unknown,Unknown,UNKN,3021,82,0,0,1,1,eb97a318-f6c6-4bdb-b0e8-e9b8b1068d87
+3104,Shingles-unspecified,"Shingles, asphalt (or unspecified)",SHIN,3021,83,0,0,1,0,f3338a24-b8ed-4c68-8d60-a3cabb7844aa
+3105,Tar paper,Tar paper,TARP,3021,84,0,0,1,1,549e73b3-ad3a-46e6-b918-40a6954674cf
+3106,Not applicable,Not applicable,NA  ,3021,85,0,0,1,1,58a1b737-a876-4106-9732-68ee92533c86
+3107,Shingles-slate,Slate shingles,SHSL,3021,86,0,0,1,0,0bae7f37-df23-4c37-889d-c517599ed619
+3108,Slate shingles,Slate shingles,SHSL,3021,87,0,0,1,1,eab0b798-1111-480a-bfb5-cb2a02822f41
+3109,Unspecified,Not specified by surveyor,UNSP,3021,88,1,0,1,1,a70d5d7d-40a6-4c9d-9ea8-7894efee5f8a
+3110,Asphalt shingles,"Shingles, asphalt (or unspecified)",SHIN,3021,89,0,0,1,1,5352f432-693b-4d19-97c9-a060e0283746
+3111,Shingles-asphalt,"Shingles, asphalt (or unspecified)",SHIN,3021,90,0,0,1,0,69f6a270-fdd0-4049-86e6-d27d935b1609
+3112,Composition Board,Composition Board,COBD,3021,91,0,0,1,1,cb12e62d-f054-4ed3-91fa-b467e875b4e0
+3113,Composition Roll,Rolled asphalt/Composition Roll,ROAS,3021,92,0,0,1,1,f7bdc456-ce38-4a65-a11e-eb156bbf044b
+3114,Random Ashlar,Stone,STON,3021,93,0,0,1,0,1becf6fd-1361-4fc7-a0d2-600bb489e0fa

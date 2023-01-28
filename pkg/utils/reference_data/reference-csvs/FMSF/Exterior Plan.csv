@@ -1,0 +1,18 @@
+4164,_,NULL VALUE,NULL,3004,0,0,0,1,1,029fcd8c-c863-44e1-9fd1-fc05fe4cc0a5
+3005,Central Block Symmetric Wings,Central Block-Symm Wings,BLKW,3004,1,0,0,1,1,11c64cef-c8e1-418b-a9dd-7b15d54fd2a3
+3006,"Central Block, 1 wing",Central Block-1 wing,BLK1,3004,2,0,0,1,1,93dd1beb-00e4-4323-97b7-2129d845175c
+3007,Greek cross,Greek Cross,GRCR,3004,3,0,0,1,1,335ba39f-2432-4b8c-bcc7-59820c5e0902
+3008,Irregular,Irregular,IRRE,3004,4,0,0,1,1,8a691541-cf98-4791-a7de-582ded02826d
+3009,L-shaped,L-shaped,LSHP,3004,5,0,0,1,1,3f279b17-9700-4a66-9120-b9b2cf67bd80
+3010,Latin cross,Latin Cross,LACR,3004,6,0,0,1,1,a79ec2eb-8437-4037-97cd-3be8c980700a
+3011,Rectangular,Rectangular,RECT,3004,7,0,0,1,1,5af43a54-b150-49e8-aa54-1414b8c21dcf
+3012,Square,Square,SQAR,3004,8,0,0,1,1,0fb31cd2-e9d4-4166-9a03-8a0305359246
+3013,T-shaped,T-shaped,TSHP,3004,9,0,0,1,1,624c5077-f9fc-4be9-9383-e84298c69755
+3014,U-shaped,U-shaped,USHP,3004,10,0,0,1,1,24211ab3-0cd0-4449-bd0e-bfc57919dd74
+3015,Other,Other,OTHR,3004,11,0,0,1,1,798fb8a5-d142-4f56-9c02-357d7285a0fc
+3016,E-shaped,E-shaped,ESHP,3004,12,0,0,1,1,2e05bbcd-00e9-4f0e-b008-b7f4c65efec5
+3017,I-shaped,I-shaped,ISHP,3004,13,0,0,1,1,84ff1115-0936-47f0-9e97-24e2e1c4c01c
+3018,Not applicable,Not Applicable,NA  ,3004,14,1,0,1,1,885b5ac8-f840-4e01-bdc3-b5dec4ff65a2
+3019,Unspecified,Unspecified,UNSP,3004,15,1,0,1,1,b37ad483-7abb-4710-9a77-fd345c72fe33
+3020,Octagonal,Octagonal,OCTA,3004,16,0,0,1,1,3ea1162c-f664-453a-a911-2636bd12ed4a
+4050,Circular,Round or Circular,CIRC,3004,17,0,0,1,1,6babbb0d-551f-4e64-8422-a5fe780337a8

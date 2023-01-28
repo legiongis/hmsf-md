@@ -1,0 +1,10 @@
+1255,YES,Eligible for NRHP,YES ,1254,1,0,0,1,1,1627475a-7024-458f-969a-b5f362e42b7a
+1256,NO,Ineligible for NRHP,NO  ,1254,2,0,0,1,1,13f73c4d-0ee5-4ae5-85db-711dfa485eb0
+1257,LIKELY,Likely NRHP Eligible,LIKE,1254,3,1,0,1,1,8e3ea7d4-fe97-4730-8bfc-a394b331eaae
+1258,INSUFF. INFO,Insufficient Information,INSF,1254,4,0,0,1,1,0829d0b9-e5e6-447d-8142-222f2cee9d0b
+1259,UNSP,Not Evaluated by Recorder,UNSP,1254,5,1,0,1,1,3efeb161-f641-49a3-9766-165f63b67674
+1260,More Work Recommended,More Work Recommended,WKYE,1254,6,1,0,1,1,fc08eb70-76f0-4925-987e-5c5c62bfa8ee
+1261,No Further Work Recommd,No Further Work Recommended,WKNO,1254,7,1,0,1,1,74f73031-6492-422b-a61a-93468b174da3
+1262,Preservation Recommended,Preservation Recommended,PRYE,1254,8,1,0,1,1,a9e8d64c-b898-496f-83f0-1f8d44173805
+1263,Presrvtn Not Recommended,Preservation Not Recommended,PRNO,1254,9,1,0,1,1,5cafb5b6-e6d3-4a85-95b7-fac044b16c1a
+3831,Not Evaluated,Not Evaluated by Recorder,NOEV,1254,10,1,0,0,1,8fc65259-4789-4ed7-b386-89d26c99a6dd

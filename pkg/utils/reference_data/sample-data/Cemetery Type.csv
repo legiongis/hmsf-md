@@ -1,0 +1,16 @@
+3439,Community,Community cemetery,COMM,3438,1,0,0,1,1,5e4aa702-bf3d-45d8-b82d-05311b90bcc7
+3440,Company Town,Company town cemetery,COMP,3438,2,0,0,1,1,08440c46-bf1a-48e9-a815-09f4805593d9
+3441,Epidemic,Cemetery used for victims of an epidemic,EPID,3438,3,0,0,1,1,73b85b62-3cc3-4332-a8a5-bb7e6159e06f
+3442,Family,Family cemetery,FMLY,3438,4,0,0,1,1,275fc25a-c4f8-41bc-936a-302e40f123f9
+3443,Fraternal Order,Cemetery used for members of a fraternal order,FRAT,3438,5,0,0,1,1,80205da3-a1b0-407b-91f5-374e174d485e
+3444,Memorial Park,Cemetery that is also a memorial park,MEMO,3438,6,0,0,1,1,c566bbb2-61b6-4308-a047-4b50682792f1
+3445,Military,Military (not-national) cemetery,MILI,3438,7,0,0,1,1,0b2a5887-1143-4425-a404-e9ec449f54b2
+3446,Municipal,Municipal cemetery,MUNI,3438,8,0,0,1,1,7a63961d-1a58-407d-a7a3-1b2364805094
+3447,National,National cemetery,NTNL,3438,9,0,0,1,1,83cfc18d-52a7-4277-9489-b50f9dc3ad1b
+3448,Potters Field,Potters Field; cemetery used to bury destitute,POTT,3438,10,0,0,1,1,1ac15098-9ccf-48dc-9c1a-1ed2175453df
+3449,Prison,Prison cemetery,PRIS,3438,11,0,0,1,1,30e2c89f-0978-4c40-8266-d09225dda29f
+3450,Religious,Cemetery associated with a religion or church,RELI,3438,12,0,0,1,1,761947b2-1dad-4a46-8258-7f5fd01b2e04
+3451,Rural Movement,Cemetery that was a part of the Rural Movement,RURL,3438,13,0,0,1,1,0179a6e4-5ca6-416e-b0fd-1e2a24ded37d
+3452,Other,"Other, please explain in field directly below",OTHR,3438,14,0,0,1,1,a2689d0f-2ad3-41f3-b6f3-bbe0c8769adb
+3453,Unknown,Unknown cemetery type,UNKN,3438,15,0,0,1,1,e6ea5a68-fab4-4cb3-bee3-6b8b6d54a83b
+3454,Unspecified,Unspecified by surveyor,UNSP,3438,16,1,0,1,1,73fbdbfe-ca19-468d-b2e7-9aec7ec394f7

@@ -1,0 +1,156 @@
+{
+    "version": 8,
+    "name": "FPAN Regions",
+    "metadata": {
+        "mapbox:autocomposite": true,
+        "mapbox:type": "template",
+        "mapbox:sdk-support": {
+            "js": "1.6.0",
+            "android": "8.6.0",
+            "ios": "5.6.0"
+        },
+        "mapbox:groups": {},
+        "mapbox:uiParadigm": "layers"
+    },
+    "center": [-81.9003650562388, 27.999210556040396],
+    "zoom": 6.161958354762373,
+    "bearing": 0,
+    "pitch": 0,
+    "sources": {
+        "composite": {
+            "url": "mapbox://hmsflorida.4g5n54ru,hmsflorida.d3l744op",
+            "type": "vector"
+        }
+    },
+    "sprite": "mapbox://sprites/hmsflorida/ck8yzb8oo02el1jp6favnyhlc/ck2u8j60r58fu0sgyxrigm3cu",
+    "glyphs": "mapbox://fonts/hmsflorida/{fontstack}/{range}.pbf",
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "paint": {"background-color": "rgba(0,0,0,0)"}
+        },
+        {
+            "id": "fpan-regions-general-0a6tjc",
+            "type": "fill",
+            "source": "composite",
+            "source-layer": "FPAN_Regions_general-0a6tjc",
+            "layout": {},
+            "paint": {
+                "fill-color": [
+                    "case",
+                    ["match", ["get", "FPANRegion"], ["Central"], true, false],
+                    "hsl(52, 88%, 55%)",
+                    [
+                        "match",
+                        ["get", "FPANRegion"],
+                        ["Northwest"],
+                        true,
+                        false
+                    ],
+                    "hsl(183, 76%, 34%)",
+                    [
+                        "match",
+                        ["get", "FPANRegion"],
+                        ["North Central"],
+                        true,
+                        false
+                    ],
+                    "hsl(124, 57%, 33%)",
+                    [
+                        "match",
+                        ["get", "FPANRegion"],
+                        ["Northeast"],
+                        true,
+                        false
+                    ],
+                    "hsl(0, 75%, 38%)",
+                    [
+                        "match",
+                        ["get", "FPANRegion"],
+                        ["East Central"],
+                        true,
+                        false
+                    ],
+                    "hsl(301, 36%, 49%)",
+                    [
+                        "match",
+                        ["get", "FPANRegion"],
+                        ["Southwest"],
+                        true,
+                        false
+                    ],
+                    "hsl(236, 82%, 28%)",
+                    [
+                        "match",
+                        ["get", "FPANRegion"],
+                        ["West Central"],
+                        true,
+                        false
+                    ],
+                    "hsl(20, 71%, 51%)",
+                    [
+                        "match",
+                        ["get", "FPANRegion"],
+                        ["Southwest", "Southeast"],
+                        true,
+                        false
+                    ],
+                    "hsl(180, 74%, 54%)",
+                    "#000000"
+                ],
+                "fill-opacity": 0.56
+            }
+        },
+        {
+            "id": "fpan-region-labels-5myq58",
+            "type": "symbol",
+            "source": "composite",
+            "source-layer": "FPAN_Region_Labels-5myq58",
+            "layout": {
+                "text-field": ["to-string", ["get", "FPANRegion"]],
+                "text-anchor": [
+                    "match",
+                    ["get", "FPANRegion"],
+                    ["East Central"],
+                    "bottom",
+                    "center"
+                ],
+                "text-offset": [
+                    "match",
+                    ["get", "FPANRegion"],
+                    ["Southeast"],
+                    ["literal", [0, 3]],
+                    ["Northeast"],
+                    ["literal", [-0.5, 0]],
+                    ["East Central"],
+                    ["literal", [0, 0]],
+                    ["literal", [0, 0]]
+                ],
+                "symbol-avoid-edges": true,
+                "text-max-width": [
+                    "match",
+                    ["get", "FPANRegion"],
+                    ["East Central"],
+                    5,
+                    10
+                ],
+                "text-justify": [
+                    "match",
+                    ["get", "FPANRegion"],
+                    ["East Central"],
+                    "left",
+                    "center"
+                ],
+                "text-font": ["Rubik Medium", "Arial Unicode MS Regular"]
+            },
+            "paint": {"text-color": "hsl(0, 8%, 16%)"}
+        }
+    ],
+    "created": "2020-04-13T21:18:22.028Z",
+    "id": "ck8yzb8oo02el1jp6favnyhlc",
+    "modified": "2020-04-16T18:09:41.437Z",
+    "owner": "hmsflorida",
+    "visibility": "private",
+    "draft": false
+}

@@ -1,0 +1,46 @@
+4169,_,NULL VALUE,NULL,1714,0,0,0,1,1,c72aec3b-3695-4dcd-b92a-06be4db38e86
+1715,Balloon wood frame,Balloon wood frame,WFBL,1714,1,0,0,1,1,cb1da90b-ff15-49ac-a8f3-73cccfd80d1e
+1716,Braced wood frame,Braced wood frame,WFBR,1714,2,0,0,1,1,73a74152-b4b2-4ada-8039-7bdadc7cd5a5
+1717,Brick,Brick,BRIC,1714,3,0,0,1,1,9e08dcf8-5520-456b-84ae-56969278ffd4
+1718,Butt joint log,Butt joint log,LGBJ,1714,4,0,0,1,1,69a34b1b-acd4-4d2b-864a-b26777952d7b
+1719,Cast iron skeleton,Cast iron skeleton,SKCI,1714,5,0,0,1,1,40689163-471b-46e2-8a8b-d1a87cb3fb85
+1720,Cast-in-place concrete,Cast-in-place concrete,CNCP,1714,6,0,0,1,1,61045cd1-7400-4be1-a09e-c4b05744a515
+1721,Concrete,Concrete,CONC,1714,7,0,0,1,1,dce34ac6-ef86-47fb-850f-cf01407f8fe5
+1722,Concrete block,Concrete block,CONB,1714,8,0,0,1,1,81e5c5ec-10f1-45b4-b8cd-c05b3eb918a3
+1723,Coquina block,Coquina block,COQB,1714,9,0,0,1,1,5bc4e018-8ae2-4b26-a07d-d1838e6e0a99
+1724,Dovetail log,Dovetail log,LGDV,1714,10,0,0,1,1,c62dd5a1-f9d5-478b-9d17-2d6a70bdaf4f
+1725,Glued-lam wood/plywood,Glued-laminated wood/plywood,GLUL,1714,11,0,0,1,1,7fe833a6-72db-49c8-b886-a72e84a81e99
+1726,Glued-laminated,Glued-laminated wood/plywood,GLUL,1714,12,0,0,1,0,baf64e04-4954-4834-805f-e6fb0146125e
+1727,Heavy timber,Braced wood frame,WFBR,1714,13,0,0,1,0,5067099b-b37d-4220-9d73-23cbe487117f
+1728,Hollow clay tile,Structural clay tile,STCT,1714,14,0,0,1,0,ed1d18b7-24db-4246-9d08-566c922401d9
+1729,Laminated Wood,Glued-laminated wood/plywood,GLUL,1714,15,0,0,1,0,3a31bd06-c851-455e-9240-621362691c60
+1730,Lapped log,Lapped log,LGLP,1714,16,0,0,1,1,b7970eeb-af8e-4c6e-9e5d-aa956c7ff88a
+1731,Light wood frame,Light wood frame,WFLT,1714,17,0,0,1,1,67288733-3599-4302-9ec6-5374078dba6c
+1732,Log,Log,LG  ,1714,18,0,0,1,1,cd0b8181-52cf-4e55-8041-f0dcc9cfbe62
+1733,Masonry - General,Masonry,MASO,1714,19,0,0,1,1,13c48c95-aa75-4be1-a3ec-217a93b2ef4e
+1734,Metal skeleton,Metal skeleton,SKME,1714,20,0,0,1,1,fc47e24f-65a8-4301-bf07-f99490c53380
+1735,Plank wall,Plank wall,PLKW,1714,21,0,0,1,1,8137c015-02b9-4524-9fee-63a428d4d6ef
+1736,Platform wood frame,Platform wood frame,WFPL,1714,22,0,0,1,1,4775d11f-d47a-4636-9baa-c76c01aee4f5
+1737,Post and beam,Braced wood frame,WFBR,1714,23,0,0,1,0,1e1b3de6-2f2c-4215-af54-a28f8cb20f0b
+1738,Pre-cast concrete,Pre-cast concrete,CNPC,1714,24,0,0,1,1,93e21ecf-a6f7-4c7a-9aee-cf2e07180e5d
+1739,Reinforced concrete,Reinforced concrete,CNRE,1714,25,0,0,1,1,573e2bab-4513-41e0-8d76-ac2a7f0b0f06
+1740,Retaining wall,Retaining wall,RETW,1714,26,0,0,1,1,3de5c921-671b-486a-b5ce-2a76b1fcb87a
+1741,Saddle notched log,Saddle notched log,LGSN,1714,27,0,0,1,1,cf0cf685-1bac-45a2-9fda-75ded35285f1
+1742,Skeleton-cast iron,Cast iron skeleton,SKCI,1714,28,0,0,1,0,f8997334-0393-4814-a8e3-1e82d743185e
+1743,Skeleton-metal,Metal skeleton,SKME,1714,29,0,0,1,0,e975ce5b-f621-4a1d-a58d-85b478f21f33
+1744,Skeleton-steel,Steel skeleton,SKST,1714,30,0,0,1,0,85098196-15a4-4969-b736-8930342739ac
+1745,Skeleton-wrought iron,Wrought iron skeleton,SKWI,1714,31,0,0,1,0,76e34f17-22f0-4878-a544-a81161bcadde
+1746,Space frame,Space frame,SPFR,1714,32,0,0,1,1,52dba2c4-9a66-4b86-8bed-0d4848a12044
+1747,Steel skeleton,Steel skeleton,SKST,1714,33,0,0,1,1,d48d9573-2af2-43aa-8b09-d889fe90c50f
+1748,Stone,Stone,STON,1714,34,0,0,1,1,a9e58a4b-dbb9-4f44-bb39-4ed221247e50
+1749,Structural clay tile,Structural clay tile,STCT,1714,35,0,0,1,1,2051c4e3-63f9-4610-b24c-3997bf8e29f7
+1750,Tabby poured,Tabby poured,TABB,1714,36,0,0,1,1,da790481-c005-48ee-bfbf-6cd510c07956
+1751,Tensile,Tensile,TENS,1714,37,0,0,1,1,21cf2215-ab86-4a97-a42e-104a73a28901
+1752,Tongue & groove log,Tongue-and-groove log,LGTG,1714,38,0,0,1,1,04adf5f0-f788-454f-a1b9-1bf61080dd6d
+1753,V-notched log,V-notched log,LGVN,1714,39,0,0,1,1,7914a0db-90b0-4c7f-82c8-1c01d00eed12
+1754,Wood frame,Wood frame,WF  ,1714,40,0,0,1,1,52892f43-e2e8-4d99-b718-3275dc56219a
+1755,Wrought iron skeleton,Wrought iron skeleton,SKWI,1714,41,0,0,1,1,64bc0f7e-822e-4008-b3e2-029fd6bc8138
+1756,Other,Other,OTHR,1714,42,0,0,1,1,48a4d445-27fc-40a3-8b92-ad3b008dbcad
+1757,Unknown,"Unknown, as specified by documenter",UNKN,1714,43,0,0,1,1,f5a7e45c-fd33-4f70-83da-7b9466159c48
+1758,Not applicable,Not applicable,NA  ,1714,44,0,0,1,1,105bcc83-d468-4483-a008-e51ea63df548
+1759,Unspecified,Not specified by surveyor,UNSP,1714,45,1,0,1,1,3fdd8189-753a-4b6c-b68b-33aee0f178c8
