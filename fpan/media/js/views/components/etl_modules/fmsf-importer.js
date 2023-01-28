@@ -21,6 +21,7 @@ define([
             this.resourceType = ko.observable("");
             this.truncate = ko.observable(0);
             this.dryRun = ko.observable(false);
+            this.onlySiteIdList = ko.observable(false);
             this.loadDescription = ko.observable("");
 
             this.moduleId = params.etlmoduleid;
@@ -52,6 +53,7 @@ define([
                 self.formData.append("resourceType", self.resourceType())
                 self.formData.append("truncate", self.truncate())
                 self.formData.append("dryRun", self.dryRun())
+                self.formData.append("onlySiteIdList", self.onlySiteIdList())
                 self.formData.append("loadDescription", self.loadDescription())
                 const response = await self.submit('run_web_import');
                 self.loading(false);

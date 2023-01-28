@@ -483,7 +483,7 @@ class FMSFImporter(BaseImportModule):
         result.stop_timer()
         return result
 
-    def apply_historical_structures_filter(self):
+    def apply_historical_structures_filter(self, only_extra_ids=False):
 
         with connection.cursor() as cursor:
             cursor.execute(
@@ -503,13 +503,16 @@ class FMSFImporter(BaseImportModule):
         )
 
         extra_ids = []
-        extra_structures_csv = Path(self.file_dir, "extra-structures.csv")
+        extra_structures_csv = Path(self.file_dir, "extra-structure-ids.csv")
+        print(extra_structures_csv)
         if extra_structures_csv.is_file():
+            print("using provided file")
             with open(extra_structures_csv, "r") as openf:
                 reader = csv.reader(openf)
                 next(reader)
                 for row in reader:
                     extra_ids.append(row[0])
+        print("extra ids:", extra_ids)
 
         extra_list, lighthouse_list, geom_list = [], [], []
         for feature in self.new_features:
@@ -517,6 +520,8 @@ class FMSFImporter(BaseImportModule):
             # include any special ids
             if siteid in extra_ids:
                 extra_list.append(siteid)
+                continue
+            elif only_extra_ids:
                 continue
             # skip structure marked as destroyed
             if _feature_is_destroyed(feature):
@@ -529,17 +534,16 @@ class FMSFImporter(BaseImportModule):
                 geom_list.append((siteid, feature.geom.wkt))
 
         # CREATE AND RUN GEOMETRY FILTER AGAINST SELECTED MANAGEMENT AREAS
-        logger.debug("unioning Management Areas")
-        nr_qry = Q(load_id="nr-districts-Sept2022")
-        sp_qry = Q(management_agency__name="Florida State Parks")
-        filter_areas = ManagementArea.objects.filter(nr_qry | sp_qry)
-        filter_areas = ManagementArea.objects.all()
-        union_results = filter_areas.aggregate(Union('geom'))
-        union_geom = union_results['geom__union']
-        logger.debug("union geom created")
-
         geom_matches = []
+        union_geom = None
         if len(geom_list) > 0:
+            logger.debug("unioning Management Areas")
+            filter_areas = ManagementArea.objects.exclude(category__name__in=["FPAN Region", "County"])
+            filter_areas = ManagementArea.objects.filter(pk=352)
+            union_results = filter_areas.aggregate(Union('geom'))
+            union_geom = union_results['geom__union']
+            logger.debug("union geom created")
+
             values_str = ", ".join([f"('{i[0]}', '{i[1]}')" for i in geom_list])
             with connection.cursor() as cursor:
                 logger.debug(f"generate table of structure geoms. geom ct: {len(geom_list)}")
@@ -563,6 +567,7 @@ class FMSFImporter(BaseImportModule):
             logger.debug(f"intersect complete, {len(geom_matches)} matching features.")
 
         use_list = set(lighthouse_list + geom_matches + extra_list)
+        print("using these ids: ", use_list)
 
         original_ct = len(self.new_features)
 
@@ -775,7 +780,7 @@ class FMSFImporter(BaseImportModule):
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET (status) = (%s) WHERE loadid = %s""", ("indexing", self.loadid),
+                    """UPDATE load_event SET status = %s WHERE loadid = %s""", ("indexing", self.loadid),
                 )
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
@@ -805,6 +810,7 @@ class FMSFImporter(BaseImportModule):
         truncate = request.POST.get('truncate')
         dry_run = request.POST.get('dryRun')
         description = request.POST.get('loadDescription')
+        only_extra_ids = request.POST.get('onlySiteIdList')
         self.resource_type = resource_type
         if truncate == "0":
             truncate = None
@@ -813,7 +819,7 @@ class FMSFImporter(BaseImportModule):
         else:
             dry_run = False
 
-        run_fmsf_import_as_task.delay(self.loadid, resource_type, truncate=truncate, dry_run=dry_run, description=description)
+        run_fmsf_import_as_task.delay(self.loadid, resource_type, truncate=truncate, dry_run=dry_run, description=description, only_extra_ids=only_extra_ids)
 
         reporter.message = "import task submitted"
         return reporter.serialize()
@@ -838,7 +844,7 @@ class FMSFImporter(BaseImportModule):
 
         return result
 
-    def run_sequence(self, resource_type, truncate=None, dry_run=False, file_dir=None, description=""):
+    def run_sequence(self, resource_type, truncate=None, dry_run=False, file_dir=None, description="", only_extra_ids=False):
 
         reporter = ETLOperationResult(
             inspect.currentframe().f_code.co_name,
@@ -881,7 +887,7 @@ class FMSFImporter(BaseImportModule):
 
         # RUN FILTERS ON THE STRUCTURES, IF NECESSARY
         if self.resource_type == "Historic Structure":
-            result = self.apply_historical_structures_filter()
+            result = self.apply_historical_structures_filter(only_extra_ids=only_extra_ids)
             reporter.data.update(result.data)
             if result.success is False:
                 self.abort_load(message="All sites in this upload already exist in the HMS database.", details=result.data)
