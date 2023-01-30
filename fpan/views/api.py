@@ -1,8 +1,7 @@
 import logging
-from psycopg2 import sql
 from django.core.cache import cache
-from django.http import Http404, HttpResponse, HttpResponseForbidden
-from django.db import transaction, connection
+from django.http import Http404, HttpResponse
+from django.db import connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
 from arches.app.views.api import APIBase
@@ -48,101 +47,176 @@ class MVT(APIBase):
             #     # ST_SetSRID({geom}, 4236)
             #     resid_where = f"ST_Intersects(geom, ST_Transform('{geom}', 3857))"
 
+            query_params = {
+                'nodeid': nodeid,
+                'zoom': zoom,
+                'x': x,
+                'y': y,
+            }
+
             graphid = str(node.graph_id)
             rule = RuleFilter().compile_rules(request.user, graphids=[graphid], single=True)
-            if rule.type == "full_access":
-                resid_where = "NULL IS NULL"
-            elif rule.type == "no_access":
+            full_access = False
+            if rule.type == "no_access":
                 return self.EMPTY_TILE
+            elif rule.type == "full_access":
+                full_access = True
             else:
                 resids = RuleFilter().get_resources_from_rule(rule, ids_only=True)
+                # if there are not sites this user can view, return and empty tile before
+                # creating a db connection
                 if len(resids) == 0:
                     return self.EMPTY_TILE
-                resid_str = "','".join([str(i) for i in resids])
-                resid_where = f"resourceinstanceid IN ('{resid_str}')"
+                # otherwise, add the list of valid ids to query params to be used below
+                query_params['valid_resids'] = tuple(resids)
 
             with connection.cursor() as cursor:
 
-                query_params = {
-                    'nodeid': nodeid,
-                    'zoom': zoom,
-                    'x': x,
-                    'y': y,
-                    'resid_where': resid_where,
-                }
-
                 if int(zoom) <= int(config["clusterMaxZoom"]):
                     arc = self.EARTHCIRCUM / ((1 << int(zoom)) * self.PIXELSPERTILE)
-                    distance = arc * int(config["clusterDistance"])
-                    min_points = int(config["clusterMinPoints"])
+                    # add some extra query_params to support clustering
+                    query_params['distance'] = arc * int(config["clusterDistance"])
+                    query_params['min_points'] = int(config["clusterMinPoints"])
 
-                    query_params['distance'] = distance
-                    query_params['min_points'] = min_points
+                    if full_access:
+                        # run the basic cluster request and return ALL resources
+                        cursor.execute(
+                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                            AS (
+                                SELECT m.*,
+                                ST_ClusterDBSCAN(geom, eps := %(distance)s, minpoints := %(min_points)s) over () AS cid
+                                FROM (
+                                    SELECT tileid,
+                                        resourceinstanceid,
+                                        nodeid,
+                                        geom
+                                    FROM geojson_geometries
+                                    WHERE nodeid = %(nodeid)s
+                                ) m
+                            )
 
-                    cursor.execute(
-                        """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
-                        AS (
-                            SELECT m.*,
-                            ST_ClusterDBSCAN(geom, eps := {distance}, minpoints := {min_points}) over () AS cid
-                            FROM (
-                                SELECT tileid,
-                                    resourceinstanceid,
-                                    nodeid,
-                                    geom
-                                FROM mv_geojson_geoms
-                                WHERE nodeid = '{nodeid}' AND {resid_where}
-                            ) m
+                            SELECT ST_AsMVT(
+                                tile,
+                                %(nodeid)s,
+                                4096,
+                                'geom',
+                                'id'
+                            ) FROM (
+                                SELECT resourceinstanceid::text,
+                                    row_number() over () as id,
+                                    1 as total,
+                                    ST_AsMVTGeom(
+                                        geom,
+                                        TileBBox(%(zoom)s, %(x)s, %(y)s, 3857)
+                                    ) AS geom,
+                                    '' AS extent
+                                FROM clusters
+                                WHERE cid is NULL
+                                UNION
+                                SELECT NULL as resourceinstanceid,
+                                    row_number() over () as id,
+                                    count(*) as total,
+                                    ST_AsMVTGeom(
+                                        ST_Centroid(
+                                            ST_Collect(geom)
+                                        ),
+                                        TileBBox(%(zoom)s, %(x)s, %(y)s, 3857)
+                                    ) AS geom,
+                                    ST_AsGeoJSON(
+                                        ST_Extent(geom)
+                                    ) AS extent
+                                FROM clusters
+                                WHERE cid IS NOT NULL
+                                GROUP BY cid
+                            ) as tile;""",
+                            query_params,
                         )
+                    else:
+                        # if not full access, add a WHERE clause to only return resources in the valid_resids list
+                        cursor.execute(
+                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                            AS (
+                                SELECT m.*,
+                                ST_ClusterDBSCAN(geom, eps := %(distance)s, minpoints := %(min_points)s) over () AS cid
+                                FROM (
+                                    SELECT tileid,
+                                        resourceinstanceid,
+                                        nodeid,
+                                        geom
+                                    FROM geojson_geometries
+                                    WHERE nodeid = %(nodeid)s AND resourceinstanceid IN %(valid_resids)s
+                                ) m
+                            )
 
-                        SELECT ST_AsMVT(
-                            tile,
-                             '{nodeid}',
-                            4096,
-                            'geom',
-                            'id'
-                        ) FROM (
-                            SELECT resourceinstanceid::text,
-                                row_number() over () as id,
-                                1 as total,
+                            SELECT ST_AsMVT(
+                                tile,
+                                %(nodeid),
+                                4096,
+                                'geom',
+                                'id'
+                            ) FROM (
+                                SELECT resourceinstanceid::text,
+                                    row_number() over () as id,
+                                    1 as total,
+                                    ST_AsMVTGeom(
+                                        geom,
+                                        TileBBox(%(zoom)s, %(x)s, %(y)s, 3857)
+                                    ) AS geom,
+                                    '' AS extent
+                                FROM clusters
+                                WHERE cid is NULL
+                                UNION
+                                SELECT NULL as resourceinstanceid,
+                                    row_number() over () as id,
+                                    count(*) as total,
+                                    ST_AsMVTGeom(
+                                        ST_Centroid(
+                                            ST_Collect(geom)
+                                        ),
+                                        TileBBox(%(zoom)s, %(x)s, %(y)s, 3857)
+                                    ) AS geom,
+                                    ST_AsGeoJSON(
+                                        ST_Extent(geom)
+                                    ) AS extent
+                                FROM clusters
+                                WHERE cid IS NOT NULL
+                                GROUP BY cid
+                            ) AS tile;""",
+                            query_params,
+                        )
+                else:
+                    if full_access is True:
+                        # run the basic request and return ALL resources
+                        cursor.execute(
+                            f"""SELECT ST_AsMVT(tile, %(nodeid)s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                                id,
+                                resourceinstanceid,
+                                nodeid,
                                 ST_AsMVTGeom(
                                     geom,
-                                    TileBBox({zoom}, {x}, {y}, 3857)
+                                    TileBBox(%(zoom)s, %(x)s, %(y)s, 3857)
                                 ) AS geom,
-                                '' AS extent
-                            FROM clusters
-                            WHERE cid is NULL
-                            UNION
-                            SELECT NULL as resourceinstanceid,
-                                row_number() over () as id,
-                                count(*) as total,
+                                1 AS total
+                            FROM geojson_geometries
+                            WHERE nodeid = %(nodeid)s) AS tile;""",
+                            query_params
+                        )
+                    else:
+                        # add a WHERE clause to only return resources in the valid_resids list
+                        cursor.execute(
+                            f"""SELECT ST_AsMVT(tile, %(nodeid)s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                                id,
+                                resourceinstanceid,
+                                nodeid,
                                 ST_AsMVTGeom(
-                                    ST_Centroid(
-                                        ST_Collect(geom)
-                                    ),
-                                    TileBBox({zoom}, {x}, {y}, 3857)
+                                    geom,
+                                    TileBBox(%(zoom)s, %(x)s, %(y)s, 3857)
                                 ) AS geom,
-                                ST_AsGeoJSON(
-                                    ST_Extent(geom)
-                                ) AS extent
-                            FROM clusters
-                            WHERE cid IS NOT NULL
-                            GROUP BY cid
-                        ) as tile;""".format(**query_params)
-                    )
-                else:
-                    cursor.execute(
-                        """SELECT ST_AsMVT(tile, '{nodeid}', 4096, 'geom', 'id') FROM (SELECT tileid,
-                            row_number() over () as id,
-                            resourceinstanceid,
-                            nodeid,
-                            ST_AsMVTGeom(
-                                geom,
-                                TileBBox({zoom}, {x}, {y}, 3857)
-                            ) AS geom,
-                            1 AS total
-                        FROM mv_geojson_geoms
-                        WHERE nodeid = '{nodeid}' AND {resid_where}) AS tile;""".format(**query_params)
-                    )
+                                1 AS total
+                            FROM geojson_geometries
+                            WHERE nodeid = %(nodeid)s AND resourceinstanceid IN %(valid_resids)s) AS tile;""",
+                            query_params
+                        )
                 tile = bytes(cursor.fetchone()[0])
                 cache.set(cache_key, tile, settings.TILE_CACHE_TIMEOUT)
 
