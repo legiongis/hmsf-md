@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from fpan.utils.testing import create_mock_landmanagers, create_mock_scout_accounts
+from hms.tests.helpers import create_mock_landmanagers, create_mock_scout_accounts
 
 class Command(BaseCommand):
 

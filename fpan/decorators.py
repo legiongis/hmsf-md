@@ -8,7 +8,7 @@ from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 
 from fpan.search.components.rule_filter import RuleFilter
-from fpan.utils.permission_backend import user_is_land_manager
+from hms.permissions_backend import user_is_land_manager
 
 logger = logging.getLogger(__name__)
 

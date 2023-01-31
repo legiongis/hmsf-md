@@ -1,9 +1,20 @@
+import six
 import random
 import string
 import logging
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 logger = logging.getLogger(__name__)
+
+
+class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
+
+    def _make_hash_value(self, user, timestamp):
+        return (six.text_type(user.pk) 
+                + six.text_type(timestamp)) + six.text_type(user.is_active)
+
+account_activation_token = AccountActivationTokenGenerator()
 
 def check_duplicate_username(newusername):
     chars = ["'", "-", "\"", "_", ".", " "]

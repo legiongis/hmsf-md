@@ -1,29 +1,191 @@
 import csv
+import logging
 from datetime import datetime
+
 from django.conf import settings
-from django.shortcuts import render, HttpResponse
 from django.core.mail import EmailMultiAlternatives
-from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
+from django.http import HttpResponseServerError
+from django.shortcuts import render, redirect, HttpResponse
+from django.template import RequestContext
+from django.template.loader import render_to_string, get_template
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.template.loader import render_to_string
+from django.utils.translation import ugettext as _
+from django.urls import reverse
+from django.views.generic import View
 
 from arches.app.utils.response import JSONResponse
 from arches.app.models.tile import Tile
 from arches.app.models.models import Node
+from arches.app.models.system_settings import settings
 
-from fpan.utils.permission_backend import user_is_anonymous
-from fpan.utils.tokens import account_activation_token
-from fpan.utils.accounts import generate_username
-from fpan.models import Region
-from hms.models import Scout, ScoutProfile, ManagementArea, ManagementAgency
 from hms.forms import ScoutForm, ScoutProfileForm
+from hms.models import Scout, ScoutProfile, ManagementArea
+from hms.permissions_backend import user_is_land_manager, user_is_scout
+from hms.utils import account_activation_token, generate_username
+
+
+logger = logging.getLogger(__name__)
+
+def index(request):
+    scout_form = ScoutForm()
+    return render(request, 'index.htm', {
+        'main_script': 'index',
+        'active_page': 'Home',
+        'app_title': '{0} | HMS'.format(settings.APP_NAME),
+        'scout_form': scout_form,
+        'page':'index'
+    })
+
+def about(request):
+    return render(request, 'about.htm', {
+        'main_script': 'about',
+        'active_page': 'About',
+        'app_title': '{0} | HMS'.format(settings.APP_NAME),
+        'page':'about'
+    })
+
+@user_passes_test(user_is_scout)
+def hms_home(request):
+
+    if request.method == "POST":
+        scout_profile_form = ScoutProfileForm(
+            request.POST,
+            instance=request.user.scout.scoutprofile)
+        if scout_profile_form.is_valid():
+            scout_profile_form.save()
+            messages.add_message(request, messages.INFO, 'Your profile has been updated.')
+        else:
+            messages.add_message(request, messages.ERROR, 'Form was invalid.')
+
+        return redirect(reverse('user_profile_manager'))
+
+    else:
+        scout_profile_form = None
+        try:
+            scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
+        except Scout.DoesNotExist:
+            pass
+        return render(request, "home-hms.htm", {
+            'scout_profile': scout_profile_form,
+            'page':'home-hms'})
+
+def server_error(request, template_name='500.html'):
+
+    t = get_template(template_name)
+    return HttpResponseServerError(t.render(RequestContext(request).__dict__))
+
+
+class LoginView(View):
+    def get(self, request):
+
+        login_type = request.GET.get("t", "landmanager")
+        if request.GET.get("logout", None) is not None:
+
+            try:
+                user = request.user
+            except Exception as e:
+                logger.warn(e)
+                return redirect(f"/")
+
+            if user_is_scout(user):
+                login_type = "scout"
+            # send land managers and admin back to the landmanager login
+            else:
+                login_type = "landmanager"
+
+            logger.info(f"logging out: {user.username} | redirect to /auth/ should follow")
+            logout(request)
+            # need to redirect to 'auth' so that the user is set to anonymous via the middleware
+            return redirect(f"/auth/?t={login_type}")
+        else:
+            next = request.GET.get("next", None)
+            return render(request, "login.htm", {
+                "auth_failed": False,
+                "next": next,
+                "login_type": login_type,
+            })
+
+    def post(self, request):
+        # POST request is taken to mean user is logging in
+        login_type = request.GET.get("t", "landmanager")
+        next = request.GET.get("next", None)
+        username = request.POST.get("username", None)
+        password = request.POST.get("password", None)
+        user = authenticate(username=username, password=password)
+
+        if user is not None and user.is_active:
+
+            auth_attempt_success = True
+            # these conditionals ensure that scouts and land managers must
+            # use the correct login portals
+            if user_is_land_manager(user) and login_type != "landmanager":
+                auth_attempt_success = False
+
+            if user_is_scout(user) and login_type != "scout":
+                auth_attempt_success = False
+            
+            # if user survives above checks, login
+            if auth_attempt_success is True:
+                login(request, user)
+                user.password = ""
+
+                # set next redirect if not previously set
+                if next is None:
+                    next = request.POST.get("next", reverse("user_profile_manager"))
+
+                return redirect(next)
+
+        return render(request, "login.htm", {
+            "auth_failed": True,
+            "next": next,
+            "login_type": login_type
+        }, status=401)
+
+def login_patch(request, login_type):
+    return redirect(f"/auth/?t={login_type}")
+
+def activate_page(request, uidb64, token):
+    
+    return render(request, "hms/email/activation_page.htm", {
+        "activation_link": f"/activate/?uidb64={uidb64}&token={token}",
+    })
+
+def activate(request):
+
+    uidb64 = request.GET.get("uidb64")
+    token = request.GET.get("token")
+    if all([uidb64, token]):
+        try:
+            uid = force_text(urlsafe_base64_decode(uidb64))
+            logger.debug(f"activate user: {uid}")
+            user = Scout.objects.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, Scout.DoesNotExist) as e:
+            logger.debug(f"error during account activation: {e}")
+            return redirect("/auth/?t=scout")
+        valid_token = account_activation_token.check_token(user, token)
+        if not valid_token:
+            logger.debug(f"token is invalid (user already activated??)")
+        if user is not None and valid_token:
+            user.is_active = True
+            user.save()
+            logger.debug(f"user set to active: {user}")
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+            return redirect(reverse("user_profile_manager"))
+
+    return redirect("/auth/?t=scout")
 
 def scout_signup(request):
     if request.method == "POST":
         form = ScoutForm(request.POST)
+        print(form)
+        print(dir(form))
+        print(form.__dict__)
+        print(form.is_valid())
         if form.is_valid():
             firstname = form.cleaned_data.get('first_name')
             middleinitial = form.cleaned_data.get('middle_initial')
@@ -53,15 +215,15 @@ def scout_signup(request):
                 'uid': urlsafe_base64_encode(force_bytes(s.pk)),
                 'token': account_activation_token.make_token(s),
             }
-            message_txt = render_to_string('email/account_activation_email.htm', msg_vars)
-            message_html = render_to_string('email/account_activation_email_html.htm', msg_vars)
+            message_txt = render_to_string('hms/email/account_activation_email.htm', msg_vars)
+            message_html = render_to_string('hms/email/account_activation_email_html.htm', msg_vars)
             subject_line = settings.EMAIL_SUBJECT_PREFIX + 'Activate your account.'
             from_email = settings.DEFAULT_FROM_EMAIL
             to_email = form.cleaned_data.get('email')
             email = EmailMultiAlternatives(subject_line,message_txt,from_email,to=[to_email])
             email.attach_alternative(message_html, "text/html")
             email.send()            
-            return render(request,'email/please-confirm.htm')
+            return render(request,'hms/email/please-confirm.htm')
     else:
         form = ScoutForm()
 

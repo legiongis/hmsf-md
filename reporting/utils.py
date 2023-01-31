@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 
 from arches.app.models.resource import Resource
 
-from fpan.utils.helpers import get_node_value
+from fpan.utils import get_node_value
 
 logger = logging.getLogger(__name__)
 

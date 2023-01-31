@@ -6,6 +6,8 @@ from django.utils.safestring import mark_safe
 from .models import Scout, ScoutProfile
 from fpan.models import Region
 
+from hms.models import ManagementArea
+
 
 class ScoutForm(UserCreationForm):
     first_name = forms.CharField(
@@ -36,7 +38,7 @@ class ScoutForm(UserCreationForm):
     )
     region_choices = forms.ModelMultipleChoiceField(
         label="In which regions can you monitor sites?",
-        queryset=Region.objects.all(),
+        queryset=ManagementArea.objects.filter(category__name="FPAN Region"),
         widget=forms.CheckboxSelectMultiple(),
         help_text='Required. You can change this preference anytime after signing up, '\
             'but you must you pick at least one region before an archaeological site can be '\
@@ -99,6 +101,7 @@ class ScoutForm(UserCreationForm):
     def clean(self):
         """disallow new accounts with the same e-mail as existing accounts."""
         cleaned_data = super(ScoutForm, self).clean()
+        print(cleaned_data)
         if "email" in cleaned_data:
             if User.objects.filter(email=cleaned_data["email"]).count() > 0:
                 self.add_error(

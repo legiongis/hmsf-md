@@ -1,12 +1,15 @@
-from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
-from arches.app.models.models import GraphModel
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 from hms.models import ManagementArea, ManagementAgency
-from .permission_backend import user_is_land_manager, user_is_scout, generate_site_access_html
+
+def debug(request):
+    return {
+        'debug':settings.DEBUG,
+        'plausible_site_domain': settings.PLAUSIBLE_SITE_DOMAIN,
+        'plausible_embed_link': settings.PLAUSIBLE_EMBED_LINK,
+    }
 
 def make_widget_data():
 
@@ -60,27 +63,3 @@ def widget_data(request):
         return make_widget_data()
     else:
         return { 'lists': {} }
-
-def user_type(request):
-
-    user_type = "anonymous"
-    if request.user.is_superuser:
-        user_type = "admin"
-    elif user_is_land_manager(request.user):
-        user_type = "landmanager"
-    elif user_is_scout(request.user):
-        user_type = "scout"
-    return {
-        'user_is_admin': request.user.is_superuser,
-        'user_is_state': user_is_land_manager(request.user),
-        'user_is_scout': user_is_scout(request.user),
-        'user_type': user_type,
-        'site_access_html': generate_site_access_html(request.user)
-    }
-
-def debug(request):
-    return {
-        'debug':settings.DEBUG,
-        'plausible_site_domain': settings.PLAUSIBLE_SITE_DOMAIN,
-        'plausible_embed_link': settings.PLAUSIBLE_EMBED_LINK,
-    }

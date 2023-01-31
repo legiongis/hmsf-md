@@ -22,13 +22,12 @@ from arches.app.utils.permission_backend import user_is_resource_reviewer
 from arches.app.views.user import UserManagerView
 
 from fpan.search.components.rule_filter import RuleFilter
-from fpan.utils.permission_backend import (
+from hms.permissions_backend import (
     generate_site_access_html,
     user_is_land_manager,
     user_is_scout,
 )
-
-from .scout import scouts_dropdown
+from hms.views import scouts_dropdown
 
 logger = logging.getLogger(__name__)
 
