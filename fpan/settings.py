@@ -60,6 +60,9 @@ SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, "system_settings", "System_S
 
 ELASTICSEARCH_PREFIX = 'fpan'
 
+DEPRECATE_LEGACY_FIXTURE_LOAD = True
+DEPRECATE_LEGACY_FIXTURE_LOAD_MSG = " \033[01m\033[94m DEPRECATED: operations skipped\033[0m"
+
 # manually disable the shapefile exporter class. This creates a 500 error if
 # someone were to hit the shapefile export url somehow.
 RESOURCE_FORMATTERS['shp'] = None
