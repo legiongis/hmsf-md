@@ -1,6 +1,6 @@
 {
     "version": 8,
-    "name": "New Basemap",
+    "name": "HMS Basemap",
     "metadata": {
         "mapbox:type": "default",
         "mapbox:origin": "streets-v11",
