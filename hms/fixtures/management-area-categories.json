@@ -1,0 +1,58 @@
+[
+{
+  "model": "hms.managementareacategory",
+  "pk": 1,
+  "fields": {
+    "name": "FPAN Region"
+  }
+},
+{
+  "model": "hms.managementareacategory",
+  "pk": 2,
+  "fields": {
+    "name": "State Park"
+  }
+},
+{
+  "model": "hms.managementareacategory",
+  "pk": 3,
+  "fields": {
+    "name": "State Forest"
+  }
+},
+{
+  "model": "hms.managementareacategory",
+  "pk": 4,
+  "fields": {
+    "name": "Conservation Area"
+  }
+},
+{
+  "model": "hms.managementareacategory",
+  "pk": 5,
+  "fields": {
+    "name": "Fish and Wildlife Conservation Commission"
+  }
+},
+{
+  "model": "hms.managementareacategory",
+  "pk": 6,
+  "fields": {
+    "name": "Aquatic Preserve"
+  }
+},
+{
+  "model": "hms.managementareacategory",
+  "pk": 7,
+  "fields": {
+    "name": "Hillsborough County Parks"
+  }
+},
+{
+  "model": "hms.managementareacategory",
+  "pk": 8,
+  "fields": {
+    "name": "Hillsborough County ELAPP"
+  }
+}
+]
