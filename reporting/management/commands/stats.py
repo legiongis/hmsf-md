@@ -1,13 +1,13 @@
 import os
 import csv
 import uuid
-import json
-from django.core import management
+
 from django.core.management.base import BaseCommand, CommandError
 from django.contrib.gis.geos import GEOSGeometry
+
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.models.resource import Resource
-from arches.app.models.models import Node, NodeGroup, Value
+from arches.app.models.models import Node, Value
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 

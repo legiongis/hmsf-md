@@ -1,17 +1,5 @@
 # place to stash tiny helper utils needed in different parts of the app
 
-
-weekday_lookup = {
-    0: "Monday",
-    1: "Tuesday",
-    2: "Wednesday",
-    3: "Thursday",
-    4: "Friday",
-    5: "Saturday",
-    6: "Sunday",
-}
-
-
 def get_node_value(resource, node_name):
     """this just flattens the response from Resource().get_node_values()"""
 

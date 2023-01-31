@@ -43,7 +43,11 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_process
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
-INSTALLED_APPS += ('fpan', 'hms')
+INSTALLED_APPS += (
+    'fpan',         # this is the Arches "project"
+    'hms',          # HMS accounts, permissions, models, etc.
+    'reporting',    # stats and email reporting
+)
 
 # some shenanigans because grappelli must precede the django.contrib.admin app
 INSTALLED_APPS = tuple([i for i in INSTALLED_APPS if not i == "django.contrib.admin"])

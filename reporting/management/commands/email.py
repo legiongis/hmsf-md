@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from fpan.utils.email import send_weekly_summary
+from reporting.utils import send_weekly_summary
 
 class Command(BaseCommand):
 
