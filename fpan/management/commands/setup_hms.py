@@ -1,3 +1,5 @@
+import os
+from django.conf import settings
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
 
@@ -22,7 +24,11 @@ class Command(BaseCommand):
 
         print("\033[96m-- Load Arches PACKAGE --\033[0m")
 
-        management.call_command('packages', operation='load_package', source='./pkg', yes=True)
+        management.call_command('packages',
+            operation='load_package',
+            source=os.path.join(settings.APP_ROOT, 'pkg'),
+            yes=True
+        )
 
         print("\033[96m-- Update MAP LAYERS --\033[0m")
 

@@ -1,5 +1,5 @@
 # package content to ignore
-pkg/business_data/local
+fpan/pkg/business_data/local
 
 # project content to ignore
 fpan/media/packages
