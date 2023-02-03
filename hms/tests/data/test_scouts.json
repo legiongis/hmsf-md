@@ -1,0 +1,53 @@
+[
+    {
+        "first_name": "Frank",
+        "middle_initial": "D",
+        "last_name": "Hardy",
+        "email": "frank@hb.com",
+        "background": "Frank's background",
+        "relevant_experience": "None",
+        "password1": "TestAccount1!",
+        "password2": "TestAccount1!",
+        "fpan_regions": [4,5],
+        "zip_code": 12345,
+        "site_interest_type": ["Prehistoric","Historic"]
+    },
+    {
+        "first_name": "joe",
+        "middle_initial": "b",
+        "last_name": "Hardy",
+        "email": "joe@hb.com",
+        "background": "Joe's background",
+        "relevant_experience": "",
+        "password1": "TestAccount1!",
+        "password2": "TestAccount1!",
+        "fpan_regions": [1,2],
+        "zip_code": 12345,
+        "site_interest_type": ["Underwater"]
+    },
+    {
+        "first_name": "Biff",
+        "middle_initial": "A",
+        "last_name": "hooper",
+        "email": "biff@hb.com",
+        "relevant_experience": "None",
+        "password1": "TestAccount1!",
+        "password2": "TestAccount1!",
+        "fpan_regions": [6,7],
+        "zip_code": 12345,
+        "site_interest_type": ["Prehistoric","Cemeteries"]
+    },
+    {
+        "first_name": "chet",
+        "middle_initial": "j",
+        "last_name": "morton",
+        "email": "chet@hb.com",
+        "background": "chum",
+        "relevant_experience": "None",
+        "password1": "TestAccount1!",
+        "password2": "TestAccount1!",
+        "fpan_regions": [5],
+        "zip_code": 12345,
+        "site_interest_type": ["Prehistoric"]
+    }
+]

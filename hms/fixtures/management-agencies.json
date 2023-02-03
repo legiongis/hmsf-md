@@ -1,0 +1,37 @@
+[
+{
+    "model": "hms.managementagency",
+    "pk": "FCO",
+    "fields": {
+    "name": "Florida Coastal Office"
+    }
+},
+{
+    "model": "hms.managementagency",
+    "pk": "FFS",
+    "fields": {
+    "name": "Florida Forest Service"
+    }
+},
+{
+    "model": "hms.managementagency",
+    "pk": "FSP",
+    "fields": {
+    "name": "Florida State Parks"
+    }
+},
+{
+    "model": "hms.managementagency",
+    "pk": "FWCC",
+    "fields": {
+    "name": "Fish and Wildlife Conservation Commission"
+    }
+},
+{
+    "model": "hms.managementagency",
+    "pk": "OWP",
+    "fields": {
+    "name": "Office of Water Policy"
+    }
+}
+]

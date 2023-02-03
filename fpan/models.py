@@ -8,7 +8,7 @@ from arches.app.models.models import Node
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
 
-from fpan.utils.helpers import get_node_value
+from fpan.utils import get_node_value
 
 logger = logging.getLogger(__name__)
 

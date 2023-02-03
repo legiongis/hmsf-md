@@ -37,13 +37,17 @@ TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
 
-TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.debug')
-TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.user_type')
-TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.utils.context_processors.widget_data')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.debug')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.widget_data')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('hms.context_processors.user_type')
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
-INSTALLED_APPS += ('fpan', 'hms')
+INSTALLED_APPS += (
+    'fpan',         # this is the Arches "project"
+    'hms',          # HMS accounts, permissions, models, etc.
+    'reporting',    # stats and email reporting
+)
 
 # some shenanigans because grappelli must precede the django.contrib.admin app
 INSTALLED_APPS = tuple([i for i in INSTALLED_APPS if not i == "django.contrib.admin"])
@@ -59,6 +63,9 @@ PLAUSIBLE_EMBED_LINK = None
 SYSTEM_SETTINGS_LOCAL_PATH = os.path.join(APP_ROOT, "system_settings", "System_Settings.json")
 
 ELASTICSEARCH_PREFIX = 'fpan'
+
+DEPRECATE_LEGACY_FIXTURE_LOAD = True
+DEPRECATE_LEGACY_FIXTURE_LOAD_MSG = " \033[01m\033[94m DEPRECATED: operations skipped\033[0m"
 
 # manually disable the shapefile exporter class. This creates a 500 error if
 # someone were to hit the shapefile export url somehow.
