@@ -1,5 +1,8 @@
+import os
+import json
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from hms.tests.helpers import create_mock_landmanagers, create_mock_scout_accounts
+from hms.utils import TestUtils
 
 class Command(BaseCommand):
 
@@ -14,5 +17,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        create_mock_landmanagers()
-        create_mock_scout_accounts()
+        TestUtils().create_test_scouts()
+        TestUtils().create_test_landmanagers()

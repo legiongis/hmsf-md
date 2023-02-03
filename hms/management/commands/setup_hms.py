@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from arches.app.models.models import MapLayer
 
-from hms.tests.helpers import create_mock_landmanagers, create_mock_scout_accounts
+from hms.utils import TestUtils
 
 class Command(BaseCommand):
 
@@ -15,12 +15,14 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--test-accounts", action="store_true", default=False,
             help='specify whether the mock land manager and scout accounts should be created')
+        parser.add_argument("--use-existing-db", action="store_true", default=False,
+            help='use this flag when calling this command during tested, so that the test database is used')
 
     def handle(self, *args, **options):
 
-        print("\033[96m-- Initialize the DATABASE --\033[0m")
-
-        management.call_command('setup_db', force=True)
+        if options['use_existing_db'] is not True:
+            print("\033[96m-- Initialize the DATABASE --\033[0m")
+            management.call_command('setup_db', force=True)
 
         print("\033[96m-- Load Arches PACKAGE --\033[0m")
 
@@ -69,8 +71,8 @@ class Command(BaseCommand):
         management.call_command('loaddata', 'management-area-groups')
 
         if options['test_accounts']:
-            create_mock_landmanagers()
-            create_mock_scout_accounts()
+            TestUtils().create_test_scouts()
+            TestUtils().create_test_landmanagers()
 
     def update_map_layers(self):
 
