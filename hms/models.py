@@ -101,7 +101,7 @@ class Scout(User):
             'relevant_experience': self.scoutprofile.relevant_experience,
             'interest_reason': self.scoutprofile.interest_reason,
             'site_interest_type': ";".join(self.scoutprofile.site_interest_type),
-            'region_choices': ";".join([r.name for r in self.scoutprofile.region_choices.all()]),
+            'fpan_regions': ";".join([r.name for r in self.scoutprofile.fpan_regions.all()]),
             'date_joined': self.date_joined.strftime("%Y-%m-%d"),
         }
 
@@ -172,13 +172,11 @@ class ScoutProfile(models.Model):
         blank=True,
     )
     region_choices = models.ManyToManyField(Region)
+    fpan_regions = models.ManyToManyField("ManagementArea")
     ethics_agreement = models.BooleanField(default=True)
 
     def __unicode__(self):
         return self.user.username
-
-    def regions(self):
-        return self.region_choices
 
     def get_graph_rule(self, graph_name):
 
@@ -529,11 +527,12 @@ class ManagementArea(models.Model):
         else:
             return super(ManagementArea, self).__str__()
 
-
     def save(self, *args, **kwargs):
 
         if self.management_agency:
             self.display_name = f"{self.name} | {self.category} | {self.management_agency.name}"
+        elif self.category.name == "FPAN Region":
+            self.display_name = self.name
         else:
             self.display_name = f"{self.name} | {self.category}"
 

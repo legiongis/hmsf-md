@@ -23,7 +23,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
                 'username': 'anonymous',
                 'display_name': 'Public Access',
                 'site_interest_type': '',
-                'region_choices': '',
+                'fpan_regions': '',
             });
 
             if (params.state != 'report') {

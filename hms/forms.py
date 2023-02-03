@@ -4,7 +4,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from .models import Scout, ScoutProfile
-from fpan.models import Region
 
 from hms.models import ManagementArea
 
@@ -36,7 +35,7 @@ class ScoutForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={'class':'form-control', 'required':'true'}),
         label="Re-enter Password"
     )
-    region_choices = forms.ModelMultipleChoiceField(
+    fpan_regions = forms.ModelMultipleChoiceField(
         label="In which regions can you monitor sites?",
         queryset=ManagementArea.objects.filter(category__name="FPAN Region"),
         widget=forms.CheckboxSelectMultiple(),
@@ -94,7 +93,7 @@ class ScoutForm(UserCreationForm):
         model = Scout
         fields = (
             'first_name', 'middle_initial', 'last_name', 'email', 'password1', 'password2', 
-            'region_choices', 'zip_code',
+            'fpan_regions', 'zip_code',
             'background', 'relevant_experience', 'interest_reason', 'site_interest_type',
         )
     
@@ -117,15 +116,22 @@ class ScoutForm(UserCreationForm):
 
 
 class ScoutProfileForm(forms.ModelForm):
-    SITE_INTEREST_CHOICES = (
-        ('Prehistoric', 'Prehistoric'),
-        ('Historic', 'Historic'),
-        ('Cemeteries', 'Cemeteries'),
-        ('Underwater', 'Underwater'),
-        ('Other', 'Other'),)
+
     class Meta:
         model = ScoutProfile
-        fields = ('street_address', 'city', 'state', 'zip_code', 'phone', 'background', 'relevant_experience', 'interest_reason', 'site_interest_type', 'region_choices')
+        fields = (
+            'street_address',
+            'city',
+            'state',
+            'zip_code',
+            'phone',
+            'background',
+            'relevant_experience',
+            'interest_reason',
+            'site_interest_type',
+            'fpan_regions'
+        )
+        
         widgets = {
             'street_address': forms.TextInput(attrs={'class': 'form-control'}),
             'city': forms.TextInput(attrs={'class': 'form-control'}),
@@ -135,5 +141,9 @@ class ScoutProfileForm(forms.ModelForm):
             'relevant_experience': forms.Textarea(attrs={'class': 'form-control'}),
             'interest_reason': forms.Textarea(attrs={'class': 'form-control'}),
             'site_interest_type': forms.TextInput(attrs={'class': 'form-control'}),
-            'region_choices': forms.CheckboxSelectMultiple(),
         }
+
+    fpan_regions = forms.ModelMultipleChoiceField(
+        queryset=ManagementArea.objects.filter(category__name="FPAN Region"),
+        widget=forms.CheckboxSelectMultiple()
+    )

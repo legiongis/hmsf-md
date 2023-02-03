@@ -4,6 +4,8 @@ import string
 import logging
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +17,33 @@ class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
                 + six.text_type(timestamp)) + six.text_type(user.is_active)
 
 account_activation_token = AccountActivationTokenGenerator()
+
+def create_scout_from_valid_form(form):
+    """Takes a validated ScoutForm() and creates a new Scout/ScoutProfile
+    from it. Return a tuple with the user and an activation token."""
+
+    firstname = form.cleaned_data.get('first_name')
+    middleinitial = form.cleaned_data.get('middle_initial')
+    lastname = form.cleaned_data.get('last_name')
+    newusername = generate_username(firstname, middleinitial, lastname)
+    s = form.save(commit=False)
+    s.is_active = False
+    s.username = newusername
+    s.save()
+
+    # now add some ScoutProfile info from the same form
+    s.scoutprofile.fpan_regions.set(form.cleaned_data.get('fpan_regions', []))
+    s.scoutprofile.zip_code = form.cleaned_data.get('zip_code')
+    s.scoutprofile.background = form.cleaned_data.get('background')
+    s.scoutprofile.relevant_experience = form.cleaned_data.get('relevant_experience')
+    s.scoutprofile.interest_reason = form.cleaned_data.get('interest_reason')
+    s.scoutprofile.site_interest_type = form.cleaned_data.get('site_interest_type')
+    s.scoutprofile.save()
+
+    token = account_activation_token.make_token(s)
+    encoded_uid = urlsafe_base64_encode(force_bytes(s.pk))
+
+    return(s, encoded_uid, token)
 
 def check_duplicate_username(newusername):
     chars = ["'", "-", "\"", "_", ".", " "]

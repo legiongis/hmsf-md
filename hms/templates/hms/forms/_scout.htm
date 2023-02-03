@@ -108,11 +108,12 @@
                 <div class="col-md-4 col-md-offset-1">
                     <div class="form-group">
 
-                        {{ scout_form.region_choices.label_tag }}
-                        <p><em>{{ scout_form.region_choices.help_text }}</em></p>
-                        {{ scout_form.region_choices }}
-                        {% if scout_form.region_choices.errors %}
-                            {% for error in scout_form.region_choices.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                        {{ scout_form.fpan_regions.label_tag }}
+                        <p><em>{{ scout_form.fpan_regions.help_text }}</em></p>
+                        {{ scout_form.fpan_regions }}
+                        {% if scout_form.fpan_regions.errors %}
+                            {% for error in scout_form.fpan_regions.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
+                            <br>
                         {% endif %}
 
                         {{ scout_form.zip_code.label_tag }}

@@ -12,8 +12,8 @@ from django.http import HttpResponseServerError
 from django.shortcuts import render, redirect, HttpResponse
 from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_text
+from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.views.generic import View
@@ -26,7 +26,7 @@ from arches.app.models.system_settings import settings
 from hms.forms import ScoutForm, ScoutProfileForm
 from hms.models import Scout, ScoutProfile, ManagementArea
 from hms.permissions_backend import user_is_land_manager, user_is_scout
-from hms.utils import account_activation_token, generate_username
+from hms.utils import account_activation_token, create_scout_from_valid_form
 
 
 logger = logging.getLogger(__name__)
@@ -182,38 +182,18 @@ def activate(request):
 def scout_signup(request):
     if request.method == "POST":
         form = ScoutForm(request.POST)
-        print(form)
-        print(dir(form))
-        print(form.__dict__)
-        print(form.is_valid())
         if form.is_valid():
-            firstname = form.cleaned_data.get('first_name')
-            middleinitial = form.cleaned_data.get('middle_initial')
-            lastname = form.cleaned_data.get('last_name')
-            newusername = generate_username(firstname, middleinitial, lastname)
-            s = form.save(commit=False)
-            s.is_active = False
-            s.username = newusername
-            s.save()
-
-            # now add some ScoutProfile info from the same form
-            s.scoutprofile.region_choices.set(form.cleaned_data.get('region_choices', []))
-            s.scoutprofile.zip_code = form.cleaned_data.get('zip_code')
-            s.scoutprofile.background = form.cleaned_data.get('background')
-            s.scoutprofile.relevant_experience = form.cleaned_data.get('relevant_experience')
-            s.scoutprofile.interest_reason = form.cleaned_data.get('interest_reason')
-            s.scoutprofile.site_interest_type = form.cleaned_data.get('site_interest_type')
-            s.scoutprofile.save()
+            scout, encoded_uid, token = create_scout_from_valid_form(form)
 
             current_site = get_current_site(request)
             baseurl = f"http://{current_site.domain}"
             if settings.HTTPS:
                 baseurl = f"https://{current_site.domain}"
             msg_vars = {
-                'user': s,
+                'user': scout,
                 'baseurl': baseurl,
-                'uid': urlsafe_base64_encode(force_bytes(s.pk)),
-                'token': account_activation_token.make_token(s),
+                'uid': encoded_uid,
+                'token': token,
             }
             message_txt = render_to_string('hms/email/account_activation_email.htm', msg_vars)
             message_html = render_to_string('hms/email/account_activation_email_html.htm', msg_vars)
@@ -222,7 +202,7 @@ def scout_signup(request):
             to_email = form.cleaned_data.get('email')
             email = EmailMultiAlternatives(subject_line,message_txt,from_email,to=[to_email])
             email.attach_alternative(message_html, "text/html")
-            email.send()            
+            email.send()
             return render(request,'hms/email/please-confirm.htm')
     else:
         form = ScoutForm()
@@ -264,8 +244,8 @@ def scouts_dropdown(request):
 
         ## as the scout list gets big this may need some optimizing!
         for scout in ScoutProfile.objects.all():
-            for region_choice in scout.region_choices.all():
-                if lookup[region_choice.name] in site_regions:
+            for region in scout.fpan_regions.all():
+                if region.name in site_regions:
                     matched_scouts.append(scout)
 
     # iterate scouts and create a list of objects to return for the dropdown
@@ -279,7 +259,7 @@ def scouts_dropdown(request):
             'username': scout.user.username,
             'display_name': display_name,
             'site_interest_type': scout.site_interest_type,
-            'region_choices': [region.name for region in scout.region_choices.all()],
+            'fpan_regions': [region.name for region in scout.fpan_regions.all()],
         })
 
     return JSONResponse(return_scouts)
@@ -305,7 +285,7 @@ def scout_list_download(request):
         'zip_code': "Zip Code",
         'phone': "Phone",
         'site_interest_type': "Site Types",
-        'region_choices': "Regions",
+        'fpan_regions': "Regions",
         'date_joined': "Signup Date",
         'background': "Education/Occupation",
         'relevant_experience': "Relevant Experience",
