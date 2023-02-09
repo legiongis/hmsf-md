@@ -70,6 +70,16 @@ class Command(BaseCommand):
         print("\033[96m-- Load MANAGEMENT AREA GROUPS --\033[0m")
         management.call_command('loaddata', 'management-area-groups')
 
+        print("\033[96m-- Deactivate Default ETL Modules --\033[0m")
+        management.call_command(
+            "extension", "deactivate", "etl-module",
+            name="Import Single CSV",
+        )
+        management.call_command(
+            "extension", "deactivate", "etl-module",
+            name="Import Branch Excel",
+        )
+
         if options['test_accounts']:
             TestUtils().create_test_scouts()
             TestUtils().create_test_landmanagers()
