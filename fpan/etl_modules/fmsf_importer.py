@@ -32,7 +32,7 @@ from arches.app.utils.index_database import index_resources_by_transaction
 
 from hms.models import ManagementArea
 from fpan.tasks import run_fmsf_import_as_task
-from fpan.etl_modules.utils import ETLOperationResult
+from fpan.utils import ETLOperationResult
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,7 @@ details = {
     "componentname": "fmsf-importer",
     "modulename": "fmsf_importer.py",
     "classname": "FMSFImporter",
-    "config": {"circleColor": "#ff77cc", "bgColor": "#cc2266", "show": False},
+    "config": {"circleColor": "#ff77cc", "bgColor": "#cc2266", "show": True},
     "icon": "fa fa-upload",
     "slug": "fmsf-importer"
 }
