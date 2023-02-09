@@ -4,6 +4,9 @@ from __future__ import unicode_literals
 from django.db import migrations
 from django.core import management
 
+from fpan.decorators import deprecated_migration_operation
+
+@deprecated_migration_operation
 def load_rule_filter(apps, schema_editor):
 
     management.call_command(
@@ -12,6 +15,7 @@ def load_rule_filter(apps, schema_editor):
         overwrite=True,
     )
 
+@deprecated_migration_operation
 def remove_rule_filter(apps, schema_editor):
 
     management.call_command(

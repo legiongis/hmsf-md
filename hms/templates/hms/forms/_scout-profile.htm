@@ -1,0 +1,302 @@
+{% load static %}
+{% load i18n %}
+
+<div class="row">
+    <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+        <form method="post" class="form-horizontal">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ scout_profile.street_address.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.street_address.label }}
+                </label>
+                <div class="col-sm-8">           
+                    {{ scout_profile.street_address }}
+                </div>
+                
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.street_address.help_text %}
+                        <small style="display: none">{{ scout_profile.street_address.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.street_address.errors %}
+                        {% for error in scout_profile.street_address.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>  
+
+            <div class="form-group">
+                <label for="{{ scout_profile.city.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.city.label }}
+                </label>
+                <div class="col-sm-8">
+                    {{ scout_profile.city }}
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.city.help_text %}
+                        <small style="display: none">{{ scout_profile.city.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.city.errors %}
+                        {% for error in scout_profile.city.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ scout_profile.state.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.state.label }}
+                </label>
+                <div class="col-sm-8">
+                    {{ scout_profile.state }}
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.state.help_text %}
+                        <small style="display: none">{{ scout_profile.state.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.state.errors %}
+                        {% for error in scout_profile.state.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ scout_profile.zip_code.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.zip_code.label }}
+                </label>
+                <div class="col-sm-8">
+                    {{ scout_profile.zip_code }}
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.zip_code.help_text %}
+                        <small style="display: none">{{ scout_profile.zip_code.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.zip_code.errors %}
+                        {% for error in scout_profile.zip_code.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ scout_profile.phone.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.phone.label }}
+                </label>
+                <div class="col-sm-8">
+                    {{ scout_profile.phone }}
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.phone.help_text %}
+                        <small style="display: none">{{ scout_profile.phone.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.phone.errors %}
+                        {% for error in scout_profile.phone.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ scout_profile.background.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.background.label }}
+                </label>
+                <div class="col-sm-8">
+                    {{ scout_profile.background }}
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.background.help_text %}
+                        <small style="display: none">{{ scout_profile.background.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.background.errors %}
+                        {% for error in scout_profile.background.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ scout_profile.relevant_experience.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.relevant_experience.label }}
+                </label>
+                <div class="col-sm-8">
+                    {{ scout_profile.relevant_experience }}
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.relevant_experience.help_text %}
+                        <small style="display: none">{{ scout_profile.relevant_experience.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.relevant_experience.errors %}
+                        {% for error in scout_profile.relevant_experience.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ scout_profile.interest_reason.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {{ scout_profile.interest_reason.label }}
+                </label>
+                <div class="col-sm-8">
+                    {{ scout_profile.interest_reason }}
+                </div>
+                <div class="col-sm-8 col-sm-offset-3">
+                    {% if scout_profile.interest_reason.help_text %}
+                        <small style="display: none">{{ scout_profile.interest_reason.help_text }}</small>
+                    {% endif %}
+
+                    {% if scout_profile.interest_reason.errors %}
+                        {% for error in scout_profile.interest_reason.errors %}
+                            <span style="color:red" > {{ error }} </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ scout_profile.site_interest_type.id_for_label"
+                       class="col-sm-3 control-label"
+                       style="color: #555">
+                    {% trans "What types of sites are you most interested in?" %}
+                </label>
+                <div class="col-sm-3">
+                    <ul id="id-site-type-choices">
+                        <li>
+                            <label for="id-site-type-choices-0">
+                                <input type="checkbox" 
+                                       id="id-site-type-choices-0"
+                                       name="site-type-choices" 
+                                       value="Prehistoric"
+                                       onclick="getSiteType(this)">
+                                Prehistoric
+                            </label>
+                        </li>
+
+                        <li>
+                            <label for="id-site-type-choices-1">
+                                <input type="checkbox"
+                                       id="id-site-type-choices-1"
+                                       name="site-type-choices" 
+                                       value="Historic"
+                                       onclick="getSiteType(this)">
+                                Historic
+                            </label>
+                        </li>
+
+                        <li>
+                            <label for="id-site-type-choices-2">
+                                <input type="checkbox" 
+                                       id="id-site-type-choices-2"
+                                       name="site-type-choices" 
+                                       value="Cemeteries"
+                                       onclick="getSiteType(this)">
+                                Cemeteries
+                            </label>
+                        </li>
+
+                        <li>
+                            <label for="id-site-type-choices-3">
+                                <input type="checkbox" 
+                                       id="id-site-type-choices-3"
+                                       name="site-type-choices" 
+                                       value="Underwater"
+                                       onclick="getSiteType(this)">
+                                Underwater
+                            </label>
+                        </li>
+
+                        <li>
+                            <label for="id-site-type-choices-4">
+                            <input type="checkbox" 
+                                   id="id-site-type-choices-4"
+                                   name="site-type-choices" 
+                                   value="Other"
+                                   onclick="getSiteType(this)">
+                                Other
+                            </label>
+                        </li>
+
+                    </ul>
+                    <div hidden>{{ scout_profile.site_interest_type }}</div>
+                </div>            
+            </div>
+
+            <div class="form-group">
+                <label for="{{ scout_profile.fpan_regions.id_for_label"
+                       class="col-sm-12"
+                       style="color: #555">
+                    {% trans "Which region(s) are you interested in monitoring sites in?" %}
+                </label>
+                <div class="col-sm-6">
+                    {{ scout_profile.fpan_regions }}
+                </div>
+                <div class="col-sm-5">
+                    <img src="{% static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">
+                </div>          
+            </div>
+
+                
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-default">Save Scout Profile</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var siteInterestTypes = document.getElementsByName("site-type-choices");
+    var siteInterestInput = document.getElementById("id_site_interest_type");
+    var siteArray = [];
+    if(siteInterestInput.value != "") {
+        siteArray = siteInterestInput.value.split(",");
+        for (var i=0; i<siteInterestTypes.length; i++) {
+            if (siteArray.indexOf(siteInterestTypes[i].value) >= 0) {
+                siteInterestTypes[i].checked = true;
+            }
+        }
+    }
+    
+    function getSiteType(site) {
+        if (site.checked == true) {
+            siteArray.push(site.value);
+        } else {
+            rmIndex = siteArray.indexOf(site.value);
+            if (rmIndex >= 0) 
+                siteArray.splice(rmIndex, 1);
+        }
+        siteInterestInput.value = siteArray.join();
+    }
+</script>

@@ -1,19 +1,22 @@
-from django.db import migrations, models
+from django.db import migrations
 from django.core import management
-import django.db.models.deletion
-from hms.models import (
-    ManagementArea,
-    ManagementAreaGroup,
-    ManagementAreaCategory,
-    ManagementAgency,
-)
 
+from fpan.decorators import deprecated_migration_operation
+
+@deprecated_migration_operation
 def migrate_areas(apps, schema_editor):
     management.call_command("areas", "migrate-legacy-areas", "--quiet")
 
+@deprecated_migration_operation
 def remove_areas(apps, schema_editor):
     """manual removal of all the objects that are created in the above command"""
 
+    from hms.models import (
+        ManagementArea,
+        ManagementAreaGroup,
+        ManagementAreaCategory,
+        ManagementAgency,
+    )
     ManagementAreaGroup.objects.get(name="SP District 1").delete()
     ManagementAreaGroup.objects.get(name="SP District 2").delete()
     ManagementAreaGroup.objects.get(name="SP District 3").delete()

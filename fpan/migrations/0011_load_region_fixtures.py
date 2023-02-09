@@ -4,16 +4,18 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 from django.core import management
-from fpan.models import Region
 
+from fpan.decorators import deprecated_migration_operation
 
+@deprecated_migration_operation
 def load_regions(apps, schema_editor):
 
     management.call_command("loaddata", "regions.json")
 
-
+@deprecated_migration_operation
 def remove_regions(apps, schema_editor):
 
+    from fpan.models import Region
     Region.objects.all().delete()
 
 class Migration(migrations.Migration):

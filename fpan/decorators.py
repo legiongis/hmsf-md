@@ -2,12 +2,13 @@ import time
 import logging
 import functools
 from django.http import Http404
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 
 from fpan.search.components.rule_filter import RuleFilter
-from fpan.utils.permission_backend import user_is_land_manager
+from hms.permissions_backend import user_is_land_manager
 
 logger = logging.getLogger(__name__)
 
@@ -66,4 +67,12 @@ def can_edit_scout_report(function):
         else:
             raise Http404
 
+    return wrapper
+
+def deprecated_migration_operation(func):
+    def wrapper(*args, **kwargs):
+        if settings.DEPRECATE_LEGACY_FIXTURE_LOAD:
+            print(settings.DEPRECATE_LEGACY_FIXTURE_LOAD_MSG, end="")
+        else:
+            func(*args, **kwargs)
     return wrapper

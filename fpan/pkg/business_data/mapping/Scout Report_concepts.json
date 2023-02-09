@@ -1,0 +1,70 @@
+{
+    "Photo Type": {
+        "146a593a-4080-44d2-918a-d4949ff5f029": "Character-defining Feature (Historic Structure only)",
+        "937d4866-e51a-47ae-b471-e127377dfb34": "Close-up",
+        "12526dfc-aed1-4bf3-a255-6546c9d8177b": "Fa\u00e7ade (Historic Structures only)",
+        "8f593727-53b8-4841-8ae4-41e60c1f45fb": "Overview",
+        "5e7cb078-1741-4dee-ac12-3b7c5b6200dd": "Unique Feature"
+    },
+    "Location Verification": {
+        "66248378-2209-4f3f-930c-2896ae455730": "Site could not be found",
+        "ef817be4-59d5-49ae-bf4e-d58fb78f3324": "Site found but in different location",
+        "b32ddf3e-753b-4c97-b113-dd673b9edaf8": "Site location verified"
+    },
+    "Overall Site Condition": {
+        "5bafbd5f-8e25-4db3-8e23-a730c633d2f7": "Fair = Declining",
+        "3696827d-9da2-4b0d-a892-7c320f2da9f9": "Good = Stable",
+        "c7df26b8-cc40-47f3-842c-d5c32c4fb876": "Not applicable = Site not found",
+        "948ef076-d14c-4cb3-9713-f780463a5a3c": "Poor = Unstable"
+    },
+    "Priority": {
+        "6475fae7-797d-4c40-b7d7-d6070ed38958": "High",
+        "71ecc9bf-1cda-47aa-a5e2-c05ecaf8bb4b": "Low",
+        "3af799ea-5188-4422-8b24-5f341f92c576": "Medium"
+    },
+    "Recommendation": {
+        "a29bd7cd-aea6-461d-963b-6cd6d4cae40a": "Defense",
+        "25a2868f-bc77-4246-954a-851a271d962b": "FMSF update",
+        "2455d32d-d1c0-4bd9-b47a-6ba4877c885d": "Other",
+        "f953f862-4cdd-4564-a0d1-0db9f693db8a": "Repeat visit"
+    },
+    "Threats": {
+        "180efc49-4660-4650-b7bb-d9ec6fd1cec9": "Active Erosion",
+        "81178803-cfb1-4d23-b7dd-87fd6bc35b39": "Animal disturbance",
+        "374974c9-ac1c-4079-a89a-6ab886e044eb": "Development",
+        "68e804cf-2bd4-45dc-a0b7-7fb7488ad3c2": "Flooding",
+        "f4d226a6-8378-4f52-9bc9-809f344607a3": "Other (describe below)",
+        "f03f8806-2351-423b-b9f0-d98f0a37fafc": "Storm surge",
+        "813c4266-3309-416b-9031-f4e4d4ad6678": "Vegetation growth",
+        "371aa906-c034-4e36-9b1b-6677ec31bdc3": "Vehicle damage",
+        "a8c78e50-0c8f-46f1-b6a7-50f280cb9c63": "Visitor traffic",
+        "18e9458f-4893-4e79-84d8-01d9b8dca5c2": "Wave action",
+        "6a1c8d3a-159a-4003-9361-f0d379f06698": "Wind"
+    },
+    "Visit Time of Day": {
+        "0b2e1622-4a22-4df5-b50d-83a5649317bd": "Afternoon",
+        "5f79916c-315b-4cc6-aff4-487bb9e5bbef": "Evening",
+        "3da759e4-d185-4a8d-be57-28d517160cfb": "Morning"
+    },
+    "Visit Type": {
+        "395b456e-ee37-486a-aa4d-161502ef1f52": "Follow-up",
+        "916a56f4-013e-4c61-82b0-9eca1cc20420": "Initial"
+    },
+    "Visible Artifacts": {
+        "360157b2-162d-4dde-b44c-f401c4acdf85": "Architectural (nails, wire, bricks)",
+        "cb619d52-99f9-4279-ac82-993de59611e5": "Faunal remains",
+        "a3b974b8-16bd-44d3-87d2-c565cdbe4061": "Glass",
+        "06146b05-b86a-4c58-8739-f7315a88e8ef": "Grave markers",
+        "497e554c-fb93-4d2c-8ec3-a1a4bc28997d": "Historic ceramics",
+        "caf4fecb-d308-40be-9bda-cbded7109474": "Lithics",
+        "561f2f7e-92a2-4cf3-bb9d-3264f7390775": "Other (describe below)",
+        "c1c172a6-c7d8-4806-9957-74c9ebc7f99a": "Prehistoric pottery",
+        "f3cf7c56-2f96-4513-a073-d60b83331d3f": "Shell midden",
+        "a5581ca6-1da5-4144-a53f-5a066219f6ce": "Shell tool",
+        "5a796e18-cabc-4c2f-afee-63d6e5f2cccd": "Ship anchor",
+        "220007bb-4fef-4f23-b55f-32e828cc6137": "Ship timbers, sheathing, or rigging"
+    },
+    "Resource to Resource Relationship Types": {
+        "ac41d9be-79db-4256-b368-2f4559cfbe55": "is related to"
+    }
+}

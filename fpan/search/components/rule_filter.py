@@ -10,7 +10,7 @@ from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel, Node, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
-from fpan.utils.permission_backend import (
+from hms.permissions_backend import (
     user_is_anonymous,
     user_is_scout,
     user_is_land_manager,

@@ -1,0 +1,22 @@
+{
+    "Scout Report": {
+        "Crowdsource Editor": {
+            "read_nodegroup": [
+                "Arrival Information",
+                "Report Evaluation",
+                "Structure Details",
+                "What did you find?",
+                "Upload Photos"
+            ],
+            "write_nodegroup": [
+                "Arrival Information",
+                "Report Evaluation",
+                "Structure Details",
+                "What did you find?",
+                "Upload Photos"
+            ],
+            "no_access_to_nodegroup": [],
+            "delete_nodegroup": []
+        }
+    }
+}
