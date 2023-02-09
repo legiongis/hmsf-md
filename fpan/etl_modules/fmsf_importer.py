@@ -504,15 +504,13 @@ class FMSFImporter(BaseImportModule):
 
         extra_ids = []
         extra_structures_csv = Path(self.file_dir, "extra-structure-ids.csv")
-        print(extra_structures_csv)
         if extra_structures_csv.is_file():
-            print("using provided file")
             with open(extra_structures_csv, "r") as openf:
                 reader = csv.reader(openf)
                 next(reader)
                 for row in reader:
                     extra_ids.append(row[0])
-        print("extra ids:", extra_ids)
+        logger.debug("extra ids:", extra_ids)
 
         extra_list, lighthouse_list, geom_list = [], [], []
         for feature in self.new_features:
@@ -521,8 +519,10 @@ class FMSFImporter(BaseImportModule):
             if siteid in extra_ids:
                 extra_list.append(siteid)
                 continue
-            elif only_extra_ids:
+            # if only_extra_ids, skip all the rest of the resources
+            if only_extra_ids is True:
                 continue
+
             # skip structure marked as destroyed
             if _feature_is_destroyed(feature):
                 continue
@@ -539,8 +539,13 @@ class FMSFImporter(BaseImportModule):
         if len(geom_list) > 0:
             logger.debug("unioning Management Areas")
             filter_areas = ManagementArea.objects.exclude(category__name__in=["FPAN Region", "County"])
-            filter_areas = ManagementArea.objects.filter(pk=352)
-            union_results = filter_areas.aggregate(Union('geom'))
+            # filter_areas = ManagementArea.objects.filter(pk=352)
+            try:
+                union_results = filter_areas.aggregate(Union('geom'))
+            except Exception as e:
+                result.success = False
+                result.message = str(e)
+                return result
             union_geom = union_results['geom__union']
             logger.debug("union geom created")
 
@@ -818,6 +823,10 @@ class FMSFImporter(BaseImportModule):
             dry_run = True
         else:
             dry_run = False
+        if only_extra_ids == "true":
+            only_extra_ids = True
+        else:
+            only_extra_ids = False
 
         run_fmsf_import_as_task.delay(self.loadid, resource_type, truncate=truncate, dry_run=dry_run, description=description, only_extra_ids=only_extra_ids)
 
