@@ -86,7 +86,8 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     background: #5ec5b9 !important;
 }
 .brand-title-landmanager, .mainnav-container-landmanager, .mainnav-landmanager, .mainnav-menu-landmanager>.active, .mainnav-landmanager .menu-popover, .mainnav-landmanager .sub-menu ul  {
-    background: url('../img/fpan/ricepaper-state.png') !important;
+    /* background: url('../img/fpan/ricepaper-state.png') !important; */
+    background: #273675 !important;
 }
 
 #mainnav .list-header {
@@ -133,11 +134,13 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
 }
 
 .mainnav-menu-landmanager>li {
-    background: url('../img/fpan/ricepaper-state.png') !important;
+    /* background: url('../img/fpan/ricepaper-state.png') !important; */
+    background: #273675 !important;
 }
 
 .mainnav-menu-landmanager>li>a {
-    background: url('../img/fpan/ricepaper-state.png') !important;
+    /* background: url('../img/fpan/ricepaper-state.png') !important; */
+    background: #273675 !important;
     color: white !important;
 }
 
@@ -495,6 +498,25 @@ input[type='text'] {
    background: #431825;
    color: #fff;
 }
+/* .ep-toolbar-profile-scout {
+    background: #5ec5b9;
+}
+.ep-toolbar-profile-scout .ep-tools-login-scout {
+    background: #5ec5b9;
+}
+.ep-toolbar-profile-scout .ep-tools-right-scout {
+    background: #5ec5b9;
+}
+.ep-toolbar-profile-landmanager {
+    background: #273675;
+}
+.ep-toolbar-profile-landmanager .ep-tools-login-landmanager {
+    background: #273675;
+}
+.ep-toolbar-profile-landmanager .ep-tools-right-landmanager {
+    background: #273675;
+} */
+
 .profile-report-scout {
   padding: 10px 10px 10px 0px;
   background: url('../img/fpan/bedge_muted.png');
