@@ -377,7 +377,7 @@ class FMSFImporter(BaseImportModule):
                     value = form_value
         return value
 
-    
+
     def lookup_labelid_from_label(self, value, node):
         """ This is a pretty simplistic approach, which should work for FMSF but 
         may not with a nested RDM collection. """
@@ -510,7 +510,7 @@ class FMSFImporter(BaseImportModule):
                 next(reader)
                 for row in reader:
                     extra_ids.append(row[0])
-        logger.debug("extra ids:", extra_ids)
+        logger.debug(f"extra ids to import: {len(extra_ids)}")
 
         extra_list, lighthouse_list, geom_list = [], [], []
         for feature in self.new_features:
@@ -631,7 +631,7 @@ class FMSFImporter(BaseImportModule):
         self.tiles = []
         self.fmsf_resources = []
 
-        # try:
+        logger.debug("generating load data")
         start = time.time()
         current_percent = 0
         for n, feature in enumerate(self.new_features, start=1):
@@ -673,11 +673,20 @@ class FMSFImporter(BaseImportModule):
             "Tiles to load": len(self.tiles),
             "New FMSF site ids": [i.siteid for i in self.fmsf_resources],
         }
-        csv_summary_file = Path(self.file_dir, "sites_loaded.csv")
-        with open(csv_summary_file, "w") as f:
-            writer = csv.writer(f)
-            writer.writerow(("SITEID", "ResourceId"))
-            writer.writerows([(i.siteid, i.resourceid) for i in self.fmsf_resources])
+
+        # This summary file of ids was a nice idea, but it is failing because
+        # of file permissions: apache creates the directory, and then celery
+        # tries to write this file to it and doesn't have permission.
+        # Disabling this for the time being...
+#        try:
+#            csv_summary_file = Path(self.file_dir, "sites_loaded.csv")
+#            with open(csv_summary_file, "w") as f:
+#                writer = csv.writer(f)
+#                writer.writerow(("SITEID", "ResourceId"))
+#                writer.writerows([(i.siteid, i.resourceid) for i in self.fmsf_resources])
+#        except Exception as e:
+#            logger.info("error trying to write csv, probably a dumb error")
+#            logger.info(e)
 
         result.stop_timer()
         result.log(logger)
@@ -694,6 +703,7 @@ class FMSFImporter(BaseImportModule):
             inspect.currentframe().f_code.co_name,
             loadid=self.loadid,
         )
+        logger.debug("writing data to load_staging table")
         try:
             with connection.cursor() as cursor:
                 for tile in self.tiles:
@@ -735,6 +745,7 @@ class FMSFImporter(BaseImportModule):
             inspect.currentframe().f_code.co_name,
             loadid=self.loadid,
         )
+        logger.debug("writing tiles from load_staging")
         try:
             with connection.cursor() as cursor:
                 # cursor.execute("""CALL __arches_prepare_bulk_load();""")
