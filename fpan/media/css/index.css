@@ -379,6 +379,32 @@ input[type='text'] {
     border-top: solid 8px #273675;
 }
 
+.profile-links {
+    border: 1px solid #431825;
+    background: rgba(255, 255, 255, 0.4);
+}
+.profile-links-scout {
+    border-color: #F26422;
+}
+.profile-links-heading-scout {
+    color: white;
+    background-color: #F26422;
+}
+.profile-links-landmanager {
+    border-color: #273675;
+}
+.profile-links-heading-landmanager {
+    background-color: #273675;
+    color: white;
+}
+.profile-links-admin {
+    border-color: #431825;
+}
+.profile-links-heading-admin {
+    background-color: #431825;
+    color: white;
+}
+
 .scout-panel {
     border: 1px solid #F26422;
     background-color: rgba(255, 255, 255, 0.4);
