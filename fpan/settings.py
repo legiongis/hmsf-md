@@ -37,10 +37,12 @@ ETL_MODULE_LOCATIONS.append('fpan.etl_modules')
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'functions', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(APP_ROOT, 'widgets', 'templates'))
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(APP_ROOT, 'templates'))
+TEMPLATES[0]['DIRS'].insert(0, os.path.join(os.path.dirname(APP_ROOT), 'site_theme', 'templates'))
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.widget_data')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('hms.context_processors.user_type')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('site_theme.context_processors.profile_content')
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
@@ -48,6 +50,8 @@ INSTALLED_APPS += (
     'fpan',         # this is the Arches "project"
     'hms',          # HMS accounts, permissions, models, etc.
     'reporting',    # stats and email reporting
+    'site_theme',   # lightweight app to hold models for front end theming
+    'tinymce',      # used for WISIWYG editor in site_theme admin pages
 )
 
 # some shenanigans because grappelli must precede the django.contrib.admin app

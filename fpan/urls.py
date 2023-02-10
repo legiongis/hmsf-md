@@ -51,6 +51,8 @@ urlpatterns = [
 
     # now include HMS urls
     url(r'^', include('hms.urls')),
+    # include site_theme urls
+    url(r'^', include('site_theme.urls')),
 
     # finally, include default Arches urls
     url(r'^', include('arches.urls')),

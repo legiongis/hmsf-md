@@ -361,72 +361,8 @@
         <div class="profile-summary-page">
             <!-- Profile Sections -->
             <div class="profile-sections-{{user_type}}">
-                <!-- FPAN Panel for State Landmanagers -->
-                {% if user_is_state %}
-                    <section id="" class="profile-list">
-                        <div class="panel fpan-panel-{{user_type}}">
-                          <div class="row">
-                              <div class="col-md-3">
-                                  <img src="{% static 'img/state/DHR transparent - NO WWW.png' %}" alt="Logo" style="width:250px;"">
-                              </div>
-                              <div class="col-md-9 text-center">
-                                  <h2>{% trans "ARCHAEOLOGICAL AND HISTORIC SITE CONDITION ASSESSMENTS" %}</h2>
-                                  <p>{% trans "The purpose of condition assessments or “annual monitoring” of archaeological sites is to evaluate threats on a regular basis. The assessments submitted through this system populate a database which the Division of Historical Resources uses to track site condition and provide feedback for Land Management Reviews, per 259, Florida Statutes." %}</p>
-                              </div>
-                          </div>
-                    </section>
-                {% endif %}
-                {% if user_is_scout %}
-                  <section id="" class="profile-list">
-                      <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row">
-                          <div class="col-md-4" >
-                              <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" alt="Logo" style="width:100%;max-width:200px;">
-                          </div>
-                          <div class="col-md-8 hidden">
-                              <h1 style="">{% trans "HMS Florida" %}</h1>
-                          </div>
-                          <div class="col-md-8">
-                              <p>{% trans "Heritage Monitoring Scouts (HMS Florida) is a public engagement program focused on tracking changes to archaeological sites at risk, particularly those impacted by climate change in the form of erosion and sea level rise." %}</p>
-                              {% if not user_is_scout %}
-                              <p>{% trans "If you are already a Heritage Monitoring Scout," %} <a class="a-{{user_type}}" href='{% url "auth" %}?t=scout'>{% trans "sign in" %}</a>. {% trans "Otherwise, why not" %} <a class="a-{{user_type}}" href='{% url "fpan_home" %}#scout-signup'>{% trans "join us" %}</a>!</p>
-                              {% endif %}
-                          </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-xs-12"><hr style="border-top:solid #676761 1px;"></div>
-                        <div class="col-xs-12 col-sm-6">
-                            <h1>{% trans "How does it work?" %}</h1>
-                            <ul>
-                                <li>Citizens sign up as Heritage Monitoring Scouts, and can begin monitoring Historic Cemeteries and Historic Structures right away!</li>
-                                <li>To monitor Archaeological Sites, Scouts must first choose a region of interest, and then wait until an administrator assigns a site to them.</li>
-                                <li>Once an Archaeological Site has been assigned to a Scout, that Scout can view the site's location, and log a Scout Visit!</li>
-                            </ul>
-                            <div class="panel panel-bordered scout-panel">
-                                <div class="panel-heading">
-                                    <div class="panel-title"><i class="fa fa-download" aria-hidden="true"></i>
-                                        {% trans "Would you like a monitoring form to take with you in the field?" %}
-                                    </div>
-                                </div>
-                                <div class="panel-body">
-                                <ul>
-                                    <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Archaeological_Sites.pdf' %}">Download the Archaeological Site form</a></li>
-                                    <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Historic_Structures.pdf' %}">Download the Historic Structure form</a></li>
-                                </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-sm-6">
-                            <h1>{% trans "How do I log a visit?" %}</h1>
-                            <ol>
-                                <li>To log a scout visit for a Cemetery or Historic Structure, click <a class="a-{{user_type}}" href="{% url 'search_home' %}">“Explore the Database”</a>, then in the Menu Pane on the far left of the main map page, hover over the <i class="fa fa-building-o"></i> building icon and click on <i class="fa fa-binoculars"></i> “Scout Report” under the “Add New Resource” heading. Then, follow the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a> to log a visit.</li>
-                                <li>To monitor an Archaeological Site, you must first request access to that site. Please email us at <a class="a-{{user_type}}" href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a> to request access or get suggestions on sites you can monitor in your area.</li>
-                                <li>Once an Archaeological Site has been assigned, you can view the site's location and log a Scout Visit by following the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a>.</li>
-                            </ol>
-                        </div>
-                      </div>
-                  </section>
-                {% endif %}
+
+                {% include 'site_theme/profile_top_content.htm' %}
 
                 <!-- My Account Info Panel -->
                 <section id="" class="profile-list">

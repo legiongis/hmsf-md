@@ -52,7 +52,7 @@ class TestUtils():
     def create_test_landmanagers(self):
         """create a few land managers to demo different permissions levels"""
 
-        TEST_PASSWORD = "Testaccount1!"
+        TEST_PASSWORD = "TestAccount1!"
 
         print("making TestMatanzasSF: AREA permissions (Matanzas State Forest)")
         u, created = User.objects.get_or_create(pk=5004, username="TestMatanzasSF")

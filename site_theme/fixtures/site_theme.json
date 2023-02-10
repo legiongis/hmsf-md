@@ -1,0 +1,50 @@
+[
+{
+  "model": "site_theme.profilelink",
+  "pk": 1,
+  "fields": {
+    "name": "FPAN Main Website",
+    "desc": null,
+    "url": "https://fpan.us",
+    "file": "",
+    "sortorder_scout": 1,
+    "sortorder_landmanager": 1,
+    "sortorder_admin": 1
+  }
+},
+{
+  "model": "site_theme.profilelink",
+  "pk": 2,
+  "fields": {
+    "name": "Download Report",
+    "desc": "Take a report into the field for monitoring",
+    "url": null,
+    "file": "uploadedfiles/0360-9081_78_2_434.pdf",
+    "sortorder_scout": 2,
+    "sortorder_landmanager": 0,
+    "sortorder_admin": 0
+  }
+},
+{
+  "model": "site_theme.profilecontent",
+  "pk": 1,
+  "fields": {
+    "name": "Scout profile content",
+    "content": "<h3>What is it?</h3>\r\n<p>Heritage Monitoring Scouts (HMS Florida) is a public engagement program focused on tracking changes to archaeological sites at risk, particularly those impacted by climate change in the form of erosion and sea level rise.</p>\r\n<h3>How does it work?</h3>\r\n<ul>\r\n<li>Citizens sign up as Heritage Monitoring Scouts, and can begin monitoring Historic Cemeteries and Historic Structures right away!</li>\r\n<li>To monitor Archaeological Sites, Scouts must first choose a region of interest, and then wait until an administrator assigns a site to them.</li>\r\n<li>Once an Archaeological Site has been assigned to a Scout, that Scout can view the site's location, and log a Scout Visit!</li>\r\n</ul>\r\n<h3>How do I log a visit?</h3>\r\n<ol>\r\n<li>To log a scout visit for a Cemetery or Historic Structure, click <a class=\"a-scout\" href=\"../../../../../search\">&ldquo;Explore the Database&rdquo;</a>, then in the Menu Pane on the far left of the main map page, hover over the building icon and click on &ldquo;Scout Report&rdquo; under the &ldquo;Add New Resource&rdquo; heading. Then, follow the <a class=\"a-scout\" href=\"https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing\">detailed instructions</a> to log a visit.</li>\r\n<li>To monitor an Archaeological Site, you must first request access to that site. Please email us at <a class=\"a-scout\" href=\"mailto:hmsflorida@fpan.us\">hmsflorida@fpan.us</a> to request access or get suggestions on sites you can monitor in your area.</li>\r\n<li>Once an Archaeological Site has been assigned, you can view the site's location and log a Scout Visit by following the <a class=\"a-scout\" href=\"https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing\">detailed instructions</a>.</li>\r\n</ol>",
+    "sortorder_scout": 1,
+    "sortorder_landmanager": 0,
+    "sortorder_admin": 0
+  }
+},
+{
+  "model": "site_theme.profilecontent",
+  "pk": 2,
+  "fields": {
+    "name": "Land Manager profile content",
+    "content": "<h3>Archaeological and Historic Site Condition Assessments</h3>\r\n<p>The purpose of condition assessments or &ldquo;annual monitoring&rdquo; of archaeological sites is to evaluate threats on a regular basis. The assessments submitted through this system populate a database which the Division of Historical Resources uses to track site condition and provide feedback for Land Management Reviews, per 259, Florida Statutes.</p>",
+    "sortorder_scout": 0,
+    "sortorder_landmanager": 1,
+    "sortorder_admin": 0
+  }
+}
+]

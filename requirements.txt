@@ -1,5 +1,6 @@
 pygments==2.9.0
 django-grappelli==2.15.5
+django-tinymce==3.5.0
 django-import-export==2.8.0
 django-storages==1.13
 boto3==1.24
