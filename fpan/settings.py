@@ -60,8 +60,6 @@ INSTALLED_APPS += ('grappelli', 'django.contrib.admin')
 
 GRAPPELLI_ADMIN_TITLE = "HMS"
 
-INSTALLED_APPS += ('import_export', )
-
 PLAUSIBLE_SITE_DOMAIN = None
 PLAUSIBLE_EMBED_LINK = None
 
