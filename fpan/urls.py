@@ -1,5 +1,6 @@
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from django.views.generic.base import TemplateView
 from django.urls import path
@@ -59,3 +60,5 @@ urlpatterns = [
 ]
 if settings.SHOW_LANGUAGE_SWITCH is True:
     urlpatterns = i18n_patterns(*urlpatterns)
+if settings.DEBUG :
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
