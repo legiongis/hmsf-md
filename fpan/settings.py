@@ -46,6 +46,12 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('site_theme.context_process
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
+# some shenanigans because grappelli must precede the django.contrib.admin app
+INSTALLED_APPS = tuple([i for i in INSTALLED_APPS if not i == "django.contrib.admin"])
+INSTALLED_APPS += ('grappelli', 'django.contrib.admin')
+
+GRAPPELLI_ADMIN_TITLE = "HMS Florida - Monitoring Database"
+
 INSTALLED_APPS += (
     'fpan',         # this is the Arches "project"
     'hms',          # HMS accounts, permissions, models, etc.
@@ -53,12 +59,6 @@ INSTALLED_APPS += (
     'site_theme',   # lightweight app to hold models for front end theming
     'tinymce',      # used for WISIWYG editor in site_theme admin pages
 )
-
-# some shenanigans because grappelli must precede the django.contrib.admin app
-INSTALLED_APPS = tuple([i for i in INSTALLED_APPS if not i == "django.contrib.admin"])
-INSTALLED_APPS += ('grappelli', 'django.contrib.admin')
-
-GRAPPELLI_ADMIN_TITLE = "HMS"
 
 PLAUSIBLE_SITE_DOMAIN = None
 PLAUSIBLE_EMBED_LINK = None
