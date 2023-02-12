@@ -80,6 +80,9 @@ class Command(BaseCommand):
             name="Import Branch Excel",
         )
 
+        print("\033[96m-- Load Site Theme content --\033[0m")
+        management.call_command('loaddata', 'site_theme')
+
         if options['test_accounts']:
             TestUtils().create_test_scouts()
             TestUtils().create_test_landmanagers()

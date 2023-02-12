@@ -29,7 +29,7 @@
                         <ul style="padding-left:10px;">
                             {% for link in profile_links %}
                             <li>
-                                <a href="{{ link.target }}">{{ link.name }}</a>
+                                <a href="{{ link.target }}" target="_blank">{{ link.name }}</a>
                                 {% if link.desc %}<p style="margin:0"><em>{{ link.desc }}</em></p>{% endif %}
                             </li>
                             {% endfor %}
