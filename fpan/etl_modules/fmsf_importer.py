@@ -2,7 +2,6 @@ import gc
 import os
 import csv
 import copy
-import json
 import time
 import uuid
 import inspect
@@ -31,7 +30,7 @@ from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
 
 from hms.models import ManagementArea
-from fpan.tasks import run_fmsf_import_as_task
+from fpan.tasks import run_sequence_as_task
 from fpan.utils import ETLOperationResult
 
 logger = logging.getLogger(__name__)
@@ -245,18 +244,19 @@ FILENAME_LOOKUP = {
 }
 
 class FMSFImporter(BaseImportModule):
-    def __init__(self, request=None, loadid=None):
+    def __init__(self, request=None):
 
         if request:
             loadid = request.POST.get("load_id")
-        else:
-            loadid = loadid
 
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.loadid = loadid
+        self.loadid = None
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
+
+        # ETLResult object that will be assigned at the beginning of run_sequence()
+        self.reporter = None
 
         # these are passed into the two different import process methods
         self.file_dir = None
@@ -321,15 +321,18 @@ class FMSFImporter(BaseImportModule):
         for the front-end generated workflow, and the loadid is generated here.
         """
 
-        # self._set_resource_type(request.POST.get("resourceType", "Archaeological Site"))
-
         if self.loadid is None:
-            self.loadid = uuid.uuid4()
+            self.loadid = str(uuid.uuid4())
 
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
+        response = {
+            'operation': 'read_zip',
+            'success': True,
+            'message': "",
+            'data': {
+                'Files': [],
+                'loadid': self.loadid,
+            }
+        }
 
         content = request.FILES.get("file")
         upload_dir = self.get_uploaded_files_location()
@@ -338,22 +341,19 @@ class FMSFImporter(BaseImportModule):
         except (FileNotFoundError):
             pass
 
-        file_list = []
         if content.content_type == "application/zip":
             with zipfile.ZipFile(content, "r") as zip_ref:
                 files = zip_ref.infolist()
                 for file in files:
-                    file_list.append(file.filename)
+                    response['data']['Files'].append(file.filename)
                     save_path = Path(upload_dir, Path(file.filename).name)
                     default_storage.save(save_path, File(zip_ref.open(file)))
         else:
-            result.success = False
-            result.message = "Uploaded file must be a .zip file."
-            return result
+            response['success'] = False
+            response['message'] = "Uploaded file must be a .zip file."
+            return response
 
-        result.data['Files'] = file_list
-        # result = self.validate_files(upload_dir, result=result)
-        return result.serialize()
+        return response
 
     def _read_resource_csv(self):
 
@@ -401,7 +401,7 @@ class FMSFImporter(BaseImportModule):
             logger.warn(f"Invalid prefLabel {value} for node {node.name} with collection {node.config['rdmCollection']}")
         return labelid
 
-    def validate_files(self, file_dir, result=None):
+    def validate_files(self, file_dir):
 
         def validate_shp_fields(layer):
             shp_fields = []
@@ -411,84 +411,63 @@ class FMSFImporter(BaseImportModule):
                         shp_fields.append(item['field'])
             return [i for i in shp_fields if not i in layer.fields]
 
-        if result is None:
-            result = ETLOperationResult(
-                inspect.currentframe().f_code.co_name,
-                loadid=self.loadid,
-            )
-
         if isinstance(file_dir, str):
             file_dir = Path(file_dir)
 
         # first make sure the SHP and CSV are present
         for path in [self.resource_shp, self.resource_csv]:
             if not path.is_file():
-                result.success = False
-                result.message = f"Expected file {self.resource_shp.name} is missing."
+                self.reporter.success = False
+                self.reporter.message = f"Expected file {self.resource_shp.name} is missing."
 
         # next check the shapefile and its fields
-        if result.success:
+        if self.reporter.success:
             try:
                 ds = DataSource(self.resource_shp)
                 lyr = ds[0]
-                result.message = "All files look good!"
+                self.reporter.message = "All files look good!"
                 missing = validate_shp_fields(lyr)
                 if len(missing) > 0:
-                    result.success = False
-                    result.message = f"Shapefile is missing these fields: {', '.join(missing)}"
-                    result.data['Missing Fields'] = missing
+                    self.reporter.success = False
+                    self.reporter.message = f"Shapefile is missing these fields: {', '.join(missing)}"
+                    self.reporter.data['Missing Fields'] = missing
             except Exception as e:
-                result.success = False
-                result.message = str(e)
+                self.reporter.success = False
+                self.reporter.message = str(e)
 
         # finally, check the extra-structures CSV if it is present
-        if result.success:
+        if self.reporter.success:
             extra_structures_csv = Path(file_dir, "extra-structures.csv")
             if extra_structures_csv.is_file():
                 with open(extra_structures_csv, "r") as o:
                     reader = csv.reader(o)
                     headers = next(reader)
                     if headers[0] != "SiteID":
-                        result.success = False
-                        result.message = f"extra-structures.csv missing required header: SiteID"
+                        self.reporter.success = False
+                        self.reporter.message = f"extra-structures.csv missing required header: SiteID"
 
-        result.data['Resource model'] = self.resource_type
-        result.stop_timer()
-        result.log(logger)
-        return result
+        self.reporter.log(logger)
+        return
 
-    def start(self, request=None, load_description=""):
+    def initialize_load_event(self, load_description=""):
 
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
-        if self.loadid is None:
-            self.loadid = str(uuid.uuid4())
         if self.moduleid is None:
             self.moduleid = ETLModule.objects.get(classname=self.__class__.__name__).pk
         if self.userid is None:
             self.userid = 1
 
-        result.data['Load id'] = self.loadid
-        result.data['Resource model'] = self.resource_type
-
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, load_description, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "running", load_description, self.moduleid, json.dumps(result.data), datetime.now(), self.userid),
+                (self.loadid, False, "running", load_description, self.moduleid, self.reporter.get_load_details(), datetime.now(), self.userid),
             )
 
-        result.message = f"etl started with loadid: {self.loadid}"
-        result.stop_timer()
-        return result
+        self.reporter.message = f"etl started with loadid: {self.loadid}"
+        return
 
     def apply_historical_structures_filter(self, only_extra_ids=False):
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("filtering", self.loadid),
-            )
+        self.update_status_and_load_details("filtering")
 
         def _feature_is_lighthouse(feature):
             vals = [feature.get(f"STRUCUSE{i}") for i in [1,2,3]]
@@ -496,11 +475,6 @@ class FMSFImporter(BaseImportModule):
 
         def _feature_is_destroyed(feature):
             return feature.get("DESTROYED") == "YES"
-
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
 
         extra_ids = []
         extra_structures_csv = Path(self.file_dir, "extra-structure-ids.csv")
@@ -543,9 +517,10 @@ class FMSFImporter(BaseImportModule):
             try:
                 union_results = filter_areas.aggregate(Union('geom'))
             except Exception as e:
-                result.success = False
-                result.message = str(e)
-                return result
+                self.reporter.success = False
+                self.reporter.message = str(e)
+                return
+
             union_geom = union_results['geom__union']
             logger.debug("union geom created")
 
@@ -572,7 +547,6 @@ class FMSFImporter(BaseImportModule):
             logger.debug(f"intersect complete, {len(geom_matches)} matching features.")
 
         use_list = set(lighthouse_list + geom_matches + extra_list)
-        print("using these ids: ", use_list)
 
         original_ct = len(self.new_features)
 
@@ -584,20 +558,14 @@ class FMSFImporter(BaseImportModule):
 
         self.new_features = final_features
 
-        result.message = f"{len(self.new_features)} out of {original_ct} left after structure filter"
-        result.data['Filtered structures'] = len(self.new_features)
-        result.stop_timer()
-        return result
+        self.reporter.message = f"{len(self.new_features)} out of {original_ct} left after structure filter"
+        self.reporter.data['Filtered structures'] = len(self.new_features)
+        return
 
     def read_features_from_shapefile(self):
 
         ds = DataSource(self.resource_shp)
         lyr = ds[0]
-
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
 
         for feature in lyr:
             self.features.append(feature)
@@ -607,24 +575,16 @@ class FMSFImporter(BaseImportModule):
             else:
                 self.new_features.append(feature)
 
-        result.data['Sites already in database'] = len(self.existing_features)
-        result.data['New sites in uploaded data'] = len(self.new_features)
-        result.message = f"features: new - {len(self.new_features)}, existing {len(self.existing_features)}"
-        result.stop_timer()
-        result.log(logger)
-        return result
+        self.reporter.data['Sites already in database'] = len(self.existing_features)
+        self.reporter.data['New sites in uploaded data'] = len(self.new_features)
+        self.reporter.message = f"features: new - {len(self.new_features)}, existing {len(self.existing_features)}"
+
+        self.reporter.log(logger)
+        return
 
     def generate_load_data(self, truncate=None):
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("generating", self.loadid),
-            )
-
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
+        self.update_status_and_load_details("generating")
 
         self._read_resource_csv()
 
@@ -663,16 +623,10 @@ class FMSFImporter(BaseImportModule):
             if n == truncate:
                 break
 
-        # except Exception as e:
-        #     success = False
-        #     message = str(e)
-
-        result.message = f"resources: {len(self.fmsf_resources)}, tiles: {len(self.tiles)}"
-        result.data = {
-            "Features to load": len(self.fmsf_resources),
-            "Tiles to load": len(self.tiles),
-            "New FMSF site ids": [i.siteid for i in self.fmsf_resources],
-        }
+        self.reporter.message = f"resources: {len(self.fmsf_resources)}, tiles: {len(self.tiles)}"
+        self.reporter.data["Features to load"] = len(self.fmsf_resources)
+        self.reporter.data["Tiles to load"] = len(self.tiles)
+        self.reporter.data["New FMSF site ids"] = [i.siteid for i in self.fmsf_resources]
 
         # This summary file of ids was a nice idea, but it is failing because
         # of file permissions: apache creates the directory, and then celery
@@ -688,21 +642,13 @@ class FMSFImporter(BaseImportModule):
 #            logger.info("error trying to write csv, probably a dumb error")
 #            logger.info(e)
 
-        result.stop_timer()
-        result.log(logger)
-        return result
+        self.reporter.log(logger)
+        return
 
     def write_data_to_load_staging(self):
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("staging", self.loadid),
-            )
+        self.update_status_and_load_details("staging")
 
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
         logger.debug("writing data to load_staging table")
         try:
             with connection.cursor() as cursor:
@@ -725,26 +671,18 @@ class FMSFImporter(BaseImportModule):
                     )
 
                 cursor.execute("""CALL __arches_check_tile_cardinality_violation_for_load(%s)""", [self.loadid])
-            result.message = f"{len(self.tiles)} tiles written to load_staging table"
+            self.reporter.message = f"{len(self.tiles)} tiles written to load_staging table"
         except Exception as e:
-            result.success = False
-            result.message = str(e)
+            self.reporter.success = False
+            self.reporter.message = str(e)
 
-        result.stop_timer()
-        result.log(logger)
-        return result
+        self.reporter.log(logger)
+        return
 
     def write_tiles_from_load_staging(self):
 
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """UPDATE load_event SET status = %s WHERE loadid = %s""", ("writing", self.loadid),
-            )
+        self.update_status_and_load_details("writing")
 
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
         logger.debug("writing tiles from load_staging")
         try:
             with connection.cursor() as cursor:
@@ -754,12 +692,12 @@ class FMSFImporter(BaseImportModule):
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
-            result.message = f"all tiles written to tile table"
+            self.reporter.message = f"all tiles written to tile table"
             if row[0][0]:
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
-                        ("loaded", datetime.now(), self.loadid),
+                        """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, %s) WHERE loadid = %s""",
+                        ("loaded", datetime.now(), self.reporter.get_load_details(), self.loadid),
                     )
             else:
                 with connection.cursor() as cursor:
@@ -767,66 +705,54 @@ class FMSFImporter(BaseImportModule):
                         """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
                         ("failed", datetime.now(), self.loadid),
                     )
-                result.success = False
-                result.message = "No rows resulted from the write process"
+                self.reporter.success = False
+                self.reporter.message = "No rows resulted from the write process"
         except (IntegrityError, ProgrammingError) as e:
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
-            result.success = False
-            result.message = str(e)
+            self.reporter.success = False
+            self.reporter.message = str(e)
         finally:
             with connection.cursor() as cursor:
                 # cursor.execute("""CALL __arches_complete_bulk_load();""")
                 cursor.execute("""ALTER TABLE tiles enable trigger __arches_check_excess_tiles_trigger;""")
                 cursor.execute("""ALTER TABLE tiles enable trigger __arches_trg_update_spatial_attributes;""")
 
-        result.stop_timer()
-        result.log(logger)
-        return result
+        self.reporter.log(logger)
+        return
 
-    def finalize_indexing(self, load_details={}):
+    def finalize_indexing(self):
 
-        result = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
         try:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    """UPDATE load_event SET status = %s WHERE loadid = %s""", ("indexing", self.loadid),
-                )
+            self.update_status_and_load_details("indexing")
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
                 cursor.execute(f"REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
-                    ("completed", datetime.now(), True, True, json.dumps(load_details), self.loadid),
+                    ("completed", datetime.now(), True, True, self.reporter.get_load_details(), self.loadid),
                 )
-            result.message = "resources indexed and materialized view refreshed"
+            self.reporter.message = "resources indexed and materialized view refreshed"
         except Exception as e:
-            result.success = False
-            result.message = str(e)
+            self.reporter.success = False
+            self.reporter.message = str(e)
 
-        result.stop_timer()
-        result.log(logger)
-        return result
+        self.reporter.log(logger)
+        return
 
     def run_web_import(self, request):
 
-        reporter = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
         # handle values coming from frontend configuration
         resource_type = request.POST.get('resourceType')
         truncate = request.POST.get('truncate')
         dry_run = request.POST.get('dryRun')
         description = request.POST.get('loadDescription')
         only_extra_ids = request.POST.get('onlySiteIdList')
+        loadid = request.POST.get('loadId')
         self.resource_type = resource_type
         if truncate == "0":
             truncate = None
@@ -839,10 +765,14 @@ class FMSFImporter(BaseImportModule):
         else:
             only_extra_ids = False
 
-        run_fmsf_import_as_task.delay(self.loadid, resource_type, truncate=truncate, dry_run=dry_run, description=description, only_extra_ids=only_extra_ids)
+        run_sequence_as_task.delay(loadid, resource_type, truncate=truncate, dry_run=dry_run, description=description, only_extra_ids=only_extra_ids)
 
-        reporter.message = "import task submitted"
-        return reporter.serialize()
+        return {
+            "message": "import task submitted",
+            "loadId": loadid,
+            "success": True,
+            "data": {},
+        }
 
     def run_cli_import(self, **kwargs):
 
@@ -857,106 +787,119 @@ class FMSFImporter(BaseImportModule):
         file_dir = kwargs.get("file_dir")
         if file_dir is None:
             raise Exception("file_dir must be provided")
-        if self.loadid is None:
-            self.loadid = str(uuid.uuid4())
 
-        result = self.run_sequence(resource_type, truncate=truncate, dry_run=dry_run, file_dir=file_dir)
+        self.run_sequence(resource_type, truncate=truncate, dry_run=dry_run, file_dir=file_dir)
 
-        return result
+        return self.reporter.serialize()
 
-    def run_sequence(self, resource_type, truncate=None, dry_run=False, file_dir=None, description="", only_extra_ids=False):
+    def run_sequence(self, resource_type, loadid=None, truncate=None, dry_run=False, file_dir=None, description="", only_extra_ids=False):
 
-        reporter = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
-            loadid=self.loadid,
-        )
+        # the loadid may or may not be created already, but now it must be
+        # and added to this instance for use in all the subsequent operations.
+        if loadid is None:
+            loadid = str(uuid.uuid4())
+        self.loadid = loadid
 
-        reporter.data["Dry run"] = dry_run
-        reporter.data["Truncate load"] = truncate
-
+        if truncate is None:
+            truncate_str = "false"
         if truncate is not None:
             truncate = int(truncate)
+            truncate_str = str(truncate)
 
         if file_dir is None:
             file_dir = self.get_uploaded_files_location()
         else:
             self.file_dir = file_dir
 
+        self.reporter = ETLOperationResult(
+            inspect.currentframe().f_code.co_name,
+            loadid=self.loadid,
+            data={
+                "Dry run": dry_run,
+                "Truncate load": truncate_str,
+                "Resource model": resource_type,
+            }
+        )
+
+        if only_extra_ids is True:
+            self.reporter.data['Only use extra ids'] = True
+
         # use the provided resource_type to reference the proper graph and import files
         self._set_resource_type(resource_type)
 
         # START THE PROCESS
-        result = self.start(load_description=description)
+        self.initialize_load_event(load_description=description)
 
         # RUN FILE VALIDATION
-        result = self.validate_files(file_dir)
-        reporter.data.update(result.data)
-        if result.success is False:
-            self.abort_load(message=result.message, details=result.data)
-            return result.serialize()
+        self.validate_files(file_dir)
+        if self.reporter.success is False:
+            return self.abort_load()
 
         # create lookup of all existing resource instances for comparison
         self._set_resource_lookup()
 
         # READ FEATURES FROM THE INPUT SHAPEFILE
-        result = self.read_features_from_shapefile()
-        reporter.data.update(result.data)
+        self.read_features_from_shapefile()
         if len(self.new_features) == 0:
-            self.abort_load(message=result.message, details=result.data, status="completed")
-            return result.serialize()
+            return self.abort_load(status="completed")
 
         # RUN FILTERS ON THE STRUCTURES, IF NECESSARY
         if self.resource_type == "Historic Structure":
-            result = self.apply_historical_structures_filter(only_extra_ids=only_extra_ids)
-            reporter.data.update(result.data)
-            if result.success is False:
-                self.abort_load(message="All sites in this upload already exist in the HMS database.", details=result.data)
-                return result.serialize()
+            self.apply_historical_structures_filter(only_extra_ids=only_extra_ids)
+            if self.reporter.success is False:
+                return self.abort_load()
 
         # GENERATE THE DATA TO BE LOADED
-        result = self.generate_load_data(truncate=truncate)
-        reporter.data.update(result.data)
-        if result.success is False:
-            self.abort_load(message=result.message, details=result.data)
-            return result.serialize()
+        self.generate_load_data(truncate=truncate)
+        if self.reporter.success is False:
+            return self.abort_load()
 
         # WRITE THE LOAD DATA TO THE STAGING TABLE IN ARCHES DB
-        result = self.write_data_to_load_staging()
-        reporter.data.update(result.data)
-        if result.success is False:
-            self.abort_load(message=result.message, details=result.data)
-            return result.serialize()
+        self.write_data_to_load_staging()
+        if self.reporter.success is False:
+            return self.abort_load()
 
         # RUN THE FUNCTION TO TRANSLATE THE STAGING TABLE INTO REAL TILES
         if dry_run is True:
-            reporter.message = f"dry run completed successfully with {len(self.fmsf_resources)} resources."
-            result = self.finalize_indexing(load_details=reporter.data)
-            reporter.data.update(result.data)
+            self.reporter.message = f"Dry run completed successfully with {len(self.fmsf_resources)} resources."
+            self.finalize_indexing()
         else:
-            result = self.write_tiles_from_load_staging()
-            reporter.data.update(result.data)
-            if result.success is False:
-                self.abort_load(message=result.message, details=result.data)
-                return result.serialize()
+            self.write_tiles_from_load_staging()
+            if self.reporter.success is False:
+                return self.abort_load()
 
             # write the cumulative reporter data to load_details in the final step
-            result = self.finalize_indexing(load_details=reporter.data)
-            reporter.data.update(result.data)
-            if result.success is False:
-                self.abort_load(message=result.message, details=result.data)
-                return result.serialize()
+            self.finalize_indexing()
+            if self.reporter.success is False:
+                return self.abort_load()
 
-            reporter.message = "completed without error"
+            self.reporter.message = "completed without error"
 
-        reporter.stop_timer()
-        return reporter.serialize()
+        return self.reporter.serialize()
 
-    def abort_load(self, message="", details={}, status="failed"):
+    def update_status_and_load_details(self, status):
+        """
+        Sets the load_event status as specified and updates the load_details
+        object from the current state of self.reporter
+        """
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """UPDATE load_event SET (status, load_details) = (%s, %s) WHERE loadid = %s""",
+                (status, self.reporter.get_load_details(), self.loadid),
+            )
+
+    def abort_load(self, status="failed"):
+        """
+        Writes a failure/abort message to the load_event table, based on the current content
+        of the self.reporter object. Status can be overridden for cases where the abort
+        is not due to error, but just a lack of new data to load.
+        """
 
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, error_message, load_details, complete, successful) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
-                (status, message, json.dumps(details), True, True, self.loadid),
+                (status, self.reporter.message, self.reporter.get_load_details(), True, True, self.loadid),
             )
 
     def get_node(self, node_name):

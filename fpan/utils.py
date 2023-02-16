@@ -1,3 +1,4 @@
+import json
 import time
 
 
@@ -44,14 +45,24 @@ class ETLOperationResult():
         message = f"loadid: {self.loadid} | {self.message}"
         logger.log(level_lookup[level], message)
 
+    def get_load_details(self):
+        """
+        returns this result's data in the desired format for insertion into
+        the load_event table (column: load_details) - inserts self.message into
+        the returned data.
+        """
+        details = dict(self.data)
+        details['Message'] = self.message
+        return json.dumps(details)
+
     def serialize(self):
 
-        data = self.data
-        data['message'] = self.message
+        details = dict(self.data)
+        details['Message'] = self.message
 
         return {
             "operation": self.operation,
             "success": self.success,
-            "data": data,
+            "data": details,
         }
 
