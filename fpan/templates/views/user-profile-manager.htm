@@ -15,7 +15,7 @@
         <div class="navbar-header">
             <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
                 <img src="{{ STATIC_URL }}img/fpan/fpan_sun.png" alt="FPAN logo" class="brand-icon">
-                <div class="brand-title brand-title-admin">
+                <div class="brand-title brand-title-{{user_type}}">
                     <span class="brand-text">{{ app_name }}</span>
                 </div>
             </a>
@@ -27,13 +27,13 @@
 
 
 {% block mainnav %}
-    <nav id="mainnav-container" class="mainnav-container-admin">
-        <div id="mainnav" class="mainnav-admin">
+    <nav id="mainnav-container" class="mainnav-container-{{user_type}}">
+        <div id="mainnav" class="mainnav-{{user_type}}">
             {% block navbar %}
             <div id="mainnav-menu-wrap">
                 <div class="nano">
                     <div class="nano-content" tabindex="0">
-                        <ul id="mainnav-menu" class="list-group mainnav-menu-admin">
+                        <ul id="mainnav-menu" class="list-group mainnav-menu-{{user_type}}">
 
                             <!-- Tools -->
                             <li class="list-header">{% trans "Tools" %}</li>
@@ -48,10 +48,10 @@
                                     </span>
                                 </a>
                                 <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                     </li>
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
                                     </li>
                                 </ul>
@@ -78,7 +78,7 @@
                                 </a>
                                 <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
                                     <!-- ko foreach: createableResources -->
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
                                             css: { 'arches-menu-item-disabled': disable_instance_creation },
                                             attr: {
@@ -101,10 +101,10 @@
                                     </span>
                                 </a>
                                 <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu"  href="{% url 'graph' '' %}" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
                                     </li>
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'graph' '' %}#branches" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}#branches')">{% trans "Branches" %}</a>
                                     </li>
                                 </ul>
@@ -121,13 +121,13 @@
                                     </span>
                                 </a>
                                 <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
                                     </li>
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'map_layer_manager' %}#basemaps" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#basemaps')">{% trans "Basemaps" %}</a>
                                     </li>
-                                    <li class="link-submenu-item-admin">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'map_layer_manager' %}#overlays" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#overlays')">{% trans "Overlays" %}</a>
                                     </li>
                                 </ul>
@@ -211,7 +211,7 @@
 {% endblock mainnav %}
 
 {% block header %}
-    <div class="ep-toolbar-profile">
+    <div class="ep-toolbar-profile ep-toolbar-profile-{{user_type}}">
 
         <!-- Tools Menu -->
         {% if nav.menu %}
@@ -247,19 +247,19 @@
         <!-- Login -->
         {% if nav.login %}
             {% if user.username == 'anonymous' %}
-            <a href="{% url 'auth' %}?t=scout" class="ep-tools ep-tools-login">
+            <a href="{% url 'auth' %}?t=scout" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Scout Login">
                 <h5 class="hidden-xs">{% trans "Scout Login" %}</h5>
                 </div>
             </a>
-            <a href="{% url 'auth' %}?t=landmanager" class="ep-tools ep-tools-login">
+            <a href="{% url 'auth' %}?t=landmanager" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Land Manager Login">
 
                 <h5 class="hidden-xs">{% trans "Land Manager Login" %}</h5>
                 </div>
             </a>
             {% else %}
-            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login">
+            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Logout">
                 <h5 class="hidden-xs">{% trans "Logout" %}</h5>
                 </div>
@@ -269,7 +269,7 @@
 
         <!-- Search Bar -->
         {% if nav.search %}
-        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-login" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
               <h5 class="hidden-xs">Explore the Database</h5>
             </div>
@@ -278,7 +278,7 @@
 
         <!-- Prov edit history-->
         {% if user_is_reviewer == False and user|can_edit_resource_instance %}
-        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right" data-bind="click:function () { getProvisionalHistory(); }">
+        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click:function () { getProvisionalHistory(); }">
             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
               <i class="ion-clock"></i>
             </div>
@@ -286,7 +286,7 @@
         {% endif %}
 
         {% if nav.res_edit and user|can_edit_resource_instance %}
-        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
+        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit" %}'>
               <i class="ion-edit"></i>
             </div>
@@ -294,7 +294,7 @@
         {% endif %}
 
         {% if nav.print %}
-        <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+        <a href="" class="ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click: function() { window.print() }">
             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
               <i class="ion-printer"></i>
             </div>
@@ -302,7 +302,7 @@
         {% endif %}
 
         {% if nav.help %}
-        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
+        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
               <i class="ion-help"></i>
             </div>
@@ -316,7 +316,7 @@
             <div class="ep-edits-title">
                 <span>{% trans 'My Edit History' %}</span>
             </div>
-            <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right" style="border:none;">
+            <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right ep-tools-right-{{user_type}}" style="border:none;">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
                   <i class="fa fa-times-circle fa-lg"></i>
                 </div>
@@ -335,7 +335,7 @@
             <div class="ep-help-title">
                 <span>{% trans nav.help.title %}</span>
             </div>
-            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right" style="border:none" data-bind="click: function(){helpOpen(false)}">
+            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right ep-tools-right-{{user_type}}" style="border:none" data-bind="click: function(){helpOpen(false)}">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
                   <i class="fa fa-times-circle fa-lg"></i>
                 </div>
@@ -361,72 +361,8 @@
         <div class="profile-summary-page">
             <!-- Profile Sections -->
             <div class="profile-sections-{{user_type}}">
-                <!-- FPAN Panel for State Landmanagers -->
-                {% if user_is_state %}
-                    <section id="" class="profile-list">
-                        <div class="panel fpan-panel-{{user_type}}">
-                          <div class="row">
-                              <div class="col-md-3">
-                                  <img src="{% static 'img/state/DHR transparent - NO WWW.png' %}" alt="Logo" style="width:250px;"">
-                              </div>
-                              <div class="col-md-9 text-center">
-                                  <h2>{% trans "ARCHAEOLOGICAL AND HISTORIC SITE CONDITION ASSESSMENTS" %}</h2>
-                                  <p>{% trans "The purpose of condition assessments or “annual monitoring” of archaeological sites is to evaluate threats on a regular basis. The assessments submitted through this system populate a database which the Division of Historical Resources uses to track site condition and provide feedback for Land Management Reviews, per 259, Florida Statutes." %}</p>
-                              </div>
-                          </div>
-                    </section>
-                {% endif %}
-                {% if user_is_scout %}
-                  <section id="" class="profile-list">
-                      <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row">
-                          <div class="col-md-4" >
-                              <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" alt="Logo" style="width:100%;max-width:200px;">
-                          </div>
-                          <div class="col-md-8 hidden">
-                              <h1 style="">{% trans "HMS Florida" %}</h1>
-                          </div>
-                          <div class="col-md-8">
-                              <p>{% trans "Heritage Monitoring Scouts (HMS Florida) is a public engagement program focused on tracking changes to archaeological sites at risk, particularly those impacted by climate change in the form of erosion and sea level rise." %}</p>
-                              {% if not user_is_scout %}
-                              <p>{% trans "If you are already a Heritage Monitoring Scout," %} <a class="a-{{user_type}}" href='{% url "auth" %}?t=scout'>{% trans "sign in" %}</a>. {% trans "Otherwise, why not" %} <a class="a-{{user_type}}" href='{% url "fpan_home" %}#scout-signup'>{% trans "join us" %}</a>!</p>
-                              {% endif %}
-                          </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-xs-12"><hr style="border-top:solid #676761 1px;"></div>
-                        <div class="col-xs-12 col-sm-6">
-                            <h1>{% trans "How does it work?" %}</h1>
-                            <ul>
-                                <li>Citizens sign up as Heritage Monitoring Scouts, and can begin monitoring Historic Cemeteries and Historic Structures right away!</li>
-                                <li>To monitor Archaeological Sites, Scouts must first choose a region of interest, and then wait until an administrator assigns a site to them.</li>
-                                <li>Once an Archaeological Site has been assigned to a Scout, that Scout can view the site's location, and log a Scout Visit!</li>
-                            </ul>
-                            <div class="panel panel-bordered scout-panel">
-                                <div class="panel-heading">
-                                    <div class="panel-title"><i class="fa fa-download" aria-hidden="true"></i>
-                                        {% trans "Would you like a monitoring form to take with you in the field?" %}
-                                    </div>
-                                </div>
-                                <div class="panel-body">
-                                <ul>
-                                    <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Archaeological_Sites.pdf' %}">Download the Archaeological Site form</a></li>
-                                    <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Historic_Structures.pdf' %}">Download the Historic Structure form</a></li>
-                                </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xs-12 col-sm-6">
-                            <h1>{% trans "How do I log a visit?" %}</h1>
-                            <ol>
-                                <li>To log a scout visit for a Cemetery or Historic Structure, click <a class="a-{{user_type}}" href="{% url 'search_home' %}">“Explore the Database”</a>, then in the Menu Pane on the far left of the main map page, hover over the <i class="fa fa-building-o"></i> building icon and click on <i class="fa fa-binoculars"></i> “Scout Report” under the “Add New Resource” heading. Then, follow the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a> to log a visit.</li>
-                                <li>To monitor an Archaeological Site, you must first request access to that site. Please email us at <a class="a-{{user_type}}" href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a> to request access or get suggestions on sites you can monitor in your area.</li>
-                                <li>Once an Archaeological Site has been assigned, you can view the site's location and log a Scout Visit by following the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a>.</li>
-                            </ol>
-                        </div>
-                      </div>
-                  </section>
-                {% endif %}
+
+                {% include 'site_theme/profile_top_content.htm' %}
 
                 <!-- My Account Info Panel -->
                 <section id="" class="profile-list">
@@ -601,7 +537,7 @@
                         <div class="row relative">
                             <div class="col-sm-3">
                                 <div class="profile-header">
-                                    {% trans 'Site Access Rules' %}
+                                    {% trans 'Site Assignment Rules' %}
                                 </div>
                             </div>
                             <div class="col-sm-9">
@@ -614,7 +550,7 @@
                         <div class="row relative">
                             <div class="col-sm-3">
                                 <div class="profile-header">
-                                    {% trans 'Accessible Sites' %} ({{ accessible_sites|length }})
+                                    {% trans 'Sites Assigned to You' %} ({{ accessible_sites|length }})
                                 </div>
                             </div>
                             <div class="col-sm-9">
@@ -654,10 +590,10 @@
                             <div class="col-sm-9">
                                 <div class="relative" style="padding-top:5px;">
                                     <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}" target="_blank">click to download full list</a></p>
-                                    <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px;background:url({% static 'img/fpan/ricepaper.png' %});">
+                                    <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px; background:url({% static 'img/fpan/ricepaper.png' %});">
                                         {% for scout in scout_list %}
                                         <li><strong>{{scout.username}}</strong> | <em>regions:</em>
-                                            {% for region in scout.region_choices %}
+                                            {% for region in scout.fpan_regions %}
                                                 {{ region }}{% if not forloop.last %},{% endif %}
                                             {% endfor %} | <em>interests:</em>
                                             {% for interest in scout.site_interest_type %}
@@ -684,77 +620,6 @@
                 </section>
                 {% endif %}
                 {% endif %}
-
-<!-- commenting this section out as it's not implemented as of Feb 19th - AC -->
-                <!-- My Devices -->
-<!--
-                <div class="profile-list">
-                    <div class="profile-header">
-                        My Devices
-                    </div>
--->
-
-                    <!-- No Device Registered Yet -->
-<!--
-                    <div class="">
--->
-
-                        <!-- Download panel -->
-<!--
-                        <div id="download-buttons-panel" class="">
-                            <span class="hidden-xs">You haven't registered a device yet.</span> Download the App:
-                            <div class="">
-                                <a class="download-app" href=""><img class="apple_app_store_icon" src="{{ STATIC_URL }}img/user/apple.png" alt="ios"></a>
-                                <a class="download-app" href=""><img class="android_app_store_icon" src="{{ STATIC_URL }}img/user/google.png" alt="android"></a>
-                            </div>
-                        </div>
--->
-
-                        <!-- Devices Panel -->
-<!--
-                        <div id="devices-panel" class="" style="display: none;">
-                            <div class="row">
-                                <div class="col-sm-9 col-sm-offset-3">-->
-                                    <!-- Device Listing -->
-                                    <!--<ul class="device-listing">
-                                        <li class="device-list-item">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>Alison's iPhone 8</dt>
-                                                </dl>
-                                            </div>
-                                            <img src="img/arches/devices/smart_phone.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>December 18, 2017</dt>
-                                                    <dd class="profile-label-shim">9:18:52</dd>
-                                                    <dd class="profile-label-shim">Last login</dd>
-                                                </dl>
-                                            </div>
-                                        </li>
-
-                                        <li class="device-list-item">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>Getty iPad #14</dt>
-                                                </dl>
-                                            </div>
-                                            <img src="img/arches/devices/tablet.png" alt="Tablet" class="mar-btm" style="height: 80px; margin-top: 10px; margin-left: 15px; margin-right: 15px;">
-                                            <div class="">
-                                                <dl class="device-summary">
-                                                    <dt>November 9, 2017</dt>
-                                                    <dd class="profile-label-shim">17:45:12</dd>
-                                                    <dd class="profile-label-shim">Last login</dd>
-                                                </dl>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
--->
 
                 <!-- Notification Settings -->
                 <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
@@ -811,134 +676,7 @@
                     </div>
                 </section>
                 {% endcomment %}
-
-                {% comment %}
-                <!-- commenting the Arches Collector section out because it is not yet active -->
-                <section class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="profile-header">
-                            {% trans 'Arches Collector Projects' %}
-                        </div>
-                        <!--ko if: mobilesurveys.length === 0 -->
-                        <div id="default-mobile-projects" class="profile-default-message-panel">
-                            {% trans "You haven't been added to a project yet." %}
-                        </div>
-                        <!--/ko-->
-
-                        <!--ko if: mobilesurveys.length > 0 -->
-                        <!-- Survey Invitations List -->
-                        <div id="mobile-projects-list" class="profile-default-message-panel">
-                            <div class="row">
-
-                                <!-- Find a survey -->
-                                <div class="col-sm-9 col-sm-offset-3 relative">
-                                    <div class="project-search-widget">
-                                        <input type="text" class="form-control" placeholder="{% trans 'Find a project...' %}" data-bind="value: mobileSurveyFilter, valueUpdate: 'keyup'">
-                                        <span class="clear-node-search" data-bind="visible: mobileSurveyFilter().length > 0, click: function() { mobileSurveyFilter(''); }"><i class="fa fa-times-circle"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Survey List -->
-                            <div id="" class="row">
-                                <div class="col-sm-9 col-sm-offset-3 mar-top">
-                                    <div class="">
-                                        <!--ko foreach: {data: filteredMobileSurveys(), as: 'vm'} -->
-                                        <div class="project-panel">
-
-                                            <div class="project-panel-header">
-                                                <div class="user-survey">
-                                                    <div class="project-status" data-bind="text:vm.mobilesurvey.active() ? '{% trans "Active" %}' : '{% trans "Inactive" %}', css: {active: vm.mobilesurvey.active()}"></div>
-                                                    <ul class="project-metadata">
-                                                        <li class="project-metadata-item">
-                                                            <span data-bind="text: vm.mobilesurvey.startdate() || '?'"></span>
-                                                            {% trans 'to' %}
-                                                            <span data-bind="text: vm.mobilesurvey.enddate() || '?'"></span>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <h3 class="project-panel-title" data-bind="text: vm.mobilesurvey.name() === '' ? '{% trans "Unnamed Survey" %}' : vm.mobilesurvey.name()"></h3>
-
-                                                <div class="">
-                                                    <div class="project-details">
-                                                        <a id="view-project-details-btn" class="text-primary text-semibold" data-bind="click: function(val){val.mobilesurvey.toggleShowDetails();}">{% trans 'View Details' %}</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class='profile-mpm-panel' data-bind="css: {'show-details': vm.mobilesurvey.showDetails}">
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Project Summary' %}
-                                                    </p>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-                                                            Number of edits: 0
-                                                        </li>
-                                                        <li class="">
-                                                            Contributors: 0
-                                                        </li>
-                                                        <li class="">
-                                                            Offline Basemap: Streets-Grey
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Groups/Users' %}
-                                                    </p>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-
-                                                            {% trans 'Groups' %} (<span data-bind="text: vm.mobilesurvey.groups().length"></span>)
-                                                            <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'group' && _.contains(mobilesurvey.groups(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <li class="">
-                                                            {% trans 'Users' %} (<span data-bind="text: vm.mobilesurvey.users().length"></span>)
-                                                            <ul class="mpm-node-detail-metadata" data-bind="foreach: _.filter(vm.mobilesurvey.identities, function(id){return (id.type === 'user' && _.contains(vm.mobilesurvey.users(), id.id))})">
-                                                                <li class="" data-bind="text: $data.name"></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-
-                                                <div class="">
-                                                    <p class="mpm-item-listing-header" style="margin-bottom: 0px;">
-                                                        {% trans 'Models and Data Entry Cards' %}
-                                                    </p>
-
-                                                    <ul class="mpm-node-detail-metadata">
-                                                        <!--ko foreach: {data: vm.resources, as: 'resource'} -->
-                                                        <li class="">
-                                                            <div data-bind="text: resource.name + ' (' + resource.cards.length + ' data entry cards)'"></div>
-                                                            <!--ko foreach: {data: resource.cards, as: 'card'} -->
-                                                            <ul class="mpm-node-detail-metadata">
-                                                                <li data-bind="text: card.name"></li>
-                                                            </ul>
-                                                            <!--/ko-->
-                                                        </li>
-                                                        <!--/ko-->
-                                                    </ul>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                        <!-- /ko -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--/ko-->
-                    </div>
-                </section>
-                {% endcomment %}
             </div>
-
         </div>
         <!-- END Profile Summary -->
 

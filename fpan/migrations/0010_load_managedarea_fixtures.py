@@ -4,10 +4,10 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 from django.core import management
-from fpan.models import ManagedArea
-from fpan.utils.legacy_utils import add_fwcc_nicknames
 
+from fpan.decorators import deprecated_migration_operation
 
+@deprecated_migration_operation
 def load_managedareas(apps, schema_editor):
 
     management.call_command("loaddata", "managedareas1.json")
@@ -19,11 +19,13 @@ def load_managedareas(apps, schema_editor):
 
     ## these operations add some extra info to some of the managed areas
     ## that is not included in the fixture files.
+    from fpan.utils.legacy_utils import add_fwcc_nicknames
     add_fwcc_nicknames()
 
-
+@deprecated_migration_operation
 def remove_managedareas(apps, schema_editor):
 
+    from fpan.models import ManagedArea
     ManagedArea.objects.all().delete()
 
 class Migration(migrations.Migration):

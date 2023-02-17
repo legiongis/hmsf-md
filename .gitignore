@@ -1,3 +1,8 @@
+# package content to ignore
+fpan/pkg/business_data/local
+
+# project content to ignore
+fpan/fmsf-uploads
 fpan/media/packages
 fpan/tileserver
 fpan/uploadedfiles

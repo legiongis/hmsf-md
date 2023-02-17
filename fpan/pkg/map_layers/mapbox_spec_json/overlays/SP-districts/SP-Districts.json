@@ -1,0 +1,76 @@
+{
+    "version": 8,
+    "name": "SP districts",
+    "metadata": {
+        "mapbox:autocomposite": true,
+        "mapbox:type": "template",
+        "mapbox:sdk-support": {
+            "js": "1.6.0",
+            "android": "8.6.0",
+            "ios": "5.6.0"
+        },
+        "mapbox:groups": {},
+        "mapbox:uiParadigm": "layers"
+    },
+    "center": [-82.42986926006364, 27.81557885858274],
+    "zoom": 6.087612238231506,
+    "bearing": 0,
+    "pitch": 0,
+    "sources": {
+        "composite": {
+            "url": "mapbox://hmsflorida.2l1p99a5,hmsflorida.bjo1n0mp",
+            "type": "vector"
+        }
+    },
+    "sprite": "mapbox://sprites/hmsflorida/ck8oy1eci04tc1in56ymfubxh/ck2u8j60r58fu0sgyxrigm3cu",
+    "glyphs": "mapbox://fonts/hmsflorida/{fontstack}/{range}.pbf",
+    "layers": [
+        {
+            "id": "background",
+            "type": "background",
+            "paint": {"background-color": "rgba(0,0,0,0)"}
+        },
+        {
+            "id": "sp-districts-09w1sv",
+            "type": "fill",
+            "source": "composite",
+            "source-layer": "SP_Districts-09w1sv",
+            "layout": {},
+            "paint": {
+                "fill-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", "DISTRICT"],
+                    1,
+                    "hsl(0, 74%, 46%)",
+                    2,
+                    "hsl(29, 80%, 58%)",
+                    3,
+                    "hsl(137, 80%, 58%)",
+                    4,
+                    "hsl(62, 80%, 58%)",
+                    5,
+                    "hsl(239, 80%, 58%)"
+                ],
+                "fill-opacity": 0.53
+            }
+        },
+        {
+            "id": "sp-district-labels-4tmmjo",
+            "type": "symbol",
+            "source": "composite",
+            "source-layer": "SP_District_Labels-4tmmjo",
+            "layout": {
+                "text-field": ["to-string", ["get", "DISTRICT"]],
+                "text-font": ["Open Sans ExtraBold", "Arial Unicode MS Regular"]
+            },
+            "paint": {"text-color": "hsl(0, 8%, 31%)"}
+        }
+    ],
+    "created": "2020-04-06T20:45:01.431Z",
+    "id": "ck8oy1eci04tc1in56ymfubxh",
+    "modified": "2020-04-16T18:18:44.592Z",
+    "owner": "hmsflorida",
+    "visibility": "public",
+    "draft": false
+}

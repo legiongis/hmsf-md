@@ -1,12 +1,12 @@
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls import include, url
+from django.conf.urls.static import static
 from django.views.generic import RedirectView
 from django.views.generic.base import TemplateView
 from django.urls import path
 from django.conf import settings
-from arches.app.views.auth import UserProfileView, GetClientIdView
-from arches.app.views.user import UserManagerView
-from fpan.views import api, main, auth, scout, search
+
+from fpan.views.api import MVT, ResourceIdLookup
 from fpan.views.user import FPANUserManagerView
 from fpan.views.resource import (
     FPANResourceListView,
@@ -18,32 +18,27 @@ from fpan.views.resource import (
     FPANRelatedResourcesView,
     FPANResourceEditorView,
 )
+from hms.views import server_error
 
-uuid_regex = settings.UUID_REGEX
-handler500 = main.server_error
-
+handler500 = server_error
 favicon_view = RedirectView.as_view(url=f'{settings.STATIC_URL}img/favicon/favicon.ico', permanent=True)
 
+uuid_regex = settings.UUID_REGEX
+
 urlpatterns = [
-    url(r'^$', main.index, name='fpan_home'),
-    url(r'^about$', main.about, name='about'),
-    url(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
-    url(r"^user/scout-profile$", main.hms_home, name="scout_profile_manager"),
-    url(r'^hms/home', RedirectView.as_view(pattern_name='scout_profile_manager', permanent=True)),
-    url(r'^state/home', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
-    url(r'^dashboard', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
-    url(r'^regions/$', main.show_regions, name='show_regions'),
-    url(r'^index.htm', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
-    url(r'^scout/signup', scout.scout_signup, name='scout_signup'),
-    url(r'^scouts/$', scout.scouts_dropdown, name='scouts_dropdown'),
-    url(r'^scout-list-download/$', scout.scout_list_download, name='scout_list_download'),
+    # some site-level urls
+    url(r'^favicon\.ico$', favicon_view),
+    path("robots.txt",TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
+    path('grappelli/', include('grappelli.urls')), # grappelli URLS
+
+    # override existing Arches urls in a few different instances
     url(
         r"^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$" % uuid_regex,
-        api.MVT.as_view(),
+        MVT.as_view(),
         name="mvt",
     ),
-
-    url(r"api/lookup$", api.ResourceIdLookup.as_view(), name="resource_lookup"),
+    url(r"api/lookup$", ResourceIdLookup.as_view(), name="resource_lookup"),
+    url(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
 
     # the following are just pass through views so HMS can apply an additional permissions-based decorator
     url(r"^resource$", FPANResourceListView.as_view(), name="resource"),
@@ -55,17 +50,15 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
 
+    # now include HMS urls
+    url(r'^', include('hms.urls')),
+    # include site_theme urls
+    url(r'^', include('site_theme.urls')),
 
-    path("auth/state", auth.login_patch, {'login_type':'landmanager'}, name="state_login_redirect"),
-    path("auth/scout", auth.login_patch, {'login_type':'scout'}, name="scout_login_redirect"),
-    url(r"^auth/", auth.LoginView.as_view(), name="auth"),
-    path("activate/", auth.activate, name='activate'),
-    path("activate/<str:uidb64>/<str:token>/", auth.activate_page, name='activate_page'),
-
-    url(r'^favicon\.ico$', favicon_view),
-    path("robots.txt",TemplateView.as_view(template_name="robots.txt", content_type="text/plain")),
-    path('grappelli/', include('grappelli.urls')), # grappelli URLS
+    # finally, include default Arches urls
     url(r'^', include('arches.urls')),
 ]
 if settings.SHOW_LANGUAGE_SWITCH is True:
     urlpatterns = i18n_patterns(*urlpatterns)
+if settings.DEBUG :
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

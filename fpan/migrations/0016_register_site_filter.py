@@ -4,17 +4,22 @@ from __future__ import unicode_literals
 from django.db import migrations
 from django.core import management
 
+from fpan.decorators import deprecated_migration_operation
+
+@deprecated_migration_operation
 def load_rule_filter(apps, schema_editor):
 
     management.call_command(
-        "extension", "search", "register",
-        source="fpan/search/components/rule_filter.py"
+        "extension", "register", "search-filter",
+        source="fpan/search/components/rule_filter.py",
+        overwrite=True,
     )
 
+@deprecated_migration_operation
 def remove_rule_filter(apps, schema_editor):
 
     management.call_command(
-        "extension", "search", "unregister",
+        "extension", "unregister", "search-filter",
         name="Rule Filter"
     )
 

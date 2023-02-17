@@ -1,0 +1,1 @@
+celery -A fpan worker --loglevel=DEBUG

@@ -2,14 +2,13 @@
 
 from django.db import migrations, models
 
-from hms.models import ManagementArea
+from fpan.decorators import deprecated_migration_operation
 
+@deprecated_migration_operation
 def update_existing_management_areas(apps, schema_editor):
+    from hms.models import ManagementArea
     for ma in ManagementArea.objects.all():
         ma.save(update_fields=['display_name'])
-
-def reversible_placeholder(apps, schema_editor):
-    pass
 
 class Migration(migrations.Migration):
 
@@ -23,5 +22,5 @@ class Migration(migrations.Migration):
             name='display_name',
             field=models.CharField(blank=True, max_length=254, null=True),
         ),
-        migrations.RunPython(update_existing_management_areas, reversible_placeholder)
+        migrations.RunPython(update_existing_management_areas)
     ]

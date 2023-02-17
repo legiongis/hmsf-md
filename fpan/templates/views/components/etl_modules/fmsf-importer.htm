@@ -1,0 +1,148 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+    <div class="fmsf-etl" style="display:flex; flex-direction:column; height:calc(100vh - 100px);">
+        <!-- ko ifnot: response() -->
+        <div style="height:50%; padding:20px; overflow-y:scroll">
+            <h2>Using the FMSF Data Importer</h2>
+            <p>Use this ETL module to sites from FMSF into the HMS database. You will run the process once per FMSF site type, creating an upload a .zip file for each import. Use the Task Status tab to view summaries of all import tasks.</p>
+            <h3>Steps</h3>
+            <ol>
+                <li>
+                    Create a .zip file with the following content and <strong>no nested directories</strong>.
+                    <ul>
+                        <li>Shapefile export from FMSF (keep default name).</li>
+                        <li>CSV export from Santa Clause MS Access database (keep default name).</li>
+                        <li>For example, an Archaeological Site upload will contain these files (plus some additional shapefile "sidecars"):</li>
+                        <ul style="font-size:.8em">
+                            <li>AR.csv</li>
+                            <li>FloridaSites.dbf</li>
+                            <li>FloridaSites.shp</li>
+                            <li>FloridaSites.shx</li>
+                        </ul>
+                    </ul>
+                </li>
+                <li>Upload the .zip file below (this may take a few seconds).</li>
+                <li>Set some configuration options (all optional)
+                    <ul>
+                        <li><strong>Truncate:</strong> Only import the first N resources in the upload files (generally this is only useful during development).</li>
+                        <li><strong>Dry run:</strong> Run a mock import that creates all necessary content behind the scenes, but stops short of loading anything into the database.</li>
+                        <li><strong>Note to self:</strong> Attach a note to this import task.</li>
+                    </ul>
+                </li>
+            </ol>
+            <h3>More information</h3>
+            <ul>
+                <li>Historic Structures will be filtered in the following manner (these filters take over 10 minutes to run):
+                    <ul>
+                        <li>Any destroyed structures are <strong>excluded</strong>.</li>
+                        <li>Any stuctures located within any Managed Areas (parks, forests, etc) are <strong>included</strong>.</li>
+                        <li>All lighthouses are <strong>included</strong>.</li>
+                    </ul>
+                </li>
+                <li>Once started, the import runs behind the scenes, and the Task Status tab will show live status updates.</li>
+            </ul>
+        </div>
+        <div class="file-select loader-select" style="height:50%; overflow-y:scroll;">
+            <div data-bind="dropzone: dropzoneOptions">
+                <div class="manifest-manager-main-menu-circle loader-button">
+                    <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
+                </div> 
+                <h2>{% trans 'Upload Your .zip File' %}</h2>
+                <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+                    <div style="display:flex; flex-direction: column;">
+                        <div>
+                            <div class="dropzone-photo-upload">
+                                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                                {% trans 'Select File' %}
+                                </div>
+                                <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
+                                    {% trans 'Cancel File Import' %}
+                                </div>
+                                <div style="min-height: 100%;">
+                                    <div id="hidden-dz-previews" style="display:none"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: response() -->
+        <div class="branch-xl-metadata-container">
+            <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px;">
+                <h3 class="branch-xl-title" style="">{% trans "FMSF File Validation Summary" %}</h3>
+                <div class="etl-module-component" style="margin-top: 0px;">
+                    <div style="display: inline-grid; grid-template-columns: auto auto; column-gap: 10px;">
+                        <div class="etl-loading-metadata-key">{% trans "Resource Model:" %}</div>
+                        <div class="etl-loading-metadata-value" data-bind="text: response().result['Resource Model']"></div>
+                        <div class="etl-loading-metadata-key">{% trans "Validation Message:" %}</div>
+                        <div class="etl-loading-metadata-value" data-bind="text: response().result.message"></div>
+                    </div>
+                </div>
+                <div class="branch-xl-file-contents-container">
+                    <h3 class="branch-xl-title">{% trans "File List" %}</h3> 
+                    <div style="color: #333333">
+                        <!--ko foreach: {data: response().result.Files, as: 'file'}-->
+                        <div data-bind="text: file"></div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div>
+                    <h3 class="branch-xl-title">{% trans "Configure Import" %}</h3>
+                    <div>
+                        <label>
+                            <strong>Resource Type:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: resourceType">
+                                <option>Archaeological Site</option>
+                                <option>Historic Cemetery</option>
+                                <option>Historic Structure</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Truncate:</strong>
+                            <input type="number" style="line-height:unset;" step="1" data-bind="value: truncate">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Enter a number of sites to import or use 0 to import <em>all</em> new sites.</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Dry run:</strong>
+                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: dryRun">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Run this import without loading any new sites into the database.</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Only Extra Site Ids:</strong>
+                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: onlySiteIdList">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Only import sites in the extra-structure-ids.csv list (Historic Sturctures only).</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Note to self:</strong>
+                            <input style="width:unset; height:unset;" data-bind="value: loadDescription">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">This note will be saved as the load description (optional).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div  class="tabbed-workflow-footer, etl-module-footer">
+           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">{% trans "Begin Import" %}</button>
+        </div>
+        <!-- /ko -->
+    </div>
+<!--/ko-->
+{% endblock task_details %}
+
+{% block etl_status %}
+{% endblock etl_status %}
