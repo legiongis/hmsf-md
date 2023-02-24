@@ -286,7 +286,7 @@ class FMSFImporter(BaseImportModule):
 
     def get_uploaded_files_location(self):
         self.file_dir = Path(settings.APP_ROOT, "fmsf-uploads", self.loadid)
-        return Path(settings.APP_ROOT, "fmsf-uploads", self.loadid)
+        return self.file_dir
 
     def _set_resource_type(self, resource_type):
         self.resource_type = resource_type
@@ -335,23 +335,28 @@ class FMSFImporter(BaseImportModule):
         }
 
         content = request.FILES.get("file")
-        upload_dir = self.get_uploaded_files_location()
+        upload_dir = str(self.get_uploaded_files_location())
+
         try:
             self.delete_from_default_storage(upload_dir)
         except (FileNotFoundError):
             pass
+        except Exception as e:
+            logger.error(e)
 
-        if content.content_type == "application/zip":
-            with zipfile.ZipFile(content, "r") as zip_ref:
-                files = zip_ref.infolist()
-                for file in files:
-                    response['data']['Files'].append(file.filename)
-                    save_path = Path(upload_dir, Path(file.filename).name)
-                    default_storage.save(save_path, File(zip_ref.open(file)))
-        else:
-            response['success'] = False
-            response['message'] = "Uploaded file must be a .zip file."
-            return response
+        try:
+            if content.content_type == "application/zip":
+                with zipfile.ZipFile(content, "r") as zip_ref:
+                    files = zip_ref.infolist()
+                    for file in files:
+                        zip_ref.extract(file.filename, upload_dir)
+                        response['data']['Files'].append(file.filename)
+            else:
+                response['success'] = False
+                response['message'] = "Uploaded file must be a .zip file."
+                return response
+        except Exception as e:
+            logger.error(e)
 
         return response
 
@@ -815,6 +820,7 @@ class FMSFImporter(BaseImportModule):
             inspect.currentframe().f_code.co_name,
             loadid=self.loadid,
             data={
+                "Load ID": self.loadid,
                 "Dry run": dry_run,
                 "Truncate load": truncate_str,
                 "Resource model": resource_type,
