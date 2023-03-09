@@ -362,12 +362,26 @@ class FMSFImporter(BaseImportModule):
 
     def _read_resource_csv(self):
 
+        # read the CSV into a list of rows, trying different encodings
+        try:
+            # First try to read as UTF encoded file
+            with open(self.resource_csv, "r", encoding="utf-8") as in_csv:
+                reader = csv.DictReader(in_csv)
+                rows = [i for i in reader]
+        except UnicodeDecodeError:
+            # If that doesn't work, try ISO-8859-1 (common in windows)
+            with open(self.resource_csv, "r", encoding="ISO-8859-1") as in_csv:
+                reader = csv.DictReader(in_csv)
+                rows = [i for i in reader]
+        except Exception as e:
+            logger.error(e)
+            raise e
+
         data = {}
-        with open(self.resource_csv, "r") as in_csv:
-            reader = csv.DictReader(in_csv)
-            for row in reader:
-                siteid = row['SiteID'].rstrip()
-                data[siteid] = data.get(siteid, []) + [row]
+        for row in rows:
+            siteid = row['SiteID'].rstrip()
+            data[siteid] = data.get(siteid, []) + [row]
+
         self.csv_data = data
 
     def get_value_from_csv(self, siteid, field_name):
@@ -591,6 +605,7 @@ class FMSFImporter(BaseImportModule):
 
         self.update_status_and_load_details("generating")
 
+        logger.debug("reading csv")
         self._read_resource_csv()
 
         self.tiles = []
