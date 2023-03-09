@@ -353,10 +353,11 @@ class FMSFImporter(BaseImportModule):
             if content.content_type in zip_types:
                 with zipfile.ZipFile(content, "r") as zip_ref:
                     files = zip_ref.infolist()
+                    zip_ref.extractall(upload_dir)
                     for file in files:
                         response['data']['Files'].append(file.filename)
-                        save_path = Path(upload_dir, Path(file.filename).name)
-                        default_storage.save(save_path, File(zip_ref.open(file)))
+                        # save_path = Path(upload_dir, Path(file.filename).name)
+                        # default_storage.save(save_path, File(zip_ref.open(file)))
             else:
                 logger.warn(f"uploaded content_type is not zip, is {content.content_type}")
                 response['success'] = False
