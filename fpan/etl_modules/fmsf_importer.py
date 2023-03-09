@@ -341,16 +341,28 @@ class FMSFImporter(BaseImportModule):
         except (FileNotFoundError):
             pass
 
-        if content.content_type == "application/zip":
-            with zipfile.ZipFile(content, "r") as zip_ref:
-                files = zip_ref.infolist()
-                for file in files:
-                    response['data']['Files'].append(file.filename)
-                    save_path = Path(upload_dir, Path(file.filename).name)
-                    default_storage.save(save_path, File(zip_ref.open(file)))
-        else:
+        zip_types = [
+            "application/zip",
+            "application/x-zip-compressed",
+        ]
+
+        try:
+            if content.content_type in zip_types:
+                with zipfile.ZipFile(content, "r") as zip_ref:
+                    files = zip_ref.infolist()
+                    for file in files:
+                        response['data']['Files'].append(file.filename)
+                        save_path = Path(upload_dir, Path(file.filename).name)
+                        default_storage.save(save_path, File(zip_ref.open(file)))
+            else:
+                logger.warn(f"uploaded content_type is not zip, is {content.content_type}")
+                response['success'] = False
+                response['message'] = "Uploaded file must be a .zip file."
+                return response
+        except Exception as e:
+            logger.error(e)
             response['success'] = False
-            response['message'] = "Uploaded file must be a .zip file."
+            response['message'] = str(e)
             return response
 
         return response
