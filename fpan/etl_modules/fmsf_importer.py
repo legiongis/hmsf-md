@@ -344,19 +344,30 @@ class FMSFImporter(BaseImportModule):
         except Exception as e:
             logger.error(e)
 
+        zip_types = [
+            "application/zip",
+            "application/x-zip-compressed",
+        ]
+
         try:
-            if content.content_type == "application/zip":
+            if content.content_type in zip_types:
                 with zipfile.ZipFile(content, "r") as zip_ref:
                     files = zip_ref.infolist()
                     for file in files:
-                        zip_ref.extract(file.filename, upload_dir)
                         response['data']['Files'].append(file.filename)
+                        save_path = Path(upload_dir, Path(file.filename).name)
+                        default_storage.save(save_path, File(zip_ref.open(file)))
             else:
+                logger.warn(f"uploaded content_type is not zip, is {content.content_type}")
                 response['success'] = False
                 response['message'] = "Uploaded file must be a .zip file."
                 return response
         except Exception as e:
             logger.error(e)
+            response['success'] = False
+            response['message'] = str(e)
+            return response
+
 
         return response
 
