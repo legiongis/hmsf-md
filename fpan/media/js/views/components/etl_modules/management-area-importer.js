@@ -18,10 +18,10 @@ define([
             this.loading = params.loading || ko.observable();
             this.data2 = ko.observable(false);
 
-            this.resourceType = ko.observable("");
-            this.truncate = ko.observable(0);
-            this.dryRun = ko.observable(false);
-            this.onlySiteIdList = ko.observable(false);
+            this.maGroup = ko.observable("");
+            this.maCategory = ko.observable("");
+            this.maAgency = ko.observable("");
+            this.maLevel = ko.observable("");
             this.loadDescription = ko.observable("");
 
             this.moduleId = params.etlmoduleid;
@@ -52,10 +52,10 @@ define([
 
             this.start = async function(){
                 self.loading(true);
-                self.formData.append("resourceType", self.resourceType())
-                self.formData.append("truncate", self.truncate())
-                self.formData.append("dryRun", self.dryRun())
-                self.formData.append("onlySiteIdList", self.onlySiteIdList())
+                self.formData.append("maGroup", self.maGroup())
+                self.formData.append("maCategory", self.maCategory())
+                self.formData.append("maAgency", self.maAgency())
+                self.formData.append("maLevel", self.maLevel())
                 self.formData.append("loadDescription", self.loadDescription())
                 self.formData.append("loadId", self.loadId)
                 const response = await self.submit('run_web_import');

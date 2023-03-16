@@ -7,53 +7,33 @@
         <!-- ko ifnot: response() -->
         <div style="display:flex; flex-direction:row; overflow-y:hidden;">
             <div style="width:75%; padding:20px; overflow-y:scroll">
-                <h2>Using the FMSF Data Importer</h2>
-                <p>Use this ETL module to sites from FMSF into the HMSF Monitoring Database. Use the Task Status tab to view summaries of all import tasks.</p>
-                <h3>Upload Format</h3>
-                <p>You must upload a single ZIP file, with <strong>no nested directories</strong>. To avoid creating a nested directory when you make the ZIP, select all the files you need (see below) in your file explorer, then right-click and find an option to compress them to a new ZIP file. In other words, do not put them all in a folder and <em>then</em> right-click to zip that folder.</p>
-                <h3>Upload Content</h3>
-                <p>You must run the process <strong>once per FMSF site type</strong>, i.e. once per Resource Model. Your upload ZIP file must include:</p>
+                <h2>Using the Management Area Importer</h2>
+                <h3>Configuring the Import</h3>
+                <p>Shapefiles must only contain new Management Areas that are of a single type. This is because all attributes of the new areas are configured at once, after the zipped file has been uploaded. You can set any of the following:</p>
                 <ul>
-                    <li>Shapefile export from FMSF (keep default name)</li>
-                    <li>CSV export from Santa Clause MS Access database (keep default name)</li>
-                    <li><strong>OPTIONAL</strong> For Historic Structures, you can include a CSV named <code>extra-structure-ids.csv</li></code></li>
+                    <li>Management Area Group*</li>
+                    <li>Management Area Category*</li>
+                    <li>Management Agency*</li>
+                    <li>Management Area Level</li>
                 </ul>
-                <p>For example, an Archaeological Site upload will contain these files (there may be some additional shapefile "sidecars" files, which are fine to include):</p>
+                <p>*Only existing values for these configurations can be associated with the import. If you would like all of the new Management Areas to be placed in a new Management Area Group, for example, you must create that group in the <a href="/admin/hms">admin backend</a> before beginning the upload process.</p>
+                <h3>Shapefile Requirements</h3>
                 <ul>
-                    <li><code>AR.csv</code></li>
-                    <li><code>FloridaSites.dbf</code></li>
-                    <li><code>FloridaSites.shp</code></li>
-                    <li><code>FloridaSites.shx</code></li>
-                </ul>
-                <h3>Upload Workflow</h3>
-                <ol>
-                    <li>Upload the .zip file at right (this may take a few seconds).</li>
-                    <li>Set some configuration options (all optional):
-                        <ul>
-                            <li><strong>Truncate:</strong> Only import the first N resources in the upload files (generally this is only useful during development).</li>
-                            <li><strong>Dry run:</strong> Run a mock import that creates all necessary content behind the scenes, but stops short of loading anything into the database.</li>
-                            <li><strong>Only use extra site ids (Historic Structures only):</strong> If your ZIP includes an <code>extra-structure-ids.csv</code> file, you can skip all other filtering operations and only import those sites.</li>
-                            <li><strong>Note to self:</strong> Attach a note to this import task.</li>
-                        </ul>
-                    </li>
-                </ol>
-                <h3>Handling Archaeological Sites and Historic Cemeteries</h3>
-                <p>All Archaeological Sites and Historic Cemeteries that in your upload file and not already in the monitoring databse will be imported. Sites that are already in the monitoring database will be left unchanged.</p>
-                <h3>Handling Historic Structures</h3>
-                Only a subset of the Historic Structures in the upload file will be added to the monitoring database, based on these default filters:
-                <ul>
-                    <li>Any destroyed structures are <strong>excluded</strong>.</li>
-                    <li>All lighthouses are <strong>included</strong>.</li>
-                    <li>Any structures located within any Management Areas (parks, forests, etc) are <strong>included</strong>.
-                        <ul><li><em>This filter can take over an hour to run!</em></li></ul>
+                    <li>Must be zipped with no nested directories</li>
+                    <li>Must have a field called "Name" with an entry for each feature</li>
+                    <li>Must be polygon or multipolygon geometry (no lines or points)</li>
+                    <li>Must be reprojected to the WGS84 geometric coordinate reference system.<br>To reproject a layer in QGIS,
+                        <ol>
+                            <li>Right-click on the layer in the Layers panel</li>
+                            <li>Choose <strong>Save Features As...</strong></li>
+                            <li>Set the <strong>CRS</strong> property to <strong>EPSG:4326 - WGS84</strong></li>
+                            <li>Save the layer as <strong>ESRI Shapefile</strong> format</li>
+                            <li>Zip the shapefile and then begin the import process</li>
+                        </ol>
                     </li>
                 </ul>
-                <h4>Overriding the default filters</h4>
-                <p>You can override the default filters by providing an <code>extra-structure-ids.csv</code> file in your ZIP. This CSV must have a single column, <code>SiteID</code>, and there is no limit to the number of site ids it can hold.</p>
-                <p>For a quick, one-off addition of extra structures, check the <strong>Only Extra Site Ids</strong> box to skip all default filters, which will <em>greatly</em> speed up the import process.</p>
-                <p><strong>Once a structure is in the database it will not be removed, even if it doesn't match default filters in the future.</strong></p>
-                <h3>Reversing Imports</h3>
-                <p>You can reverse a specific import in the Task Status tab. This will delete sites from the monitoring database, so do not reverse an import if a Scout Report has been made for one of the sites in it.</p>
+                <h3>Reversing a Load</h3>
+                <p>At this time, reversing a load must be done by a server administrator.</p>
             </div>
             <div class="file-select loader-select" style="width:25%; overflow-y:scroll;">
                 <div data-bind="dropzone: dropzoneOptions">
@@ -98,27 +78,50 @@
                     <h3 class="branch-xl-title">{% trans "Configure Import" %}</h3>
                     <div>
                         <label>
-                            <strong>Resource Type:</strong>
-                            <select style="line-height:unset;" step="1" data-bind="value: resourceType">
-                                <option>Archaeological Site</option>
-                                <option>Historic Cemetery</option>
-                                <option>Historic Structure</option>
+                            <strong>Management Area Group:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maGroup">
+                                <option value="---">---</option>
+                                {% for i in ma_group_opts %}
+                                <option value="{{ i.id }}">{{ i.name }}</option>
+                                {% endfor %}
                             </select>
                         </label>
+                        <p style="font-style:italic; margin-left: 5px;"><a href="/admin/hms/managementareagroup/add/">Add a new group</a></p>
                     </div>
                     <div>
                         <label>
-                            <strong>Truncate:</strong>
-                            <input type="number" style="line-height:unset;" step="1" data-bind="value: truncate">
+                            <strong>Management Agency:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maAgency">
+                                <option value="---">---</option>
+                                {% for i in ma_agency_opts %}
+                                <option value="{{ i.code }}">{{ i.name }}</option>
+                                {% endfor %}
+                            </select>
                         </label>
-                        <p style="font-style:italic; margin-left: 5px;">Enter a number of new sites to import or use 0 to import <em>all</em> new sites (optional).</p>
+                        <p style="font-style:italic; margin-left: 5px;"><a href="/admin/hms/managementagency/add/">Add a new agency</a></p>
                     </div>
                     <div>
                         <label>
-                            <strong>Dry run:</strong>
-                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: dryRun">
+                            <strong>Management Area Category:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maCategory">
+                                <option value="---">---</option>
+                                {% for i in ma_category_opts %}
+                                <option value="{{ i.id }}">{{ i.name }}</option>
+                                {% endfor %}
+                            </select>
                         </label>
-                        <p style="font-style:italic; margin-left: 5px;">Run this import without loading any new sites into the database (optional).</p>
+                        <p style="font-style:italic; margin-left: 5px;"><a href="/admin/hms/managementareacategory/add/">Add a new category</a></p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Management Area Level:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maLevel">
+                                <option value="---">---</option>
+                                {% for i in ma_level_opts %}
+                                <option value="{{ i.0 }}">{{ i.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
                     </div>
                     <div>
                         <label>
@@ -127,13 +130,13 @@
                         </label>
                         <p style="font-style:italic; margin-left: 5px;">This note will be saved as the load description (optional).</p>
                     </div>
-                    <div>
+                    <!-- <div>
                         <label>
-                            <strong>Only Extra Site Ids:</strong>
-                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: onlySiteIdList">
+                            <strong>Update existing:</strong>
+                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: overwrite">
                         </label>
-                        <p style="font-style:italic; margin-left: 5px;">Only import sites in the extra-structure-ids.csv list (Historic Sturctures only).</p>
-                    </div>
+                        <p style="font-style:italic; margin-left: 5px;">Existing Management Areas with the same <strong>Name + File Name</strong> will be  .</p>
+                    </div> -->
                 </div>
             </div>
         </div>
