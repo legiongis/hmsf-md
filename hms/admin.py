@@ -43,8 +43,9 @@ admin.site.register(LandManager, LandManagerAdmin)
 
 class ManagementAreaAdmin(admin.ModelAdmin):
     list_display = ('name', 'management_level', 'category', 'management_agency', 'load_id')
-    list_filter = ('category', 'management_level', 'management_agency')
-    search_fields = ("name", )
+    list_filter = ('category', 'management_level', 'management_agency', 'load_id')
+    readonly_fields = ('display_name', )
+    search_fields = ('name', )
 
 class ManagementAreaGroupAdmin(admin.ModelAdmin):
     filter_horizontal = ('areas',)

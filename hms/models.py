@@ -531,10 +531,10 @@ class ManagementArea(models.Model):
 
         if self.management_agency:
             self.display_name = f"{self.name} | {self.category} | {self.management_agency.name}"
-        elif self.category.name == "FPAN Region":
-            self.display_name = self.name
-        else:
+        elif self.category and self.category.name != "FPAN Region":
             self.display_name = f"{self.name} | {self.category}"
+        else:
+            self.display_name = self.name
 
         super(ManagementArea, self).save(*args, **kwargs)
 
