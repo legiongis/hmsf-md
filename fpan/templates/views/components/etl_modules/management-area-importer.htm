@@ -1,0 +1,150 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+    <div class="fmsf-etl" style="display:flex; flex-direction:column; height:calc(100vh - 100px);">
+        <!-- ko ifnot: response() -->
+        <div style="display:flex; flex-direction:row; overflow-y:hidden;">
+            <div style="width:75%; padding:20px; overflow-y:scroll">
+                <h2>Using the FMSF Data Importer</h2>
+                <p>Use this ETL module to sites from FMSF into the HMSF Monitoring Database. Use the Task Status tab to view summaries of all import tasks.</p>
+                <h3>Upload Format</h3>
+                <p>You must upload a single ZIP file, with <strong>no nested directories</strong>. To avoid creating a nested directory when you make the ZIP, select all the files you need (see below) in your file explorer, then right-click and find an option to compress them to a new ZIP file. In other words, do not put them all in a folder and <em>then</em> right-click to zip that folder.</p>
+                <h3>Upload Content</h3>
+                <p>You must run the process <strong>once per FMSF site type</strong>, i.e. once per Resource Model. Your upload ZIP file must include:</p>
+                <ul>
+                    <li>Shapefile export from FMSF (keep default name)</li>
+                    <li>CSV export from Santa Clause MS Access database (keep default name)</li>
+                    <li><strong>OPTIONAL</strong> For Historic Structures, you can include a CSV named <code>extra-structure-ids.csv</li></code></li>
+                </ul>
+                <p>For example, an Archaeological Site upload will contain these files (there may be some additional shapefile "sidecars" files, which are fine to include):</p>
+                <ul>
+                    <li><code>AR.csv</code></li>
+                    <li><code>FloridaSites.dbf</code></li>
+                    <li><code>FloridaSites.shp</code></li>
+                    <li><code>FloridaSites.shx</code></li>
+                </ul>
+                <h3>Upload Workflow</h3>
+                <ol>
+                    <li>Upload the .zip file at right (this may take a few seconds).</li>
+                    <li>Set some configuration options (all optional):
+                        <ul>
+                            <li><strong>Truncate:</strong> Only import the first N resources in the upload files (generally this is only useful during development).</li>
+                            <li><strong>Dry run:</strong> Run a mock import that creates all necessary content behind the scenes, but stops short of loading anything into the database.</li>
+                            <li><strong>Only use extra site ids (Historic Structures only):</strong> If your ZIP includes an <code>extra-structure-ids.csv</code> file, you can skip all other filtering operations and only import those sites.</li>
+                            <li><strong>Note to self:</strong> Attach a note to this import task.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <h3>Handling Archaeological Sites and Historic Cemeteries</h3>
+                <p>All Archaeological Sites and Historic Cemeteries that in your upload file and not already in the monitoring databse will be imported. Sites that are already in the monitoring database will be left unchanged.</p>
+                <h3>Handling Historic Structures</h3>
+                Only a subset of the Historic Structures in the upload file will be added to the monitoring database, based on these default filters:
+                <ul>
+                    <li>Any destroyed structures are <strong>excluded</strong>.</li>
+                    <li>All lighthouses are <strong>included</strong>.</li>
+                    <li>Any structures located within any Management Areas (parks, forests, etc) are <strong>included</strong>.
+                        <ul><li><em>This filter can take over an hour to run!</em></li></ul>
+                    </li>
+                </ul>
+                <h4>Overriding the default filters</h4>
+                <p>You can override the default filters by providing an <code>extra-structure-ids.csv</code> file in your ZIP. This CSV must have a single column, <code>SiteID</code>, and there is no limit to the number of site ids it can hold.</p>
+                <p>For a quick, one-off addition of extra structures, check the <strong>Only Extra Site Ids</strong> box to skip all default filters, which will <em>greatly</em> speed up the import process.</p>
+                <p><strong>Once a structure is in the database it will not be removed, even if it doesn't match default filters in the future.</strong></p>
+                <h3>Reversing Imports</h3>
+                <p>You can reverse a specific import in the Task Status tab. This will delete sites from the monitoring database, so do not reverse an import if a Scout Report has been made for one of the sites in it.</p>
+            </div>
+            <div class="file-select loader-select" style="width:25%; overflow-y:scroll;">
+                <div data-bind="dropzone: dropzoneOptions">
+                    <div class="manifest-manager-main-menu-circle loader-button">
+                        <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
+                    </div> 
+                    <h2>{% trans 'Upload Your .zip File' %}</h2>
+                    <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+                        <div style="display:flex; flex-direction: column;">
+                            <div>
+                                <div class="dropzone-photo-upload">
+                                    <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                                    {% trans 'Select File' %}
+                                    </div>
+                                    <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
+                                        {% trans 'Cancel File Import' %}
+                                    </div>
+                                    <div style="min-height: 100%;">
+                                        <div id="hidden-dz-previews" style="display:none"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: response() -->
+        <div class="branch-xl-metadata-container">
+            <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px;">
+                <div class="branch-xl-file-contents-container">
+                    <h3 class="branch-xl-title">{% trans "File List" %}</h3> 
+                    <div style="color: #333333">
+                        <!--ko foreach: {data: response().result.Files, as: 'file'}-->
+                        <div data-bind="text: file"></div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div>
+                    <h3 class="branch-xl-title">{% trans "Configure Import" %}</h3>
+                    <div>
+                        <label>
+                            <strong>Resource Type:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: resourceType">
+                                <option>Archaeological Site</option>
+                                <option>Historic Cemetery</option>
+                                <option>Historic Structure</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Truncate:</strong>
+                            <input type="number" style="line-height:unset;" step="1" data-bind="value: truncate">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Enter a number of new sites to import or use 0 to import <em>all</em> new sites (optional).</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Dry run:</strong>
+                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: dryRun">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Run this import without loading any new sites into the database (optional).</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Note to self:</strong>
+                            <input style="width:unset; height:unset;" data-bind="value: loadDescription">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">This note will be saved as the load description (optional).</p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Only Extra Site Ids:</strong>
+                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: onlySiteIdList">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Only import sites in the extra-structure-ids.csv list (Historic Sturctures only).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div  class="tabbed-workflow-footer, etl-module-footer">
+           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">{% trans "Begin Import" %}</button>
+        </div>
+        <!-- /ko -->
+    </div>
+<!--/ko-->
+{% endblock task_details %}
+
+{% block etl_status %}
+{% endblock etl_status %}
