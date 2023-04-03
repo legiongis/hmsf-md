@@ -9,7 +9,6 @@ from pygments.lexers.data import JsonLexer
 
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User, Group
-from fpan.models import Region
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.postgres.fields import ArrayField
@@ -171,7 +170,6 @@ class ScoutProfile(models.Model):
         null=True,
         blank=True,
     )
-    region_choices = models.ManyToManyField(Region)
     fpan_regions = models.ManyToManyField(
         "ManagementArea",
         verbose_name="FPAN Regions",

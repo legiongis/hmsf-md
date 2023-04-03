@@ -2,8 +2,10 @@
 
 from django.db import migrations, models
 
+from fpan.decorators import deprecated_migration_operation
 from hms.models import ScoutProfile, ManagementArea
 
+@deprecated_migration_operation
 def migrate_region_choices(apps, schema_editor):
     """ Populate the new fpan_regions field with ManagementArea
     instances based on the existing region_choices field which uses
