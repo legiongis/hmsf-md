@@ -172,7 +172,13 @@ class ScoutProfile(models.Model):
         blank=True,
     )
     region_choices = models.ManyToManyField(Region)
-    fpan_regions = models.ManyToManyField("ManagementArea")
+    fpan_regions = models.ManyToManyField(
+        "ManagementArea",
+        verbose_name="FPAN Regions",
+        limit_choices_to={
+            'category__name': "FPAN Region"
+        },
+    )
     ethics_agreement = models.BooleanField(default=True)
 
     def __unicode__(self):
@@ -529,9 +535,11 @@ class ManagementArea(models.Model):
 
     def save(self, *args, **kwargs):
 
-        if self.management_agency:
+        if self.category and self.category.name == "FPAN Region":
+            self.display_name = self.name.replace("FPAN ","")
+        elif self.management_agency:
             self.display_name = f"{self.name} | {self.category} | {self.management_agency.name}"
-        elif self.category and self.category.name != "FPAN Region":
+        elif self.category:
             self.display_name = f"{self.name} | {self.category}"
         else:
             self.display_name = self.name
