@@ -37,7 +37,7 @@ from hms.models import (
     ManagementAgency,
 )
 from fpan.tasks import run_management_area_import_as_task
-from fpan.utils import ETLOperationResult
+from fpan.utils import ETLOperationResult, SpatialJoin
 
 logger = logging.getLogger(__name__)
 
@@ -254,50 +254,10 @@ class ManagementAreaImporter(BaseImportModule):
     def apply_spatial_join(self):
 
         self.update_status_and_load_details("running spatial join")
+
+        joiner = SpatialJoin()
         for area in self.areas:
-            with connection.cursor() as cursor:
-                cursor.execute(
-                    f'''SELECT resourceinstanceid FROM geojson_geometries
-                            WHERE ST_Intersects( ST_GeomFromText( %s, 4326 ), ST_Transform(geojson_geometries.geom, 4326) );''',
-                            (area.geom.wkt,)
-                )
-                rows = cursor.fetchall()
-            resids = [str(i[0]) for i in rows if len(i) > 0]
-
-            if len(resids) > 0:
-                resources = ResourceInstance.objects.filter(pk__in=resids).exclude(graph__name="Arches System Settings")
-                for res in resources:
-                    g_name = res.graph.name
-                    n_lookup = self._get_node_lookup(g_name)
-                    ng = self._get_nodegroup(g_name)
-                    try:
-                        tile = Tile.objects.get(nodegroup_id=ng, resourceinstance=res)
-                    except Tile.DoesNotExist:
-                        logger.error(f"missing expected Site Management tile for {res.pk}")
-
-                    pk = str(area.pk)
-                    add_to_main = True
-                    # if management area has a category, check for where it should be added
-                    if area.category is not None:
-                        # add to region node in this case
-                        if area.category.name == "FPAN Region":
-                            add_to_main = False
-                            if not pk in tile.data[n_lookup['FPAN Region']]:
-                                tile.data[n_lookup['FPAN Region']].append(pk)
-                        # add to county node in this case
-                        elif area.category.name == "County":
-                            add_to_main = False
-                            if not pk in tile.data[n_lookup['County']]:
-                                tile.data[n_lookup['County']].append(pk)
-                    # for all other cases, add to the main Management Area node
-                    if add_to_main is True:
-                        if not pk in tile.data[n_lookup['Management Area']]:
-                            tile.data[n_lookup['Management Area']].append(pk)
-                    # add the agency if available
-                    if area.management_agency is not None:
-                        if not pk in tile.data[n_lookup['Management Area']]:
-                            tile.data[n_lookup['Management Area']].append(pk)
-                    tile.save()
+            joiner.join_management_area_to_resources(area)
 
     def finalize_load(self):
 
