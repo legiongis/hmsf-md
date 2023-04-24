@@ -377,7 +377,7 @@ class FMSFImporter(BaseImportModule):
         # read the CSV into a list of rows, trying different encodings
         try:
             # First try to read as UTF encoded file
-            with open(self.resource_csv, "r", encoding="utf-8") as in_csv:
+            with open(self.resource_csv, "r", encoding="utf-8-sig") as in_csv:
                 reader = csv.DictReader(in_csv)
                 rows = [i for i in reader]
         except UnicodeDecodeError:
