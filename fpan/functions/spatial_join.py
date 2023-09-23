@@ -82,6 +82,9 @@ def get_valueid_from_preflabel(preflabel):
     return str(vs[0].valueid)
 
 class SpatialJoin(BaseFunction):
+    """DEPRECATED - Apr 2023 - This functionality (for a little while now)
+    has been handled elsewhere, specifically in the ETL Module operations
+    for loading FMSF resources and Management Areas."""
 
     def save(self,tile,request):
 

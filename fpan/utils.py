@@ -1,6 +1,132 @@
 import json
 import time
+import logging
 
+from django.db import connection
+
+from arches.app.models.models import ResourceInstance, Node
+from arches.app.models.tile import Tile
+
+from hms.models import ManagementArea, ManagementAgency
+
+logger = logging.getLogger(__name__)
+
+class SpatialJoin():
+
+    def __init__(self):
+
+        self.node_lookups = {}
+        self.nodegroup_lookup = {}
+        self.valid_management_area_pks = [str(i) for i in ManagementArea.objects.all().values_list("pk", flat=True)]
+        self.valid_management_agency_pks = ManagementAgency.objects.all().values_list("pk", flat=True)
+
+    def _get_node_lookup(self, graph_name):
+
+        if not graph_name in self.node_lookups:
+            self.node_lookups[graph_name] = {
+                "FPAN Region": str(Node.objects.get(graph__name=graph_name, name="FPAN Region").pk),
+                "County": str(Node.objects.get(graph__name=graph_name, name="County").pk),
+                "Management Area": str(Node.objects.get(graph__name=graph_name, name="Management Area").pk),
+                "Management Agency": str(Node.objects.get(graph__name=graph_name, name="Management Agency").pk),
+            }
+        return self.node_lookups[graph_name]
+    
+    def _get_nodegroup(self, graph_name):
+
+        if not graph_name in self.nodegroup_lookup:
+            self.nodegroup_lookup[graph_name] = str(Node.objects.get(graph__name=graph_name, name="Site Management").nodegroup.pk)
+        return self.nodegroup_lookup[graph_name]
+
+    def update_resource(self, resourceinstance):
+
+        areas_pks = self.get_areas_for_resourceinstance(resourceinstance)
+        for area in ManagementArea.objects.filter(pk__in=areas_pks):
+            self.apply_management_area_attributes(resourceinstance, area)
+
+    def join_management_area_to_resources(self, area):
+
+        resids = self.get_resources_for_area(area)
+        for resinstance in ResourceInstance.objects.filter(pk__in=resids):
+            self.apply_management_area_attributes(resinstance, area)
+
+    def get_areas_for_resourceinstance(self, resourceinstance):
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                '''SELECT id FROM hms_managementarea
+                        WHERE ST_Intersects(
+                            (SELECT ST_Transform(ST_Union(geom), 4326) FROM geojson_geometries WHERE resourceinstanceid = %s), hms_managementarea.geom);''',
+                            (str(resourceinstance.pk), )
+            )
+            rows = cursor.fetchall()
+        return [i[0] for i in rows if len(i) > 0]
+
+    def get_resources_for_area(self, area):
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f'''SELECT resourceinstanceid FROM geojson_geometries
+                        WHERE ST_Intersects( ST_GeomFromText( %s, 4326 ), ST_Transform(geojson_geometries.geom, 4326) );''',
+                        (area.geom.wkt,)
+            )
+            rows = cursor.fetchall()
+        return [str(i[0]) for i in rows if len(i) > 0]
+
+    def apply_management_area_attributes(self, resourceinstance, area):
+
+        g_name = resourceinstance.graph.name
+        n_lookup = self._get_node_lookup(g_name)
+        ng = self._get_nodegroup(g_name)
+        try:
+            tile = Tile.objects.get(nodegroup_id=ng, resourceinstance=resourceinstance)
+        except Tile.DoesNotExist:
+            logger.error(f"missing expected Site Management tile for {resourceinstance.pk}")
+            return
+
+        # set empty lists if the node value is None or nonexistent
+        if not isinstance(tile.data.get(n_lookup['FPAN Region']), list):
+            tile.data[n_lookup['FPAN Region']] = []
+        if not isinstance(tile.data.get(n_lookup['County']), list):
+            tile.data[n_lookup['County']] = []
+        if not isinstance(tile.data.get(n_lookup['Management Area']), list):
+            tile.data[n_lookup['Management Area']] = []
+        if not isinstance(tile.data.get(n_lookup['Management Agency']), list):
+            tile.data[n_lookup['Management Agency']] = []
+
+        pk = str(area.pk)
+        add_to_main = True
+        # if management area has a category, check for where it should be added
+        if area.category is not None:
+            # add to region node in this case
+            if area.category.name == "FPAN Region":
+                add_to_main = False
+                tile.data[n_lookup['FPAN Region']].append(pk)
+            # add to county node in this case
+            elif area.category.name == "County":
+                add_to_main = False
+                tile.data[n_lookup['County']].append(pk)
+        # for all other cases, add to the main Management Area node
+        if add_to_main is True:
+            tile.data[n_lookup['Management Area']].append(pk)
+        # add the agency if available
+        if area.management_agency is not None:
+            tile.data[n_lookup['Management Agency']].append(area.management_agency.pk)
+
+        # finalize with some QA/QC
+        tile.data[n_lookup['FPAN Region']] = list(set(
+            [i for i in tile.data[n_lookup['FPAN Region']] if i in self.valid_management_area_pks]
+        ))
+        tile.data[n_lookup['County']] = list(set(
+            [i for i in tile.data[n_lookup['County']] if i in self.valid_management_area_pks]
+        ))
+        tile.data[n_lookup['Management Area']] = list(set(
+            [i for i in tile.data[n_lookup['Management Area']] if i in self.valid_management_area_pks]
+        ))
+        tile.data[n_lookup['Management Agency']] = list(set(
+            [i for i in tile.data[n_lookup['Management Agency']] if i in self.valid_management_agency_pks]
+        ))
+
+        tile.save()
 
 def get_node_value(resource, node_name):
     """this just flattens the response from Resource().get_node_values()"""
@@ -65,4 +191,3 @@ class ETLOperationResult():
             "success": self.success,
             "data": details,
         }
-

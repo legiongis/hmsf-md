@@ -11,7 +11,6 @@ from arches.app.models.models import GraphModel, Node, ResourceInstance
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 
 from hms.permissions_backend import (
-    user_is_anonymous,
     user_is_scout,
     user_is_land_manager,
 )
@@ -173,7 +172,7 @@ class RuleFilter(BaseSearchFilter):
             elif user_is_scout(user):
                 rule = user.scout.scoutprofile.get_graph_rule(graph_name)
 
-            elif user_is_anonymous(user):
+            elif user.username == 'anonymous':
                 ## manual handling of public users here
                 if graph_name == "Archaeological Site":
                     rule = Rule("attribute_filter",
@@ -345,3 +344,51 @@ class RuleFilter(BaseSearchFilter):
             return ids
 
         return [i['_source'] for i in results['hits']['hits']]
+
+    def generate_html(self, user):
+        """ This function should be called by a context_processor to dynamically generate HTML
+        content that is used in the rule filter component template. It can be altered as needed."""
+
+        ## ultimately, this should be dynamically driven directly by the rules this filter finds.
+        ## for now though, there is a lot of hard-coded HMS logic
+        #rules = self.compile_rules(user)
+
+        FULL_ACCESS_HTML = "<p>Your account has full access to <strong>all</strong> archaeological sites.</p>"
+        NO_ACCESS_HTML = "<p>Your account does not have access to any archaeological sites.</p>"
+
+        if user.is_superuser:
+            return FULL_ACCESS_HTML
+        if user.username == 'anonymous':
+            return NO_ACCESS_HTML
+
+        if user_is_scout(user):
+
+            if user.scout.scoutprofile.site_access_mode == "FULL":
+                return FULL_ACCESS_HTML
+            elif user.scout.scoutprofile.site_access_mode == "USERNAME=ASSIGNEDTO":
+                return "<p>You have access to any archaeological sites to which you have been individually assigned.</p>"
+            else:
+                return NO_ACCESS_HTML
+
+        if user_is_land_manager(user):
+
+            if user.landmanager.site_access_mode == "FULL":
+                html = FULL_ACCESS_HTML
+            elif user.landmanager.site_access_mode == "AREA":
+                html = "<p>You can access any archaeological sites that are located in the following Management Areas:</p>"
+                if len(user.landmanager.all_areas) == 0:
+                    html += "<p><em>No Management Areas have been added to your Land Manager profile.</em></p>"
+                else:
+                    html += "<ul style='list-style:none; padding-left:0px; font-weight:bold;'>"
+                    for group in user.landmanager.grouped_areas.all():
+                        html += f"<li>{group.name} (grouped area)</li>"
+                    for area in user.landmanager.individual_areas.all():
+                        html += f"<li>{area.name}</li>"
+                    html += "</ul>"
+            elif user.landmanager.site_access_mode == "AGENCY":
+                html = f"<p>You can access any archaeological sites that are managed by your agency: <strong>{user.landmanager.management_agency}</strong></p>"
+            else:
+                html = NO_ACCESS_HTML
+
+            return html
+

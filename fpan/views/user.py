@@ -23,7 +23,6 @@ from arches.app.views.user import UserManagerView
 
 from fpan.search.components.rule_filter import RuleFilter
 from hms.permissions_backend import (
-    generate_site_access_html,
     user_is_land_manager,
     user_is_scout,
 )
@@ -74,13 +73,11 @@ class FPANUserManagerView(UserManagerView):
 
         
         site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
-        access_summary = generate_site_access_html(user)
         logger.debug(f"getting hms_details for {user.username}: {time.time()-start} seconds elapsed")
 
         all_info = {
             "site_access_rules": rule.serialize(), 
             "accessible_sites": site_info,
-            "site_access_html": access_summary,
         }
         return all_info
 
@@ -117,7 +114,6 @@ class FPANUserManagerView(UserManagerView):
             hms_details = self.get_hms_details(request.user)
             context["site_access_rules"] = hms_details['site_access_rules']
             context["accessible_sites"] = hms_details['accessible_sites']
-            context["site_access_html"] = hms_details['site_access_html']
 
             if request.user.is_superuser:
                 scouts_unsorted = json.loads(scouts_dropdown(request).content)
@@ -183,7 +179,6 @@ class FPANUserManagerView(UserManagerView):
             hms_details = self.get_hms_details(request.user)
             context["site_access_rules"] = hms_details['site_access_rules']
             context["accessible_sites"] = hms_details['accessible_sites']
-            context["site_access_html"] = hms_details['site_access_html']
 
             if request.user.is_superuser:
                 scouts_unsorted = json.loads(scouts_dropdown(request).content)

@@ -2,7 +2,13 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from arches.app.models.system_settings import settings
 
-from hms.models import ManagementArea, ManagementAgency
+from hms.models import (
+    ManagementArea,
+    ManagementAgency,
+    ManagementAreaGroup,
+    ManagementAreaCategory,
+)
+from fpan.search.components.rule_filter import RuleFilter
 
 def debug(request):
     return {
@@ -63,3 +69,17 @@ def widget_data(request):
         return make_widget_data()
     else:
         return { 'lists': {} }
+
+def management_area_importer_configs(request):
+
+    return {
+        "ma_group_opts": ManagementAreaGroup.objects.all().order_by("name").values("id", "name"),
+        "ma_category_opts": ManagementAreaCategory.objects.all().order_by("name").values("id", "name"),
+        "ma_agency_opts": ManagementAgency.objects.all().order_by("name").values("code", "name"),
+        "ma_level_opts": ManagementArea._meta.get_field('management_level').choices,
+    }
+
+def rule_filter_html(request):
+    return {
+        "rule_filter_html": RuleFilter().generate_html(request.user)
+    }

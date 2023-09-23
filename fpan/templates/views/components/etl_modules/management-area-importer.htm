@@ -1,0 +1,159 @@
+{% extends "views/components/etl_modules/base-import.htm" %}
+{% load i18n %}
+
+{% block task_details %}
+<!-- ko ifnot: loading() -->
+    <div class="fmsf-etl" style="display:flex; flex-direction:column; height:calc(100vh - 100px);">
+        <!-- ko ifnot: response() -->
+        <div style="display:flex; flex-direction:row; overflow-y:hidden;">
+            <div style="width:75%; padding:20px; overflow-y:scroll">
+                <h2>Using the Management Area Importer</h2>
+                <h3>Configuring the Import</h3>
+                <p>Shapefiles must only contain new Management Areas that are of a single type. This is because all attributes of the new areas are configured at once, after the zipped file has been uploaded. You can set any of the following:</p>
+                <ul>
+                    <li>Management Area Group*</li>
+                    <li>Management Area Category*</li>
+                    <li>Management Agency*</li>
+                    <li>Management Area Level</li>
+                </ul>
+                <p>*Only existing values for these configurations can be associated with the import. If you would like all of the new Management Areas to be placed in a new Management Area Group, for example, you must create that group in the <a href="/admin/hms">admin backend</a> before beginning the upload process.</p>
+                <h3>Shapefile Requirements</h3>
+                <ul>
+                    <li>Must be zipped with no nested directories</li>
+                    <li>Must have a field called "Name" with an entry for each feature</li>
+                    <li>Must be polygon or multipolygon geometry (no lines or points)</li>
+                    <li>Must be reprojected to the WGS84 geometric coordinate reference system.<br>To reproject a layer in QGIS,
+                        <ol>
+                            <li>Right-click on the layer in the Layers panel</li>
+                            <li>Choose <strong>Save Features As...</strong></li>
+                            <li>Set the <strong>CRS</strong> property to <strong>EPSG:4326 - WGS84</strong></li>
+                            <li>Save the layer as <strong>ESRI Shapefile</strong> format</li>
+                            <li>Zip the shapefile and then begin the import process</li>
+                        </ol>
+                    </li>
+                </ul>
+                <h3>Reversing a Load</h3>
+                <p>At this time, reversing a load must be done by a server administrator.</p>
+            </div>
+            <div class="file-select loader-select" style="width:25%; overflow-y:scroll;">
+                <div data-bind="dropzone: dropzoneOptions">
+                    <div class="manifest-manager-main-menu-circle loader-button">
+                        <span><i style="color: #000" class="fa fa-cloud-upload r-select-icon"></i></span>
+                    </div> 
+                    <h2>{% trans 'Upload Your .zip File' %}</h2>
+                    <div style="display: flex; padding: 15px 25px; flex-direction: column; justify-content: center; align-items: center;">
+                        <div style="display:flex; flex-direction: column;">
+                            <div>
+                                <div class="dropzone-photo-upload">
+                                    <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-primary btn-labeled btn-lg fa fa-file fileinput-button dz-clickable" data-bind="css: uniqueidClass" role="button">
+                                    {% trans 'Select File' %}
+                                    </div>
+                                    <div style="border-top: 1px solid #c4c4c4; margin-bottom: 15px;" class="btn btn-danger btn-labeled btn-lg fa fa-times-circle" data-bind="click: function() { $parent.cancel() }" role="button">
+                                        {% trans 'Cancel File Import' %}
+                                    </div>
+                                    <div style="min-height: 100%;">
+                                        <div id="hidden-dz-previews" style="display:none"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko if: response() -->
+        <div class="branch-xl-metadata-container">
+            <div style="display: grid; row-gap: 2px; height:fit-content; padding:15px 20px;">
+                <div class="branch-xl-file-contents-container">
+                    <h3 class="branch-xl-title">{% trans "File List" %}</h3> 
+                    <div style="color: #333333">
+                        <!--ko foreach: {data: response().result.Files, as: 'file'}-->
+                        <div data-bind="text: file"></div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+                <div>
+                    <h3 class="branch-xl-title">{% trans "Configure Import" %}</h3>
+                    <div>
+                        <label>
+                            <strong>Management Area Group:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maGroup">
+                                <option value="---">---</option>
+                                {% for i in ma_group_opts %}
+                                <option value="{{ i.id }}">{{ i.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">
+                            <a href="/admin/hms/managementareagroup/add/" target="_blank">Add a new group</a>
+                        </p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Management Agency:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maAgency">
+                                <option value="---">---</option>
+                                {% for i in ma_agency_opts %}
+                                <option value="{{ i.code }}">{{ i.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">
+                            <a href="/admin/hms/managementagency/add/" target="_blank">Add a new agency</a>
+                        </p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Management Area Category:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maCategory">
+                                <option value="---">---</option>
+                                {% for i in ma_category_opts %}
+                                <option value="{{ i.id }}">{{ i.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">
+                            <a href="/admin/hms/managementareacategory/add/" target="_blank">Add a new category</a>
+                        </p>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Management Area Level:</strong>
+                            <select style="line-height:unset;" step="1" data-bind="value: maLevel">
+                                <option value="---">---</option>
+                                {% for i in ma_level_opts %}
+                                <option value="{{ i.0 }}">{{ i.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <strong>Note to self:</strong>
+                            <input style="width:unset; height:unset;" data-bind="value: loadDescription">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">This note will be saved as the load description (optional).</p>
+                    </div>
+                    <!-- <div>
+                        <label>
+                            <strong>Update existing:</strong>
+                            <input type="checkbox" style="width:unset; height:unset;" data-bind="checked: overwrite">
+                        </label>
+                        <p style="font-style:italic; margin-left: 5px;">Existing Management Areas with the same <strong>Name + File Name</strong> will be  .</p>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+
+        <div  class="tabbed-workflow-footer, etl-module-footer">
+           <button class="btn btn-shim btn-labeled btn-lg fa fa-check btn-primary" style="margin-right: 8px;" data-bind="click: function(){ start(); }">{% trans "Begin Import" %}</button>
+        </div>
+        <!-- /ko -->
+    </div>
+<!--/ko-->
+{% endblock task_details %}
+
+{% block etl_status %}
+{% endblock etl_status %}

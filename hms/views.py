@@ -226,22 +226,6 @@ def scouts_dropdown(request):
                 ma = ManagementArea.objects.get(pk=pk)
                 site_regions.append(ma.name)
 
-        ## this lookup is needed to translate between the names of the fpan.models.Region
-        ## objects, which is what the ScoutProfile is related to, and the
-        ## hms.models.ManagementArea objects, which is the content now stored in the 
-        ## FPAN Region node. Ultimately, the ScoutProfile model should be related to
-        ## ManagementArea and Region can be completely removed.
-        lookup = {
-            "Northwest": "FPAN Northwest Region",
-            "Northeast": "FPAN Northeast Region",
-            "Central": "FPAN Central Region",
-            "East Central": "FPAN East Central Region",
-            "West Central": "FPAN West Central Region",
-            "North Central": "FPAN North Central Region",
-            "Southwest": "FPAN Southwest Region",
-            "Southeast": "FPAN Southeast Region",
-        }
-
         ## as the scout list gets big this may need some optimizing!
         for scout in ScoutProfile.objects.all():
             for region in scout.fpan_regions.all():

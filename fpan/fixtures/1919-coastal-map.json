@@ -4,12 +4,11 @@
   "fields": {
    "name": "coastal-route-map-1919",
    "source": {
-    "type": "raster",
-    "tiles": [
-     "https://gn.legiongis.com/geoserver/ows?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.3.0&request=GetMap&srs=EPSG:3857&width=256&height=256&layers=fpan:1919-coastal-map&transparent=true"
-    ],
-    "tileSize": 256
-   }
+      "type": "raster",
+      "tiles": [
+        "https://titiler.oldinsurancemaps.net/mosaicjson/tiles/{z}/{x}/{y}.png?TileMatrixSetId=WebMercatorQuad&url=https%3A%2F%2Flegion-maps.us-southeast-1.linodeobjects.com%2Ffpan%2Fcoastal-map%2F1919-coastal-map-mosaic.json"
+      ]
+    }
   }
  },
  {

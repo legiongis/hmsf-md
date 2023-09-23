@@ -41,6 +41,8 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(os.path.dirname(APP_ROOT), 'site_the
 
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.debug')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.widget_data')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.management_area_importer_configs')
+TEMPLATES[0]['OPTIONS']['context_processors'].append('fpan.context_processors.rule_filter_html')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('hms.context_processors.user_type')
 TEMPLATES[0]['OPTIONS']['context_processors'].append('site_theme.context_processors.profile_content')
 
