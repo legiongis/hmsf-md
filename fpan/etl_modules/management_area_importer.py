@@ -179,6 +179,7 @@ class ManagementAreaImporter(BaseImportModule):
 
         shp_file = [i for i in file_dir.glob("*.shp")][0]
         self.file_path = shp_file
+        self.reporter.data['File name'] = self.file_path.name
 
         try:
             ds = DataSource(self.file_path)
