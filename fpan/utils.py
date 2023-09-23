@@ -81,6 +81,17 @@ class SpatialJoin():
             tile = Tile.objects.get(nodegroup_id=ng, resourceinstance=resourceinstance)
         except Tile.DoesNotExist:
             logger.error(f"missing expected Site Management tile for {resourceinstance.pk}")
+            return
+
+        # set empty lists if the node value is None or nonexistent
+        if not isinstance(tile.data.get(n_lookup['FPAN Region']), list):
+            tile.data[n_lookup['FPAN Region']] = []
+        if not isinstance(tile.data.get(n_lookup['County']), list):
+            tile.data[n_lookup['County']] = []
+        if not isinstance(tile.data.get(n_lookup['Management Area']), list):
+            tile.data[n_lookup['Management Area']] = []
+        if not isinstance(tile.data.get(n_lookup['Management Agency']), list):
+            tile.data[n_lookup['Management Agency']] = []
 
         pk = str(area.pk)
         add_to_main = True
