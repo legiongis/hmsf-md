@@ -57,6 +57,9 @@ urlpatterns = [
 
     # finally, include default Arches urls
     url(r'^', include('arches.urls')),
+
+    # django-docs urls
+    url(r'^docs/', include('docs.urls')),
 ]
 if settings.SHOW_LANGUAGE_SWITCH is True:
     urlpatterns = i18n_patterns(*urlpatterns)

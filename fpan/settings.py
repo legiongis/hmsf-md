@@ -54,12 +54,17 @@ INSTALLED_APPS += ('grappelli', 'django.contrib.admin')
 
 GRAPPELLI_ADMIN_TITLE = "HMS Florida - Monitoring Database"
 
+DOCS_ROOT = os.path.join(os.path.dirname(APP_ROOT), 'docs/_build/dirhtml')
+DOCS_ACCESS = 'staff'
+DOCS_DIRHTML = True
+
 INSTALLED_APPS += (
     'fpan',         # this is the Arches "project"
     'hms',          # HMS accounts, permissions, models, etc.
     'reporting',    # stats and email reporting
     'site_theme',   # lightweight app to hold models for front end theming
     'tinymce',      # used for WISIWYG editor in site_theme admin pages
+    'docs',         # django-docs implementation: https://github.com/littlepea/django-docs/
 )
 
 PLAUSIBLE_SITE_DOMAIN = None
