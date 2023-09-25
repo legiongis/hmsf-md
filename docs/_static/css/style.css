@@ -1,0 +1,22 @@
+body, body.body-anonymous, body.body-admin, .profile-sections-admin {
+    font-family: 'Kreon',sans-serif;
+    background: url('../img/fpan/ricepaper.png');
+    font-size: 16px;
+    line-height: 1.65;
+}
+body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {
+    background: url('../img/fpan/ricepaper-hms.png');
+}
+body.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager, .profile-sections-landmanager {
+    background: url('../img/fpan/ricepaper-state.png');
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Ropa Sans',sans-serif !important;
+    line-height: 1.15;
+    scroll-margin-top: 50px;
+}
+
+section {
+    scroll-margin-top: 50px;
+}
