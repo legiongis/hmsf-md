@@ -5,7 +5,6 @@
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-import sphinx_redactor_theme
 
 project = 'HMS-Florida Monitoring Database'
 copyright = '2023, Legion GIS'
