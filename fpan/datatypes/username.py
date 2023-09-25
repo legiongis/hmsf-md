@@ -38,7 +38,7 @@ class UsernameDataType(DomainListDataType):
             try:
                 return User.objects.get(pk=value).username
             except User.DoesNotExist:
-                logger.warn(f"index error: user {option_id} not found")
+                logger.warn(f"index error: user {value} not found")
                 return "<user not found>"
 
     def validate(self, values, **kwargs):
