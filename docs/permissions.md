@@ -3,13 +3,12 @@
 The specific requirements for how we handle access to archaeological site data have changed a bit since 2017 when we first started the project. The current approach aims to be as flexible as possible, while also exposing all components of permissions levels to the Django backend, so FPAN staff can manage the system as easily as possible. This is achieved by combining the following elements:
 
 - User profiles - Scouts vs. Land Managers
-   - Each user category has its own login page, and will see different page styles when they are logged in.
    - Site access permissions are handled differently for each category.
-   - **All users fill out the exact same Scout Report**.
+   - Each user category has its own login page, and will see different page styles after logging in, but **all users fill out the exact same Scout Report**.
 - Management Areas and Management Agencies
    - Used to determine Land Manager site access.
 - *Assigned To* and *Management Info* branches on the Archaeological Site resource model
-   - Interrogated to determine access to a given aite for Scouts and Land Managers, respectively.
+   - Attributes attached to Archaeological Site that are interrogated to determine resource-level access Scouts and Land Managers, respectively.
 - The `RuleFilter` custom search component
    - Synthesizes everything described above to alter search queries and results.
 
