@@ -74,7 +74,7 @@ def widget_data(request):
         general_areas = [{
             "id": str(i[0]),
             "selected": "false",
-            "text": i[1]
+            "text": str(i[1])
         } for i in general_areas.order_by("display_name").values_list("pk", "display_name") ]
 
         fpan_regions = [{
@@ -86,19 +86,19 @@ def widget_data(request):
         counties = [{
             "id": str(i[0]),
             "selected": "false",
-            "text": i[1]
+            "text": str(i[1])
         } for i in all_areas.filter(category__name="County").values_list("pk", "name") ]
 
         agencies = [{
             "id": str(i[0]),
             "selected": "false",
-            "text": i[1]
+            "text": str(i[1])
         } for i in ManagementAgency.objects.all().values_list("pk", "name") ]
 
         usernames = [{
             "id": str(i[0]),
             "selected": "false",
-            "text": i[1]
+            "text": str(i[1])
         } for i in User.objects.all().order_by("username").values_list("pk", "username")]
 
         data["lists"]["usernames"] = usernames
