@@ -69,8 +69,12 @@ def report_rule_from_arch_rule(arch_rule):
             fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
             if fmsfid in resids:
                 reportids.append(str(rd["resourceinstance_id"]))
-        except (IndexError, KeyError):
-            pass
+        except (IndexError, KeyError, TypeError) as e:
+            logger.warn(f"can't get fmsf id from {rd['resourceinstance_id']}")
+            logger.warn(e)
+        except Exception as e:
+            logger.error(f"can't get fmsf id from {rd['resourceinstance_id']}")
+            logger.error(e)
 
     report_rule = Rule("resourceid_filter", resourceids=reportids)
     logger.debug(f"report_rule_from_arch_rule: {time.time() - start}")

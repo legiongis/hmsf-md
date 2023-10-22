@@ -57,12 +57,12 @@ class FPANUserManagerView(UserManagerView):
             report_id = rd['resourceinstance_id']
             try:
                 fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
-            except IndexError as e:
-                logger.debug(f"{report_id} - Scout Report has no FMSF Site ID")
-                continue
-            except KeyError as e:
-                logger.debug(f"{report_id} - KeyError: {e}")
-                continue
+            except (IndexError, KeyError, TypeError) as e:
+                logger.warn(f"can't get fmsf id from {report_id}")
+                logger.warn(e)
+            except Exception as e:
+                logger.error(f"can't get fmsf id from {report_id}")
+                logger.error(e)
             if fmsfid in site_lookup:
                 site_lookup[fmsfid]["scout_report_ct"] += 1
                 res = Resource.objects.get(pk=report_id)
