@@ -5,6 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from arches.app.models.models import MapLayer
 
+from hms.models import ManagementArea
 from hms.utils import TestUtils
 
 class Command(BaseCommand):
@@ -15,6 +16,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--test-accounts", action="store_true", default=False,
             help='specify whether the mock land manager and scout accounts should be created')
+        parser.add_argument("--test-resources", action="store_true", default=False,
+            help='specify whether to load a sample set of resource instances')
         parser.add_argument("--use-existing-db", action="store_true", default=False,
             help='use this flag when calling this command during tested, so that the test database is used')
 
@@ -67,6 +70,11 @@ class Command(BaseCommand):
         management.call_command('loaddata', 'management-areas-hillsborough-co-parks')
         management.call_command('loaddata', 'management-areas-july2021')
 
+        print("re-saving all objects to generate display_name...")
+        for i in ManagementArea.objects.all():
+            i.save()
+        print("  done.")
+
         print("\033[96m-- Load MANAGEMENT AREA GROUPS --\033[0m")
         management.call_command('loaddata', 'management-area-groups')
 
@@ -84,8 +92,13 @@ class Command(BaseCommand):
         management.call_command('loaddata', 'site_theme')
 
         if options['test_accounts']:
+            print("\033[96m-- Loading test Scout and Land Manager accounts --\033[0m")
             TestUtils().create_test_scouts()
             TestUtils().create_test_landmanagers()
+
+        if options['test_resources']:
+            print("\033[96m-- Loading test resources --\033[0m")
+            TestUtils().load_test_resources()
 
     def update_map_layers(self):
 

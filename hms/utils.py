@@ -4,8 +4,10 @@ import json
 import random
 import string
 import logging
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.management import call_command
 from django.test import Client
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -34,11 +36,14 @@ class TestUtils():
         Scout creation form, creating a new Scout and profile. Then
         the activation token is used to activate the account."""
 
+        pk = None
+        if "pk" in scout_data:
+            pk = scout_data.pop("pk")
         form = ScoutForm(data=scout_data)
         if not form.is_valid():
             raise Exception(form.errors)
 
-        scout, uidb64, token = create_scout_from_valid_form(form)
+        scout, uidb64, token = create_scout_from_valid_form(form, pk=pk)
         assert len(Scout.objects.filter(username=scout.username)) == 1
         assert scout.is_active is False
 
@@ -104,6 +109,28 @@ class TestUtils():
         p.save()
         print(f"  land manager created: {u.username}")
 
+    def load_test_resources(self):
+
+        call_command("packages",
+            operation="import_business_data",
+            source=os.path.join(TEST_DATA_DIR, "resources", "test_archaeological_sites.json"),
+            overwrite="overwrite",
+        )
+        call_command("packages",
+            operation="import_business_data",
+            source=os.path.join(TEST_DATA_DIR, "resources", "test_cemeteries.json"),
+            overwrite="overwrite",
+        )
+        call_command("packages",
+            operation="import_business_data",
+            source=os.path.join(TEST_DATA_DIR, "resources", "test_historic_structures.json"),
+            overwrite="overwrite",
+        )
+        call_command("packages",
+            operation="import_business_data",
+            source=os.path.join(TEST_DATA_DIR, "resources", "test_scout_reports.json"),
+            overwrite="overwrite",
+        )
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
 
@@ -113,7 +140,7 @@ class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
 
 account_activation_token = AccountActivationTokenGenerator()
 
-def create_scout_from_valid_form(form):
+def create_scout_from_valid_form(form, pk=None):
     """Takes a validated ScoutForm() and creates a new Scout/ScoutProfile
     from it. Return a tuple with the user and an activation token."""
 
@@ -122,6 +149,8 @@ def create_scout_from_valid_form(form):
     lastname = form.cleaned_data.get('last_name')
     newusername = generate_username(firstname, middleinitial, lastname)
     s = form.save(commit=False)
+    if pk:
+        s.pk = pk
     s.is_active = False
     s.username = newusername
     s.save()

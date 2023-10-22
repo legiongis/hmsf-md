@@ -1,5 +1,6 @@
 [
     {
+        "pk": 5000,
         "first_name": "Frank",
         "middle_initial": "D",
         "last_name": "Hardy",
@@ -13,6 +14,7 @@
         "site_interest_type": ["Prehistoric","Historic"]
     },
     {
+        "pk": 5001,
         "first_name": "joe",
         "middle_initial": "b",
         "last_name": "Hardy",
@@ -26,6 +28,7 @@
         "site_interest_type": ["Underwater"]
     },
     {
+        "pk": 5002,
         "first_name": "Biff",
         "middle_initial": "A",
         "last_name": "hooper",
@@ -38,6 +41,7 @@
         "site_interest_type": ["Prehistoric","Cemeteries"]
     },
     {
+        "pk": 5003,
         "first_name": "chet",
         "middle_initial": "j",
         "last_name": "morton",
