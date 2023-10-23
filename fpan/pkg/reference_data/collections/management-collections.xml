@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+>
+  <skos:Collection rdf:about="http://localhost:8000/fffcacef-cabb-4d5a-aaa1-c9b823be9911">
+    <skos:prefLabel xml:lang="en">{"id": "ae06ccce-69de-49f1-bc59-dbe9e1d200d2", "value": "Management Agencies"}</skos:prefLabel>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/aa8bb75f-942b-4cd0-8ae3-4e3a77ba6ca3">
+    <skos:prefLabel xml:lang="en">{"id": "5619a037-9089-46bb-8553-6a2bf04572da", "value": "Management Areas"}</skos:prefLabel>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/a1209152-0702-4354-9b7f-a2efee2a2a8a">
+    <skos:prefLabel xml:lang="en">{"id": "7911f902-14d8-4208-a8e3-a1e41dfae25f", "value": "FPAN Regions"}</skos:prefLabel>
+  </skos:Collection>
+  <skos:Collection rdf:about="http://localhost:8000/64b80aab-3d13-4ecb-a87d-03fa0a4367a7">
+    <skos:prefLabel xml:lang="en">{"id": "82e32a44-ce6c-435a-a1e1-94914f672124", "value": "Counties"}</skos:prefLabel>
+  </skos:Collection>
+</rdf:RDF>
