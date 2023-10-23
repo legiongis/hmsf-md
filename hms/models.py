@@ -2,11 +2,13 @@ from __future__ import unicode_literals
 
 import time
 import json
+from uuid import uuid4
 import logging
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
 
+from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User, Group
 from django.db.models.signals import post_save
@@ -16,9 +18,11 @@ from django.contrib.gis.geos import MultiPolygon
 from django.utils.safestring import mark_safe
 
 from arches.app.models.resource import Resource
-from arches.app.models.graph import Graph
-from arches.app.models.models import Node
+from arches.app.models.models import (
+    Node, Concept, Value, Relation,
+)
 from arches.app.models.tile import Tile
+from arches.app.models.concept import Concept as ConceptProxy
 
 from fpan.search.components.rule_filter import RuleFilter, Rule
 
@@ -448,6 +452,56 @@ def create_user_land_manager(sender, instance, created, **kwargs):
 #     instance.landmanagerprofile.save()
 
 
+def create_new_concept(label, parent_lbl, collection_lbl, concept_id=None):
+    """ Helper function that creates a new concept and adds it to the specified
+    parent and collection. """
+
+    if not concept_id:
+        concept_id = str(uuid4())
+
+    concept = Concept.objects.create(
+        conceptid=concept_id,
+        nodetype_id="Concept",
+        legacyoid=f"{settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT.rstrip('/')}/rdm/{concept_id}",
+    )
+    v = Value.objects.create(
+        concept=concept,
+        valuetype_id="prefLabel",
+        value=label,
+        language_id="en",
+    )
+
+    p = Value.objects.get(value=parent_lbl, concept__nodetype__nodetype="Concept").concept
+    rp = Relation.objects.create(
+        conceptfrom=p,
+        conceptto=concept,
+        relationtype_id="narrower",
+    )
+
+    c = Value.objects.get(value=collection_lbl, concept__nodetype__nodetype="Collection").concept
+    rc = Relation.objects.create(
+        conceptfrom=c,
+        conceptto=concept,
+        relationtype_id="member",
+    )
+
+    # need to reinstantiate this concept with the "proxy" class to index it
+    cp = ConceptProxy().get(concept_id)
+    cp.index()
+
+    return concept
+
+def get_concept_value_id(concept):
+    try:
+        return str(Value.objects.get(
+            concept=concept,
+            language_id="en",
+            valuetype_id="prefLabel",
+        ).pk)
+    except Value.DoesNotExist:
+        return"<no value>"
+
+
 class ManagementAgency(models.Model):
 
     class Meta:
@@ -459,6 +513,10 @@ class ManagementAgency(models.Model):
         max_length=20
     )
     name = models.CharField(null=True, blank=True, max_length=200)
+    concept = models.ForeignKey(Concept, null=True, blank=True,
+        limit_choices_to={"nodetype_id": "Concept"},
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.name
@@ -469,6 +527,18 @@ class ManagementAgency(models.Model):
             'id': self.code,
             'name': self.name,
         }
+
+    def save(self, *args, **kwargs):
+
+        if not self.concept:
+            concept = create_new_concept(
+                self.name,
+                parent_lbl="Management Agencies",
+                collection_lbl="Management Agencies"
+            )
+            self.concept = concept
+
+        super(ManagementAgency, self).save(*args, **kwargs)
 
 class ManagementAreaCategory(models.Model):
 
@@ -526,6 +596,10 @@ class ManagementArea(models.Model):
     nickname = models.CharField(max_length=30,null=True,blank=True)
     load_id = models.CharField(max_length=200,null=True,blank=True)
     geom = models.MultiPolygonField()
+    concept = models.ForeignKey(Concept, null=True, blank=True,
+        limit_choices_to={"nodetype_id": "Concept"},
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         if self.display_name:
@@ -534,6 +608,28 @@ class ManagementArea(models.Model):
             return self.name
         else:
             return super(ManagementArea, self).__str__()
+
+    def set_concept(self):
+
+        if self.category.name == "FPAN Region":
+            concept = create_new_concept(
+                self.name,
+                parent_lbl="FPAN Regions",
+                collection_lbl="FPAN Regions"
+            )
+        elif self.category.name == "County":
+            concept = create_new_concept(
+                self.name,
+                parent_lbl="Counties",
+                collection_lbl="Counties"
+            )
+        else:
+            concept = create_new_concept(
+                self.display_name,
+                parent_lbl="Management Areas",
+                collection_lbl="Management Areas"
+            )
+        self.concept = concept
 
     def save(self, *args, **kwargs):
 
@@ -545,6 +641,11 @@ class ManagementArea(models.Model):
             self.display_name = f"{self.name} | {self.category}"
         else:
             self.display_name = self.name
+
+        if not self.concept:
+            self.set_concept()
+        else:
+            self.update_concept
 
         super(ManagementArea, self).save(*args, **kwargs)
 
