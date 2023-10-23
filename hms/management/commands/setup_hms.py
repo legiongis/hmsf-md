@@ -103,6 +103,7 @@ class Command(BaseCommand):
         if options['test_resources']:
             print("\033[96m-- Loading test resources --\033[0m")
             TestUtils().load_test_resources()
+            management.call_command("spatial_join", all=True)
 
     def update_map_layers(self):
 
