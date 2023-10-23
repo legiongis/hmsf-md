@@ -528,6 +528,10 @@ class ManagementAgency(models.Model):
             'name': self.name,
         }
 
+    @property
+    def concept_value_id(self):
+        return get_concept_value_id(self.concept)
+
     def save(self, *args, **kwargs):
 
         if not self.concept:
@@ -608,6 +612,10 @@ class ManagementArea(models.Model):
             return self.name
         else:
             return super(ManagementArea, self).__str__()
+
+    @property
+    def concept_value_id(self):
+        return get_concept_value_id(self.concept)
 
     def set_concept(self):
 

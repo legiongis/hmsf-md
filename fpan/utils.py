@@ -8,7 +8,7 @@ from django.db import connection
 from arches.app.models.models import ResourceInstance, Node
 from arches.app.models.tile import Tile
 
-from hms.models import ManagementArea, ManagementAgency, get_concept_value_id
+from hms.models import ManagementArea, ManagementAgency
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +17,8 @@ class SpatialJoin():
     def __init__(self):
 
         self.node_lookup = settings.SPATIAL_JOIN_GRAPHID_LOOKUP
-        self.valid_management_area_vals = [get_concept_value_id(i.concept) for i in ManagementArea.objects.all()]
-        self.valid_management_agency_vals = [get_concept_value_id(i.concept) for i in ManagementAgency.objects.all()]
+        self.valid_management_area_vals = [i.concept_value_id for i in ManagementArea.objects.all()]
+        self.valid_management_agency_vals = [i.concept_value_id for i in ManagementAgency.objects.all()]
 
     def update_resource(self, resourceinstance):
 
@@ -75,7 +75,7 @@ class SpatialJoin():
         if not isinstance(tile.data.get(n_lookup['Management Agency']), list):
             tile.data[n_lookup['Management Agency']] = []
 
-        val = get_concept_value_id(area.concept)
+        val = area.concept_value_id
         add_to_main = True
         # if management area has a category, check for where it should be added
         if area.category is not None:
@@ -92,7 +92,7 @@ class SpatialJoin():
             tile.data[n_lookup['Management Area']].append(val)
         # add the agency if available
         if area.management_agency is not None:
-            tile.data[n_lookup['Management Agency']].append(get_concept_value_id(area.management_agency.concept))
+            tile.data[n_lookup['Management Agency']].append(area.management_agency.concept_value_id)
 
         # finalize with some QA/QC
         tile.data[n_lookup['FPAN Region']] = list(set(
