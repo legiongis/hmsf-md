@@ -198,7 +198,7 @@ class ScoutProfile(models.Model):
             else:
                 rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
-                    node_name="Assigned To",
+                    node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP['Archaeological Site']['Assigned To'],
                     value=[self.user.username]
                 )
 
@@ -368,7 +368,7 @@ class LandManager(models.Model):
                     value = [i.name for i in self.all_areas]
                 rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
-                    node_name="Management Area",
+                    node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP['Archaeological Site']["Management Area"],
                     value=value
                 )
 
@@ -380,7 +380,7 @@ class LandManager(models.Model):
 
                 rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
-                    node_name="Management Agency",
+                    node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP['Archaeological Site']["Management Agency"],
                     value=value
                 )
             elif self.site_access_mode == "NONE":

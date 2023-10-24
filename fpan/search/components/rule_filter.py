@@ -46,22 +46,21 @@ class Rule(object):
             self.config["graph_id"] = self.graph_id
 
         elif self.type == "attribute_filter":
-            node_name = kwargs.get("node_name")
-            if not node_name or not self.graph_id:
+            node_id = kwargs.get("node_id")
+            if not node_id or not self.graph_id:
                 raise(Exception(f"Invalid params for {self.type} rule."))
 
-            node = Node.objects.filter(graph=self.graph_id, name=node_name)
-            if len(node) == 1:
-                nodegroup_id = str(node[0].nodegroup_id)
-            else:
-                raise(Exception(f"rule error: Can't find single node '{node_name}' in {self.graph_name}."))
+            try:
+                node = Node.objects.get(pk=node_id)
+            except Node.DoesNotExist:
+                raise(Exception(f"rule error: Can't find single node '{node_id}'"))
 
             value = kwargs.get("value", [])
             if not isinstance(value, list):
                 value = [value]
 
-            self.config["node_name"] = node_name
-            self.config["nodegroup_id"] = nodegroup_id
+            self.config["node_name"] = node.name
+            self.config["nodegroup_id"] = str(node.nodegroup_id)
             self.config["value"] = value
 
         elif self.type == "resourceid_filter":
@@ -177,7 +176,7 @@ class RuleFilter(BaseSearchFilter):
                 if graph_name == "Archaeological Site":
                     rule = Rule("attribute_filter",
                         graph_name=graph_name,
-                        node_name="Assigned To",
+                        node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP["Archaeological Site"]["Assigned To"],
                         value=[user.username],
                     )
 
@@ -185,7 +184,7 @@ class RuleFilter(BaseSearchFilter):
                     from hms.models import report_rule_from_arch_rule
                     arch_rule = Rule("attribute_filter",
                         graph_name="Archaeological Site",
-                        node_name="Assigned To",
+                        node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP["Archaeological Site"]["Assigned To"],
                         value=[user.username],
                     )
                     rule = report_rule_from_arch_rule(arch_rule)
