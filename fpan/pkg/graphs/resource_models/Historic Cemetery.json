@@ -1,7 +1,7 @@
 {
     "graph": [
         {
-            "author": "Legion GIS, LLC",
+            "author": "Adam Cox, Legion GIS, LLC",
             "cards": [
                 {
                     "active": true,
@@ -1562,7 +1562,7 @@
                     "sortorder": 0
                 },
                 {
-                    "alias": "management_area_s_",
+                    "alias": "management_area_n1",
                     "config": {
                         "rdmCollection": "aa8bb75f-942b-4cd0-8ae3-4e3a77ba6ca3"
                     },
@@ -1576,12 +1576,12 @@
                     "isrequired": false,
                     "issearchable": true,
                     "istopnode": false,
-                    "name": "Management Area(s)",
+                    "name": "Management Area",
                     "nodegroup_id": "48821219-715e-11ee-9e57-4df2569ff543",
                     "nodeid": "4882121e-715e-11ee-9e57-4df2569ff543",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 2
+                    "sortorder": 0
                 },
                 {
                     "alias": "historic_cemetery",
@@ -5359,7 +5359,7 @@
                 "ontologyclass": null,
                 "sortorder": null
             },
-            "slug": null,
+            "slug": "historic_cemetery",
             "subtitle": "Historic Cemetery resource model for FPAN-HMS (no ontology)",
             "template_id": "50000000-0000-0000-0000-000000000002",
             "version": ""

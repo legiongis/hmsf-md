@@ -1,7 +1,7 @@
 {
     "graph": [
         {
-            "author": " ",
+            "author": " Adam Cox, Legion GIS, LLC",
             "cards": [
                 {
                     "active": true,
@@ -5428,7 +5428,7 @@
                 "ontologyclass": null,
                 "sortorder": null
             },
-            "slug": null,
+            "slug": "archaeological_site",
             "subtitle": "Archaeological Site resource model for FPAN-HMS (no ontology)",
             "template_id": "50000000-0000-0000-0000-000000000002",
             "version": ""

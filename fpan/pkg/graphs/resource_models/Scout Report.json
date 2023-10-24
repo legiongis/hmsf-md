@@ -1,7 +1,7 @@
 {
     "graph": [
         {
-            "author": " Legion GIS, LLC",
+            "author": "Adam Cox, Legion GIS, LLC",
             "cards": [
                 {
                     "active": true,
@@ -6027,16 +6027,16 @@
                 "ontologyclass": null,
                 "sortorder": 0
             },
-            "slug": null,
+            "slug": "scout_report",
             "subtitle": "Scout Report resource model for FPAN-HMS (no ontology)",
             "template_id": "50000000-0000-0000-0000-000000000003",
             "version": ""
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 12.12 (Ubuntu 12.12-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
+        "db": "PostgreSQL 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
         "git hash": "fatal: detected dubious ownership in repository at '/opt/hms/arches'",
         "os": "Linux",
-        "os version": "5.19.2-x86_64-linode156"
+        "os version": "6.2.9-x86_64-linode160"
     }
 }
