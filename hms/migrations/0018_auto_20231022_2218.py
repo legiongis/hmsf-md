@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('models', '8579_alter_resourceinstance_descriptors'),
         ('hms', '0017_auto_20230403_1610'),
     ]
 
