@@ -1,5 +1,6 @@
 import os
 import csv
+from datetime import datetime
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.models import ResourceInstance
@@ -45,6 +46,9 @@ class Command(BaseCommand):
             exit()
 
         joiner = SpatialJoin()
-        for res in resources:
-            print(res)
+        total = resources.count()
+        start = datetime.now()
+        for n, res in enumerate(resources, start=1):
+            print(f'{n}/{total}: {str(res.pk)} ({res.graph.name})')
             joiner.update_resource(res)
+        print(f"completed. elapsed time: {datetime.now() - start}")
