@@ -365,7 +365,7 @@ class LandManager(models.Model):
                 ## of associated areas.
                 value = ["<no area set>"]
                 if len(self.all_areas) > 0:
-                    value = [i.name for i in self.all_areas]
+                    value = [f"{i.name} ({i.pk})" for i in self.all_areas]
                 rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
                     node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP['Archaeological Site']["Management Area"],
@@ -532,15 +532,31 @@ class ManagementAgency(models.Model):
     def concept_value_id(self):
         return get_concept_value_id(self.concept)
 
+    def set_concept(self):
+
+        concept = create_new_concept(
+            self.name,
+            parent_lbl="Management Agencies",
+            collection_lbl="Management Agencies"
+        )
+        self.concept = concept
+
+    def update_concept(self):
+
+        v = Value.objects.get(
+            concept=self.concept,
+            valuetype_id="prefLabel",
+            language_id="en"
+        )
+        v.value = f"{self.name} ({self.pk})"
+        v.save()
+
     def save(self, *args, **kwargs):
 
-        if not self.concept:
-            concept = create_new_concept(
-                self.name,
-                parent_lbl="Management Agencies",
-                collection_lbl="Management Agencies"
-            )
-            self.concept = concept
+        if self.concept:
+            self.update_concept()
+        else:
+            self.set_concept()
 
         super(ManagementAgency, self).save(*args, **kwargs)
 
@@ -639,6 +655,16 @@ class ManagementArea(models.Model):
             )
         self.concept = concept
 
+    def update_concept(self):
+
+        v = Value.objects.get(
+            concept=self.concept,
+            valuetype_id="prefLabel",
+            language_id="en"
+        )
+        v.value = f"{self.name} ({self.pk})"
+        v.save()
+
     def save(self, *args, **kwargs):
 
         if self.category and self.category.name == "FPAN Region":
@@ -650,10 +676,10 @@ class ManagementArea(models.Model):
         else:
             self.display_name = self.name
 
-        if not self.concept:
-            self.set_concept()
+        if self.concept:
+            self.update_concept()
         else:
-            self.update_concept
+            self.set_concept()
 
         super(ManagementArea, self).save(*args, **kwargs)
 
