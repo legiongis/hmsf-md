@@ -499,7 +499,7 @@ def get_concept_value_id(concept):
             valuetype_id="prefLabel",
         ).pk)
     except Value.DoesNotExist:
-        return"<no value>"
+        return None
 
 
 class ManagementAgency(models.Model):
