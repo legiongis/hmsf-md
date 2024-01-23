@@ -6,9 +6,16 @@
 HMS-Florida Monitoring Database
 ===============================
 
+We have extended Arches using built-in [extension patterns](https://arches.readthedocs.io/en/stable/developing/extending/creating-extensions/) to add some custom functionalities, mainly stemming from our need to protect archaeological data from public access. In some cases, we had hand-built some of these customizations, only to later roll them up into Arches patterns as the core code-base took on a more extensibility-focused nature.
+
+The Datatypes and Widgets are used in the HMS Resource Models, so they must be loaded prior to graph loading.
+
+
 .. toctree::
    :maxdepth: 2
 
    permissions
    map-layers
    extensions
+   search-filter
+   etl-modules
