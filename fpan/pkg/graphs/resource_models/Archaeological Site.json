@@ -1,7 +1,7 @@
 {
     "graph": [
         {
-            "author": " ",
+            "author": " Adam Cox, Legion GIS, LLC",
             "cards": [
                 {
                     "active": true,
@@ -263,6 +263,38 @@
                     "nodegroup_id": "5006429e-d535-11e7-bbbc-94659cf754d0",
                     "sortorder": 2,
                     "visible": true
+                },
+                {
+                    "active": true,
+                    "cardid": "e6929a4f-b31c-4108-99e7-847b37c33843",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [
+                        {
+                            "card_id": "e6929a4f-b31c-4108-99e7-847b37c33843",
+                            "constraintid": "cfc91de7-4fad-4b4d-a24f-cadd6883aefa",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        },
+                        {
+                            "card_id": "e6929a4f-b31c-4108-99e7-847b37c33843",
+                            "constraintid": "3d09cb0b-0e4d-40a8-88fb-b4fb1d8f6fda",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        }
+                    ],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "helpenabled": false,
+                    "helptext": null,
+                    "helptitle": null,
+                    "instructions": null,
+                    "is_editable": true,
+                    "name": "Management",
+                    "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "sortorder": null,
+                    "visible": false
                 }
             ],
             "cards_x_nodes_x_widgets": [
@@ -310,6 +342,36 @@
                     "sortorder": null,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000002"
+                },
+                {
+                    "card_id": "e6929a4f-b31c-4108-99e7-847b37c33843",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Management Area(s)",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "2a779e1d-6ad2-49e5-a8c8-b31b848611c7",
+                    "label": "Management Area(s)",
+                    "node_id": "877fefaa-715c-11ee-9e57-4df2569ff543",
+                    "sortorder": 2,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                },
+                {
+                    "card_id": "e6929a4f-b31c-4108-99e7-847b37c33843",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "FPAN Region",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "2c0d7f92-944a-45a4-b3cf-9cc354cb0a0f",
+                    "label": "FPAN Region",
+                    "node_id": "4d1dc620-715c-11ee-9e57-4df2569ff543",
+                    "sortorder": 1,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
                 },
                 {
                     "card_id": "30681423-dbaa-11e7-9ca3-94659cf754d0",
@@ -396,6 +458,21 @@
                     "sortorder": 1,
                     "visible": true,
                     "widget_id": "2d298980-cbd9-11e7-b225-94659cf754d0"
+                },
+                {
+                    "card_id": "e6929a4f-b31c-4108-99e7-847b37c33843",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Management Agency",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "41e5922a-c1c7-45e7-aa4a-633ae5821fa8",
+                    "label": "Management Agency",
+                    "node_id": "58908172-715d-11ee-9e57-4df2569ff543",
+                    "sortorder": 3,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
                 },
                 {
                     "card_id": "4d1193b3-d535-11e7-b836-94659cf754d0",
@@ -686,6 +763,21 @@
                     "sortorder": 1,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000012"
+                },
+                {
+                    "card_id": "e6929a4f-b31c-4108-99e7-847b37c33843",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "County",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "c4ea3382-6a94-40b3-98dd-05bc487dce4d",
+                    "label": "County",
+                    "node_id": "64f9a4da-715c-11ee-9e57-4df2569ff543",
+                    "sortorder": 0,
+                    "visible": false,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
                 }
             ],
             "color": "rgba(233,112,111,0.8)",
@@ -909,6 +1001,15 @@
                 },
                 {
                     "description": null,
+                    "domainnode_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "edgeid": "477c22b4-7ce8-4174-92b6-ca26dc379ad7",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "877fefaa-715c-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
                     "domainnode_id": "4d11bac3-d535-11e7-a921-94659cf754d0",
                     "edgeid": "4d11e1cf-d535-11e7-9c14-94659cf754d0",
                     "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
@@ -1023,6 +1124,42 @@
                     "name": null,
                     "ontologyproperty": null,
                     "rangenode_id": "50061b90-d535-11e7-9348-94659cf754d0"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "edgeid": "74d15763-ef6d-420a-8f15-40e3e758cf1f",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "58908172-715d-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "f2127100-d534-11e7-b2c3-94659cf754d0",
+                    "edgeid": "7d96582d-fa6b-4d40-9502-26a9fcec3623",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "4259ff42-715c-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "edgeid": "8deed765-82fd-4e3b-a4b7-b34eb89c7f7e",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "4d1dc620-715c-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "edgeid": "a7ff8d5c-b8ac-4fbf-9718-a66cac748fe6",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "64f9a4da-715c-11ee-9e57-4df2569ff543"
                 }
             ],
             "functions_x_graphs": [
@@ -1101,6 +1238,12 @@
                 {
                     "cardinality": "1",
                     "legacygroupid": null,
+                    "nodegroupid": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
                     "nodegroupid": "4d1193b1-d535-11e7-919a-94659cf754d0",
                     "parentnodegroup_id": "4d11bac3-d535-11e7-a921-94659cf754d0"
                 },
@@ -1168,7 +1311,7 @@
                     "nodeid": "03643bd0-d550-11e7-9629-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 3
                 },
                 {
                     "alias": "site_type",
@@ -1359,7 +1502,7 @@
                     "nodeid": "30681424-dbaa-11e7-ae6e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 1
                 },
                 {
                     "alias": "managed_area_name",
@@ -1511,7 +1654,7 @@
                     "nodeid": "3bdb249d-f860-11eb-a448-c7e1ad12b602",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 4
                 },
                 {
                     "alias": "county",
@@ -4861,6 +5004,26 @@
                     "sortorder": 0
                 },
                 {
+                    "alias": "management",
+                    "config": null,
+                    "datatype": "semantic",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Management",
+                    "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "nodeid": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 5
+                },
+                {
                     "alias": "fmsf_identification",
                     "config": null,
                     "datatype": "semantic",
@@ -4887,8 +5050,8 @@
                     },
                     "datatype": "concept",
                     "description": "",
-                    "exportable": false,
-                    "fieldname": null,
+                    "exportable": true,
+                    "fieldname": "Ownership",
                     "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
                     "hascustomalias": false,
                     "is_collector": true,
@@ -4900,7 +5063,7 @@
                     "nodeid": "4d1193b4-d535-11e7-8bcc-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "assigned_to",
@@ -4942,7 +5105,7 @@
                     "nodeid": "4d11bac3-d535-11e7-a921-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 2
                 },
                 {
                     "alias": "fmsf_name",
@@ -4985,6 +5148,28 @@
                     "sortorder": 0
                 },
                 {
+                    "alias": "fpan_region_n1",
+                    "config": {
+                        "rdmCollection": "a1209152-0702-4354-9b7f-a2efee2a2a8a"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "FPAN Region",
+                    "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "nodeid": "4d1dc620-715c-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 1
+                },
+                {
                     "alias": "national_register_eligibility",
                     "config": {
                         "fillColor": "rgba(233,112,111,0.8)"
@@ -5004,7 +5189,7 @@
                     "nodeid": "50061b90-d535-11e7-9348-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_assessment",
@@ -5135,6 +5320,72 @@
                     "sortorder": null
                 },
                 {
+                    "alias": "management_agency_n1",
+                    "config": {
+                        "rdmCollection": "fffcacef-cabb-4d5a-aaa1-c9b823be9911"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Management Agency",
+                    "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "nodeid": "58908172-715d-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "county_n1",
+                    "config": {
+                        "rdmCollection": "64b80aab-3d13-4ecb-a87d-03fa0a4367a7"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "County",
+                    "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "nodeid": "64f9a4da-715c-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "management_area_s_",
+                    "config": {
+                        "rdmCollection": "aa8bb75f-942b-4cd0-8ae3-4e3a77ba6ca3"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Management Area(s)",
+                    "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
+                    "nodeid": "877fefaa-715c-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 2
+                },
+                {
                     "alias": "archaeological_site",
                     "config": {},
                     "datatype": "semantic",
@@ -5177,16 +5428,16 @@
                 "ontologyclass": null,
                 "sortorder": null
             },
-            "slug": null,
+            "slug": "archaeological_site",
             "subtitle": "Archaeological Site resource model for FPAN-HMS (no ontology)",
             "template_id": "50000000-0000-0000-0000-000000000002",
             "version": ""
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 12.12 (Ubuntu 12.12-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
+        "db": "PostgreSQL 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
         "git hash": "fatal: detected dubious ownership in repository at '/opt/hms/arches'",
         "os": "Linux",
-        "os version": "5.19.2-x86_64-linode156"
+        "os version": "6.2.9-x86_64-linode160"
     }
 }

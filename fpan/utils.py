@@ -2,6 +2,7 @@ import json
 import time
 import logging
 
+from django.conf import settings
 from django.db import connection
 
 from arches.app.models.models import ResourceInstance, Node
@@ -15,27 +16,9 @@ class SpatialJoin():
 
     def __init__(self):
 
-        self.node_lookups = {}
-        self.nodegroup_lookup = {}
-        self.valid_management_area_pks = [str(i) for i in ManagementArea.objects.all().values_list("pk", flat=True)]
-        self.valid_management_agency_pks = ManagementAgency.objects.all().values_list("pk", flat=True)
-
-    def _get_node_lookup(self, graph_name):
-
-        if not graph_name in self.node_lookups:
-            self.node_lookups[graph_name] = {
-                "FPAN Region": str(Node.objects.get(graph__name=graph_name, name="FPAN Region").pk),
-                "County": str(Node.objects.get(graph__name=graph_name, name="County").pk),
-                "Management Area": str(Node.objects.get(graph__name=graph_name, name="Management Area").pk),
-                "Management Agency": str(Node.objects.get(graph__name=graph_name, name="Management Agency").pk),
-            }
-        return self.node_lookups[graph_name]
-    
-    def _get_nodegroup(self, graph_name):
-
-        if not graph_name in self.nodegroup_lookup:
-            self.nodegroup_lookup[graph_name] = str(Node.objects.get(graph__name=graph_name, name="Site Management").nodegroup.pk)
-        return self.nodegroup_lookup[graph_name]
+        self.node_lookup = settings.SPATIAL_JOIN_GRAPHID_LOOKUP
+        self.valid_management_area_vals = [i.concept_value_id for i in ManagementArea.objects.all()]
+        self.valid_management_agency_vals = [i.concept_value_id for i in ManagementAgency.objects.all()]
 
     def update_resource(self, resourceinstance):
 
@@ -75,13 +58,12 @@ class SpatialJoin():
     def apply_management_area_attributes(self, resourceinstance, area):
 
         g_name = resourceinstance.graph.name
-        n_lookup = self._get_node_lookup(g_name)
-        ng = self._get_nodegroup(g_name)
+        n_lookup = self.node_lookup[g_name]
+        ng = self.node_lookup[g_name]['Nodegroup']
         try:
             tile = Tile.objects.get(nodegroup_id=ng, resourceinstance=resourceinstance)
         except Tile.DoesNotExist:
-            logger.error(f"missing expected Site Management tile for {resourceinstance.pk}")
-            return
+            tile = Tile().get_blank_tile(ng, resourceid=resourceinstance.pk)
 
         # set empty lists if the node value is None or nonexistent
         if not isinstance(tile.data.get(n_lookup['FPAN Region']), list):
@@ -93,37 +75,37 @@ class SpatialJoin():
         if not isinstance(tile.data.get(n_lookup['Management Agency']), list):
             tile.data[n_lookup['Management Agency']] = []
 
-        pk = str(area.pk)
+        val = area.concept_value_id
         add_to_main = True
         # if management area has a category, check for where it should be added
         if area.category is not None:
             # add to region node in this case
             if area.category.name == "FPAN Region":
                 add_to_main = False
-                tile.data[n_lookup['FPAN Region']].append(pk)
+                tile.data[n_lookup['FPAN Region']].append(val)
             # add to county node in this case
             elif area.category.name == "County":
                 add_to_main = False
-                tile.data[n_lookup['County']].append(pk)
+                tile.data[n_lookup['County']].append(val)
         # for all other cases, add to the main Management Area node
         if add_to_main is True:
-            tile.data[n_lookup['Management Area']].append(pk)
+            tile.data[n_lookup['Management Area']].append(val)
         # add the agency if available
         if area.management_agency is not None:
-            tile.data[n_lookup['Management Agency']].append(area.management_agency.pk)
+            tile.data[n_lookup['Management Agency']].append(area.management_agency.concept_value_id)
 
         # finalize with some QA/QC
         tile.data[n_lookup['FPAN Region']] = list(set(
-            [i for i in tile.data[n_lookup['FPAN Region']] if i in self.valid_management_area_pks]
+            [i for i in tile.data[n_lookup['FPAN Region']] if i in self.valid_management_area_vals]
         ))
         tile.data[n_lookup['County']] = list(set(
-            [i for i in tile.data[n_lookup['County']] if i in self.valid_management_area_pks]
+            [i for i in tile.data[n_lookup['County']] if i in self.valid_management_area_vals]
         ))
         tile.data[n_lookup['Management Area']] = list(set(
-            [i for i in tile.data[n_lookup['Management Area']] if i in self.valid_management_area_pks]
+            [i for i in tile.data[n_lookup['Management Area']] if i in self.valid_management_area_vals]
         ))
         tile.data[n_lookup['Management Agency']] = list(set(
-            [i for i in tile.data[n_lookup['Management Agency']] if i in self.valid_management_agency_pks]
+            [i for i in tile.data[n_lookup['Management Agency']] if i in self.valid_management_agency_vals]
         ))
 
         tile.save()

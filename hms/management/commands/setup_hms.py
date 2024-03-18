@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from arches.app.models.models import MapLayer
 
-from hms.models import ManagementArea
+from hms.models import ManagementArea, ManagementAgency
 from hms.utils import TestUtils
 
 class Command(BaseCommand):
@@ -55,6 +55,10 @@ class Command(BaseCommand):
 
         print("\033[96m-- Load MANAGEMENT AGENCIES --\033[0m")
         management.call_command('loaddata', 'management-agencies')
+        print("\033[37mRe-saving all objects to generate RDM concepts...", end="")
+        for i in ManagementAgency.objects.all():
+            i.save()
+        print(" done.\033[0m")
 
         print("\033[96m-- Load MANAGEMENT AREA CATEGORIES --\033[0m")
         management.call_command('loaddata', 'management-area-categories')
@@ -70,10 +74,10 @@ class Command(BaseCommand):
         management.call_command('loaddata', 'management-areas-hillsborough-co-parks')
         management.call_command('loaddata', 'management-areas-july2021')
 
-        print("re-saving all objects to generate display_name...")
+        print("\033[37mRe-saving all objects to generate display_name and RDM concepts...", end="")
         for i in ManagementArea.objects.all():
             i.save()
-        print("  done.")
+        print(" done.\033[0m")
 
         print("\033[96m-- Load MANAGEMENT AREA GROUPS --\033[0m")
         management.call_command('loaddata', 'management-area-groups')
@@ -99,6 +103,7 @@ class Command(BaseCommand):
         if options['test_resources']:
             print("\033[96m-- Loading test resources --\033[0m")
             TestUtils().load_test_resources()
+            management.call_command("spatial_join", all=True)
 
     def update_map_layers(self):
 

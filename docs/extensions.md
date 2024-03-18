@@ -1,10 +1,8 @@
-# Our Extensions
+# Custom Datatypes & Widgets
 
-We have extended Arches using built-in [extension patterns](https://arches.readthedocs.io/en/stable/developing/extending/creating-extensions/) to add some custom functionalities, mainly stemming from our need to protect archaeological data from public access. In some cases, we had hand-built some of these customizations, only to later roll them up into Arches patterns as the core code-base took on a more extensibility-focused nature.
+**PAGE NEEDS UPDATES!**
 
-The Datatypes and Widgets are used in the HMS Resource Models, so they must be loaded prior to graph loading.
-
-## ORM-Based Datatypes & Widgets
+## Using the Django ORM in Arches
 
 We have created two Datatype extensions, both of which are meant to allow direct references to objects in the Django ORM. They both inherit from the `DomainListDataType`.
 
@@ -87,19 +85,3 @@ def widget_data(request):
 On the other hand, the `scout-widget` does not inherit the `DomainWidgetViewModel`, and it is populated via an AJAX call to a view, `hms.views.scouts_dropdown()`. This is a bit more robust of an implementation, it was our first custom widget and requires more logic than the others. Aligning all patterns across these widgets would be wise.
 
 > Extending the `DomainWidgetViewModel` seemed wise at first, but it comes with some strangeness, like the configuration needing to be saved if you go to this node in the Resource Model graph. It would probably be better to look back at the `scout-widget` implementation.
-
-## `RuleFilter` Search Component
-
-At the heart of our archaeological site access permission system is a custom search component, `RuleFilter`. While this is an Arches search component that follows traditional patterns, some aspects of it are based on custom user profiles, and attributes that are stored on them.
-
-![rule filter 1](_static/images/rf-1.png)
-
-![rule filter 1](_static/images/rf-2.png)
-
-## FMSF Importer
-
-*to do...*
-
-## Management Area Importer
-
-*to do...*

@@ -1,7 +1,7 @@
 {
     "graph": [
         {
-            "author": " Legion GIS, LLC",
+            "author": "Adam Cox, Legion GIS, LLC",
             "cards": [
                 {
                     "active": true,
@@ -183,6 +183,32 @@
                 },
                 {
                     "active": true,
+                    "cardid": "ad51e45e-715e-11ee-9e57-4df2569ff543",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [
+                        {
+                            "card_id": "ad51e45e-715e-11ee-9e57-4df2569ff543",
+                            "constraintid": "517a1236-ac34-4868-a49d-c5a13a2de0d9",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        }
+                    ],
+                    "cssclass": null,
+                    "description": "",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "helpenabled": false,
+                    "helptext": null,
+                    "helptitle": null,
+                    "instructions": null,
+                    "is_editable": true,
+                    "name": "Management",
+                    "nodegroup_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "sortorder": null,
+                    "visible": false
+                },
+                {
+                    "active": true,
                     "cardid": "e2ca3d27-f860-11eb-a448-c7e1ad12b602",
                     "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
                     "config": null,
@@ -267,6 +293,21 @@
             ],
             "cards_x_nodes_x_widgets": [
                 {
+                    "card_id": "ad51e45e-715e-11ee-9e57-4df2569ff543",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Management Area(s)",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "118bb0e7-813c-4368-934f-e0a8104a45ec",
+                    "label": "Management Area(s)",
+                    "node_id": "ad51e462-715e-11ee-9e57-4df2569ff543",
+                    "sortorder": 2,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                },
+                {
                     "card_id": "efe6cb60-dbab-11e7-9629-94659cf754d0",
                     "config": {
                         "basemap": "streets",
@@ -325,6 +366,21 @@
                     "sortorder": null,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000002"
+                },
+                {
+                    "card_id": "ad51e45e-715e-11ee-9e57-4df2569ff543",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "County",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "4e708079-5578-4afe-9f9e-811c0114700e",
+                    "label": "County",
+                    "node_id": "ad51e461-715e-11ee-9e57-4df2569ff543",
+                    "sortorder": 0,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
                 },
                 {
                     "card_id": "a6084bf1-d524-11e7-a155-94659cf754d0",
@@ -402,6 +458,21 @@
                     "sortorder": null,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000002"
+                },
+                {
+                    "card_id": "ad51e45e-715e-11ee-9e57-4df2569ff543",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Management Agency",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "7bb61e9f-1581-4481-9c0c-c4f01eab1506",
+                    "label": "Management Agency",
+                    "node_id": "ad51e45f-715e-11ee-9e57-4df2569ff543",
+                    "sortorder": 3,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
                 },
                 {
                     "card_id": "a6084bf1-d524-11e7-a155-94659cf754d0",
@@ -1727,6 +1798,21 @@
                     "widget_id": "10000000-0000-0000-0000-000000000001"
                 },
                 {
+                    "card_id": "ad51e45e-715e-11ee-9e57-4df2569ff543",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "FPAN Region",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "ad51e463-715e-11ee-9e57-4df2569ff543",
+                    "label": "FPAN Region",
+                    "node_id": "ad51e460-715e-11ee-9e57-4df2569ff543",
+                    "sortorder": 1,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000012"
+                },
+                {
                     "card_id": "a7520a01-d524-11e7-92ef-94659cf754d0",
                     "config": {
                         "defaultValue": "",
@@ -1795,7 +1881,7 @@
                     "label": "County",
                     "node_id": "e2ca3d28-f860-11eb-a448-c7e1ad12b602",
                     "sortorder": 1,
-                    "visible": false,
+                    "visible": true,
                     "widget_id": "2d29abba-cbd9-11e7-b225-94659cf754d0"
                 },
                 {
@@ -1929,6 +2015,15 @@
             "deploymentfile": null,
             "description": "Resource model created for the Florida Public Archaeology Network \"Heritage Monitoring Scouts\" program to represent Historic Structure resources. Designed to hold all qualitative information from the Florida Master Site File shapefile export of \"Florida Structure\" resources, as well as HMS-specific attributes, such as site visit evaluations.",
             "edges": [
+                {
+                    "description": null,
+                    "domainnode_id": "c67216be-8cc2-11e7-883c-06ed184dc22c",
+                    "edgeid": "6b29ad75-80be-4927-929a-95240e87dc4a",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "ad51e45d-715e-11ee-9e57-4df2569ff543"
+                },
                 {
                     "description": null,
                     "domainnode_id": "a6084bef-d524-11e7-a500-94659cf754d0",
@@ -2108,6 +2203,42 @@
                     "name": null,
                     "ontologyproperty": null,
                     "rangenode_id": "a90dead7-d524-11e7-b9e0-94659cf754d0"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "edgeid": "ad51e464-715e-11ee-9e57-4df2569ff543",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "ad51e462-715e-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "edgeid": "ad51e465-715e-11ee-9e57-4df2569ff543",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "ad51e45f-715e-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "edgeid": "ad51e466-715e-11ee-9e57-4df2569ff543",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "ad51e460-715e-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "edgeid": "ad51e467-715e-11ee-9e57-4df2569ff543",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "ad51e461-715e-11ee-9e57-4df2569ff543"
                 },
                 {
                     "description": null,
@@ -2325,6 +2456,12 @@
                 {
                     "cardinality": "1",
                     "legacygroupid": null,
+                    "nodegroupid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "parentnodegroup_id": null
+                },
+                {
+                    "cardinality": "1",
+                    "legacygroupid": null,
                     "nodegroupid": "e2ca3d25-f860-11eb-a448-c7e1ad12b602",
                     "parentnodegroup_id": null
                 },
@@ -2368,7 +2505,7 @@
                     "nodeid": "a6084bef-d524-11e7-a500-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 1
                 },
                 {
                     "alias": "exterior_plan",
@@ -2520,7 +2657,7 @@
                     "nodeid": "a751e2f1-d524-11e7-a98a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 3
                 },
                 {
                     "alias": "survey_assessment",
@@ -2732,7 +2869,7 @@
                     "nodeid": "a90dead7-d524-11e7-b9e0-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "fmsf_name",
@@ -2775,6 +2912,114 @@
                     "sortorder": 0
                 },
                 {
+                    "alias": "management",
+                    "config": null,
+                    "datatype": "semantic",
+                    "description": "",
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Management",
+                    "nodegroup_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "nodeid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 5
+                },
+                {
+                    "alias": "management_agency_n1",
+                    "config": {
+                        "rdmCollection": "fffcacef-cabb-4d5a-aaa1-c9b823be9911"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Management Agency",
+                    "nodegroup_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 3
+                },
+                {
+                    "alias": "fpan_region_n1",
+                    "config": {
+                        "rdmCollection": "a1209152-0702-4354-9b7f-a2efee2a2a8a"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "FPAN Region",
+                    "nodegroup_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "nodeid": "ad51e460-715e-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 1
+                },
+                {
+                    "alias": "county_n1",
+                    "config": {
+                        "rdmCollection": "64b80aab-3d13-4ecb-a87d-03fa0a4367a7"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "County",
+                    "nodegroup_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "nodeid": "ad51e461-715e-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "management_area_s_",
+                    "config": {
+                        "rdmCollection": "aa8bb75f-942b-4cd0-8ae3-4e3a77ba6ca3"
+                    },
+                    "datatype": "concept-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Management Area(s)",
+                    "nodegroup_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+                    "nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 2
+                },
+                {
                     "alias": "historic_structure",
                     "config": {},
                     "datatype": "semantic",
@@ -2812,7 +3057,7 @@
                     "nodeid": "e2ca3d25-f860-11eb-a448-c7e1ad12b602",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 4
                 },
                 {
                     "alias": "county",
@@ -6243,7 +6488,7 @@
                     "nodeid": "efe6cb64-dbab-11e7-b596-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 2
                 },
                 {
                     "alias": "managed_area_name",
@@ -6404,16 +6649,16 @@
                 "ontologyclass": null,
                 "sortorder": null
             },
-            "slug": null,
+            "slug": "historic_structure",
             "subtitle": "Historic Structure resource model for FPAN-HMS (no ontology)",
             "template_id": "50000000-0000-0000-0000-000000000002",
             "version": ""
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 12.12 (Ubuntu 12.12-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
+        "db": "PostgreSQL 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
         "git hash": "fatal: detected dubious ownership in repository at '/opt/hms/arches'",
         "os": "Linux",
-        "os version": "5.19.2-x86_64-linode156"
+        "os version": "6.2.9-x86_64-linode160"
     }
 }

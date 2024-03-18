@@ -1,4 +1,4 @@
-# Rules for Archaeological Site Access
+# Controlling Archaeological Site Access
 
 The specific requirements for how we handle access to archaeological site data have changed a bit since 2017 when we first started the project. The current approach aims to be as flexible as possible, while also exposing all components of permissions levels to the Django backend, so FPAN staff can manage the system as easily as possible. This is achieved by combining the following elements:
 

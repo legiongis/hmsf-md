@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+>
+  <skos:ConceptScheme rdf:about="http://localhost:8000/6c8e1ce6-554e-44c9-9064-c9ac7eec9773">
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="http://localhost:8000/a28c2cb2-9ec3-43b8-9528-7cd4b491d27e">
+        <skos:inScheme rdf:resource="http://localhost:8000/6c8e1ce6-554e-44c9-9064-c9ac7eec9773"/>
+        <skos:prefLabel xml:lang="en">{"id": "6fdc9326-1bee-41e8-a0ea-a27febf009fe", "value": "Management Agencies"}</skos:prefLabel>
+      </skos:Concept>
+    </skos:hasTopConcept>
+    <dcterms:description xml:lang="en">{"id": "6fbd570e-d837-4d7f-bb10-d91e3d957987", "value": "Concepts and collections used to link resource instances with management areas and related objects."}</dcterms:description>
+    <dcterms:title xml:lang="en">{"id": "90d527d4-d116-4da3-b340-375e1f7410d3", "value": "SiteManagement-thesaurus"}</dcterms:title>
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="http://localhost:8000/3c5afbaf-b811-408b-b4c6-633705a3ef69">
+        <skos:prefLabel xml:lang="en">{"id": "187d82ec-6935-4803-88e4-1e922a73da9c", "value": "Management Areas"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/6c8e1ce6-554e-44c9-9064-c9ac7eec9773"/>
+      </skos:Concept>
+    </skos:hasTopConcept>
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="http://localhost:8000/880a36e5-5679-4710-a844-4a2ac6549bbd">
+        <skos:prefLabel xml:lang="en">{"id": "b0d8fc55-577b-49ae-9648-37e7d3bf830a", "value": "FPAN Regions"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/6c8e1ce6-554e-44c9-9064-c9ac7eec9773"/>
+      </skos:Concept>
+    </skos:hasTopConcept>
+    <skos:hasTopConcept>
+      <skos:Concept rdf:about="http://localhost:8000/61b98bdd-beb9-4f6f-bd43-3db2ddb421b5">
+        <skos:prefLabel xml:lang="en">{"id": "26f94428-13a6-4308-ae12-a263c9f6e163", "value": "Counties"}</skos:prefLabel>
+        <skos:inScheme rdf:resource="http://localhost:8000/6c8e1ce6-554e-44c9-9064-c9ac7eec9773"/>
+      </skos:Concept>
+    </skos:hasTopConcept>
+  </skos:ConceptScheme>
+</rdf:RDF>

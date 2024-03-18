@@ -1,7 +1,7 @@
 body, body.body-anonymous, body.body-admin, .profile-sections-admin {
     font-family: 'Kreon',sans-serif;
     background: url('../img/fpan/ricepaper.png');
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1.65;
 }
 body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {

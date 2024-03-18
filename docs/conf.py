@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'HMS-Florida Monitoring Database'
-copyright = '2023, Legion GIS'
+copyright = '2024, Legion GIS'
 author = 'Adam Cox'
 
 # -- General configuration ---------------------------------------------------
@@ -33,7 +33,7 @@ html_css_files = [
 html_theme_options = {
 
     # Set the name of the project to appear in the navigation.
-    'nav_title': 'Docs | HMS-F Monitoring Database',
+    'nav_title': 'HMSF-MD Documentation',
 
     # Specify a base_url used to generate sitemap.xml. If not
     # specified, then no sitemap will be built.
@@ -45,12 +45,18 @@ html_theme_options = {
 
     # Set the repo location to get a badge with stats
     'repo_url': 'https://github.com/legiongis/hmsf-md',
-    'repo_name': 'HMS-Florida Arches Project',
+    'repo_name': 'HMSF-MD',
 
     # Visible levels of the global TOC; -1 means unlimited
-    'globaltoc_depth': 3,
+    'globaltoc_depth': 2,
     # If False, expand all TOC entries
     'globaltoc_collapse': False,
     # If True, show hidden TOC entries
     'globaltoc_includehidden': False,
+
+    'master_doc': False,
+}
+
+html_sidebars = {
+    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
 }

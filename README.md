@@ -119,3 +119,18 @@ This will get a fully function (if empty of real site data) installation of the 
     python manage.py runserver
     ```
     - You may need to add `0:8000` on remote server instances.
+
+## Documentation
+
+Documentation is implemented with Sphinx via [django-docs](https://github.com/littlepea/django-docs/), and stored in the `/docs` directory. Currently, it is restricted to staff access only, but this can be changed in the project `settings.py`.
+
+To build the documentation:
+
+```
+cd docs
+sphinx-build . ./_build/dirhtml -b dirhtml
+```
+
+Also, the builder `dirhtml` must apparently be passed directly to the command because it can't be stored in `conf.py` (?).
+
+Currently, using sphinx-autobuild fails, saying it can't find the `myst_parser` module, even though it is in the virtual env.
