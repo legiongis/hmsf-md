@@ -1,13 +1,28 @@
+# View, Create/Edit Access to Resource Instances
+
+Of the four Resource Models, only **Scout Reports** can be created and updated by Scouts and Land Managers. Historic Cemeteries and Historic Structures can be viewed by any user, including guests, and a custom rule-based permission system determines who can view specific Archaeological Sites.
+
+Scout Report edit permissions are handled by assigning the `Crowdsource Editor` group to all Scouts and Land Managers and then using the Permissions Tab in the Arches Graph Designer to configure the following:
+
+| Resource Model | NodeGroups | Group | Permissions |
+|---|---|---|---|
+| Archaeological Site | all | Crowdsource Editor | Read |
+| Historic Cemetery | all | Crowdsource Editor | Read |
+| Historic Structure | all | Crowdsource Editor | Read |
+| Scout Report | all | Crowdsource Editor | Read, Create/Update |
+
+The rest of this page describes our rule-based access system for Archaeological Sites.
+
 # Controlling Archaeological Site Access
 
 The specific requirements for how we handle access to archaeological site data have changed a bit since 2017 when we first started the project. The current approach aims to be as flexible as possible, while also exposing all components of permissions levels to the Django backend, so FPAN staff can manage the system as easily as possible. This is achieved by combining the following elements:
 
 - User profiles - Scouts vs. Land Managers
-   - Site access permissions are handled differently for each category.
-   - Each user category has its own login page, and will see different page styles after logging in, but **all users fill out the exact same Scout Report**.
+   - Site access permissions are handled differently for type of user.
+   - Each type of user has its own login page, and will see different page styles after logging in, but *all users fill out the exact same Scout Report*.
 - Management Areas and Management Agencies
    - Used to determine Land Manager site access.
-- *Assigned To* and *Management Info* branches on the Archaeological Site resource model
+- **Assigned To** and **Management** branches on the Archaeological Site resource model
    - Attributes attached to Archaeological Site that are interrogated to determine resource-level access Scouts and Land Managers, respectively.
 - The `RuleFilter` custom search component
    - Synthesizes everything described above to alter search queries and results.
