@@ -30,7 +30,7 @@ urlpatterns = [
 
     path("auth/state", login_patch, {'login_type':'landmanager'}, name="state_login_redirect"),
     path("auth/scout", login_patch, {'login_type':'scout'}, name="scout_login_redirect"),
-    url(r"^auth/", LoginView.as_view(), name="auth"),
+    url(r"^auth/$", LoginView.as_view(), name="auth"),
     path("activate/", activate, name='activate'),
     path("activate/<str:uidb64>/<str:token>/", activate_page, name='activate_page'),
 ]

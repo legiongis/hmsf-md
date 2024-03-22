@@ -244,11 +244,7 @@ class ScoutProfile(models.Model):
 def create_user_scout(sender, instance, created, **kwargs):
     if created:
         ScoutProfile.objects.create(user=instance)
-    # group = Group.objects.get(name='Scout')
-    # group.user_set.add(instance)
     group_cs = Group.objects.get(name='Crowdsource Editor')
-    group_cs.user_set.add(instance)
-    group_cs = Group.objects.get(name='Resource Editor')
     group_cs.user_set.add(instance)
     instance.scoutprofile.save()
 
@@ -431,8 +427,6 @@ class LandManager(models.Model):
 def create_user_land_manager(sender, instance, created, **kwargs):
     if created:
         group_cs = Group.objects.get(name='Crowdsource Editor')
-        group_cs.user_set.add(instance.user)
-        group_cs = Group.objects.get(name='Resource Editor')
         group_cs.user_set.add(instance.user)
 
 
