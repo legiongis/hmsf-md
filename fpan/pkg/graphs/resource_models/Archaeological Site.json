@@ -294,7 +294,7 @@
                     "name": "Management",
                     "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
                     "sortorder": null,
-                    "visible": false
+                    "visible": true
                 }
             ],
             "cards_x_nodes_x_widgets": [
@@ -450,7 +450,9 @@
                 {
                     "card_id": "3bdb249f-f860-11eb-a448-c7e1ad12b602",
                     "config": {
-                        "label": "Management Area"
+                        "defaultValue": "",
+                        "label": "Management Area",
+                        "placeholder": "Select an option"
                     },
                     "id": "3bdb24a7-f860-11eb-a448-c7e1ad12b602",
                     "label": "Management Area",
@@ -1183,18 +1185,7 @@
                     },
                     "function_id": "60000000-0000-0000-0000-000000000001",
                     "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
-                    "id": "83a809db-138a-11e8-9a11-0abff18d581c"
-                },
-                {
-                    "config": {
-                        "assignment_node_id": "4d11bac0-d535-11e7-a1b3-94659cf754d0",
-                        "triggering_nodegroups": [
-                            "4d11bac0-d535-11e7-a1b3-94659cf754d0"
-                        ]
-                    },
-                    "function_id": "4a1da8f0-dddd-11e7-a700-94659cf754d0",
-                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
-                    "id": "dc12dfaf-d06a-11eb-96c1-0abff18d581c"
+                    "id": "37d9a0d1-bfec-4091-a216-6a10d5f0d07c"
                 }
             ],
             "graphid": "f212980f-d534-11e7-8ca8-94659cf754d0",
@@ -1311,7 +1302,7 @@
                     "nodeid": "03643bd0-d550-11e7-9629-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 3
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_type",
@@ -1333,7 +1324,7 @@
                     "nodeid": "036462e2-d550-11e7-a492-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_culture",
@@ -1355,7 +1346,7 @@
                     "nodeid": "036462e3-d550-11e7-932a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_culture_assignment",
@@ -1375,7 +1366,7 @@
                     "nodeid": "036462e4-d550-11e7-93eb-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "human_remains",
@@ -1397,7 +1388,7 @@
                     "nodeid": "036462e5-d550-11e7-8942-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_type_assignment",
@@ -1417,7 +1408,7 @@
                     "nodeid": "036462e6-d550-11e7-884d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "geospatial_coordinates",
@@ -1460,7 +1451,7 @@
                     "nodeid": "3067ed10-dbaa-11e7-87be-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "location_details",
@@ -1480,7 +1471,7 @@
                     "nodeid": "30681421-dbaa-11e7-aba9-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "location",
@@ -1502,7 +1493,7 @@
                     "nodeid": "30681424-dbaa-11e7-ae6e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 1
+                    "sortorder": 0
                 },
                 {
                     "alias": "managed_area_name",
@@ -1590,7 +1581,7 @@
                     "nodeid": "3068142a-dbaa-11e7-9afc-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "hms_region",
@@ -1634,7 +1625,7 @@
                     "nodeid": "3068142c-dbaa-11e7-a50e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_management",
@@ -1654,7 +1645,7 @@
                     "nodeid": "3bdb249d-f860-11eb-a448-c7e1ad12b602",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 4
+                    "sortorder": 0
                 },
                 {
                     "alias": "county",
@@ -5021,7 +5012,7 @@
                     "nodeid": "4259ff42-715c-11ee-9e57-4df2569ff543",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 5
+                    "sortorder": 0
                 },
                 {
                     "alias": "fmsf_identification",
@@ -5041,7 +5032,7 @@
                     "nodeid": "4d1193b1-d535-11e7-919a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "ownership",
@@ -5083,7 +5074,7 @@
                     "nodeid": "4d11bac0-d535-11e7-a1b3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "basic_site_information",
@@ -5105,7 +5096,7 @@
                     "nodeid": "4d11bac3-d535-11e7-a921-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 2
+                    "sortorder": 0
                 },
                 {
                     "alias": "fmsf_name",
@@ -5167,7 +5158,7 @@
                     "nodeid": "4d1dc620-715c-11ee-9e57-4df2569ff543",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 1
+                    "sortorder": 0
                 },
                 {
                     "alias": "national_register_eligibility",
@@ -5209,7 +5200,7 @@
                     "nodeid": "50061b93-d535-11e7-8d13-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "shpo_evaluation",
@@ -5231,7 +5222,7 @@
                     "nodeid": "50061b96-d535-11e7-b9a0-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "national_register_list_date",
@@ -5253,7 +5244,7 @@
                     "nodeid": "5006429e-d535-11e7-bbbc-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation_district_",
@@ -5275,7 +5266,7 @@
                     "nodeid": "500642a1-d535-11e7-812f-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation",
@@ -5297,7 +5288,7 @@
                     "nodeid": "500642a2-d535-11e7-9699-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_number",
@@ -5317,7 +5308,7 @@
                     "nodeid": "500642a3-d535-11e7-9eec-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "management_agency_n1",
@@ -5383,7 +5374,7 @@
                     "nodeid": "877fefaa-715c-11ee-9e57-4df2569ff543",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 2
+                    "sortorder": 0
                 },
                 {
                     "alias": "archaeological_site",
@@ -5403,7 +5394,7 @@
                     "nodeid": "f2127100-d534-11e7-b2c3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": "",
-                    "sortorder": null
+                    "sortorder": 0
                 }
             ],
             "ontology_id": null,
@@ -5426,7 +5417,7 @@
                 "nodegroup_id": null,
                 "nodeid": "f2127100-d534-11e7-b2c3-94659cf754d0",
                 "ontologyclass": null,
-                "sortorder": null
+                "sortorder": 0
             },
             "slug": "archaeological_site",
             "subtitle": "Archaeological Site resource model for FPAN-HMS (no ontology)",
@@ -5435,9 +5426,9 @@
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
-        "git hash": "fatal: detected dubious ownership in repository at '/opt/hms/arches'",
+        "db": "PostgreSQL 12.18 (Ubuntu 12.18-1.pgdg20.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit",
+        "git hash": "3623b36a6 2023-02-24 16:27:56 +0000",
         "os": "Linux",
-        "os version": "6.2.9-x86_64-linode160"
+        "os version": "5.15.0-100-generic"
     }
 }
