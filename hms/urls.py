@@ -23,8 +23,8 @@ urlpatterns = [
     url(r'^hms/home', RedirectView.as_view(pattern_name='scout_profile_manager', permanent=True)),
     url(r'^state/home', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
     url(r'^dashboard', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),
-
-    url(r'^scout/signup', scout_signup, name='scout_signup'),
+    # this url is meant to be sensible but not guessable
+    url(r'^scout/signup-850-595-0050', scout_signup, name='scout_signup'),
     url(r'^scouts/$', scouts_dropdown, name='scouts_dropdown'),
     url(r'^scout-list-download/$', scout_list_download, name='scout_list_download'),
 

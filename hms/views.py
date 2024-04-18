@@ -37,7 +37,6 @@ def index(request):
         'main_script': 'index',
         'active_page': 'Home',
         'app_title': '{0} | HMS'.format(settings.APP_NAME),
-        'scout_form': scout_form,
         'page':'index'
     })
 
@@ -180,6 +179,15 @@ def activate(request):
     return redirect("/auth/?t=scout")
 
 def scout_signup(request):
+    if request.method == "GET":
+        scout_form = ScoutForm()
+        return render(request, 'scout-signup.htm', {
+            'main_script': 'scout-signup',
+            'active_page': 'Scout Signup',
+            'app_title': '{0} | Scout Signup'.format(settings.APP_NAME),
+            'scout_form': scout_form,
+            'page':'scout-signup'
+        })
     if request.method == "POST":
         form = ScoutForm(request.POST)
         if form.is_valid():
