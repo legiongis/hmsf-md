@@ -181,9 +181,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         <div class="row" style="margin: 10px 0px;">
             <div class="col-xs-12">
                 {% if login_type %}
-                <span>&copy; {% now "Y" %} | powered by <a class="a-{{login_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{login_type}}" href="https://github.com/legiongis/arches/tree/fpan_master">arches</a>, <a class="a-{{login_type}}" href="https://github.com/legiongis/fpan">fpan</a>, <a class="a-{{login_type}}" href="https://github.com/legiongis/fpan-data">fpan-data</a> | admin contact &mdash; <a id="email-contact" class="a-{{login_type}}"></a></span>
+                <span>&copy; {% now "Y" %} | powered by <a class="a-{{login_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{login_type}}" href="https://github.com/legiongis/arches/tree/dev/6.2.x-hms">arches</a>, <a class="a-{{login_type}}" href="https://github.com/legiongis/hmsf-md">fpan</a> | admin contact &mdash; <a id="email-contact" class="a-{{login_type}}"></a></span>
                 {% else %}
-                <span>&copy; {% now "Y" %} | powered by <a class="a-{{user_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{user_type}}" href="https://github.com/legiongis/arches/tree/fpan_master">arches</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan">fpan</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan-data">fpan-data</a> | admin contact &mdash; <a id="email-contact" class="a-{{user_type}}"></a></span>
+                <span>&copy; {% now "Y" %} | powered by <a class="a-{{user_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{user_type}}" href="https://github.com/legiongis/arches/tree/dev/6.2.x-hms">arches</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan">fpan</a> | admin contact &mdash; <a id="email-contact" class="a-{{user_type}}"></a></span>
                 {% endif %}
             </div>
         </div>
@@ -192,16 +192,6 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 </body>
 
 <script>
-    {% if GOOGLE_ANALYTICS_TRACKING_ID != None %}
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', '{{GOOGLE_ANALYTICS_TRACKING_ID}}', 'auto');
-    ga('send', 'pageview');
-    {% endif %}
-
     var c1 = "admin";
     var c2 = "@";
     var c3 = "legiongis.com";
