@@ -7,19 +7,10 @@
             {% csrf_token %}
             <div class="row">
                 <div class="col-xs-12" style="text-align:center">
-                    <img style="width:300px; margin-bottom: 30px;" src="{% static 'img/fpan/HMS_Florida_Course_Portal_Black.png' %}"></img>
+                    <img style="width:300px; margin-bottom: 30px;" src="{% static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}"></img>
                     <h2 style="margin-bottom: 30px;">Sign up to be a Heritage Monitoring Scout</h2>
                 </div>
             </div>
-            {% comment %}
-            <div class="row">
-                <div class="col-xs-12" style="text-align:center">
-                    <h4 style="text-align:center; margin-bottom: 30px;">Open registration is temporarily on hold while we re-vamp our HMS Scout training program.</h4>
-                    <img style="width:300px; margin-bottom: 30px;" src="{% static 'img/fpan/HMS_Florida_Course_Portal_Black.png' %}"></img>
-                    <h4 style="text-align:center; margin-bottom: 30px;"><em>Please check back soon!</h4>
-                </div>
-            </div>
-            {% endcomment %}
             <div class="row">
                 <div class="col-xs-12" style="text-align:center">
                 </div>
@@ -32,7 +23,7 @@
             </div>
             {% endif %}
             <div class="row">
-                <div class="col-md-4 col-md-offset-1">
+                <div class="col-md-3 col-md-offset-1">
                     <!-- manually create this form field by field to split the fields into -->
                     <!-- a couple of different sections -->
                     <div class="form-group">
@@ -92,7 +83,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <div class="panel panel-default" style="box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);">
                         <div class="panel-heading">
                             Ethics Agreement
@@ -148,50 +139,6 @@
             <div class="row">
                 <div class="col-xs-12"><hr></div>
             </div>
-
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <div class="form-group">
-                        {{ scout_form.background.label_tag }}
-                        {{ scout_form.background }}
-                        {% if scout_form.background.help_text %}
-                            <small class="help-block">{{ scout_form.background.help_text }}</small>
-                        {% endif %}
-                        {% if scout_form.background.errors %}
-                            {% for error in scout_form.background.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
-                        {% endif %}
-
-                        {{ scout_form.relevant_experience.label_tag }}
-                        {{ scout_form.relevant_experience }}
-                        {% if scout_form.relevant_experience.help_text %}
-                            <small class="help-block">{{ scout_form.relevant_experience.help_text }}</small>
-                        {% endif %}
-                        {% if scout_form.relevant_experience.errors %}
-                            {% for error in scout_form.relevant_experience.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
-                        {% endif %}
-
-                        {{ scout_form.interest_reason.label_tag }}
-                        {{ scout_form.interest_reason }}
-                        {% if scout_form.interest_reason.help_text %}
-                            <small class="help-block">{{ scout_form.interest_reason.help_text }}</small>
-                        {% endif %}
-                        {% if scout_form.interest_reason.errors %}
-                            {% for error in scout_form.background.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
-                        {% endif %}
-
-                        {{ scout_form.site_interest_type.label_tag }}
-                        <p><em>{{ scout_form.site_interest_type.help_text }}</em></p>
-                        {{ scout_form.site_interest_type }}
-                        {% if scout_form.site_interest_type.errors %}
-                            {% for error in scout_form.background.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-12"><hr></div>
-            </div>
-
             <div class="row">
                 <div class="col-xs-12 col-md-offset-2 col-md-8" style="display:grid; align-content:center;">
                     <button type="submit" style="font-size: 1.5em;" class="btn btn-default" id="scout_submit" disabled>Sign me up!</button>
