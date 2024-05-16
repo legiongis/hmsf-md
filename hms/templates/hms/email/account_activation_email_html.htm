@@ -1,9 +1,9 @@
 {% autoescape off %}
 <h3>Hello {{ user.username }}!</h3>
-<p>Welcome to the Heritage Monitoring Scouts, we're excited to have you! Your new HMS Scout ID is <strong>{{ user.username }}</strong>.</p>
+<p>Welcome to the HMS Florida Monitoring Database, we're excited to have you! Your HMS Scout ID is <strong>{{ user.username }}</strong>. You will use your Scout ID to log in to the Database.</p>
 <p>To activate your account and verify your email address, please click this link <a href="{{ baseurl }}{% url 'activate_page' uidb64=uid token=token %}">{{ baseurl }}{% url 'activate_page' uidb64=uid token=token %}</a>.</p>
 <p><em>*If the above link is broken or expired, please email <a href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a> for assistance.</em></p>
-<p>We will contact you soon to provide next steps and more details about the program.</p>
+<p>Once your account is activated, go back to the Course Portal to complete your training.</p>
 <p><strong>Thanks for Signing Up and Welcome Aboard!</strong></p>
-<img src="{{ baseurl }}/media/img/fpan/HMSflorida_option3long.png" alt="Logo" style="width:200px;display:block;margin-left:auto;margin-right:auto;">
+<img src="{{ baseurl }}/media/img/fpan/HMS_Florida_Monitoring_Database%20_H_Black-500px.png" alt="HMSF MD Logo" style="width:200px;display:block;margin-left:auto;margin-right:auto;">
 {% endautoescape %}

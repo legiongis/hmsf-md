@@ -1,13 +1,13 @@
 {% autoescape off %}
 Hello {{ user.username }}!
 
-Welcome to the Heritage Monitoring Scouts, we're excited to have you! Your new HMS Scout ID is {{ user.username }}.
+Welcome to the HMS Florida Monitoring Database, we're excited to have you! Your HMS Scout ID is {{ user.username }}. You will use your Scout ID to log in to the Database.
 
 To activate your account and verify your email address, please click this link: {{ baseurl }}{% url 'activate_page' uidb64=uid token=token %}
 
 *If the above link is broken or expired, please email hmsflorida@fpan.us for assistance.
 
-We will contact you soon to provide next steps and more details about the program.
+Once your account is activated, go back to the Course Portal to complete your training.
 
 Thanks for Signing Up and Welcome Aboard!
 {% endautoescape %}
