@@ -240,36 +240,6 @@ class ScoutProfile(models.Model):
     accessible_sites_formatted.short_description = 'Accessible Sites'
 
 
-@receiver(post_save, sender=Scout)
-def create_user_scout(sender, instance, created, **kwargs):
-    if created:
-        ScoutProfile.objects.create(user=instance)
-    group_cs = Group.objects.get(name='Crowdsource Editor')
-    group_cs.user_set.add(instance)
-    instance.scoutprofile.save()
-
-@receiver(post_save, sender=Scout)
-def save_user_scout(sender, instance, **kwargs):
-    instance.scoutprofile.save()
-
-## DEPRECATED - Previously, this model was used in conjunction with
-## LandManagerProfile, which has since been renamed LandManager. The change cut
-## this intermediate model out of the mix, as it was ultimately not necessary.
-# class LandManager(User):
-#
-#     class Meta:
-#         verbose_name = "Land Manager"
-#         verbose_name_plural = "Land Managers"
-#
-#     def __str__(self):
-#         return self.username
-#
-#     def get_areas(self):
-#         areas = self.landmanagerprofile.individual_areas.all()
-#         for ga in self.landmanagerprofile.grouped_areas.all():
-#             areas = areas.union(ga.areas.all())
-#         return areas
-
 class LandManager(models.Model):
 
     class Meta:
@@ -421,30 +391,6 @@ class LandManager(models.Model):
         return format_json_display(self.get_allowed_resources("Archaeological Site"))
 
     accessible_sites_formatted.short_description = 'Accessible Sites'
-
-
-@receiver(post_save, sender=LandManager)
-def create_user_land_manager(sender, instance, created, **kwargs):
-    if created:
-        group_cs = Group.objects.get(name='Crowdsource Editor')
-        group_cs.user_set.add(instance.user)
-
-
-## PROBLEM: these signals cause errors in the admin interface when createing
-## new land managers or land manager profiles. The solution now is to comment
-## them out and direct admins to create new profiles through the Land Manager
-## Profile admin page, and also make the new Land Manager through that page
-## at the same time.
-
-# @receiver(post_save, sender=LandManager)
-# def create_user_land_manager(sender, instance, created, **kwargs):
-#     if created:
-#         LandManagerProfile.objects.create(user=instance)
-
-# @receiver(post_save, sender=LandManager)
-# def save_user_land_manager(sender, instance, **kwargs):
-#     instance.landmanagerprofile.save()
-
 
 def create_new_concept(label, parent_lbl, collection_lbl, concept_id=None):
     """ Helper function that creates a new concept and adds it to the specified

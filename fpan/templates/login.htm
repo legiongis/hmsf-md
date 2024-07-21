@@ -67,11 +67,11 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <br>
                         {% if login_type == "scout" %}
                         <a class="a-{{login_type}}" href="{% url 'auth' %}?t=landmanager">
-                            {% trans "Switch to Land Manager Portal" %} &rarr;
+                            {% trans "Switch to Land Manager Login" %} &rarr;
                         </a>
                         {% elif login_type == "landmanager" %}
                         <a class="a-{{login_type}}" href="{% url 'auth' %}?t=scout">
-                            {% trans "Switch to Scout Portal" %} &rarr;
+                            {% trans "Switch to Scout Login" %} &rarr;
                         </a>
                         {% endif %}
                     </div>
@@ -80,15 +80,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                         <div id="login-failed-alert" class="alert alert-danger" role="alert">
                             <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">{% trans "Close" %}</span></button>
                             <h4>{% trans "Login failed" %}</h4>
-                            <span>{% trans "Invalid username and/or password. Make sure you are using the correct login portal for your account type." %}
+                            <span>{% trans "Invalid username and/or password. Make sure you are using the correct login page for your account type." %}
                                 <em>
                                 {% if login_type == "scout" %}
                                 <a class="a-{{login_type}}" href="{% url 'auth' %}?t=landmanager">
-                                    {% trans "Go to Land Manager Portal." %}
+                                    {% trans "Login as land manager" %} &rarr;
                                 </a>
                                 {% elif login_type == "landmanager" %}
                                 <a class="a-{{login_type}}" href="{% url 'auth' %}?t=scout">
-                                    {% trans "Go to Scout Portal." %}
+                                    {% trans "Login as scout" %} &rarr;
                                 </a>
                                 {% endif %}
                                 </em>

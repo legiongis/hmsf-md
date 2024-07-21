@@ -1,4 +1,4 @@
-# Custom Map Layers
+# Map Layers
 
 ## Sea-Level Rise
 
