@@ -144,6 +144,9 @@
                     <button type="submit" style="font-size: 1.5em;" class="btn btn-default" id="scout_submit" disabled>Sign me up!</button>
                 </div>
             </div>
+            {% for error in form.errors %}
+                {{ error }}
+            {% endfor %}
         </form>
     </div>
 </section>

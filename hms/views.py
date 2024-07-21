@@ -179,15 +179,20 @@ def activate(request):
     return redirect("/auth/?t=scout")
 
 def scout_signup(request):
-    if request.method == "GET":
-        scout_form = ScoutForm()
-        return render(request, 'scout-signup.htm', {
+
+    context = {
             'main_script': 'scout-signup',
             'active_page': 'Scout Signup',
             'app_title': '{0} | Scout Signup'.format(settings.APP_NAME),
-            'scout_form': scout_form,
+            'scout_form': None,
             'page':'scout-signup'
-        })
+    }
+
+    if request.method == "GET":
+        scout_form = ScoutForm()
+        context['scout_form'] = scout_form
+        return render(request, 'scout-signup.htm', context)
+
     if request.method == "POST":
         form = ScoutForm(request.POST)
         if form.is_valid():
@@ -211,11 +216,10 @@ def scout_signup(request):
             email = EmailMultiAlternatives(subject_line,message_txt,from_email,to=[to_email])
             email.attach_alternative(message_html, "text/html")
             email.send()
-            return render(request,'hms/email/please-confirm.htm')
-    else:
-        form = ScoutForm()
+            return render(request, 'hms/email/please-confirm.htm')
 
-    return render(request, 'index.htm', {'scout_form': form})
+        context['scout_form'] = form
+        return render(request, 'scout-signup.htm', context)
 
 def scouts_dropdown(request):
     resourceid = request.GET.get('resourceid', None)
