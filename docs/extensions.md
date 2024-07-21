@@ -1,18 +1,16 @@
-# Custom Datatypes & Widgets
-
-**PAGE NEEDS UPDATES!**
+# Datatypes & Widgets
 
 ## Using the Django ORM in Arches
 
 We have created two Datatype extensions, both of which are meant to allow direct references to objects in the Django ORM. They both inherit from the `DomainListDataType`.
 
-**Username Datatype**
+## Username Datatype
 
 The `Username` Datatype inherits the core Arches `DomainListDataType` and augments that datatype by auto-populating a list of all registered users in the database. The username for a user is shown, while the `pk` for that user is actually stored in the tiles.
 
 Its default widget is the `username-widget`, but it can also be implemented through the `scout-dropdown-widget`.
 
-**Management Area Datatype**
+## Management Area Datatype
 
 The similar to the Username Datatype, this one also inherits the core Arches `DomainListDataType`. It augments the dropdown list with all Management Area objects in the ORM. This is a model in the hms app.
 

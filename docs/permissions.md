@@ -1,4 +1,6 @@
-# View, Create/Edit Access to Resource Instances
+# Permissions
+
+## View, Create/Edit Access to Resource Instances
 
 Of the four Resource Models, only **Scout Reports** can be created and updated by Scouts and Land Managers. Historic Cemeteries and Historic Structures can be viewed by any user, including guests, and a custom rule-based permission system determines who can view specific Archaeological Sites.
 
@@ -13,7 +15,7 @@ Scout Report edit permissions are handled by assigning the `Crowdsource Editor` 
 
 The rest of this page describes our rule-based access system for Archaeological Sites.
 
-# Controlling Archaeological Site Access
+## Archaeological Site Access
 
 The specific requirements for how we handle access to archaeological site data have changed a bit since 2017 when we first started the project. The current approach aims to be as flexible as possible, while also exposing all components of permissions levels to the Django backend, so FPAN staff can manage the system as easily as possible. This is achieved by combining the following elements:
 
@@ -31,13 +33,13 @@ The specific requirements for how we handle access to archaeological site data h
 
 This page will give an overview of how these elements are put together.
 
-## Scouts
+### Scouts
 
 Scouts are citizens who have registered in order to participate in the Heritage Monitoring Scouts program. **Scouts only get access to individual sites to which they have been assigned.** FPAN staff assign a site to a scout by going to that site's editor view and changing the "Assigned To" node to include the Scout's username.
 
 ![Overview](_static/images/perms-2.png)
 
-## Land Managers
+### Land Managers
 
 On the other hand, Land Managers are employees or staff at various agencies around the state. **Land Managers get access to sites based on how their user profile is configured in the Django admin backend.** Site access is rule-based, with the following modes:
 
@@ -53,7 +55,7 @@ On the other hand, Land Managers are employees or staff at various agencies arou
 
 Unerstanding how the **AREA** mode works requires an understanding of how Management Areas function within the system.
 
-## Management Areas
+### Management Areas
 
 Management Areas are the fundamental component on which Land Manager access hinges. State Parks, FPAN Regions, Conservation Areas, these are all "Management Areas". Each area can have a Management Agency. **Management Area *Names* and *Agencies* are attached to any archaeological site resource that falls within the boundary of the area.**
 
@@ -76,11 +78,11 @@ Each area is defined by the following attribues, some of which reference other c
 
 FPAN staff can load new Management Areas through the [Management Area Importer](project:extensions.md#management-area-importer) ETL Module.
 
-### Management Area Category
+#### Management Area Category
 
 Category options are stored in a separate database table to allow FPAN staff to add new categories in the future as needed. One map overlay layer will be automaticaly generated for each category. During the management area spatial join, the category of an area is checked becuase two categories are treated a little differently than the others: for *FPAN Region* and *County* areas the area id is placed into different nodes within the site resource (outside of the general Management Areas node).
 
-### Management Agency
+#### Management Agency
 
 Management Agency options are stored in a separate database table to allow FPAN staff to add new agencies in the future as needed. During the management area spatial join, the agency is transferred to the Management Agency node of any sites within the area.
 

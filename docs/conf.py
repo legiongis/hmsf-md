@@ -29,6 +29,7 @@ html_css_files = [
     'css/style.css',
 ]
 
+html_show_sourcelink = False
 
 html_theme_options = {
 
@@ -53,6 +54,8 @@ html_theme_options = {
     'globaltoc_collapse': False,
     # If True, show hidden TOC entries
     'globaltoc_includehidden': False,
+
+    'localtoc_label_text': "On this page...",
 
     'master_doc': False,
 }
