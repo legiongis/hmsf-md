@@ -4,14 +4,16 @@
 
 Of the four Resource Models, only **Scout Reports** can be created and updated by Scouts and Land Managers. Historic Cemeteries and Historic Structures can be viewed by any user, including guests, and a custom rule-based permission system determines who can view specific Archaeological Sites.
 
-Scout Report edit permissions are handled by assigning the `Crowdsource Editor` group to all Scouts and Land Managers and then using the Permissions Tab in the Arches Graph Designer to configure the following:
+Scout Report edit permissions are handled by assigning the `Crowdsource Editor` and `Resource Editor` groups to all Scouts and Land Managers and then using the Permissions Tab in the Arches Graph Designer to configure the following:
 
-| Resource Model | NodeGroups | Group | Permissions |
+| Resource Model | NodeGroups | Group | Permission Level |
 |---|---|---|---|
 | Archaeological Site | all | Crowdsource Editor | Read |
 | Historic Cemetery | all | Crowdsource Editor | Read |
 | Historic Structure | all | Crowdsource Editor | Read |
 | Scout Report | all | Crowdsource Editor | Read, Create/Update |
+
+There is no need to change permissions for the `Resource Editor` group, as the more restrictive `Crowdsource Editor` permissions will supercede.
 
 The rest of this page describes our rule-based access system for Archaeological Sites.
 
