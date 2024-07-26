@@ -172,9 +172,6 @@
 
                             <li class="list-divider-dark"></li>
 
-                            <!-- Tools -->
-                            <li class="list-header">{% trans "Modules" %}</li>
-
                             {% if request.user|has_group:"RDM Administrator" %}
                             <!--Menu list item-->
                             <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
