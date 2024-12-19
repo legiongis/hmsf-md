@@ -1,10 +1,13 @@
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls import include, url
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import user_passes_test
 from django.views.generic import RedirectView
 from django.views.generic.base import TemplateView
 from django.urls import path
 from django.conf import settings
+
+from arches.app.views import search
 
 from fpan.views.api import MVT, ResourceIdLookup
 from fpan.views.user import FPANUserManagerView
@@ -24,6 +27,9 @@ handler500 = server_error
 favicon_view = RedirectView.as_view(url=f'{settings.STATIC_URL}img/favicon/favicon.ico', permanent=True)
 
 uuid_regex = settings.UUID_REGEX
+
+def is_not_anonymous(user):
+    return user.username != "anonymous"
 
 urlpatterns = [
     # some site-level urls
@@ -49,6 +55,15 @@ urlpatterns = [
     url(r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex, FPANResourceTiles.as_view(), name="resource_tiles"),
     url(r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex, FPANResourceCards.as_view(), name="resource_cards"),
     url(r"^report/(?P<resourceid>%s)$" % uuid_regex, FPANResourceReportView.as_view(), name="resource_report"),
+
+    # override Arches /search view to apply login_required
+    url(r"^search$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.SearchView.as_view()), name="search_home"),
+    url(r"^search/terms$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.search_terms), name="search_terms"),
+    url(r"^search/resources$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.search_results), name="search_results"),
+    url(r"^search/time_wheel_config$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.time_wheel_config), name="time_wheel_config"),
+    url(r"^search/export_results$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.export_results), name="export_results"),
+    url(r"^search/get_export_file$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_export_file), name="get_export_file"),
+    url(r"^search/get_dsl$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_dsl_from_search_string), name="get_dsl"),
 
     # now include HMS urls
     url(r'^', include('hms.urls')),
