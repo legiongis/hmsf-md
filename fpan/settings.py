@@ -27,6 +27,8 @@ STATICFILES_DIRS = (os.path.join(APP_ROOT, 'media'),) + STATICFILES_DIRS
 ## new setting in 6.1  -AC 07/28/2022
 EXPORT_DATA_FIELDS_IN_CARD_ORDER = True
 
+CELERY_BROKER_URL = "amqp://username:password@localhost:5672"
+
 ## seems to cause errors still, disabling
 ##SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 4000
 
