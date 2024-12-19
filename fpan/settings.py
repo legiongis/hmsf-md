@@ -29,6 +29,8 @@ EXPORT_DATA_FIELDS_IN_CARD_ORDER = True
 
 CELERY_BROKER_URL = "amqp://username:password@localhost:5672"
 
+TEST_DATA_DIR = os.path.join(os.path.dirname(APP_ROOT), "tests", "data")
+
 ## seems to cause errors still, disabling
 ##SEARCH_EXPORT_IMMEDIATE_DOWNLOAD_THRESHOLD = 4000
 
@@ -164,22 +166,11 @@ try:
 except ImportError as e:
     pass
 
-# Use Nose for running tests - errors occur unless you run test modules individually
 if MODE == "DEV":
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "test":
         import logging
         logging.disable(logging.CRITICAL)
-
-    INSTALLED_APPS += ('django_nose', )
-    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-    NOSE_ARGS = [
-        '--with-coverage',
-        '--nologcapture',
-        '--cover-package=fpan',
-        '--verbosity=3',
-        '--cover-erase',
-    ]
 
     LOG_LEVEL = 'DEBUG'
 

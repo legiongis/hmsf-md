@@ -18,15 +18,13 @@ from hms.models import ManagementAgency, LandManager, ManagementArea, Scout
 logger = logging.getLogger(__name__)
 
 
-TEST_DATA_DIR = os.path.join(os.path.dirname(__file__), "tests", "data")
-
 class TestUtils():
 
     def create_test_scouts(self):
         """ This function can be called from test cases or from anywhere in
         the app. """
 
-        with open(os.path.join(TEST_DATA_DIR, "test_scouts.json"), "r") as o:
+        with open(os.path.join(settings.TEST_DATA_DIR, "test_scouts.json"), "r") as o:
             scouts = json.load(o)
         for s in scouts:
             self.create_scout_from_json(s)
@@ -113,22 +111,22 @@ class TestUtils():
 
         call_command("packages",
             operation="import_business_data",
-            source=os.path.join(TEST_DATA_DIR, "resources", "test_archaeological_sites.json"),
+            source=os.path.join(settings.TEST_DATA_DIR, "resources", "test_archaeological_sites.json"),
             overwrite="overwrite",
         )
         call_command("packages",
             operation="import_business_data",
-            source=os.path.join(TEST_DATA_DIR, "resources", "test_cemeteries.json"),
+            source=os.path.join(settings.TEST_DATA_DIR, "resources", "test_cemeteries.json"),
             overwrite="overwrite",
         )
         call_command("packages",
             operation="import_business_data",
-            source=os.path.join(TEST_DATA_DIR, "resources", "test_historic_structures.json"),
+            source=os.path.join(settings.TEST_DATA_DIR, "resources", "test_historic_structures.json"),
             overwrite="overwrite",
         )
         call_command("packages",
             operation="import_business_data",
-            source=os.path.join(TEST_DATA_DIR, "resources", "test_scout_reports.json"),
+            source=os.path.join(settings.TEST_DATA_DIR, "resources", "test_scout_reports.json"),
             overwrite="overwrite",
         )
 

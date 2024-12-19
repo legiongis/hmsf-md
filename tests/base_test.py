@@ -34,7 +34,6 @@ CREATE_TOKEN_SQL = """
 
 def setUpTestPackage():
     """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
     this is called from __init__.py
     """
 
@@ -60,7 +59,6 @@ def setUpTestPackage():
 
 def tearDownTestPackage():
     """
-    see https://nose.readthedocs.io/en/latest/writing_tests.html#test-packages
     this is called from __init__.py
     """
 
