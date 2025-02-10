@@ -32,11 +32,10 @@ from hms.utils import account_activation_token, create_scout_from_valid_form
 logger = logging.getLogger(__name__)
 
 def index(request):
-    scout_form = ScoutForm()
     return render(request, 'index.htm', {
         'main_script': 'index',
         'active_page': 'Home',
-        'app_title': '{0} | HMS'.format(settings.APP_NAME),
+        'app_title': '{0} | Home'.format(settings.APP_NAME),
         'page':'index'
     })
 
@@ -44,7 +43,7 @@ def about(request):
     return render(request, 'about.htm', {
         'main_script': 'about',
         'active_page': 'About',
-        'app_title': '{0} | HMS'.format(settings.APP_NAME),
+        'app_title': '{0} | About the Database'.format(settings.APP_NAME),
         'page':'about'
     })
 
