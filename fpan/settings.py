@@ -11,7 +11,7 @@ DEBUG = False
 HTTPS = False
 MODE = "PROD"
 
-APP_NAME = "HMSF"
+APP_NAME = "HMS - FPAN"
 APP_ROOT = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 LOG_DIR = os.path.join(APP_ROOT, "logs")
