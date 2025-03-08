@@ -18,7 +18,7 @@ from hms.views import (
 urlpatterns = [
     url(r'^$', index, name='fpan_home'),
     url(r'^index.htm', RedirectView.as_view(pattern_name='fpan_home', permanent=True)),
-    url(r'^about$', about, name='about'),
+    path('about/', about, name='about'),
     url(r"^user/scout-profile$", hms_home, name="scout_profile_manager"),
     url(r'^hms/home', RedirectView.as_view(pattern_name='scout_profile_manager', permanent=True)),
     url(r'^state/home', RedirectView.as_view(pattern_name='user_profile_manager', permanent=True)),

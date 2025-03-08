@@ -7,43 +7,93 @@
 {% block content %}
 
     <section class="about-section section-first" style="padding-top: 0px;">
-        <div class="row" style="min-height: 500px;">
-            <div class="col-md-5 hidden-xs hidden-sm">
-                <div class="col-xs-12 fpan-panel-{{user_type}}" style="min-height: 500px;">
-                    <div class="title-v1">
-                        <div class="col-md-12" style="padding-bottom:15px; padding-top: 25px;">
-                            <h1><a class="a-{{user_type}}" href="https://www.fpan.us/training-courses/hms-florida/"><img src="{% static 'img/fpan/fpan-logo-feb23.png' %}" style="width: 100%;max-width: 300px;"></a></h1>
+        <div class="row" style="display:flex; justify-content: space-between; align-items: center; padding: 0 15px;">
+            <div>
+                <h1>Welcome to the HMS Florida Monitoring Database!</h1>
+            </div>
+            <div class="hidden-xs" style="display:flex; justify-content: end;">
+                <img class="" src="{% static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}" alt="Logo" style="height:150px;">
+            </div>
+        </div>
+        <div class="row hidden-sm hidden-md hidden-lg">
+            <div class="col-xs-12" style="display:flex; justify-content: center;">
+                <img class="" src="{% static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}" alt="Logo" style="height:150px;">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-5">
+                <div class="col-xs-12 fpan-panel-{{user_type}}" style="display:flex; flex-direction:column; align-items:center; padding: 30px 15px;">
+                    <div style="border-bottom:1px solid grey; margin-bottom:30px; padding-bottom:20px; display:flex; flex-direction:column; align-items:center;">
+                        <div>
+                            <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" height=100 alt="Data flow diagram">
                         </div>
-                        <div class="col-md-12">
-                            <p>{% trans "The Florida Public Archaeology Network's mission is to promote and facilitate the conservation, study and public understanding of Florida's archaeological heritage through regional centers throughout the state. To learn more about FPAN, visit <a class='a-{{user_type}}' href='http://fpan.us'>fpan.us</a>." %}</p>
+                        <p>
+                            Heritage Monitoring Scouts (HMS Florida) is a public engagement program focused on tracking changes
+                            to cultural sites at risk, particularly those impacted by climate change in the form of erosion and sea level rise.
+                        </p>
+                        <p>For more information on this program and helpful links, visit the <a class="a-{{user_type}}" href="https://www.fpan.us/training-courses/hms-florida/">HMS Florida website</a>.</p>
+                    </div>
+                    <div style="border-bottom:1px solid grey; margin-bottom:30px; padding-bottom:20px; display:flex; flex-direction:column; align-items:center;">
+                        <div>
+                            <img src="{% static 'img/fpan/HMS_Florida_Course_Portal_Black.png' %}" height=130 alt="HMs Scout Portal logo">
                         </div>
-
+                        <p>
+                            To access your portal account, training materials, and other Scout information, visit the HMS Scout Portal
+                            <a class="a-{{user_type}}" href="https://flagler.instructure.com/login/canvas">here</a>.
+                        </p>
+                    </div>
+                    <div style="display:flex; flex-direction:column; align-items:center;">
+                        <p>
+                            HMS is a program created and administered by:
+                        </p>
+                        <div>
+                            <img src="{% static 'img/fpan/fpan-logo-feb23.png' %}" style="width: 100%;max-width: 300px;">
+                        </div>
+                        <p>
+                            {% blocktrans %}
+                            The Florida Public Archaeology Network's mission is to promote and facilitate the conservation, study and public understanding of Florida's archaeological heritage through regional centers 
+                            throughout the state. To learn more about FPAN, visit <a class='a-{{user_type}}' href='http://fpan.us'>fpan.us</a>.
+                            {% endblocktrans %}
+                        </p>
                     </div>
                 </div>
             </div>
-            <div class="col-md-7">
-                <div class="col-xs-12 fpan-panel-{{user_type}}" style="min-height: 500px;">
-                    <div class="title-v1">
-                        <div class="col-xs-12" style="padding-top:45px">
-                            <h2>Sign in to Begin Monitoring</h2>
-                            <!-- <h4>To become a Heritage Monitoring Scout, signup below!</h4> -->
-                        </div>
-                        <div class="col-xs-12 col-sm-5" style="margin-top:20px;">
-                            <p><em>
-                            <a id="auth-link" class="a-{{user_type}}" href="{% url 'auth' %}?t=scout" style="color:#2d8b80;font-size:14pt;">
-                                <img style="width:181px;" src="{% static 'img/fpan/hmsf-logo-feb23_sm.png' %}" alt="Logo"><br>
-                                Scout Login
+            <div class="col-xs-12 col-md-7">
+                <div class="col-xs-12 fpan-panel-{{user_type}}" style="margin-bottom: 30px; padding-bottom:30px;">
+                    <div class="col-xs-12" style="padding-top:45px; text-align:center;">
+                        <h2>Sign in</h2>
+                    </div>
+                    <div class="col-xs-12" style="display:flex;">
+                        <div style="width:50%; display:flex; flex-direction:column; align-items:center;">
+                            <a href="{% url 'auth' %}?t=scout">
+                                <img height=180 src="{% static 'img/fpan/hmsf-logo-feb23_sm.png' %}" alt="Scout login">
                             </a>
-                            </em></p>
+                            <a href="{% url 'auth' %}?t=scout" class="a-scout" style="color:#2d8b80;font-size:14pt;">Scout Login</a>
                         </div>
-                        <div class="col-xs-12 col-sm-7" style="margin-top:20px;">
-                            <p><em>
-                            <a id="auth-link" class="a-{{user_type}}" href="{% url 'auth' %}?t=landmanager" style="color:#273675;font-size:14pt;">
-                                <img style="width:224px;margin-top: 25px;" src="{% static 'img/state/DHR transparent - NO url.png' %}" alt="Logo"><br>
-                                Land Manager Login
+                        <div style="width:50%; display:flex; flex-direction:column; align-items:center;">
+                            <a href="{% url 'auth' %}?t=landmanager">
+                                <img height=180 src="{% static 'img/state/DHR transparent - NO url.png' %}" alt="Land manager login"><br>
                             </a>
-                            </em></p>
+                            <a href="{% url 'auth' %}?t=landmanager" style="color:#273675;font-size:14pt;">Land Manager Login</a>
                         </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 fpan-panel-{{user_type}}">
+                    <div class="col-xs-12" style="padding:30px 15px;">
+                        <h2>Not a Scout? Sign Up Here!</h2>
+                        <p>
+                            To become a Heritage Monitoring Scout you must sign up and complete the training course
+                            through the HMS Florida Scout Portal. Sign up by visiting our website <a class="a-{{user_type}}" href="https://www.fpan.us/training-courses/hms-florida/">here</a>.
+                        </p>
+                        <h4>I thought I already was a Scout?</h4>
+                        <p>
+                            In 2024 we re-launched HMS Florida and updated the training materials with more information to help
+                            Scouts learn to monitor sites. The website you're on now is only used to access the HMS Florida Monitoring
+                            Database. To remain an active Scout, you'll need to complete the new training using the new HMS Florida
+                            Scout Portal before you can monitor sites with the program, regardless of past Scout history.
+                        </p>
+                        <h4>Contact Us</h4>
+                        <p><a href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a></p>
                     </div>
                 </div>
             </div>

@@ -46,8 +46,6 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'packages/ionicons/css/ionicons.min.css' %}">
 
-
-    <link href="{% static 'css/unify.css' %}" rel="stylesheet">
     <link href="{% static 'css/index.css' %}" rel="stylesheet">
 </head>
 
@@ -85,7 +83,7 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
                             <a class="a-{{user_type}}" href="{% url 'fpan_home' %}"><h3>{% trans "Home" %}</h3></a>
                         </li>
                         <li class="page-scroll">
-                            <a class="a-{{user_type}}" href="{% url 'about' %}"><h3>{% trans "About HMS" %}</h3></a>
+                            <a class="a-{{user_type}}" href="{% url 'about' %}"><h3>{% trans "About the Database" %}</h3></a>
                         </li>
                         {% if user.username != 'anonymous' %}
                         <li class="page-scroll">

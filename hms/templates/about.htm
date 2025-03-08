@@ -7,51 +7,133 @@
 {% block content %}
 <section class="about-section section-first" style="padding-top: 0px;">
     <div class="row">
+        <div class="col-xs-12 col-sm-5">
+            <div class="col-xs-12 fpan-panel-{{user_type}}" style="min-height:250px;">
+                <div class="col-xs-12">
+                    <img class="" src="{% static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}" alt="Logo" style="width:100%;">
+                </div>
+                <div class="col-xs-12 hidden-sm hidden-md hidden-lg" style="text-align:center;">
+                    <p style="margin:0;">
+                        The HMS Florida Database is an interactive, map-based website where
+                        trained Scouts and Land Managers submit site photos and monitoring
+                        information collected using the HMS Florida protocol. All data
+                        submitted is securely curated within the Database and can be used by
+                        FPAN staff and other professionals to help make smart decisions about
+                        these cultural resources.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-7 hidden-xs">
+            <div class="col-xs-12 col-sm-6 fpan-panel-{{user_type}}" style="display:flex; align-items:center; min-height:250px; width:100%">
+                <div class="col-xs-12" style="text-align:center;">
+                    <p style="margin:0;">
+                        The HMS Florida Database is an interactive, map-based website where
+                        trained Scouts and Land Managers submit site photos and monitoring
+                        information collected using the HMS Florida protocol. All data
+                        submitted is securely curated within the Database and can be used by
+                        FPAN staff and other professionals to help make smart decisions about
+                        these cultural resources.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:30px;">
         <div class="col-xs-12">
-            <div class="col-xs-12 fpan-panel-{{user_type}}" style="padding-top:35px;padding-bottom:35px;">
-                <div class="title-v1">
-                    <div class="col-md-4" >
-                        <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" alt="Logo" style="width:100%;max-width:200px;">
-                    </div>
-                    <div class="col-md-8 hidden">
-                        <h1 style="">{% trans "HMS Florida" %}</h1>
-                    </div>
-                    <div class="col-md-8">
-                        <p>{% trans "Heritage Monitoring Scouts (HMS Florida) is a public engagement program focused on tracking changes to archaeological sites at risk, particularly those impacted by climate change in the form of erosion and sea level rise." %}</p>
-                        {% if not user_is_scout %}
-                        <p>{% trans "If you are already a Heritage Monitoring Scout," %} <a class="a-{{user_type}}" href='{% url "auth" %}?t=scout'>{% trans "sign in" %}</a>. {% trans "Otherwise, why not" %} <a class="a-{{user_type}}" href='{% url "fpan_home" %}#scout-signup'>{% trans "join us" %}</a>!</p>
-                        {% endif %}
-                    </div>
+            <div class="col-xs-12 fpan-panel-{{user_type}}">
+                <h2 style="margin:20px 0;">Cultural Site Data</h2>
+                <div class="hidden-xs col-sm-5">
+                    <p>
+                        <img src="{% static 'img/state/fmsf-logo-trans.png' %}" width=200 alt="FMSF Logo">
+                    </p>
                 </div>
-                <div class="col-xs-12"><hr style="border-top:solid #676761 1px;"></div>
-                <div class="col-xs-12 col-sm-6">
-                    <h2>{% trans "How does it work?" %}</h2>
+                <div class="col-xs-12 col-sm-7">
+                    <p>
+                        The <strong>Florida Master Site File (FMSF)</strong> is the State of Florida's official inventory
+                        of historical, cultural resources. FMSF data are used as the framework to view 
+                        site information and add Scout Reports in the Database. The Database is only a
+                        snapshot of FMSF data and cannot change or update data held by the FMSF. Visit
+                        the <a href="https://dos.fl.gov/historical/preservation/master-site-file/" target="_blank">FMSF website</a> for more information.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:30px;">
+        <div class="col-xs-12">
+            <div class="col-xs-12 fpan-panel-{{user_type}}">
+                <h2 style="margin:20px 0;">Content Management System</h2>
+                <div class="hidden-xs col-sm-5">
+                    <img src="{% static 'img/fpan/arches-logo.png' %}" width=250 alt="FMSF Logo">
+                </div>
+                <div class="col-xs-12 col-sm-7">
+                    <p>
+                        The Database is powered by Arches&trade;, an open-source data management platform, which is an integrated
+                        system that stores and manages data but also allows for data visualization, discovery, and advanced
+                        searching. Arches&trade; was created by the Getty Conservation Institute and World Monuments Fund. This
+                        website and Arches instance are not affiliated with or endorsed by the Arches Project or the J. Paul
+                        Getty Trust. For more information about Arches, see <a href="https://archesproject.org" target="_blank">archesproject.org</a>.
+                        For more about Arches and security, see <a href="https://www.archesproject.org/cybersecurity/" target="_blank">archesproject.org/cybersecurity</a>.
+                    </p>
+                    <p>
+                        The HMS Database is an instance of Arches with unique and specific features customized to work for the HMS
+                        Florida Program's needs. The HMS Florida Monitoring Database is a secure and multi-level password protected
+                        database with specific access and permissions settings that allows users with permission to easily view cultural
+                        sites with map-based visualization and submit monitoring data and photos to the Database, while maintaining 
+                        the legally required protections provided to sites in Florida.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:30px;">
+        <div class="col-xs-12">
+            <div class="col-xs-12 fpan-panel-{{user_type}}">
+                <h2 style="margin:20px 0;">Database Server and Security Information</h2>
+                <div class="hidden-xs col-sm-5">
+                    <img src="{% static 'img/fpan/arch-diagram.png' %}" style="width:300px" alt="Data flow diagram">
+                </div>
+                <div class="col-xs-12 col-sm-7">
+                    <h3>Cloud Hosting Provider</h3>
                     <ul>
-                        <li>Citizens sign up as Heritage Monitoring Scouts, and can begin monitoring Historic Cemeteries and Historic Structures right away!</li>
-                        <li>To monitor Archaeological Sites, Scouts must first choose a region of interest, and then wait until an administrator assigns a site to them.</li>
-                        <li>Once an Archaeological Site has been assigned to a Scout, that Scout can view the site's location, and log a Scout Visit!</li>
+                        <li>Virtual servers hosted on Akamai/Linode, an enterprise=level global cloud hosting company</li>
+                        <li>Trusted by the World Health Organization, Best Buy, Wayfair, and many more</li>
                     </ul>
-
-                    <div class="panel scout-panel">
-                        <div class="panel-heading">
-                            <i class="fa fa-download" aria-hidden="true"></i>
-                            {% trans "Would you like a monitoring form to take with you in the field?" %}
-                        </div>
-                        <div class="panel-body">
-                        <ul>
-                            <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Archaeological_Sites.pdf' %}">Download the Archaeological Site form</a></li>
-                            <li><a class="a-{{user_type}}" href="{% static 'files/Fillable_Form_Historic_Structures.pdf' %}">Download the Historic Structure form</a></li>
-                        </ul>
-                        </div>
-                    </div>
+                    <h3>Data Access Protection</h3>
+                    <ul>
+                        <li>Secure Sockets Layer (SSL) encrypts requests and responses between browser and server</li>
+                        <li>Built-in firewalls restrict server access to a whitelist of IP addresses</li>
+                        <li>Custom-built Arches search filters provide granular control over Archaeological Site 
+                            access, based on user profile attributes
+                        </li>
+                    </ul>
+                    <h3>Database Maintenance and Backups</h3>
+                    <ul>
+                        <li>Security updates are applied to all servers monthly</li>
+                        <li>Full database backups are made daily and retained for ten days, after which bi-monthly backups
+                            are retained
+                        </li>
+                    </ul>
+                    <h3>Image and Backup Storage</h3>
+                    <ul>
+                        <li>All uploaded photographs and database backups are stored in Amazon Web Services (AWS) S3 buckets</li>
+                    </ul>
                 </div>
-                <div class="col-xs-12 col-sm-6">
-                    <h2>{% trans "How do I log a visit?" %}</h2>
-                    <ol>
-                        <li>To log a scout visit for a Cemetery or Historic Structure, click <a class="a-{{user_type}}" href="{% url 'search_home' %}">“Explore the Database”</a>, then in the Menu Pane on the far left of the main map page, hover over the <i class="fa fa-building-o"></i> building icon and click on <i class="fa fa-binoculars"></i> “Scout Report” under the “Add New Resource” heading. Then, follow the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a> to log a visit.</li>
-                        <li>To monitor an Archaeological Site, you must first request access to that site. Please email us at <a class="a-{{user_type}}" href="mailto:hmsflorida@fpan.us">hmsflorida@fpan.us</a> to request access or get suggestions on sites you can monitor in your area.</li>
-                        <li>Once an Archaeological Site has been assigned, you can view the site's location and log a Scout Visit by following the <a class="a-{{user_type}}" href="https://drive.google.com/file/d/1NAnY6n4eLGXE0Vf0Wd-esg0ZeqZWX_SE/view?usp=sharing">detailed instructions</a>.</li>
-                    </ol>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:30px;">
+        <div class="col-xs-12">
+            <div class="col-sm-12 fpan-panel-{{user_type}}" style="display:flex; justify-content: space-around; align-items:center; flex-wrap:wrap;">
+                <div>
+                    <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" height=80 alt="Data flow diagram">
+                </div>
+                <div>
+                    <img src="{% static 'img/fpan/HMS_Florida_Course_Portal_Black.png' %}" height=100 alt="Data flow diagram">
+                </div>
+                <div>
+                    <img src="{% static 'img/fpan/fpan-logo-feb23.png' %}" height=120 alt="Data flow diagram">
                 </div>
             </div>
         </div>
