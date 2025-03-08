@@ -199,7 +199,7 @@ class ScoutProfile(models.Model):
                 rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
                     node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP['Archaeological Site']['Assigned To'],
-                    value=[self.user.username]
+                    value=[self.user.username, "anonymous"]
                 )
 
         elif graph_name == "Scout Report":
