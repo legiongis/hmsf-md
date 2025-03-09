@@ -58,8 +58,8 @@ class FPANUserManagerView(UserManagerView):
             try:
                 fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
             except (IndexError, KeyError, TypeError) as e:
-                logger.warn(f"can't get fmsf id from {report_id}")
-                logger.warn(e)
+                logger.warning(f"can't get fmsf id from {report_id}")
+                logger.warning(e)
             except Exception as e:
                 logger.error(f"can't get fmsf id from {report_id}")
                 logger.error(e)
@@ -67,12 +67,17 @@ class FPANUserManagerView(UserManagerView):
                 site_lookup[fmsfid]["scout_report_ct"] += 1
                 res = Resource.objects.get(pk=report_id)
                 site_lookup[fmsfid]["scout_reports"].append({
-                    "displayname": res.displayname,
+                    "displayname": res.displayname(),
                     "url": reverse("resource_report", args=(report_id,)),
                 })
 
-        
+        # sort list of reports on each site
+        for v in site_lookup.values():
+            v["scout_reports"].sort(key=lambda k: k["displayname"], reverse=True)
+
+        # sort site list
         site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
+
         logger.debug(f"getting hms_details for {user.username}: {time.time()-start} seconds elapsed")
 
         all_info = {
