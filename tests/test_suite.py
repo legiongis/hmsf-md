@@ -2,7 +2,8 @@ import os
 import json
 from django.conf import settings
 from django.core import management
-from django.test import TestCase
+
+from arches.app.models.graph import Graph
 
 from hms.models import (
     Scout,
@@ -11,36 +12,9 @@ from hms.models import (
     ManagementAreaCategory,
 )
 
-# from hms.utils import TestUtils
-# from hms.helpers import (
-#     create_test_scouts,
-#     create_test_landmanagers,
-# )
+from .base_test import HMSTestCase
 
-
-
-class AccountTests(TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        
-        # management.call_command('packages',
-        #     operation='load_package',
-        #     source=os.path.join(settings.APP_ROOT, 'pkg'),
-        #     yes=True
-        # )
-
-        # create_mock_landmanagers()
-        # create_hardy_boys_accounts()
-
-        pass
-        ## IMPORTANT - fake_passwords MUST be used here, otherwise the password log file will
-        ## be overwritten which would erase the record of current passwords in the real db.
-        # management.call_command('load_package', exclude_business_data=True, fake_passwords=True)
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
+class AccountTests(HMSTestCase):
 
     def test_001_load_fpan_regions(self, dry_run=False):
 
@@ -72,3 +46,27 @@ class AccountTests(TestCase):
         from hms.utils import TestUtils
         TestUtils().create_test_landmanagers()
         self.assertEqual(LandManager.objects.all().count(), 5)
+
+
+class LoadingTests(HMSTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        management.call_command("setup_hms", use_existing_db=True)
+
+    def test_fpan_package_load(self, dry_run=False):
+
+        # make sure all resource models have loaded
+        ct = Graph.objects.all().count()
+        self.assertEqual(ct, 4)
+        return
+
+
+class ETLTests(HMSTestCase):
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
+    def test_fpan_package_load(self, dry_run=False):
+        pass

@@ -1,4 +1,5 @@
 import os
+from django.conf import settings
 from django.test import TestCase
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
@@ -6,7 +7,6 @@ from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
-from tests import test_settings
 from django.db import connection
 from django.contrib.auth.models import User
 from django.core import management
@@ -79,11 +79,9 @@ def tearDownModule():
     pass
 
 
-class ArchesTestCase(TestCase):
+class HMSTestCase(TestCase):
     def __init__(self, *args, **kwargs):
-        print("initing ArchesTestCase")
-        super(ArchesTestCase, self).__init__(*args, **kwargs)
-        print("passed the super call")
+        super(HMSTestCase, self).__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             print("in the default bounds thing")
             management.call_command("migrate")
@@ -97,7 +95,7 @@ class ArchesTestCase(TestCase):
     def loadOntology(cls):
         ontologies_count = Ontology.objects.exclude(ontologyid__isnull=True).count()
         if ontologies_count == 0:
-            management.call_command("load_ontology", source=test_settings.ONTOLOGY_PATH)
+            management.call_command("load_ontology", source=settings.ONTOLOGY_PATH)
 
     @classmethod
     def setUpClass(cls):

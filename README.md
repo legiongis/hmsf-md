@@ -120,6 +120,16 @@ This will get a fully function (if empty of real site data) installation of the 
     ```
     - You may need to add `0:8000` on remote server instances.
 
+### Running tests
+
+- Run the full test suite with:
+
+    ```
+    python manage.py test tests.test_suite
+    ```
+
+    Note that all tests are in a single file to make it easy to run everything at once--automatic discovery of multiple files doesn't work because `fpan` is not a proper Python package.
+
 ## Documentation
 
 Documentation is implemented with Sphinx via [django-docs](https://github.com/littlepea/django-docs/), and stored in the `/docs` directory. Currently, it is restricted to staff access only, but this can be changed in the project `settings.py`.
