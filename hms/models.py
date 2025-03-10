@@ -10,9 +10,7 @@ from pygments.lexers.data import JsonLexer
 
 from django.conf import settings
 from django.contrib.gis.db import models
-from django.contrib.auth.models import User, Group
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.gis.geos import MultiPolygon
 from django.utils.safestring import mark_safe
@@ -404,7 +402,7 @@ def create_new_concept(label, parent_lbl, collection_lbl, concept_id=None):
         nodetype_id="Concept",
         legacyoid=f"{settings.ARCHES_NAMESPACE_FOR_DATA_EXPORT.rstrip('/')}/rdm/{concept_id}",
     )
-    v = Value.objects.create(
+    Value.objects.create(
         concept=concept,
         valuetype_id="prefLabel",
         value=label,
@@ -412,14 +410,14 @@ def create_new_concept(label, parent_lbl, collection_lbl, concept_id=None):
     )
 
     p = Value.objects.get(value=parent_lbl, concept__nodetype__nodetype="Concept").concept
-    rp = Relation.objects.create(
+    Relation.objects.create(
         conceptfrom=p,
         conceptto=concept,
         relationtype_id="narrower",
     )
 
     c = Value.objects.get(value=collection_lbl, concept__nodetype__nodetype="Collection").concept
-    rc = Relation.objects.create(
+    Relation.objects.create(
         conceptfrom=c,
         conceptto=concept,
         relationtype_id="member",
@@ -472,33 +470,22 @@ class ManagementAgency(models.Model):
     def concept_value_id(self):
         return get_concept_value_id(self.concept)
 
-    def set_concept(self):
-
-        concept = create_new_concept(
-            self.name,
-            parent_lbl="Management Agencies",
-            collection_lbl="Management Agencies"
-        )
-        self.concept = concept
-
-    def update_concept(self):
-
-        v = Value.objects.get(
-            concept=self.concept,
-            valuetype_id="prefLabel",
-            language_id="en"
-        )
-        v.value = f"{self.name} ({self.pk})"
-        v.save()
-
     def save(self, *args, **kwargs):
 
-        if self.concept:
-            self.update_concept()
-        else:
-            self.set_concept()
+        if self.pk and not self.concept:
+            self.concept = create_new_concept(
+                f"{self.name} ({self.pk})",
+                parent_lbl="Management Agencies",
+                collection_lbl="Management Agencies"
+            )
 
-        super(ManagementAgency, self).save(*args, **kwargs)
+        return super(ManagementAgency, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.concept:
+            self.concept.delete()
+        return super(ManagementAgency, self).delete(*args, **kwargs)
+
 
 class ManagementAreaCategory(models.Model):
 
@@ -573,38 +560,6 @@ class ManagementArea(models.Model):
     def concept_value_id(self):
         return get_concept_value_id(self.concept)
 
-    def set_concept(self):
-
-        if self.category.name == "FPAN Region":
-            concept = create_new_concept(
-                self.name,
-                parent_lbl="FPAN Regions",
-                collection_lbl="FPAN Regions"
-            )
-        elif self.category.name == "County":
-            concept = create_new_concept(
-                self.name,
-                parent_lbl="Counties",
-                collection_lbl="Counties"
-            )
-        else:
-            concept = create_new_concept(
-                self.display_name,
-                parent_lbl="Management Areas",
-                collection_lbl="Management Areas"
-            )
-        self.concept = concept
-
-    def update_concept(self):
-
-        v = Value.objects.get(
-            concept=self.concept,
-            valuetype_id="prefLabel",
-            language_id="en"
-        )
-        v.value = f"{self.name} ({self.pk})"
-        v.save()
-
     def save(self, *args, **kwargs):
 
         if self.category and self.category.name == "FPAN Region":
@@ -616,12 +571,34 @@ class ManagementArea(models.Model):
         else:
             self.display_name = self.name
 
-        if self.concept:
-            self.update_concept()
-        else:
-            self.set_concept()
+        if self.pk and not self.concept:
+            concept_label = f"{self.name} ({self.pk})"
+            if self.category.name == "FPAN Region":
+                concept = create_new_concept(
+                    concept_label,
+                    parent_lbl="FPAN Regions",
+                    collection_lbl="FPAN Regions"
+                )
+            elif self.category.name == "County":
+                concept = create_new_concept(
+                    concept_label,
+                    parent_lbl="Counties",
+                    collection_lbl="Counties"
+                )
+            else:
+                concept = create_new_concept(
+                    concept_label,
+                    parent_lbl="Management Areas",
+                    collection_lbl="Management Areas"
+                )
+            self.concept = concept
 
-        super(ManagementArea, self).save(*args, **kwargs)
+        return super(ManagementArea, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.concept:
+            self.concept.delete()
+        return super(ManagementArea, self).delete(*args, **kwargs)
 
 
 class ManagementAreaGroup(models.Model):

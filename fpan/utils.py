@@ -3,10 +3,12 @@ import time
 import logging
 
 from django.conf import settings
-from django.db import connection
+from django.db import connection, transaction
 
+from arches.app.models.resource import Resource
 from arches.app.models.models import ResourceInstance, Node
 from arches.app.models.tile import Tile
+from arches.app.utils.index_database import index_resources_using_singleprocessing
 
 from hms.models import ManagementArea, ManagementAgency
 
@@ -28,9 +30,18 @@ class SpatialJoin():
 
     def join_management_area_to_resources(self, area):
 
+        logger.info(f"joining {area.name} to resources")
         resids = self.get_resources_for_area(area)
-        for resinstance in ResourceInstance.objects.filter(pk__in=resids):
-            self.apply_management_area_attributes(resinstance, area)
+
+        resinstances = ResourceInstance.objects.filter(pk__in=resids).exclude(graph__name="Arches System Settings")
+        logger.info(f"updating {resinstances.count()} resources overlapping this area")
+
+        for resinstance in resinstances:
+            self.apply_management_area_attributes(resinstance, area, index_tile=False)
+
+        resources = Resource.objects.filter(pk__in=resids).exclude(graph__name="Arches System Settings")
+        logger.info(f"indexing {resources.count()} resources")
+        index_resources_using_singleprocessing(resources=resources, quiet=True)
 
     def get_areas_for_resourceinstance(self, resourceinstance):
 
@@ -55,7 +66,7 @@ class SpatialJoin():
             rows = cursor.fetchall()
         return [str(i[0]) for i in rows if len(i) > 0]
 
-    def apply_management_area_attributes(self, resourceinstance, area):
+    def apply_management_area_attributes(self, resourceinstance, area, index_tile=True):
 
         g_name = resourceinstance.graph.name
         n_lookup = self.node_lookup[g_name]
@@ -108,7 +119,7 @@ class SpatialJoin():
             [i for i in tile.data[n_lookup['Management Agency']] if i in self.valid_management_agency_vals]
         ))
 
-        tile.save()
+        tile.save(index=index_tile)
 
 def get_node_value(resource, node_name):
     """this just flattens the response from Resource().get_node_values()"""
