@@ -165,7 +165,7 @@ field_maps = {
             {"field": "D_NRLISTED", "source": "shp"}
         ],
         "Ownership": [
-            {"field": "Ownership", "source": "csv"}
+            {"field": "Owntype", "source": "csv"}
         ],
         "Plot Method": [
             {"field": "PLOTMTHD", "source": "shp"}
@@ -371,7 +371,7 @@ class FMSFImporter(BaseImportModule):
 
 
         return response
-    
+
     def _get_csv_content(self):
         try:
             # First try to read as UTF encoded file
@@ -388,7 +388,7 @@ class FMSFImporter(BaseImportModule):
         except Exception as e:
             logger.error(e)
             raise e
-        
+
         return {
             "fieldnames": fieldnames,
             "rows": rows,
@@ -446,14 +446,16 @@ class FMSFImporter(BaseImportModule):
         def validate_shp_fields(layer_fields):
             required = []
             for fieldset in self.field_map.values():
-                required += [i['field'] for i in fieldset if i["source"] == "csv" and not i['field'] == "geom"]
-            return [i for i in required if not i in layer_fields]
-        
+                required += [i['field'] for i in fieldset if i["source"] == "shp" and not i['field'] == "geom"]
+
+            print(layer_fields)
+            return [i for i in required if i not in layer_fields]
+
         def validate_csv_fields(csv_fields):
             required = ["SiteID"]
             for fieldset in self.field_map.values():
                 required += [i['field'] for i in fieldset if i["source"] == "csv"]
-            return [i for i in required if not i in csv_fields] 
+            return [i for i in required if i not in csv_fields]
 
         if isinstance(file_dir, str):
             file_dir = Path(file_dir)
@@ -499,7 +501,7 @@ class FMSFImporter(BaseImportModule):
                     headers = next(reader)
                     if headers[0] != "SiteID":
                         self.reporter.success = False
-                        self.reporter.message = f"extra-structures.csv missing required header: SiteID"
+                        self.reporter.message = "extra-structures.csv missing required header: SiteID"
 
         self.reporter.log(logger)
         return
@@ -568,7 +570,6 @@ class FMSFImporter(BaseImportModule):
         if len(geom_list) > 0:
             logger.debug("unioning Management Areas")
             filter_areas = ManagementArea.objects.exclude(category__name__in=["FPAN Region", "County"])
-            # filter_areas = ManagementArea.objects.filter(pk=352)
             try:
                 union_results = filter_areas.aggregate(Union('geom'))
             except Exception as e:
@@ -998,7 +999,7 @@ class FMSFResource():
         self.siteid = None
         self.feature = None
         self.parent_tile_lookup = {}
-    
+
     def from_shp_feature(self, feature):
 
         self.siteid = feature.get("SITEID")
