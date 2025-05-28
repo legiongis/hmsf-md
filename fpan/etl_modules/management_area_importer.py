@@ -95,7 +95,7 @@ class ManagementAreaImporter(BaseImportModule):
                 "Management Agency": str(Node.objects.get(graph__name=graph_name, name="Management Agency").pk),
             }
         return self.node_lookups[graph_name]
-    
+
     def _get_nodegroup(self, graph_name):
 
         if not graph_name in self.nodegroup_lookup:
@@ -168,9 +168,7 @@ class ManagementAreaImporter(BaseImportModule):
             response['message'] = str(e)
             return response
 
-
         return response
-
 
     def validate_files(self, file_dir):
 
@@ -188,10 +186,10 @@ class ManagementAreaImporter(BaseImportModule):
             name_field_present = "name" in [i.lower() for i in lyr.fields]
             if not name_field_present:
                 self.reporter.success = False
-                self.reporter.message = f"Shapefile is missing 'name' field"
+                self.reporter.message = "Shapefile is missing 'name' field"
             if lyr.srs.srid != 4326:
                 self.reporter.success = False
-                self.reporter.message = f"Shapefile must be reprojected to WGS84 / EPSG:4326"
+                self.reporter.message = "Shapefile must be reprojected to WGS84 / EPSG:4326"
         except Exception as e:
             self.reporter.success = False
             self.reporter.message = str(e)
@@ -242,7 +240,7 @@ class ManagementAreaImporter(BaseImportModule):
                     )
                     if self.group:
                         self.group.areas.add(ma)
-
+                    ma.save()
                     self.areas.append(ma)
 
         except Exception as e:
@@ -258,6 +256,7 @@ class ManagementAreaImporter(BaseImportModule):
 
         joiner = SpatialJoin()
         for area in self.areas:
+            self.update_status_and_load_details(f"processing {area.name}")
             joiner.join_management_area_to_resources(area)
 
     def finalize_load(self):

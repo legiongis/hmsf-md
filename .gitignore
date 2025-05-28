@@ -1,7 +1,12 @@
+.services
+celerybeat-schedule*
+fpan/logs
+
 # package content to ignore
 fpan/pkg/business_data/local
 
 # project content to ignore
+fpan/export_deliverables
 fpan/fmsf-uploads
 fpan/management-area-uploads
 fpan/media/packages

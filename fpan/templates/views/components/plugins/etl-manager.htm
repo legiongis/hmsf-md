@@ -89,10 +89,6 @@
                             </div>
                             <div class="etl-job-task-bar">
                                 <div class="task">
-                                    <!-- ko if: event.status == "completed" && event.etl_module.name == "Management Area Importer" -->
-                                    <!-- call a custom function to unload non-Arches ORM objects -->
-                                    <a data-bind="click: function() { $parent.reverseTransactions(event, '{% trans "Warning" %}', '{% trans "Are you sure you want to delete this load?" %}')}">{% trans "undo import" %}</a>
-                                    <!-- /ko -->
                                     <!-- ko if: event.status == "completed" && event.etl_module.name != "Management Area Importer" -->
                                     <a data-bind="click: function() { $parent.reverseTransactions(event, '{% trans "Warning" %}', '{% trans "Are you sure you want to delete this load?" %}')}">{% trans "undo import" %}</a>
                                     <!-- /ko -->

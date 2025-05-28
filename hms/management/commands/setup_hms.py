@@ -19,7 +19,7 @@ class Command(BaseCommand):
         parser.add_argument("--test-resources", action="store_true", default=False,
             help='specify whether to load a sample set of resource instances')
         parser.add_argument("--use-existing-db", action="store_true", default=False,
-            help='use this flag when calling this command during tested, so that the test database is used')
+            help='use this flag when calling this command during testing, so that the test database is used')
 
     def handle(self, *args, **options):
 

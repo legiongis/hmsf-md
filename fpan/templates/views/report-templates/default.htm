@@ -71,7 +71,7 @@
 
             <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
             <!-- ko if: resourceData.name == "Scout Report" -->
-            <!-- ko foreach: { data: resourceData.loadedRelatedResources(), as: 'relatedResource' } -->
+            <!-- ko foreach: { data: resourceData.loadedRelatedResources().sort((a, b) => {return b.displayName.localeCompare(a.displayName)}), as: 'relatedResource' } -->
             <div class="rp-report-container-tile" style="padding-top:0px; padding-bottom:0px">
                 <div class="row rp-report-tile">
                     <dl class="dl-horizontal">
