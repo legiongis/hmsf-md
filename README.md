@@ -40,7 +40,9 @@ This implementation also uses a slightly modified fork of the core Arches code b
 
 ## Making a dev installation
 
-This will get a fully function (if empty of real site data) installation of the HMS Florida Monitoring Database
+This will get a fully function (if empty of real site data) installation of the HMS Florida Monitoring Database.
+
+> 🐳 If you want to run a dev environment in Docker instead of installing dependencies directly on your machine, skip to [these instructions](/docker/README.md). _If you're developing on an `arm64` machine, this is necessary. (This includes Apple Silicon.)_
 
 ### Install core Arches
 
