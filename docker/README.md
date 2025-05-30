@@ -1,4 +1,4 @@
-# SETTING UP THE DEV ENVIRONMENT USING DOCKER COMPOSE
+# SETTING UP THE DOCKER DEV ENVIRONMENT
 
 > ⚠️ This process is a work in progress. `make` and `docker compose` work together to run `fpan` so the dev can run a single command to get a dev environment up and running, without installing legacy dependencies directly on the dev's machine. Both are needed to keep the `arches` Docker container flexible on startup.
 
