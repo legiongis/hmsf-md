@@ -582,3 +582,77 @@ input[type='text'] {
 .profile-label-shim {
   color: #555;
 }
+
+/* applies to scout reports only, but no code enforces this */
+@media print {
+  
+  body {
+    width: 8.5in;
+    padding-block: 0.8in;
+    padding-inline: 0.5in;
+  }
+  
+  /* hide for printing */
+  #mainnav-container,
+  .carousel,
+  .ep-toolbar,
+  .toggle-container,
+  button#scroll-top,
+  footer {
+    display: none !important;
+  }
+
+  /* don't page break inside of these elements */
+  /* card sections containing single imgs (results when user selects one image for upload, then clicks "+ Add" button) -- implies: OK to break inside card sections with multiple images */
+  .rp-card-section[id]:has(img):not(:has(img ~ img)),
+  img {
+    page-break-inside: avoid;
+  }
+
+  .rp-tile-separator {
+    margin-block: 1rem;
+  }
+  
+  /* <dt> = field labels */
+  dt,
+  .rp-tile-title {
+    font-weight: bold;
+  }
+
+  .rp-tile-title {
+    text-decoration: underline;
+    font-size: 1.15rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+
+    /* add space between label:value lines */
+    dt, dd { margin-bottom: 1rem; }
+    
+    /* keep vertical gap bt rows consistent when the field value is paragraph text instead of text directly inside the <dd> */
+    p:first-child { margin-top: 0; }
+  }
+
+  /* selects cards containing actual resource data, with the data being an image */
+  .rp-card-section[id]:has(img) {
+      width: 100%;
+      
+      /* make alignment more visually pleasing in cards with images inside -- decrease label and increase value col widths -- stops values (eg Overview, Unique Feature, <comment>, etc) from looking like there was a failed attempt at centering text */
+      dl { grid-template-columns: 1fr 7fr; }
+  }
+
+  dd:has(img) {
+    margin: 0;
+    /* make img 100% width of dd that contains it */
+    grid-column: 1 / -1;
+    /* center the image */
+    text-align: center;
+  }
+
+  dd img {
+    max-width: 100%;
+    max-height: 4in;
+  }
+}
