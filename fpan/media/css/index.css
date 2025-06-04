@@ -666,7 +666,7 @@ input[type='text'] {
   /* force field labels and values onto the same row */
   dl {
     display: grid;
-    /* make more room for field values, without causing labels, which would force the 2nd+ line of the following value to be set too far down */
+    /* make more room for field values, without causing labels to wrap, which would force the 2nd+ line of the following value to be set too far down */
     grid-template-columns: 1fr 2fr;
 
     /* match alignment of field labels to web view */
@@ -696,7 +696,7 @@ input[type='text'] {
     /* center the image */
     text-align: center;
     
-    /* hide the image files label and vertical space */
+    /* hide the image files label, buying more vertical space to keep images as large as possible (up to half a page height) */
     margin-top: calc(var(--printed-font-size) * 2.4 * -1);
     background: white;
     z-index: 100;
