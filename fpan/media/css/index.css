@@ -583,7 +583,7 @@ input[type='text'] {
   color: #555;
 }
 
-/* applies to scout reports only, but no code enforces this */
+/* applies to scout reports only */
 @media print {
   :root {
     --printed-font-size: 0.8rem;
@@ -595,7 +595,7 @@ input[type='text'] {
 
   @page {
     margin-inline: 0.75in;
-    border: 1px solid red;
+    margin-block: 0.5in;
   }
   
   /* hide for printing */
@@ -608,13 +608,46 @@ input[type='text'] {
     display: none !important;
   }
 
-  /* don't page break inside of these elements */
-  /* card sections containing single imgs (results when user selects one image for upload, then clicks "+ Add" button) -- implies: OK to break inside card sections with multiple images */
-  .rp-card-section[id]:has(img):not(:has(img ~ img)),
-  img {
+  /* card sections containing single imgs (results when user selects one image for upload, then clicks "+ Add" button) */
+  .rp-card-section[id]:has(.rp-image-grid-item) {
     page-break-inside: avoid;
   }
+  
+  /* card sections containing multiple images (results when user selects multiple images for upload, then clicks "+ Add" button) */
+  .rp-card-section[id]:has(.rp-image-grid-item ~ .rp-image-grid-item) {
+    page-break-before: avoid;
+  }
 
+  /* add space between images with sibling image */
+  .rp-image-grid-item:not(:first-child) {
+    margin-top: calc(var(--printed-font-size) * 1);
+  }
+  
+  /* put site logo and brand text into a single row */
+  .navbar-header a {
+    display: grid;
+    grid-template-columns: 1fr 100fr;
+    gap: 0 calc(var(--printed-font-size) * 1);
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  /* align 'Scout Report - <date> - <user>' page title with following headers */
+  .report-toolbar-title {
+    margin-block: calc(var(--printed-font-size) * 1);
+    margin-inline: 0;
+  }
+
+  /* split the page/report title and 'Report Date' across the page */
+  .report-toolbar-preview.ep-form-toolbar {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* increase margins of <hr> */
   .rp-tile-separator {
     margin-block: 1rem;
   }
@@ -630,10 +663,14 @@ input[type='text'] {
     font-size: calc(var(--printed-font-size) * 1.15);
   }
 
+  /* force field labels and values onto the same row */
   dl {
     display: grid;
     /* make more room for field values, without causing labels, which would force the 2nd+ line of the following value to be set too far down */
     grid-template-columns: 1fr 2fr;
+
+    /* match alignment of field labels to web view */
+    dt { text-align: end; }
 
     /* add space between label:value lines */
     dt, dd { margin-bottom: calc(var(--printed-font-size) * 0.8); }
@@ -642,13 +679,14 @@ input[type='text'] {
     p:first-child { margin-top: 0; }
   }
 
-  /* selects cards containing actual resource data, with the data being an image */
+  /* selects cards containing actual resource data, where the data is an image */
   .rp-card-section[id]:has(img) {
       width: 100%;
 
-      /* make alignment more visually pleasing in cards with images inside -- decrease label and increase value col widths -- stops values (eg Overview, Unique Feature, <comment>, etc) from looking like there was a failed attempt at centering text */
+      /* make alignment more visually pleasing in cards with images inside, since images are centered and possibly full-width -- decrease label and increase value col widths -- stops values (eg Overview, Unique Feature, <comment>, etc) from looking like there was a failed attempt at centering text */
       dl { grid-template-columns: 1fr 8fr; }
-      dd { margin-left: 0 }
+      dt { text-align: start; }
+      dd { margin-inline-start: 0; }
   }
 
   dd:has(img) {
@@ -658,7 +696,7 @@ input[type='text'] {
     /* center the image */
     text-align: center;
     
-    /* hide the image files label */
+    /* hide the image files label and vertical space */
     margin-top: calc(var(--printed-font-size) * 2.4 * -1);
     background: white;
     z-index: 100;
