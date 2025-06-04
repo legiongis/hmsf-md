@@ -585,11 +585,17 @@ input[type='text'] {
 
 /* applies to scout reports only, but no code enforces this */
 @media print {
+  :root {
+    --printed-font-size: 0.8rem;
+  }
   
   body {
-    width: 8.5in;
-    padding-block: 0.8in;
-    padding-inline: 0.5in;
+    font-size: var(--printed-font-size);
+  }
+
+  @page {
+    margin-inline: 0.75in;
+    border: 1px solid red;
   }
   
   /* hide for printing */
@@ -621,15 +627,16 @@ input[type='text'] {
 
   .rp-tile-title {
     text-decoration: underline;
-    font-size: 1.15rem;
+    font-size: calc(var(--printed-font-size) * 1.15);
   }
 
   dl {
     display: grid;
+    /* make more room for field values, without causing labels, which would force the 2nd+ line of the following value to be set too far down */
     grid-template-columns: 1fr 2fr;
 
     /* add space between label:value lines */
-    dt, dd { margin-bottom: 1rem; }
+    dt, dd { margin-bottom: calc(var(--printed-font-size) * 0.8); }
     
     /* keep vertical gap bt rows consistent when the field value is paragraph text instead of text directly inside the <dd> */
     p:first-child { margin-top: 0; }
@@ -638,9 +645,10 @@ input[type='text'] {
   /* selects cards containing actual resource data, with the data being an image */
   .rp-card-section[id]:has(img) {
       width: 100%;
-      
+
       /* make alignment more visually pleasing in cards with images inside -- decrease label and increase value col widths -- stops values (eg Overview, Unique Feature, <comment>, etc) from looking like there was a failed attempt at centering text */
-      dl { grid-template-columns: 1fr 7fr; }
+      dl { grid-template-columns: 1fr 8fr; }
+      dd { margin-left: 0 }
   }
 
   dd:has(img) {
@@ -649,10 +657,16 @@ input[type='text'] {
     grid-column: 1 / -1;
     /* center the image */
     text-align: center;
+    
+    /* hide the image files label */
+    margin-top: calc(var(--printed-font-size) * 2.4 * -1);
+    background: white;
+    z-index: 100;
+      
   }
 
   dd img {
     max-width: 100%;
-    max-height: 4in;
+    max-height: 3.9in;
   }
 }
