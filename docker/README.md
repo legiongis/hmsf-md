@@ -97,3 +97,44 @@ cd fpan-workspace/fpan
 
 make test
 ```
+
+## Configuring Pyright LSP
+
+Warning: this is bit odd. The issue is that the python environment is inside the arches docker container, but fpan is on the host machine. This breaks Pyright's ability to find imported symbols. To allow the LSP to work as intended, we must have a copy of the container's venv directory on the host machine. This copy will only be used for its site-packages directory, which can be inspected by Pyright if it's configured to look for it. This config lives in fpan/pyrightconfig.json exists.
+
+For now, run this when you first set up this project, and when python dependencies change:
+
+```sh
+cd fpan-workspace
+
+docker cp arches:/web_root/ENV ./local_ENV
+```
+
+## Open a Shell in the Arches Container To Run Django Commands, etc...
+
+The arches Docker container does nothing on start-up (outside of the context of the make command). This means you can manually spin up this container and run Django commands, like `runserver`. Note that you want to `runserver 0:8000`, since Django is running in a Docker container.
+
+```sh
+# run the arches container in the background
+docker compose up -d arches
+
+# open a shell in the arches container
+docker compose exec arches bash
+
+# [inside arches container shell] run django
+>> cd /web_root/fpan
+>> source ../ENV/bin/activate
+>> python manage.py runserver 0:8000
+```
+
+## Working with Celery
+
+If you want to make a celery task, you'll need a way to auto-reload the celery process in the arches container.
+
+```sh
+# open a shell in the arches container
+docker compose exec arches bash
+
+source ../ENV/bin/activate
+python manage.py 
+```
