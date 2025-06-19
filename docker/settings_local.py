@@ -1,6 +1,6 @@
 import os
 
-from .settings import ALLOWED_HOSTS, DATABASES, INSTALLED_APPS
+from fpan.settings import ALLOWED_HOSTS, DATABASES, INSTALLED_APPS, CELERY_BROKER_URL
 
 DATABASES["default"]["USER"] = os.environ.get("PGUSERNAME", "username")
 DATABASES["default"]["PASSWORD"] = os.environ.get("PGPASSWORD", "password")
@@ -13,6 +13,9 @@ ELASTICSEARCH_HOSTS = [
         "port": int(os.environ.get("ESPORT", "9200")),
     }
 ]
+
+# TODO: define the host as docker compose env var in arches service
+CELERY_BROKER_URL = "amqp://username:password@rabbitmq:5672"
 
 INSTALLED_APPS += ("arches_extensions",)
 
