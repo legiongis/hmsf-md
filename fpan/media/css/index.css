@@ -588,6 +588,15 @@ input[type='text'] {
   :root {
     --printed-font-size: 0.8rem;
   }
+
+  /* we never want to print backgrounds -- override Chrome print dialog > Options > Background graphics = checked */ 
+  *,
+  /* Chrome ignores this for the brand header .brand-scout-report, so be more specific */
+  .brand-title
+  {
+    background: none !important;
+    color: black;
+  }
   
   body {
     font-size: var(--printed-font-size);
@@ -707,4 +716,7 @@ input[type='text'] {
     max-width: 100%;
     max-height: 3.9in;
   }
+
+  /* keeping above in case we decide we want images in the future, but for now, hide all images */
+  .rp-card-section:has(img) { display: none; }
 }
