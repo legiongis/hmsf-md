@@ -679,7 +679,13 @@ input[type='text'] {
     grid-template-columns: 1fr 2fr;
 
     /* match alignment of field labels to web view */
-    dt { text-align: end; }
+    dt {
+      text-align: end;
+      grid-column: 1;
+    }
+
+    /* when a dt has multiple dd's, unsure all dd's align right */
+    dd { grid-column: 2; }
 
     /* add space between label:value lines */
     dt, dd { margin-bottom: calc(var(--printed-font-size) * 0.8); }
