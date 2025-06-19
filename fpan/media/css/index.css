@@ -591,11 +591,10 @@ input[type='text'] {
 
   /* we never want to print backgrounds -- override Chrome print dialog > Options > Background graphics = checked */ 
   *,
-  /* Chrome ignores this for the brand header .brand-scout-report, so be more specific */
-  .brand-title
+  .brand-title /* Chrome ignores this for the brand header, requiring more specificity */
   {
     background: none !important;
-    color: black;
+    color: black !important;
   }
   
   body {
@@ -684,7 +683,7 @@ input[type='text'] {
       grid-column: 1;
     }
 
-    /* when a dt has multiple dd's, unsure all dd's align right */
+    /* when a dt has multiple dd's, ensure all dd's align right */
     dd { grid-column: 2; }
 
     /* add space between label:value lines */
