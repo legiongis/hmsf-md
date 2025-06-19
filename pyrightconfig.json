@@ -1,0 +1,11 @@
+{
+  "venvPath": "../",
+  "venv": "_local_ENV",
+  "executionEnvironments": [
+    {
+      "extraPaths": [
+        "./fpan/media/packages/arches"
+      ]
+    }
+  ]
+}
