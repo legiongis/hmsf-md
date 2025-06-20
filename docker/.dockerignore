@@ -18,3 +18,5 @@ arches/settings_local.pyc
 elasticsearch-5.2.1
 virtualenv
 arches/app/media/packages
+
+_local_ENV

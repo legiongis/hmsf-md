@@ -14,8 +14,9 @@ ELASTICSEARCH_HOSTS = [
     }
 ]
 
-# TODO: define the host as docker compose env var in arches service
-CELERY_BROKER_URL = "amqp://username:password@rabbitmq:5672"
+rabbitmq_user = os.environ.get("RABBITMQ_DEFAULT_USER")
+rabbitmq_pass = os.environ.get("RABBITMQ_DEFAULT_PASS")
+CELERY_BROKER_URL = f"amqp://{rabbitmq_user}:{rabbitmq_pass}@rabbitmq:5672"
 
 INSTALLED_APPS += ("arches_extensions",)
 

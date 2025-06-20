@@ -1,5 +1,7 @@
-CREATE DATABASE template_postgis_20 WITH ENCODING 'UTF8' LC_COLLATE='C.UTF-8' LC_CTYPE='C.UTF-8';
-UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis_20';
+UPDATE pg_database SET datistemplate='false' WHERE datname='template_postgis';
+DROP DATABASE IF EXISTS template_postgis_20;
+CREATE DATABASE template_postgis_20 WITH ENCODING 'UTF8';
+UPDATE pg_database SET datistemplate='true' WHERE datname='template_postgis';
 
 \c template_postgis_20
 

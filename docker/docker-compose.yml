@@ -1,142 +1,216 @@
 services:
 
     arches:
-      container_name: arches
-      image: legion/arches:6.2
-      platform: linux/amd64  # enforce x64 arch -- for Apple Silicon, use Docker VMM virtualization
+      container_name: ${COMPOSE_PROJECT_NAME}_arches
+      image: legiongis/arches6.2
+      env_file:
+        - ./.env
       build:
         context: .
         dockerfile: ./Dockerfile
-      command: bash -c "\
-        . /web_root/ENV/bin/activate && \
-        cd /web_root/fpan && \
-        sleep infinity"  # keep the container open to allow make to set up the dev env
-      volumes:
-        - ./fpan:/web_root/fpan
-        - arches-log:/arches/arches/logs
-        - arches-static:/static_root
+        args:
+          ARCHES_PROJECT: ${ARCHES_PROJECT}
+          ARCHES_ROOT: ${ARCHES_ROOT}
+          APP_ROOT: ${APP_ROOT}
+          APP_COMP_FOLDER: ${APP_COMP_FOLDER}
       environment:
-        - INSTALL_DEFAULT_GRAPHS=False
-        - INSTALL_DEFAULT_CONCEPTS=False
-        - PGUSERNAME=postgres
-        - PGPASSWORD=postgres
-        - PGDBNAME=fpan
-        - PGHOST=db
-        - PGPORT=5432
-        - COUCHDB_HOST=couchdb
-        - COUCHDB_PORT=5984
-        - COUCHDB_USER=admin
-        - COUCHDB_PASS=password
-        - ESHOST=elasticsearch
-        - ESPORT=9200
-        - DJANGO_MODE=DEV
-        - DJANGO_DEBUG=True
-        - DOMAIN_NAMES=localhost
-        - PYTHONUNBUFFERED=1
-        - TZ=PST
+        - DEBUG="${DJANGO_DEBUG}"
+        - ARCHES_PROJECT=${ARCHES_PROJECT}
+      stdin_open: true # docker run -i
+      tty: true        # docker run -t
       ports:
-        - '8000:8000'
+        - 5432:5432
+        - 8004:8000
+        - 5678:5678
+        - 5984:5984
       depends_on:
-        - db
-        - elasticsearch
-        - couchdb
+        - arches_db
+        - arches_elasticsearch
+        # - arches_redis
+      # command:
+      #   - run_arches
+      # expose:
+      #   - 8004:8000
+      volumes:
+        - arches-log:/web_root/logs
+        - arches-static:/static_root
+        # - arches-app:/arches_app
+        - ../arches_data/:/arches_data
+        - ./fpan:${APP_ROOT}
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10m"
+          max-file: "10"
+      networks:
+        - arches_net
 
     nginx:
-      container_name: nginx
-      image: cvast/cvast-nginx:1.2.0
-      restart: unless-stopped
-      ports:
-        - '80:80'
-        - '443:443'
-      volumes:
-        - arches-static:/www/static
-        - letsencrypt-acme-challenge:/var/www
-        - letsencrypt:/etc/letsencrypt
+      container_name: ${COMPOSE_PROJECT_NAME}_nginx
+      build: ./nginx
+      image: arches_via_docker/nginx
+      env_file:
+        - ./.env
       environment:
-        - NGINX_PROXY_MODE=local
-        - NGINX_PROTOCOL=http
-        - LOCAL_PROXY_HOST=arches
-        - LOCAL_PROXY_PORT=8000
-        - DOMAIN_NAMES=localhost
-        - PUBLIC_MODE=False
-        - TZ=PST
+        - DOMAINS="${DOMAINS}"
+        - DEPLOY_HOST="${DEPLOY_HOST}"
+        - CERT_PATH="${CERT_PATH}"
+        - DJANGO_PORT="${DJANGO_PORT}"
+      volumes:
+        - logs_nginx:/logs/nginx
+        - nginx_ssl:/etc/nginx/ssl
+        - certbot_certs:/etc/letsencrypt
+        - certbot:$CERT_PATH
+        - arches-static:/static_root
+        - ./html:$NGINX_HTML_PATH
+      ports:
+        - 80:80
+        - 443:443
+      restart: always
       depends_on:
         - arches
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10m"
+          max-file: "10"
+      networks:
+        - arches_net
 
-    db:
-      container_name: db
-      image: kartoza/postgis:12.0
+    arches_db:
+      container_name: ${COMPOSE_PROJECT_NAME}_db
+      image: postgis/postgis:14-3.2
+      env_file:
+        - ./.env
+      environment:
+        - PGUSER=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgis
+        - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
+      restart: always
       volumes:
-          # ⚠️ Data not persisting?
-          # Check the true locations of pg data and logs:
-          # (these might change with different Postgres Docker images)
-          # `docker compose exec db psql -h localhost -U postgres -c "SHOW data_directory;"`
-          # `docker compose exec db psql -h localhost -U postgres -c "SHOW log_directory;"`
-          #   (Output of "log" probably means /var/log/fsck_apfs_error.log.
-          #    Confirm this with `docker compose exec db ls -la /var/log/postgresql/`
-          #    output -> postgresql-12-main.log)
-          - postgres-data:/var/lib/postgresql/12/main
+          - postgres-data:/var/lib/postgresql/data/
           - postgres-log:/var/log/postgresql
           - ./init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
+          - ../arches_data/:/arches_data
       ports:
-        - '5432:5432'
-      environment:
-        - POSTGRES_USER=postgres
-        - POSTGRES_PASS=postgres
-        - POSTGRES_DB=fpan
-        - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
-        - TZ=PST
+        - '5434:5432'
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10k"
+          max-file: "10"
+      networks:
+        - arches_net
 
-    couchdb:
-      container_name: couchdb
-      image: couchdb:2.1.1
-      ports:
-        - "5984:5984"
-      environment:
-        COUCHDB_USER: admin
-        COUCHDB_PASSWORD: password
-      volumes:
-        - couchdb-data:/usr/local/var/lib/couchdb
-        - couchdb-log:/usr/local/var/log/couchdb
+    # couchdb:
+    #   container_name: ${COMPOSE_PROJECT_NAME}_couchdb
+    #   image: couchdb:2.1.1
+    #   ports:
+    #     - 5984:5984
+    #   environment:
+    #     COUCHDB_USER: admin
+    #     COUCHDB_PASSWORD: password
+    #   volumes:
+    #     - couchdb-data:/usr/local/var/lib/couchdb
+    #     - couchdb-log:/usr/local/var/log/couchdb
+    #   networks:
+    #     - arches_net
 
-    elasticsearch:
-      container_name: elasticsearch
-      image: docker.elastic.co/elasticsearch/elasticsearch:7.8.1
+    arches_elasticsearch:
+      container_name: ${COMPOSE_PROJECT_NAME}_elasticsearch
+      image: elasticsearch:7.17.28
+      restart: always
+      env_file:
+        - ./.env
+      environment:
+        - TZ="${TZ}"
+        - xpack.security.enabled=false
+        - discovery.type=single-node
+        - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
       volumes:
         - elasticsearch-data:/usr/share/elasticsearch/data
       ports:
-        - "9200:9200"
-        - "9300:9300"
-      environment:
-        - TZ=PST
-        - discovery.type=single-node
-        - discovery.seed_hosts=
-        - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+        - 9202:9200
+        - 9302:9300
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10k"
+          max-file: "10"
+      networks:
+        - arches_net
 
-    letsencrypt:
-      container_name: letsencrypt
-      image: cvast/cvast-letsencrypt:1.1
+    certbot:
+      container_name: ${COMPOSE_PROJECT_NAME}_certbot
+      build: ./certbot
+      image: arches_oc/certbot
+      env_file:
+        - ./.env
       volumes:
-        - letsencrypt-acme-challenge:/var/www
-        - letsencrypt:/etc/letsencrypt
-        - letsencrypt-log:/var/log/letsencrypt
-      command: get_certificate
+        - certbot_certs:/etc/letsencrypt
+        - certbot:$CERT_PATH
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "1k"
+          max-file: "3"
+      networks:
+        - arches_net
+
+    cron:
+      container_name: ${COMPOSE_PROJECT_NAME}_cron
+      build: ./cron
+      image: arches_via_docker/cron
       environment:
-        - MODE=regular
-        - LETSENCRYPT_EMAIL=info@example.com
-        - DOMAIN_NAMES=localhost
-        - PRODUCTION_MODE=False
-        - PERSISTENT_MODE=True
-        - TZ=PST
+        COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME}"
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./:/workdir:ro
+      restart: unless-stopped
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "1k"
+          max-file: "3"
+      networks:
+        - arches_net
+
+    rabbitmq:
+      container_name: ${COMPOSE_PROJECT_NAME}_rabbitmq
+      image: rabbitmq:3-management
+      hostname: my-rabbit
+      environment:
+        RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+        RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      volumes:
+        - rabbitmq-data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+        - rabbitmq-logs:/var/log/rabbitmq/log
+      ports:
+        - 5672:5672
+        - 15672:15672
+      networks:
+        - arches_net
 
 volumes:
-    arches-log:
-    arches-static:
-    couchdb-data:
-    couchdb-log:
-    postgres-data:
-    postgres-log:
-    elasticsearch-data:
-    letsencrypt:
-    letsencrypt-log:
-    letsencrypt-acme-challenge:
+  arches-log:
+  arches-static:
+  # arches-app:
+  postgres-data:
+  postgres-log:
+  elasticsearch-data:
+  rabbitmq-data:
+  rabbitmq-logs:
+  logs_nginx:
+  nginx_ssl:
+  #   # external: true
+  certbot_certs:
+  #   # external: true
+  certbot:
+  #   # external: true
+  # redisdata:
+  # couchdb-data:
+  # couchdb-log:
+
+networks:
+  arches_net:
