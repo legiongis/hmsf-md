@@ -38,7 +38,7 @@ make dev-down
 
 ## Set Up A Workspace From Scratch
 
-This will download the repos and docker images, then initialize the containers with test accounts and resources.
+This will download the repos and docker images, initialize the containers with test accounts and resources, and install javascript dependencies.
 
 > If you've already set up the dev environment, any make command containing `init-dev` will wipe all persistent data from the db and elasticsearch.
 
@@ -60,8 +60,9 @@ git clone \
 
 # clone this project and copy the Docker and Arches files
 git clone https://github.com/legiongis/fpan
-cp fpan/docker/* .
+cp ./fpan/docker/* .
 mv ./settings_local.py fpan/fpan/
+cp ./edit_dot_env .env
 
 # download docker images and initialize fpan
 cd fpan
@@ -86,7 +87,7 @@ make test
   - `make django-shell`
 - Wipe all db and elasticsearch data. Afterwards, you'll want to run some `init-dev` command again.
   - `make dev-down-delete-data`
-- Open a bash shell in the `arches` container to run arbitrary commands, like Django management commands:
+- Open a bash shell in the `arches` container to run arbitrary commands, like Django management commands and `pip install`:
   - `make arches-bash`
 
 ## Configuring Pyright LSP
@@ -102,7 +103,12 @@ This is bit odd. The issue is that the python environment is inside the arches d
 }
 ```
 
-Run this command anytime after you've set up the docker dev environment, and when python dependencies change to sync your local venv copy with the container's:
+You'll want to run the command below after either of the following has occurred:
+- The Docker dev environment has been set up
+- The Python dependencies in the `arches` container have changed (either `arches` or `fpan` dependencies)
+
+> `pip` commands should be run from within the `arches` container. See [Additional Make Commands](#additional-make-commands) to open a shell.
+
 
 ```sh
 cd fpan-workspace

@@ -45,7 +45,7 @@ ARG APP_COMP_FOLDER
 ENV SETTINGS_LOCAL_PATH=${APP_COMP_FOLDER}/settings_local.py
 ENV CELERY_PATH=${APP_COMP_FOLDER}/celery.py
 ENV URLS_PATH=${APP_COMP_FOLDER}/urls.py
-ENV GUNICORN_CONFIG_PATH=${APP_COMP_FOLDER}/gunicorn_config.py
+# ENV GUNICORN_CONFIG_PATH=${APP_COMP_FOLDER}/gunicorn_config.py
 ENV ARCHES_DATA=${ARCHES_ROOT}/arches_data
 ENV PACKAGE_PATH=${APP_COMP_FOLDER}/package.json
 ENV WHEELS=/wheels
@@ -95,7 +95,6 @@ RUN set -ex \
 # Do installs relating to Node
 # ----------------------------------------------
 
-# Set environment variables
 ENV NODE_MAJOR=18
 
 # Update package lists and install necessary packages
@@ -113,13 +112,13 @@ RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg -
 RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list \
     && apt-get update
 
-# Install Node.js
 RUN apt-get install -y nodejs
 
 # Clean up
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+# Install Arches
 
 WORKDIR ${ARCHES_ROOT}
 
@@ -139,9 +138,9 @@ RUN sed -i 's/psycopg2-binary==2.8.4/psycopg2-binary==2.9.10/' arches/arches/ins
 
 RUN pip install supervisor && \
     pip install pytz --upgrade && \
-    pip install tzdata --upgrade && \
-    pip install Redis && \
-    pip install gunicorn
+    pip install tzdata --upgrade
+    # pip install Redis && \
+    # pip install gunicorn
 
 # TODO: determine if this is necessary for fpan
 # # copy in local settings to our newly created Arches project.
@@ -184,9 +183,6 @@ RUN pip install supervisor && \
 # RUN mkdir -p /var/log/supervisor
 # RUN mkdir -p /var/log/celery
 
-# Now install NPM
-WORKDIR ${APP_ROOT}
-
 # NOTE: currently unused -- django command setup_hms seems to do the init of arches+fpan for us
 # Make sure the entry point is available and lacks weird characters
 # that don't work in a Linux OS
@@ -194,8 +190,6 @@ WORKDIR ${APP_ROOT}
 # RUN chmod -R 700 ${APP_ROOT}/entrypoint.sh &&\
 #   dos2unix ${APP_ROOT}/entrypoint.sh
 
-
-# Set default workdir
 WORKDIR ${APP_ROOT}
 
 # Run forever to allow dev to to run `python manage.py setup_hms` or `python manage.py runserver 0:8000` as desired
@@ -212,8 +206,6 @@ EXPOSE 8021
 
 
 # Project-specific requirements
-
-RUN npm install -g yarn
 
 # Install legiongis arches extensions
 RUN cd ${VIRTUAL_ENV} && \

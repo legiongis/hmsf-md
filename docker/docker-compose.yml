@@ -24,60 +24,24 @@ services:
         - 5678:5678
         - 5984:5984
       depends_on:
-        - arches_db
-        - arches_elasticsearch
-        # - arches_redis
-      # command:
-      #   - run_arches
-      # expose:
-      #   - 8004:8000
+        - db
+        - elasticsearch
       volumes:
         - arches-log:/web_root/logs
         - arches-static:/static_root
-        # - arches-app:/arches_app
         - ../arches_data/:/arches_data
-        - ./fpan:${APP_ROOT}
+        # mount legiongis/arches as a volume (it was `pip install`ed with the `-e` [editable] flag)
+        - ./arches:/opt/venv/arches
+        - ./${ARCHES_PROJECT}:${APP_ROOT}
       logging:
         driver: "json-file"
         options:
           max-size: "10m"
           max-file: "10"
       networks:
-        - arches_net
+        - network
 
-    nginx:
-      container_name: ${COMPOSE_PROJECT_NAME}_nginx
-      build: ./nginx
-      image: arches_via_docker/nginx
-      env_file:
-        - ./.env
-      environment:
-        - DOMAINS="${DOMAINS}"
-        - DEPLOY_HOST="${DEPLOY_HOST}"
-        - CERT_PATH="${CERT_PATH}"
-        - DJANGO_PORT="${DJANGO_PORT}"
-      volumes:
-        - logs_nginx:/logs/nginx
-        - nginx_ssl:/etc/nginx/ssl
-        - certbot_certs:/etc/letsencrypt
-        - certbot:$CERT_PATH
-        - arches-static:/static_root
-        - ./html:$NGINX_HTML_PATH
-      ports:
-        - 80:80
-        - 443:443
-      restart: always
-      depends_on:
-        - arches
-      logging:
-        driver: "json-file"
-        options:
-          max-size: "10m"
-          max-file: "10"
-      networks:
-        - arches_net
-
-    arches_db:
+    db:
       container_name: ${COMPOSE_PROJECT_NAME}_db
       image: postgis/postgis:14-3.2
       env_file:
@@ -101,23 +65,9 @@ services:
           max-size: "10k"
           max-file: "10"
       networks:
-        - arches_net
+        - network
 
-    # couchdb:
-    #   container_name: ${COMPOSE_PROJECT_NAME}_couchdb
-    #   image: couchdb:2.1.1
-    #   ports:
-    #     - 5984:5984
-    #   environment:
-    #     COUCHDB_USER: admin
-    #     COUCHDB_PASSWORD: password
-    #   volumes:
-    #     - couchdb-data:/usr/local/var/lib/couchdb
-    #     - couchdb-log:/usr/local/var/log/couchdb
-    #   networks:
-    #     - arches_net
-
-    arches_elasticsearch:
+    elasticsearch:
       container_name: ${COMPOSE_PROJECT_NAME}_elasticsearch
       image: elasticsearch:7.17.28
       restart: always
@@ -139,42 +89,7 @@ services:
           max-size: "10k"
           max-file: "10"
       networks:
-        - arches_net
-
-    certbot:
-      container_name: ${COMPOSE_PROJECT_NAME}_certbot
-      build: ./certbot
-      image: arches_oc/certbot
-      env_file:
-        - ./.env
-      volumes:
-        - certbot_certs:/etc/letsencrypt
-        - certbot:$CERT_PATH
-      logging:
-        driver: "json-file"
-        options:
-          max-size: "1k"
-          max-file: "3"
-      networks:
-        - arches_net
-
-    cron:
-      container_name: ${COMPOSE_PROJECT_NAME}_cron
-      build: ./cron
-      image: arches_via_docker/cron
-      environment:
-        COMPOSE_PROJECT_NAME: "${COMPOSE_PROJECT_NAME}"
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-        - ./:/workdir:ro
-      restart: unless-stopped
-      logging:
-        driver: "json-file"
-        options:
-          max-size: "1k"
-          max-file: "3"
-      networks:
-        - arches_net
+        - network
 
     rabbitmq:
       container_name: ${COMPOSE_PROJECT_NAME}_rabbitmq
@@ -190,27 +105,16 @@ services:
         - 5672:5672
         - 15672:15672
       networks:
-        - arches_net
+        - network
 
 volumes:
   arches-log:
   arches-static:
-  # arches-app:
   postgres-data:
   postgres-log:
   elasticsearch-data:
   rabbitmq-data:
   rabbitmq-logs:
-  logs_nginx:
-  nginx_ssl:
-  #   # external: true
-  certbot_certs:
-  #   # external: true
-  certbot:
-  #   # external: true
-  # redisdata:
-  # couchdb-data:
-  # couchdb-log:
 
 networks:
-  arches_net:
+  network:
