@@ -19,4 +19,4 @@ elasticsearch-5.2.1
 virtualenv
 arches/app/media/packages
 
-_local_ENV
+local_venv
