@@ -1,14 +1,18 @@
 # SETTING UP THE DOCKER DEV ENVIRONMENT
 
-> ⚠️ This process is a work in progress. `make` and `docker compose` work together to run `fpan` so the dev can run a single command to get a dev environment up and running, without installing legacy dependencies directly on the dev's machine. Both are needed to keep the `arches` Docker container flexible on startup.
+`make` and `docker compose` work together to simplify the process of setting up a dev environment and running `fpan`, specifically in development. Docker is currently not being used in production.
 
-> ⚠️ If you're running this on an Apple Silicon machine, set the following in Docker Desktop: Settings > General > Virtual Machine Options > Docker VMM
+Core Arches (and thus Django) runs in the `arches` container defined in [docker-compose.yml](./docker-compose.yml). Django/Arches and `fpan` commands run inside this container. Postgres, Elastic Search, and RabbitMQ run in their own containers.
 
-> ⚠️ If you're running this on an older version of Docker, you may need to replace all instances of `docker compose` with `docker-compose` in fpan-workspace/fpan/Makefile.
+`fpan` source code is mounted as a volume to the `arches` docker service, so open `fpan-workspace/fpan` on your host machine to make code changes. You should see your changes in the browser after reloading the page.
+
+> ⚠️ If you're running the Docker dev environment on an Apple Silicon machine, set the following in Docker Desktop: Settings > General > Virtual Machine Options: ✅ Apple Virtualization Framework, ✅ Use Rosetta for x86_64/amd64 emulation on Apple Silicon, ✅ VirtioFS.
 
 ## Bugs
 
-- Once you've set everything up, have shut down, and run `make dev` to continue working, you may see the following error at the bottom of the stack trace in the console output, after logging in using the browser. _There has been no meaningful impact as a result of this error_:
+- 25.06.23 - As of a recent PR merge, `python manage.py setup_hms --test-resources` is broken. Until this is fixed, `make init-dev` only creates test accounts and no test resources.
+
+- Once you've set everything up, have shut down, and run `make dev` to continue working, you may see the following error at the bottom of the stack trace in the Django console output, after logging into the main site. _You can ignore this error_:
 
 ```
   File "/web_root/ENV/lib/python3.8/site-packages/django/db/models/query.py", line 439, in get
@@ -16,81 +20,57 @@
 arches.app.models.models.UserXNotificationType.MultipleObjectsReturned: get() returned more than one UserXNotificationType -- it returned 2!
 ```
 
-## Tip
+## Start and Stop the Dev Environment
 
-After you've [Set Up A Workspace From Scratch](#set-up-a-workspace-from-scratch), you probably want to run these two commands only, unless something goes wrong or you need to start fresh:
+After you've [Set Up A Workspace From Scratch](#set-up-a-workspace-from-scratch), you'll mostly be running these two commands:
 
 ```sh
 cd fpan-workspace/fpan
 
 # start working
+# spins up the docker containers and runs the django server
 make dev
 
 # stop working
+# shuts down the docker containers
 make dev-down
 ```
 
 ## Set Up A Workspace From Scratch
 
-This will download the repos and docker images, and run the containers with test data. If you've already initialized (setup the database and elasticsearch), this will wipe everything and start fresh.
+This will download the repos and docker images, then initialize the containers with test accounts and resources.
 
-If you don't need test accounts and resources, run `make init-dev-clean` instead of the make command, below. This will save ~10-15 minutes on container startup time.
+> If you've already set up the dev environment, any make command containing `init-dev` will wipe all persistent data from the db and elasticsearch.
+
+> If you don't need test accounts and resources, run `make init-dev-clean` instead of the make command, below. This will save several minutes on container startup time.
+
+After setting up the workspace, you can start and stop the containers with [these commands](#start-and-stop-the-dev-environment).
+
+Paste the following code block into your shell after `cd`ing to an appropriate directory:
 
 ```sh
+# create the workspace
 mkdir fpan-workspace && cd fpan-workspace
 
 # clone our Arches 6.2 fork
-git clone https://github.com/legiongis/arches
-cd arches
-git fetch --all
-git checkout dev/6.2.x-hms-cli
-cd ..
+git clone \
+  --branch=dev/6.2.x-hms-cli \
+  --single-branch \
+  https://github.com/legiongis/arches
 
-# clone this project and copy the Docker files to the workspace
+# clone this project and copy the Docker and Arches files
 git clone https://github.com/legiongis/fpan
 cp fpan/docker/* .
 mv ./settings_local.py fpan/fpan/
 
-# run the fpan / Arches docker containers with mock accounts and resources
+# download docker images and initialize fpan
 cd fpan
 make init-dev
 ```
 
-> `fpan` source code is mounted as a volume to the `arches` docker service, so open `fpan-workspace/fpan` in your host machine's IDE to make code changes. You should see your changes in the browser after reloading the page.
-
-## Shut Down the Dev Environment and Persist Data
-
-This will shut down the dev environment without wiping the database.
-
-```sh
-cd fpan-workspace/fpan
-
-make dev-down
-```
-
-## Run the Dev Environment with Persisted Data
-
-This will run the dev environment using an already-initialized database (or after running [Set Up A Workspace From Scratch](#set-up-a-workspace-from-scratch), or really `make init-dev` or `make init-dev-clean`). Also use this command when you want to keep working with data you've already created.
-
-```sh
-cd fpan-workspace/fpan
-
-make dev
-```
-
-## Initialize the Dev Environment with No Test Data
-
-This will set everything up from scratch, without adding test accounts and resources. This is much faster than the `make init-dev` command.
-
-```sh
-cd fpan-workspace/fpan
-
-make init-dev-clean
-```
-
 ## Running Tests
 
-This will run all tests, assuming the dev environment is already running.
+This will run all tests, assuming you've already run `make dev` to spin up the dev environment.
 
 ```sh
 cd fpan-workspace/fpan
@@ -98,43 +78,34 @@ cd fpan-workspace/fpan
 make test
 ```
 
+## Additional Make Commands
+
+- Run a celery auto-reloader, if you want to work on a celery task:
+  - `make autoreload-celery`
+- Run the Django shell in your terminal:
+  - `make django-shell`
+- Wipe all db and elasticsearch data. Afterwards, you'll want to run some `init-dev` command again.
+  - `make dev-down-delete-data`
+- Open a bash shell in the `arches` container to run arbitrary commands, like Django management commands:
+  - `make arches-bash`
+
 ## Configuring Pyright LSP
 
-Warning: this is bit odd. The issue is that the python environment is inside the arches docker container, but fpan is on the host machine. This breaks Pyright's ability to find imported symbols. To allow the LSP to work as intended, we must have a copy of the container's venv directory on the host machine. This copy will only be used for its site-packages directory, which can be inspected by Pyright if it's configured to look for it. This config lives in fpan/pyrightconfig.json exists.
+This is bit odd. The issue is that the python environment is inside the arches docker container, but fpan is on the host machine. On Mac and Windows*, to allow the LSP to work as intended (allow for jump to definition, docs, completion), we must have a copy of the container's venv directory on the host machine, since that's where the LSP is running. This copy will only be used for its site-packages directory, which pyright is configured to inspect.
 
-For now, run this when you first set up this project, and when python dependencies change:
+> *You should only need a copy of the venv on the host on Mac and Windows machines, since both run Docker containers in virtual machines. On a Linux machine, you should be able to point pyright to the actual directory in the container, as it's really a directory on the host machine, although this is untested. To try this, edit pyrightconfig.json to look like this:
+
+```json
+{
+  "venvPath": "path/to/parent/directory/of/venv/in/container",
+  "venv": "name-of-venv-directory-found-in-venvPath"
+}
+```
+
+Run this command anytime after you've set up the docker dev environment, and when python dependencies change to sync your local venv copy with the container's:
 
 ```sh
 cd fpan-workspace
 
-docker cp arches:/web_root/ENV ./local_ENV
-```
-
-## Open a Shell in the Arches Container To Run Django Commands, etc...
-
-The arches Docker container does nothing on start-up (outside of the context of the make command). This means you can manually spin up this container and run Django commands, like `runserver`. Note that you want to `runserver 0:8000`, since Django is running in a Docker container.
-
-```sh
-# run the arches container in the background
-docker compose up -d arches
-
-# open a shell in the arches container
-docker compose exec arches bash
-
-# [inside arches container shell] run django
->> cd /web_root/fpan
->> source ../ENV/bin/activate
->> python manage.py runserver 0:8000
-```
-
-## Working with Celery
-
-If you want to make a celery task, you'll need a way to auto-reload the celery process in the arches container.
-
-```sh
-# open a shell in the arches container
-docker compose exec arches bash
-
-source ../ENV/bin/activate
-python manage.py 
+docker cp arches:/opt/venv ./local_venv
 ```
