@@ -61,3 +61,18 @@ dev-down-delete-data:
 # Run the test suite (assumes the containers are running)
 test:
 	$(DC_EXEC_ARCHES) $(MANAGE_PY) test tests.test_suite
+
+
+# Access django/arches python management shell
+django-shell:
+	$(DC_EXEC_ARCHES) $(MANAGE_PY) shell
+
+
+# Open a bash shell in the arches container to run arbitrary commands.
+arches-bash:
+	$(DC_EXEC_ARCHES) bash
+
+
+# Run a foreground process that auto-reloads celery when celery tasks are changed
+autoreload-celery:
+	$(DC_EXEC_ARCHES) $(MANAGE_PY) autoreload_celery
