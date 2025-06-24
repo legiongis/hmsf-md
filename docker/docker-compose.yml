@@ -29,7 +29,7 @@ services:
       volumes:
         - arches-log:/web_root/logs
         - arches-static:/static_root
-        - ../arches_data/:/arches_data
+        - ./arches_data/:/arches_data
         # mount legiongis/arches as a volume (it was `pip install`ed with the `-e` [editable] flag)
         - ./arches:/opt/venv/arches
         - ./${ARCHES_PROJECT}:${APP_ROOT}

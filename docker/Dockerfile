@@ -41,13 +41,8 @@ ARG ARCHES_PROJECT
 ARG APP_ROOT
 ARG APP_COMP_FOLDER
 
-# settings_local.py provides the DB credentials, etc. to the Arches project.
-ENV SETTINGS_LOCAL_PATH=${APP_COMP_FOLDER}/settings_local.py
-ENV CELERY_PATH=${APP_COMP_FOLDER}/celery.py
-ENV URLS_PATH=${APP_COMP_FOLDER}/urls.py
-# ENV GUNICORN_CONFIG_PATH=${APP_COMP_FOLDER}/gunicorn_config.py
+# TODO: what is ARCHES_DATA for?
 ENV ARCHES_DATA=${ARCHES_ROOT}/arches_data
-ENV PACKAGE_PATH=${APP_COMP_FOLDER}/package.json
 ENV WHEELS=/wheels
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -59,6 +54,7 @@ RUN mkdir ${ARCHES_ROOT} && mkdir /var/log/supervisor && mkdir /var/log/celery
 RUN apt-get update && apt-get install -y make software-properties-common
 
 # Install packages required to run Arches
+
 # Note that the ubuntu/debian package for libgdal1-dev pulls in libgdal1i, which is built
 # with everything enabled, and so, it has a huge amount of dependancies (everything that GDAL
 # support, directly and indirectly pulling in mysql-common, odbc, jp2, perl! ... )
@@ -89,11 +85,7 @@ RUN set -ex \
     && apt-get install -y nano \
     && apt-get install -y --no-install-recommends $RUN_DEPS
 
-
-
-# ----------------------------------------------
-# Do installs relating to Node
-# ----------------------------------------------
+# Node-related installs
 
 ENV NODE_MAJOR=18
 
@@ -126,7 +118,7 @@ RUN rm -rf /root/.cache/pip/*
 
 RUN pip install --upgrade pip
 
-# Install legiongis fork of Arches 6.2
+# legiongis fork of Arches 6.2
 RUN git clone https://github.com/legiongis/arches && \
     cd arches && \
     git fetch --all && \
@@ -139,56 +131,6 @@ RUN sed -i 's/psycopg2-binary==2.8.4/psycopg2-binary==2.9.10/' arches/arches/ins
 RUN pip install supervisor && \
     pip install pytz --upgrade && \
     pip install tzdata --upgrade
-    # pip install Redis && \
-    # pip install gunicorn
-
-# TODO: determine if this is necessary for fpan
-# # copy in local settings to our newly created Arches project.
-# WORKDIR ${APP_ROOT}
-# COPY ./arches/settings_local.py ${SETTINGS_LOCAL_PATH}
-# RUN sed -i 's/\r$//g' ${SETTINGS_LOCAL_PATH}
-# # copy the celery.py file into out arches project. This hopefully makes the workers and beat work:
-# COPY ./arches/celery.py ${CELERY_PATH}
-# RUN sed -i 's/\r$//g' ${CELERY_PATH}
-
-# TODO: determine if this is necessary for fpan
-# # copy the urls.py into our new Arches project. This is part of
-# # customization for internationalization
-# RUN echo "copied urls to ${URLS_PATH}";
-# COPY ./arches/urls.py ${URLS_PATH}
-# RUN sed -i 's/\r$//g' ${URLS_PATH}
-
-# NOTE: [legiongis] this is currently unused as this image is only intended for development
-# (gunicorn is only needed when Django mode = production)
-# ------------
-# Copy the gunicorn_config.py file into our new Arches project. This is used
-# for running Arches in production (not DEBUG mode)
-# NOTE: We're NOT actually using this, because it will throw an error with urls.py 
-# So this is here for reference only in case someone wants to edit gunicorn_config.py
-# and figure out how to make it work.
-# RUN echo "copy gunicorn_config.py to ${GUNICORN_CONFIG_PATH}";
-# COPY ./arches/gunicorn_config.py ${GUNICORN_CONFIG_PATH}
-# RUN sed -i 's/\r$//g' ${GUNICORN_CONFIG_PATH}
-
-# NOTE: currently unused -- doesn't appear to be an issue
-# Copy customized package until the issue with datatables.net is resolved.
-# COPY ./arches/package.json ${PACKAGE_PATH}
-
-# TODO: get rabbitmq working
-# # copy the celery supervisor
-# COPY /arches/conf.d/ ${APP_ROOT}/conf.d/
-# RUN chmod -R 700 ${APP_ROOT}/conf.d/
-# COPY /arches/arches_proj-supervisor.conf ${APP_ROOT}/arches_proj-supervisor.conf
-# RUN chmod -R 700 ${APP_ROOT}/arches_proj-supervisor.conf
-# RUN mkdir -p /var/log/supervisor
-# RUN mkdir -p /var/log/celery
-
-# NOTE: currently unused -- django command setup_hms seems to do the init of arches+fpan for us
-# Make sure the entry point is available and lacks weird characters
-# that don't work in a Linux OS
-# COPY /arches/entrypoint.sh ${APP_ROOT}/entrypoint.sh
-# RUN chmod -R 700 ${APP_ROOT}/entrypoint.sh &&\
-#   dos2unix ${APP_ROOT}/entrypoint.sh
 
 WORKDIR ${APP_ROOT}
 
@@ -199,11 +141,6 @@ CMD ["sleep", "infinity"]
 EXPOSE 8000
 # Webpack port
 EXPOSE 8021
-
-# NOTE: currently unused -- fpan does not use couchdb
-# # CouchDB port
-# EXPOSE 5984
-
 
 # Project-specific requirements
 
