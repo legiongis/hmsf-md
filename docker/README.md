@@ -107,7 +107,11 @@ This is bit odd. The issue is that the python environment is inside the arches d
 ```json
 {
   "venvPath": "path/to/parent/directory/of/venv/in/container",
-  "venv": "name-of-venv-directory-found-in-venvPath"
+  "venv": "name-of-venv-directory-found-in-venvPath",
+  "extraPaths": [
+    "../arches",
+    "../arches-extensions"
+  ]
 }
 ```
 
