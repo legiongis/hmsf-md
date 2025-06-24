@@ -4,7 +4,7 @@
 
 Core Arches (and thus Django) runs in the `arches` container defined in [docker-compose.yml](./docker-compose.yml). Django/Arches and `fpan` commands run inside this container. Postgres, Elastic Search, and RabbitMQ run in their own containers.
 
-`fpan` source code is mounted as a volume to the `arches` docker service, so open `fpan-workspace/fpan` on your host machine to make code changes. You should see your changes in the browser after reloading the page.
+`legiongis/arches#dev/6.2.x-hms-cli`, `legiongis/arches-extensions`, and `fpan` repos are mounted as volumes to the `arches` docker service so they can all be edited. Open these directories on your host machine to make code changes. You should see your changes to `fpan` in the browser after reloading the page. Editing arches and arches-extensions has not been tested.
 
 > ⚠️ If you're running the Docker dev environment on an Apple Silicon machine, set the following in Docker Desktop: Settings > General > Virtual Machine Options: ✅ Apple Virtualization Framework, ✅ Use Rosetta for x86_64/amd64 emulation on Apple Silicon, ✅ VirtioFS.
 
@@ -58,7 +58,13 @@ git clone \
   --single-branch \
   https://github.com/legiongis/arches
 
-# clone this project and copy the Docker and Arches files
+# clone our Arches extensions
+git clone https://github.com/legiongis/arches-extensions
+cd arches-extensions
+git checkout e349934
+cd ..
+
+# clone this project and copy the Docker and files and local settings
 git clone https://github.com/legiongis/fpan
 cp ./fpan/docker/* .
 mv ./settings_local.py fpan/fpan/

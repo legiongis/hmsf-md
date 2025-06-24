@@ -50,11 +50,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # Setup needed directories
 RUN mkdir ${ARCHES_ROOT} && mkdir /var/log/supervisor && mkdir /var/log/celery
 
-# Get ready to do some code installation
+# Prepare for apt installs
 RUN apt-get update && apt-get install -y make software-properties-common
 
 # Install packages required to run Arches
-
 # Note that the ubuntu/debian package for libgdal1-dev pulls in libgdal1i, which is built
 # with everything enabled, and so, it has a huge amount of dependancies (everything that GDAL
 # support, directly and indirectly pulling in mysql-common, odbc, jp2, perl! ... )
@@ -110,52 +109,48 @@ RUN apt-get install -y nodejs
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-WORKDIR ${ARCHES_ROOT}
-
 RUN npm install -g yarn
 
-# Install Arches
+# Install Arches, arches-extensions, and the Arches app
+# Later (in docker-compose), we mount over the install locations
+# as volumes from the host machine to maintain editability
+# without rebuilding the this Docker image.
 
 RUN rm -rf /root/.cache/pip/*
 
 RUN pip install --upgrade pip
 
-# legiongis fork of Arches 6.2
-RUN git clone https://github.com/legiongis/arches && \
-    cd arches && \
-    git fetch --all && \
-    git checkout dev/6.2.x-hms-cli
+WORKDIR ${VIRTUAL_ENV}
 
+# Clone the legiongis fork of Arches 6.2
+RUN git clone --branch=dev/6.2.x-hms-cli --single-branch https://github.com/legiongis/arches
+
+# psycopg2 2.9.10 supports arm64 architecture
 RUN sed -i 's/psycopg2-binary==2.8.4/psycopg2-binary==2.9.10/' arches/arches/install/requirements.txt && \
-    pip install arches/ && \
+    pip install -e arches/ && \
     pip install -r arches/arches/install/requirements_dev.txt
 
 RUN pip install supervisor && \
     pip install pytz --upgrade && \
     pip install tzdata --upgrade
 
-WORKDIR ${APP_ROOT}
+# Install legiongis arches extensions
+RUN git clone https://github.com/legiongis/arches-extensions.git && \
+    cd arches-extensions && \
+    git checkout e349934 && \
+    pip install -e .
+
+# Project-specific requirements
+# Install fpan python deps -- must rebuild when python requirements change
+# (JS dependencies should be installed via yarn on the host machine, as
+# they live in fpan, which gets mounted as a volume)
+COPY ../fpan/requirements.txt ${VIRTUAL_ENV}/fpan_requirements.txt
+RUN pip install -r ${VIRTUAL_ENV}/fpan_requirements.txt
 
 # Run forever to allow dev to to run `python manage.py setup_hms` or `python manage.py runserver 0:8000` as desired
 CMD ["sleep", "infinity"]
 
 # Django server port
 EXPOSE 8000
-# Webpack port
-EXPOSE 8021
 
-# Project-specific requirements
-
-# Install legiongis arches extensions
-RUN cd ${VIRTUAL_ENV} && \
-    git clone https://github.com/legiongis/arches-extensions.git && \
-    cd arches-extensions && \
-    git checkout e349934 && \
-    pip install -e .
-
-
-# Install fpan python deps -- must rebuild when python requirements change
-# (JS dependencies should be installed via yarn on the host machine, as
-# they live in fpan, which gets mounted as a volume)
-COPY ../fpan/requirements.txt ${VIRTUAL_ENV}/fpan_requirements.txt
-RUN pip install -r ${VIRTUAL_ENV}/fpan_requirements.txt
+WORKDIR ${APP_ROOT}

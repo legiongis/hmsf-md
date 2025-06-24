@@ -30,8 +30,9 @@ services:
         - arches-log:/web_root/logs
         - arches-static:/static_root
         - ./arches_data/:/arches_data
-        # mount legiongis/arches as a volume (it was `pip install`ed with the `-e` [editable] flag)
+        # mount legiongis arches, arches-extensions, and the arches app as volumes so they can be edited without rebuilding this image
         - ./arches:/opt/venv/arches
+        - ./arches-extensions:/opt/venv/arches-extensions
         - ./${ARCHES_PROJECT}:${APP_ROOT}
       logging:
         driver: "json-file"
