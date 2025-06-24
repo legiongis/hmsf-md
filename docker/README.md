@@ -38,7 +38,7 @@ make dev-down
 
 ## Set Up A Workspace From Scratch
 
-This will download the repos and docker images, initialize the containers with test accounts and resources, and install javascript dependencies.
+This will download the repos and docker images, initialize the containers with test accounts and resources, and install javascript dependencies. The first time you do this, it will take several minutes, as Docker has to download large images. After the first time, Docker will use its local cache.
 
 > If you've already set up the dev environment, any make command containing `init-dev` will wipe all persistent data from the db and elasticsearch.
 
