@@ -110,9 +110,11 @@ RUN apt-get install -y nodejs
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Install Arches
-
 WORKDIR ${ARCHES_ROOT}
+
+RUN npm install -g yarn
+
+# Install Arches
 
 RUN rm -rf /root/.cache/pip/*
 

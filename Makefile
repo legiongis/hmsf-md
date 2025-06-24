@@ -5,11 +5,8 @@ DC_EXEC_ARCHES = docker compose exec arches
 DC_LOGS_F = docker compose logs -f
 
 MANAGE_PY = python manage.py
-RUN_DJANGO_SERVER = $(MANAGE_PY) runserver 0:8000
 
 MKDIR_FPAN_LOGS = mkdir -p ./fpan/logs
-
-YARN_INSTALL = yarn install
 
 # purple/pink log printing
 PRINT_MESSAGE = @printf "\n\033[35m%s\033[0m\n\n"
@@ -31,7 +28,8 @@ init-dev:
 	$(DC_EXEC_ARCHES) $(MANAGE_PY) setup_hms \
 		--test-accounts \
 		# --test-resources  # NOTE: as of the merging of PR #295, `--test-resources` fails
-	$(YARN_INSTALL)
+	$(DC_EXEC_ARCHES) yarn install --cwd fpan
+
 
 # Run once -- Initial setup of dev environment and fpan, without test data -- clean slate
 # ⚠️ This will delete all pre-existing data from the db and elasticsearch, if any exists -- accounts, resources, indexes
@@ -40,7 +38,7 @@ init-dev-clean:
 	$(MAKE) __await_dependencies
 	$(MKDIR_FPAN_LOGS)
 	$(DC_EXEC_ARCHES) $(MANAGE_PY) setup_hms
-	$(YARN_INSTALL)
+	$(DC_EXEC_ARCHES) yarn install --cwd fpan
 
 
 HOST_DJANGO_PORT=8004
@@ -49,7 +47,7 @@ HOST_DJANGO_PORT=8004
 dev:
 	$(DC_UP_D)
 	$(PRINT_MESSAGE) "View fpan in the browser at http://localhost:${HOST_DJANGO_PORT}"
-	$(DC_EXEC_ARCHES) $(RUN_DJANGO_SERVER)
+	$(DC_EXEC_ARCHES) $(MANAGE_PY) runserver 0:8000
 
 
 # Stop running the dev environment and allow data to persist
