@@ -31,8 +31,8 @@ services:
         - arches-static:/static_root
         - ./arches_data/:/arches_data
         # mount legiongis arches, arches-extensions, and the arches app as volumes so they can be edited without rebuilding this image
-        - ./arches:/opt/venv/arches
-        - ./arches-extensions:/opt/venv/arches-extensions
+        - ./arches:${ARCHES_ROOT}/arches
+        - ./arches-extensions:${ARCHES_ROOT}/arches-extensions
         - ./${ARCHES_PROJECT}:${APP_ROOT}
       logging:
         driver: "json-file"

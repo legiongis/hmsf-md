@@ -125,5 +125,5 @@ You'll want to run the command below after either of the following has occurred:
 ```sh
 cd fpan-workspace
 
-docker cp arches:/opt/venv ./local_venv
+docker cp fpan_arches:/opt/venv ./local_venv
 ```

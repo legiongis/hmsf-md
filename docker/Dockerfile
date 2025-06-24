@@ -114,13 +114,14 @@ RUN npm install -g yarn
 # Install Arches, arches-extensions, and the Arches app
 # Later (in docker-compose), we mount over the install locations
 # as volumes from the host machine to maintain editability
-# without rebuilding the this Docker image.
+# without rebuilding this Docker image.
 
 RUN rm -rf /root/.cache/pip/*
 
 RUN pip install --upgrade pip
 
-WORKDIR ${VIRTUAL_ENV}
+# Location of arches and arches-extensions repos
+WORKDIR ${ARCHES_ROOT}
 
 # Clone the legiongis fork of Arches 6.2
 RUN git clone --branch=dev/6.2.x-hms-cli --single-branch https://github.com/legiongis/arches
