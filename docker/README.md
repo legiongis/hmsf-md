@@ -46,7 +46,7 @@ This will download the repos and docker images, initialize the containers with t
 
 After setting up the workspace, you can start and stop the containers with [these commands](#start-and-stop-the-dev-environment).
 
-Paste the following code block into your shell after `cd`ing to an appropriate directory:
+Run Docker, then paste the following code block into your terminal after `cd`ing to an appropriate directory:
 
 ```sh
 # create the workspace
