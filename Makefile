@@ -2,6 +2,7 @@ DC_UP_D = docker compose up -d
 DC_DOWN = docker compose down
 DC_DOWN_V = docker compose down -v
 DC_EXEC_ARCHES = docker compose exec arches
+DC_LOGS_F = docker compose logs -f
 
 MANAGE_PY = python manage.py
 RUN_DJANGO_SERVER = $(MANAGE_PY) runserver 0:8000
@@ -79,3 +80,17 @@ arches-bash:
 # Run a foreground process that auto-reloads celery when celery tasks are changed
 autoreload-celery:
 	$(DC_EXEC_ARCHES) $(MANAGE_PY) autoreload_celery
+
+
+# Log commands -- watch logs for db, elasticsearch, and rabbitmq
+
+logs-db:
+	$(DC_LOGS_F) db
+
+
+logs-elasticsearch:
+	$(DC_LOGS_F) elasticsearch
+
+
+logs-rabbitmq:
+	$(DC_LOGS_F) rabbitmq

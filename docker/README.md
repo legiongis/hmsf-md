@@ -89,6 +89,8 @@ make test
   - `make dev-down-delete-data`
 - Open a bash shell in the `arches` container to run arbitrary commands, like Django management commands and `pip install`:
   - `make arches-bash`
+- Watch logs for `db`, `elasticsearch`, and `rabbitmq` containers.
+  - `make logs-db`, `make logs-elasticsearch`, `make logs-rabbitmq`
 
 ## Configuring Pyright LSP
 
