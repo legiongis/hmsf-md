@@ -4,7 +4,7 @@
 
 Core Arches (and thus Django) runs in the `arches` container defined in [docker-compose.yml](./docker-compose.yml). Django/Arches and `fpan` commands run inside this container. Postgres, Elastic Search, and RabbitMQ run in their own containers.
 
-`legiongis/arches#dev/6.2.x-hms-cli`, `legiongis/arches-extensions`, and `fpan` repos are mounted as volumes to the `arches` docker service so they can all be edited. Open these directories on your host machine to make code changes. You should see your changes to `fpan` in the browser after reloading the page. Editing arches and arches-extensions has not been tested.
+`legiongis/arches#dev/6.2.x-hms-cli`, `legiongis/arches-extensions`, and `fpan` repos are mounted as volumes to the `arches` docker service so they can all be edited. Open these directories on your host machine to make code changes. You should see your changes to `fpan`, `arches`, and `arches-extensions` reflected immediately after reloading the page.
 
 > ⚠️ If you're running the Docker dev environment on an Apple Silicon machine, set the following in Docker Desktop: Settings > General > Virtual Machine Options: ✅ Apple Virtualization Framework, ✅ Use Rosetta for x86_64/amd64 emulation on Apple Silicon, ✅ VirtioFS.
 
@@ -102,7 +102,19 @@ make test
 
 This is bit odd. The issue is that the python environment is inside the arches docker container, but fpan is on the host machine. On Mac and Windows*, to allow the LSP to work as intended (allow for jump to definition, docs, completion), we must have a copy of the container's venv directory on the host machine, since that's where the LSP is running. This copy will only be used for its site-packages directory, which pyright is configured to inspect.
 
-> *You should only need a copy of the venv on the host on Mac and Windows machines, since both run Docker containers in virtual machines. On a Linux machine, you should be able to point pyright to the actual directory in the container, as it's really a directory on the host machine, although this is untested. To try this, edit pyrightconfig.json to look like this:
+```sh
+cd fpan-workspace
+
+docker cp fpan_arches:/opt/venv ./local_venv
+```
+
+You'll want to run this command after either of the following has occurred:
+- The Docker dev environment has been set up
+- The Python dependencies in the `arches` container have changed (either `arches` or `fpan` dependencies)
+
+> `pip` commands should be run from within the `arches` container. See [Additional Make Commands](#additional-make-commands) to open a shell.
+
+> *It's possible that on a Linux machine you could point pyright to the actual directory in the container, as it's really a directory on the host machine, though we have yet to successfully figure this out. To try this, edit pyrightconfig.json to look like this:
 
 ```json
 {
@@ -113,17 +125,4 @@ This is bit odd. The issue is that the python environment is inside the arches d
     "../arches-extensions"
   ]
 }
-```
-
-You'll want to run the command below after either of the following has occurred:
-- The Docker dev environment has been set up
-- The Python dependencies in the `arches` container have changed (either `arches` or `fpan` dependencies)
-
-> `pip` commands should be run from within the `arches` container. See [Additional Make Commands](#additional-make-commands) to open a shell.
-
-
-```sh
-cd fpan-workspace
-
-docker cp fpan_arches:/opt/venv ./local_venv
 ```
