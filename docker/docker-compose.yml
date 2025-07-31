@@ -1,0 +1,121 @@
+services:
+
+    arches:
+      container_name: ${COMPOSE_PROJECT_NAME}_arches
+      image: legiongis/arches6.2
+      env_file:
+        - ./.env
+      build:
+        context: .
+        dockerfile: ./Dockerfile
+        args:
+          ARCHES_PROJECT: ${ARCHES_PROJECT}
+          ARCHES_ROOT: ${ARCHES_ROOT}
+          APP_ROOT: ${APP_ROOT}
+          APP_COMP_FOLDER: ${APP_COMP_FOLDER}
+      environment:
+        - DEBUG="${DJANGO_DEBUG}"
+        - ARCHES_PROJECT=${ARCHES_PROJECT}
+      stdin_open: true # docker run -i
+      tty: true        # docker run -t
+      ports:
+        - 5432:5432
+        - 8004:8000
+        - 5678:5678
+        - 5984:5984
+      depends_on:
+        - db
+        - elasticsearch
+      volumes:
+        - arches-log:/web_root/logs
+        - arches-static:/static_root
+        - ./arches_data/:/arches_data
+        # mount legiongis arches, arches-extensions, and the arches app as volumes so they can be edited without rebuilding this image
+        - ./arches:${ARCHES_ROOT}/arches
+        - ./arches-extensions:${ARCHES_ROOT}/arches-extensions
+        - ./${ARCHES_PROJECT}:${APP_ROOT}
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10m"
+          max-file: "10"
+      networks:
+        - network
+
+    db:
+      container_name: ${COMPOSE_PROJECT_NAME}_db
+      image: postgis/postgis:14-3.2
+      env_file:
+        - ./.env
+      environment:
+        - PGUSER=postgres
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgis
+        - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
+      restart: always
+      volumes:
+          - postgres-data:/var/lib/postgresql/data/
+          - postgres-log:/var/log/postgresql
+          - ./init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
+          - ./arches_data/:/arches_data
+      ports:
+        - '5434:5432'
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10k"
+          max-file: "10"
+      networks:
+        - network
+
+    elasticsearch:
+      container_name: ${COMPOSE_PROJECT_NAME}_elasticsearch
+      image: elasticsearch:7.17.28
+      restart: always
+      env_file:
+        - ./.env
+      environment:
+        - TZ="${TZ}"
+        - xpack.security.enabled=false
+        - discovery.type=single-node
+        - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      volumes:
+        - elasticsearch-data:/usr/share/elasticsearch/data
+      ports:
+        - 9202:9200
+        - 9302:9300
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "10k"
+          max-file: "10"
+      networks:
+        - network
+
+    rabbitmq:
+      container_name: ${COMPOSE_PROJECT_NAME}_rabbitmq
+      image: rabbitmq:3-management
+      hostname: my-rabbit
+      environment:
+        RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+        RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+      volumes:
+        - rabbitmq-data:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+        - rabbitmq-logs:/var/log/rabbitmq/log
+      ports:
+        - 5672:5672
+        - 15672:15672
+      networks:
+        - network
+
+volumes:
+  arches-log:
+  arches-static:
+  postgres-data:
+  postgres-log:
+  elasticsearch-data:
+  rabbitmq-data:
+  rabbitmq-logs:
+
+networks:
+  network:

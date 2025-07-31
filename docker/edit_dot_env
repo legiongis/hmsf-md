@@ -1,0 +1,65 @@
+# Edit this file and save as ".env" for use.
+
+# Docker Compose project name - this will prefix all container and volume names created in docker-compose.yml
+COMPOSE_PROJECT_NAME=fpan
+
+# Not supporting multiple domains yet, so just make sure there's only one here.
+DOMAINS=[SET_ME]
+DEPLOY_HOST=$DOMAINS
+NGINX_HTML_PATH=/var/www/html/$DEPLOY_HOST
+CERT_PATH=/var/www/certbot/$DEPLOY_HOST
+CERTBOT_EMAILS=[SET_ME]
+CERTBOT_TEST_CERT=1
+CERTBOT_RSA_KEY_SIZE=4096
+TZ=PST
+
+# Arches project and paths
+ARCHES_PROJECT=fpan
+ARCHES_ROOT=/arches_app
+APP_ROOT=$ARCHES_ROOT/$ARCHES_PROJECT
+APP_COMP_FOLDER=$APP_ROOT/$ARCHES_PROJECT
+
+# Arches configs
+# NOTE: the ARCHES_NAMESPACE needs to look like a URL, ending in a '/',
+# with the same port as used by the Arches Django APP.
+ARCHES_NAMESPACE=http://$ARCHES_PROJECT:8000/
+
+# This will hopefully make the yarn build not fail.
+NODE_OPTIONS='--max-old-space-size=1024'
+INSTALL_DEFAULT_GRAPHS=True
+INSTALL_DEFAULT_CONCEPTS=True
+
+# Don't change these, because I can't figure out how dynamically pass
+# a new database password to Postgres via docker compose. If you change
+# something like the PGPASSWORD, be sure to change it in the corresponding
+# value in the docker-compse.yml for the Postgres container.
+PGUSERNAME=postgres
+PGPASSWORD=postgis
+PGDBNAME=$ARCHES_PROJECT
+PGHOST=db
+PGPORT=5432
+ESHOST=elasticsearch
+ESPORT=9200
+DJANGO_MODE=DEV
+DJANGO_DEBUG=False
+# Don't change the port, since it's pretty hard-coded.
+DJANGO_PORT=8000
+DOMAIN_NAMES=$DOMAINS localhost 0.0.0.0 127.0.0.1
+# NOTE: Only set BUILD_PRODUCTION=True if you have well over
+# 8GB of system RAM. Otherwise, yarn will likely error out.
+BUILD_PRODUCTION=False
+PYTHONUNBUFFERED=0
+ELASTICSEARCH_PREFIX=$ARCHES_PROJECT
+
+RABBITMQ_DEFAULT_USER=username
+RABBITMQ_DEFAULT_PASS=password
+
+# COUCHDB_HOST=arches
+# COUCHDB_PORT=5984
+# COUCHDB_USER=admin
+# COUCHDB_PASS=password
+# COUCHDB_URL=http://$COUCHDB_USER:$COUCHDB_PASS@$COUCHDB_HOST:$COUCHDB_PORT
+
+# The DATABASE_URL is a convenience consolidated way help connect to Postgresql
+# pg_featureserv and tileserv
+DATABASE_URL=postgresql://$PGUSERNAME:$PGPASSWORD@$PGHOST/$PGDBNAME
