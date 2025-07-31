@@ -148,7 +148,32 @@
                         {% endif %}
 
                         {% if nav.print %}
-                        <a href="" class="ep-tools ep-tools-right" data-bind="click: function() { window.print() }">
+                        <script>
+                            /** Intercept print keyboard shortcut and print button press to
+                            provide message about browser compat, only when viewing a Scout Report. */
+                            
+                            addEventListener('keydown', onPrintShortcut)
+                            
+                            function onPrintShortcut(e) {
+                              if (!e.metaKey && !e.ctrlKey ) return
+                              if (e.key === 'p') {
+                                e.preventDefault()
+                                printScoutReport()
+                              }
+                            }
+                            
+                            function printScoutReport() {
+                              // don't interfere with printing if not in a Scout Report view
+                              if (!location.pathname.startsWith('/report')) {
+                                print()
+                                return
+                              }
+                              const msg = "⚠️ Scout Report printing is only fully supported on desktop Chrome browser. Formatting may be inconsistent when printing from other devices or browsers."
+                              if (!confirm(msg)) return
+                              print()
+                            }
+                        </script>
+                        <a href="" class="ep-tools ep-tools-right" data-bind="click: printScoutReport">
                             <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
                               <i class="ion-printer"></i>
                             </div>

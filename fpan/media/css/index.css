@@ -582,3 +582,146 @@ input[type='text'] {
 .profile-label-shim {
   color: #555;
 }
+
+/* applies to scout reports only */
+@media print {
+  :root {
+    --printed-font-size: 0.8rem;
+  }
+
+  /* we never want to print backgrounds -- override Chrome print dialog > Options > Background graphics = checked */ 
+  *,
+  .brand-title /* Chrome ignores this for the brand header, requiring more specificity */
+  {
+    background: none !important;
+    color: black !important;
+  }
+  
+  body {
+    font-size: var(--printed-font-size);
+  }
+
+  @page {
+    margin-inline: 0.75in;
+    margin-block: 0.5in;
+  }
+  
+  /* hide for printing */
+  #mainnav-container,
+  .carousel,
+  .ep-toolbar,
+  .toggle-container,
+  button#scroll-top,
+  footer {
+    display: none !important;
+  }
+
+  /* card sections containing single imgs (results when user selects one image for upload, then clicks "+ Add" button) */
+  .rp-card-section[id]:has(.rp-image-grid-item) {
+    page-break-inside: avoid;
+  }
+  
+  /* card sections containing multiple images (results when user selects multiple images for upload, then clicks "+ Add" button) */
+  .rp-card-section[id]:has(.rp-image-grid-item ~ .rp-image-grid-item) {
+    page-break-before: avoid;
+  }
+
+  /* add space between images with sibling image */
+  .rp-image-grid-item:not(:first-child) {
+    margin-top: calc(var(--printed-font-size) * 1);
+  }
+  
+  /* put site logo and brand text into a single row */
+  .navbar-header a {
+    display: grid;
+    grid-template-columns: 1fr 100fr;
+    gap: 0 calc(var(--printed-font-size) * 1);
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  /* align 'Scout Report - <date> - <user>' page title with following headers */
+  .report-toolbar-title {
+    margin-block: calc(var(--printed-font-size) * 1);
+    margin-inline: 0;
+  }
+
+  /* split the page/report title and 'Report Date' across the page */
+  .report-toolbar-preview.ep-form-toolbar {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* increase margins of <hr> */
+  .rp-tile-separator {
+    margin-block: 1rem;
+  }
+  
+  /* <dt> = field labels */
+  dt,
+  .rp-tile-title {
+    font-weight: bold;
+  }
+
+  .rp-tile-title {
+    text-decoration: underline;
+    font-size: calc(var(--printed-font-size) * 1.15);
+  }
+
+  /* force field labels and values onto the same row */
+  dl {
+    display: grid;
+    /* make more room for field values, without causing labels to wrap, which would force the 2nd+ line of the following value to be set too far down */
+    grid-template-columns: 1fr 2fr;
+
+    /* match alignment of field labels to web view */
+    dt {
+      text-align: end;
+      grid-column: 1;
+    }
+
+    /* when a dt has multiple dd's, ensure all dd's align right */
+    dd { grid-column: 2; }
+
+    /* add space between label:value lines */
+    dt, dd { margin-bottom: calc(var(--printed-font-size) * 0.8); }
+    
+    /* keep vertical gap bt rows consistent when the field value is paragraph text instead of text directly inside the <dd> */
+    p:first-child { margin-top: 0; }
+  }
+
+  /* selects cards containing actual resource data, where the data is an image */
+  .rp-card-section[id]:has(img) {
+      width: 100%;
+
+      /* make alignment more visually pleasing in cards with images inside, since images are centered and possibly full-width -- decrease label and increase value col widths -- stops values (eg Overview, Unique Feature, <comment>, etc) from looking like there was a failed attempt at centering text */
+      dl { grid-template-columns: 1fr 8fr; }
+      dt { text-align: start; }
+      dd { margin-inline-start: 0; }
+  }
+
+  dd:has(img) {
+    margin: 0;
+    /* make img 100% width of dd that contains it */
+    grid-column: 1 / -1;
+    /* center the image */
+    text-align: center;
+    
+    /* hide the image files label, buying more vertical space to keep images as large as possible (up to half a page height) */
+    margin-top: calc(var(--printed-font-size) * 2.4 * -1);
+    background: white;
+    z-index: 100;
+      
+  }
+
+  dd img {
+    max-width: 100%;
+    max-height: 3.9in;
+  }
+
+  /* keeping above in case we decide we want images in the future, but for now, hide all images */
+  .rp-card-section:has(img) { display: none; }
+}
