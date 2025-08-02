@@ -57,6 +57,8 @@
                             {% trans "Switch to Scout Login" %} &rarr;
                         </a>
                         {% endif %}
+                        <br>
+                        <span>Login trouble? Email us:</span> <a class="a-{{login_type}} email-contact"></a>
                     </div>
                     {% if auth_failed %}
                     <div class="form-group">
@@ -85,8 +87,8 @@
     </div>
 </div>
 {% if login_type == "landmanager" %}
-<div class="row">
-    <div class="copyright-section copyright-section-{{ login_type }}">
+<div class="row" style="margin-top: 1em;">
+    <div class="copyright-section copyright-section-{{ login_type }}" style="text-align: center;">
         <ul class="state-logos-list">
             <li>
                 <img src="{% static 'img/state/FL-DEP-LOGO-color.png' %}" class="state-logo-img">
