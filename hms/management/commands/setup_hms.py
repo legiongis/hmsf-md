@@ -1,4 +1,7 @@
 import os
+import subprocess
+from pathlib import Path
+
 from django.conf import settings
 from django.core import management
 from django.core.management.base import BaseCommand, CommandError
@@ -23,9 +26,46 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        db = settings.DATABASES['default']
+        db_name = db['NAME']
+        db_user = db['USER']
+
         if options['use_existing_db'] is not True:
+            if not input("\nDrop and recreate the database? y/N ").lower().startswith("y"):
+                print("cancelled")
+                exit()
+            ## replacing the Arches setup_db command here
+            # management.call_command('setup_db', force=True)
             print("\033[96m-- Initialize the DATABASE --\033[0m")
-            management.call_command('setup_db', force=True)
+            prefix = ["psql", "-U", "postgres"]
+            cmd1 = prefix + ["-c", f"DROP DATABASE IF EXISTS {db_name};"]
+            subprocess.call(cmd1)
+            cmd2 = prefix + ["-c", f"CREATE DATABASE {db_name} WITH OWNER {db_user};"]
+            subprocess.call(cmd2)
+            cmd3 = prefix + ["-d", db_name, "-c", "CREATE EXTENSION postgis; CREATE EXTENSION \"uuid-ossp\";"]
+            subprocess.call(cmd3)
+
+            management.call_command("es", operation="delete_indexes")
+
+            # setup initial Elasticsearch indexes
+            management.call_command("es", operation="setup_indexes")
+
+            management.call_command("createcachetable")
+            management.call_command("migrate")
+
+            # import system settings graph and any saved system settings data
+            settings_graph = Path(settings.APP_ROOT, "system_settings", "Arches_System_Settings_Model.json")
+            management.call_command(
+                "packages", operation="import_graphs", source=str(settings_graph)
+            )
+
+            settings_instance = Path(settings.APP_ROOT, "system_settings", "System_Settings.json")
+            management.call_command(
+                "packages",
+                operation="import_business_data",
+                source=str(settings_instance),
+                overwrite="overwrite",
+            )
 
         print("\033[96m-- Load Arches PACKAGE --\033[0m")
 
