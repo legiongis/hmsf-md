@@ -158,9 +158,9 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
         <div class="row" style="margin: 10px 0px;">
             <div class="col-xs-12">
                 {% if login_type %}
-                <span>&copy; {% now "Y" %} | powered by <a class="a-{{login_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{login_type}}" href="https://github.com/legiongis/arches/tree/dev/6.2.x-hms">arches</a>, <a class="a-{{login_type}}" href="https://github.com/legiongis/hmsf-md">fpan</a> | admin contact &mdash; <a id="email-contact" class="a-{{login_type}}"></a></span>
+                <span>&copy; {% now "Y" %} | powered by <a class="a-{{login_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{login_type}}" href="https://github.com/legiongis/arches/tree/dev/6.2.x-hms">arches</a>, <a class="a-{{login_type}}" href="https://github.com/legiongis/hmsf-md">fpan</a> | admin contact &mdash; <a class="a-{{login_type}} email-contact"></a></span>
                 {% else %}
-                <span>&copy; {% now "Y" %} | powered by <a class="a-{{user_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{user_type}}" href="https://github.com/legiongis/arches/tree/dev/6.2.x-hms">arches</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan">fpan</a> | admin contact &mdash; <a id="email-contact" class="a-{{user_type}}"></a></span>
+                <span>&copy; {% now "Y" %} | powered by <a class="a-{{user_type}}" href="http://archesproject.org">Arches {{ app_settings.VERSION }}</a> | source code &mdash; <a class="a-{{user_type}}" href="https://github.com/legiongis/arches/tree/dev/6.2.x-hms">arches</a>, <a class="a-{{user_type}}" href="https://github.com/legiongis/fpan">fpan</a> | admin contact &mdash; <a class="a-{{user_type}} email-contact"></a></span>
                 {% endif %}
             </div>
         </div>
@@ -169,13 +169,17 @@ The data-spy and data-target are part of the built-in Bootstrap scrollspy functi
 </body>
 
 <script>
-    var c1 = "admin";
+    var c1 = "hmsflorida";
     var c2 = "@";
-    var c3 = "legiongis.com";
+    var c3 = "fpan.us";
     var email = c1+c2+c3
     $(document).ready(function() {
-        document.getElementById('email-contact').textContent = email;
-        document.getElementById('email-contact').href = "mailto:"+email;
+        var els = document.getElementsByClassName('email-contact')
+        console.log(els)
+        for (var i = 0; els[i]; i++) {
+            els[i].textContent = email;
+            els[i].href = "mailto:"+email;
+        }
     });
 </script>
 </html>
