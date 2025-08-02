@@ -27,7 +27,7 @@ init-dev:
 	$(MKDIR_FPAN_LOGS)
 	$(DC_EXEC_ARCHES) $(MANAGE_PY) setup_hms \
 		--test-accounts \
-		# --test-resources  # NOTE: as of the merging of PR #295, `--test-resources` fails
+		--test-resources
 	$(DC_EXEC_ARCHES) yarn install --cwd fpan
 
 
