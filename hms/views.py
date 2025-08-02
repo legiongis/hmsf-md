@@ -20,7 +20,7 @@ from django.views.generic import View
 
 from arches.app.utils.response import JSONResponse
 from arches.app.models.tile import Tile
-from arches.app.models.models import Node
+from arches.app.models.models import Node, Value
 from arches.app.models.system_settings import settings
 
 from hms.forms import ScoutForm, ScoutProfileForm
@@ -233,8 +233,9 @@ def scouts_dropdown(request):
         n = Node.objects.get(name="FPAN Region", graph__name="Archaeological Site")
         region_tiles = Tile.objects.filter(resourceinstance=resourceid, nodegroup=n.nodegroup)
         for t in region_tiles:
-            for pk in t.data[str(n.nodeid)]:
-                ma = ManagementArea.objects.get(pk=pk)
+            for v in t.data[str(n.nodeid)]:
+                value = Value.objects.get(valueid=v)
+                ma = ManagementArea.objects.get(concept=value.concept)
                 site_regions.append(ma.name)
 
         ## as the scout list gets big this may need some optimizing!
