@@ -161,6 +161,12 @@ SPATIAL_JOIN_GRAPHID_LOOKUP = {
     },
 }
 
+SPATIAL_COORDINATES_NODEGROUPS_IDS = [
+    "3067ed10-dbaa-11e7-87be-94659cf754d0", # archaeological site
+    "210c6341-dbab-11e7-9832-94659cf754d0", # historic cemetery
+    "efe6cb5e-dbab-11e7-a327-94659cf754d0", # historic structure
+]
+
 try:
     from .settings_local import *
 except ImportError as e:
