@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-i',
+            '-r',
             '--resourceinstanceid',
         )
         parser.add_argument(
@@ -56,14 +56,22 @@ class Command(BaseCommand):
             resids = []
             for k, v in settings.SPATIAL_JOIN_GRAPHID_LOOKUP.items():
                 print(k)
-                tiles = Tile.objects.filter(nodegroup_id=v['Nodegroup'])
-                empty_tiles = [i for i in tiles if i.data and not i.data[v["FPAN Region"]]]
-                print(f"resources to join: {len(empty_tiles)}")
-                resids += [i.resourceinstance.pk for i in empty_tiles]
+                all_tiles = Tile.objects.filter(nodegroup_id=v['Nodegroup'])
+                res_with_nodegroup = all_tiles.values_list("resourceinstance_id", flat=True)
+                res_without_nodegroup = ResourceInstance.objects.filter(graph__name=k).exclude(pk__in=res_with_nodegroup)
+                resids_missing_region = list(res_without_nodegroup.values_list("pk", flat=True))
+                for tile in all_tiles:
+                    if tile.data:
+                        region_val = tile.data.get(v["FPAN Region"])
+                        if region_val in (None, ""):
+                            resids_missing_region.append(tile.resourceinstance.pk)
+                print(f"resources to join: {len(resids_missing_region)}")
+                print(resids_missing_region[:25])
+                resids += resids_missing_region
             resources = ResourceInstance.objects.filter(pk__in=resids)
             print(f"\ntotal resources: {resources.count()}")
             if not options["noinput"]:
-                if input("continue? Y/n").lower().startswith("n"):
+                if input("continue? Y/n ").lower().startswith("n"):
                     exit()
         else:
             exit()
