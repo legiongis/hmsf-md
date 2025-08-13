@@ -23,7 +23,7 @@ from django.conf import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.concept import Concept
-from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule
+from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule, ResourceInstance
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -31,7 +31,7 @@ from arches.app.utils.index_database import index_resources_by_transaction
 
 from hms.models import ManagementArea
 from fpan.tasks import run_sequence_as_task
-from fpan.utils import ETLOperationResult
+from fpan.utils import ETLOperationResult, SpatialJoin
 
 logger = logging.getLogger(__name__)
 
@@ -781,6 +781,24 @@ class FMSFImporter(BaseImportModule):
         self.reporter.log(logger)
         return
 
+    def run_spatial_join(self):
+
+        self.update_status_and_load_details("join management areas")
+
+        logger.debug("running spatial join on resources")
+        resids = [i.resourceid for i in self.fmsf_resources]
+        try:
+            joiner = SpatialJoin()
+            resources = ResourceInstance.objects.filter(pk__in=resids)
+            for resource in resources:
+                joiner.update_resource(resource)
+        except Exception as e:
+            self.reporter.success = False
+            self.reporter.message = str(e)
+
+        self.reporter.log(logger)
+        return
+
     def finalize_indexing(self):
 
         try:
@@ -921,19 +939,23 @@ class FMSFImporter(BaseImportModule):
         if dry_run is True:
             self.reporter.message = f"Dry run completed successfully with {len(self.fmsf_resources)} resources."
             self.finalize_indexing()
-        else:
-            self.write_tiles_from_load_staging()
-            if self.reporter.success is False:
-                return self.abort_load()
+            return self.reporter.serialize()
 
-            # write the cumulative reporter data to load_details in the final step
-            self.finalize_indexing()
-            if self.reporter.success is False:
-                return self.abort_load()
+        self.write_tiles_from_load_staging()
+        if self.reporter.success is False:
+            return self.abort_load()
 
-            self.reporter.message = "completed without error"
+        # RUN SPATIAL JOIN ON ALL NEW RESOURCES
+        self.run_spatial_join()
+        if self.reporter.success is False:
+            return self.abort_load()
 
-        return self.reporter.serialize()
+        # write the cumulative reporter data to load_details in the final step
+        self.finalize_indexing()
+        if self.reporter.success is False:
+            return self.abort_load()
+
+        self.reporter.message = "completed without error"
 
     def update_status_and_load_details(self, status):
         """
@@ -1008,56 +1030,9 @@ class FMSFResource():
         self.feature = feature
         return self
 
-    def management_areas_from_geom(self, geojson):
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f'''SELECT id FROM hms_managementarea
-                        WHERE ST_Intersects(ST_GeomFromGeoJSON('{geojson}'), hms_managementarea.geom);'''
-            )
-            rows = cursor.fetchall()
-        pks = [i[0] for i in rows if len(i) > 0]
-        return ManagementArea.objects.filter(pk__in=pks)
-
-    def generate_management_area_node_objs(self, management_areas, importer):
-
-        values_dict = {
-            "FPAN Region": [],
-            "County": [],
-            "Management Area": [],
-            "Management Agency": [],
-        }
-        for ma in management_areas:
-            if ma.category.name == "FPAN Region":
-                values_dict["FPAN Region"].append(ma)
-            elif ma.category.name == "County":
-                values_dict["County"].append(ma)
-            else:
-                values_dict["Management Area"].append(ma)
-                if ma.management_agency is not None:
-                    values_dict["Management Agency"].append(ma.management_agency)
-
-        node_objs = []
-        nodegroupid = None
-        for node_name, value in values_dict.items():
-            node = importer.get_node(node_name)
-            if nodegroupid is None:
-                nodegroupid = str(node.nodegroup_id)
-            node_objs.append({
-                str(node.nodeid): {
-                    "value": [str(i.pk) for i in value],
-                    "valid": True,
-                    "source": [str(i.pk) for i in value],
-                    "notes": "",
-                    "datatype": node.datatype,
-                }
-            })
-        return nodegroupid, node_objs
-
     def generate_tiles(self, importer: FMSFImporter):
 
         dict_by_nodegroup = {}
-        management_areas = []
         for node_name, fieldset in importer.field_map.items():
             node = importer.get_node(node_name)
             node_config = node.config if node.config else {}
@@ -1093,8 +1068,6 @@ class FMSFResource():
                         cursor.execute(f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));")
                         geojson = cursor.fetchone()[0]
                     source_value = geojson
-                    # also, run spatial intersection to find overlapping management areas
-                    management_areas += self.management_areas_from_geom(geojson)
                 else:
                     source_value = self.feature.get(fieldset[0]['field'])
                 value = datatype_instance.transform_value_for_tile(source_value, **node_config)
@@ -1110,10 +1083,6 @@ class FMSFResource():
                 }
             }
             dict_by_nodegroup[nodegroupid] = dict_by_nodegroup.get(nodegroupid, []) + [node_obj]
-
-        # generate tiles for the management area nodegroup
-        ma_nodegroupid, ma_node_objs = self.generate_management_area_node_objs(management_areas, importer)
-        dict_by_nodegroup[ma_nodegroupid] = ma_node_objs
 
         tiles = []
         for nid in dict_by_nodegroup:
