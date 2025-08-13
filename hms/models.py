@@ -332,7 +332,7 @@ class LandManager(models.Model):
                     value = [f"{i.name} ({i.pk})" for i in self.all_areas]
                 rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
-                    node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP['Archaeological Site']["Management Area"],
+                    node_id=settings.SPATIAL_JOIN_NODE_LOOKUP["Archaeological Site"]["area_nodeid"],
                     value=value
                 )
 
@@ -344,7 +344,7 @@ class LandManager(models.Model):
 
                 rule = Rule("attribute_filter",
                     graph_name="Archaeological Site",
-                    node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP['Archaeological Site']["Management Agency"],
+                    node_id=settings.SPATIAL_JOIN_NODE_LOOKUP["Archaeological Site"]["agency_nodeid"],
                     value=value
                 )
             elif self.site_access_mode == "NONE":

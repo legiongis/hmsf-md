@@ -18,7 +18,7 @@ class SpatialJoin():
 
     def __init__(self):
 
-        self.node_lookup = settings.SPATIAL_JOIN_GRAPHID_LOOKUP
+        self.node_lookup = settings.SPATIAL_JOIN_NODE_LOOKUP
         self.valid_management_area_vals = [i.concept_value_id for i in ManagementArea.objects.all()]
         self.valid_management_agency_vals = [i.concept_value_id for i in ManagementAgency.objects.all()]
 
@@ -70,21 +70,21 @@ class SpatialJoin():
 
         g_name = resourceinstance.graph.name
         n_lookup = self.node_lookup[g_name]
-        ng = self.node_lookup[g_name]['Nodegroup']
+        ng = self.node_lookup[g_name]['nodegroupid']
         try:
             tile = Tile.objects.get(nodegroup_id=ng, resourceinstance=resourceinstance)
         except Tile.DoesNotExist:
             tile = Tile().get_blank_tile(ng, resourceid=resourceinstance.pk)
 
         # set empty lists if the node value is None or nonexistent
-        if not isinstance(tile.data.get(n_lookup['FPAN Region']), list):
-            tile.data[n_lookup['FPAN Region']] = []
-        if not isinstance(tile.data.get(n_lookup['County']), list):
-            tile.data[n_lookup['County']] = []
-        if not isinstance(tile.data.get(n_lookup['Management Area']), list):
-            tile.data[n_lookup['Management Area']] = []
-        if not isinstance(tile.data.get(n_lookup['Management Agency']), list):
-            tile.data[n_lookup['Management Agency']] = []
+        if not isinstance(tile.data.get(n_lookup['region_nodeid']), list):
+            tile.data[n_lookup['region_nodeid']] = []
+        if not isinstance(tile.data.get(n_lookup['county_nodeid']), list):
+            tile.data[n_lookup['county_nodeid']] = []
+        if not isinstance(tile.data.get(n_lookup['area_nodeid']), list):
+            tile.data[n_lookup['area_nodeid']] = []
+        if not isinstance(tile.data.get(n_lookup['agency_nodeid']), list):
+            tile.data[n_lookup['agency_nodeid']] = []
 
         val = area.concept_value_id
         add_to_main = True
@@ -93,30 +93,30 @@ class SpatialJoin():
             # add to region node in this case
             if area.category.name == "FPAN Region":
                 add_to_main = False
-                tile.data[n_lookup['FPAN Region']].append(val)
+                tile.data[n_lookup['region_nodeid']].append(val)
             # add to county node in this case
             elif area.category.name == "County":
                 add_to_main = False
-                tile.data[n_lookup['County']].append(val)
+                tile.data[n_lookup['county_nodeid']].append(val)
         # for all other cases, add to the main Management Area node
         if add_to_main is True:
-            tile.data[n_lookup['Management Area']].append(val)
+            tile.data[n_lookup['area_nodeid']].append(val)
         # add the agency if available
         if area.management_agency is not None:
-            tile.data[n_lookup['Management Agency']].append(area.management_agency.concept_value_id)
+            tile.data[n_lookup['agency_nodeid']].append(area.management_agency.concept_value_id)
 
         # finalize with some QA/QC
-        tile.data[n_lookup['FPAN Region']] = list(set(
-            [i for i in tile.data[n_lookup['FPAN Region']] if i in self.valid_management_area_vals]
+        tile.data[n_lookup['region_nodeid']] = list(set(
+            [i for i in tile.data[n_lookup['region_nodeid']] if i in self.valid_management_area_vals]
         ))
-        tile.data[n_lookup['County']] = list(set(
-            [i for i in tile.data[n_lookup['County']] if i in self.valid_management_area_vals]
+        tile.data[n_lookup['county_nodeid']] = list(set(
+            [i for i in tile.data[n_lookup['county_nodeid']] if i in self.valid_management_area_vals]
         ))
-        tile.data[n_lookup['Management Area']] = list(set(
-            [i for i in tile.data[n_lookup['Management Area']] if i in self.valid_management_area_vals]
+        tile.data[n_lookup['area_nodeid']] = list(set(
+            [i for i in tile.data[n_lookup['area_nodeid']] if i in self.valid_management_area_vals]
         ))
-        tile.data[n_lookup['Management Agency']] = list(set(
-            [i for i in tile.data[n_lookup['Management Agency']] if i in self.valid_management_agency_vals]
+        tile.data[n_lookup['agency_nodeid']] = list(set(
+            [i for i in tile.data[n_lookup['agency_nodeid']] if i in self.valid_management_agency_vals]
         ))
 
         tile.save(index=index_tile)

@@ -54,15 +54,16 @@ class Command(BaseCommand):
         elif options["backfill"]:
             # find all empty FPAN Region nodes and use only these resources
             resids = []
-            for k, v in settings.SPATIAL_JOIN_GRAPHID_LOOKUP.items():
+            for k, v in settings.SPATIAL_JOIN_NODE_LOOKUP.items():
                 print(k)
-                all_tiles = Tile.objects.filter(nodegroup_id=v['Nodegroup'])
+                all_tiles = Tile.objects.filter(nodegroup_id=v['nodegroupid'])
                 res_with_nodegroup = all_tiles.values_list("resourceinstance_id", flat=True)
                 res_without_nodegroup = ResourceInstance.objects.filter(graph__name=k).exclude(pk__in=res_with_nodegroup)
                 resids_missing_region = list(res_without_nodegroup.values_list("pk", flat=True))
                 for tile in all_tiles:
                     if tile.data:
-                        region_val = tile.data.get(v["FPAN Region"])
+                        ## use the FPAN Region as a way to test whether this has been filled.
+                        region_val = tile.data.get(v["region_nodeid"])
                         if region_val in (None, ""):
                             resids_missing_region.append(tile.resourceinstance.pk)
                 print(f"resources to join: {len(resids_missing_region)}")
@@ -70,6 +71,8 @@ class Command(BaseCommand):
                 resids += resids_missing_region
             resources = ResourceInstance.objects.filter(pk__in=resids)
             print(f"\ntotal resources: {resources.count()}")
+            if resources.count() == 0:
+                exit()
             if not options["noinput"]:
                 if input("continue? Y/n ").lower().startswith("n"):
                     exit()

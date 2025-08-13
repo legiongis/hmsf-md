@@ -137,28 +137,28 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID = "4d11bac0-d535-11e7-a1b3-94659cf754d0"
 
-## Full config with node ids used in spatial join
-SPATIAL_JOIN_GRAPHID_LOOKUP = {
+## Full config with node ids used in spatial join.
+SPATIAL_JOIN_NODE_LOOKUP = {
     "Archaeological Site": {
-        "Nodegroup": "4259ff42-715c-11ee-9e57-4df2569ff543",
-        "County": "64f9a4da-715c-11ee-9e57-4df2569ff543",
-        "FPAN Region": "4d1dc620-715c-11ee-9e57-4df2569ff543",
-        "Management Area": "877fefaa-715c-11ee-9e57-4df2569ff543",
-        "Management Agency": "58908172-715d-11ee-9e57-4df2569ff543",
+        "nodegroupid": "4259ff42-715c-11ee-9e57-4df2569ff543",
+        "county_nodeid": "64f9a4da-715c-11ee-9e57-4df2569ff543",
+        "region_nodeid": "4d1dc620-715c-11ee-9e57-4df2569ff543",
+        "area_nodeid": "877fefaa-715c-11ee-9e57-4df2569ff543",
+        "agency_nodeid": "58908172-715d-11ee-9e57-4df2569ff543",
     },
     "Historic Cemetery": {
-        "Nodegroup": "48821219-715e-11ee-9e57-4df2569ff543",
-        "County": "4882121d-715e-11ee-9e57-4df2569ff543",
-        "FPAN Region": "4882121c-715e-11ee-9e57-4df2569ff543",
-        "Management Area": "4882121e-715e-11ee-9e57-4df2569ff543",
-        "Management Agency": "4882121b-715e-11ee-9e57-4df2569ff543",
+        "nodegroupid": "48821219-715e-11ee-9e57-4df2569ff543",
+        "county_nodeid": "4882121d-715e-11ee-9e57-4df2569ff543",
+        "region_nodeid": "4882121c-715e-11ee-9e57-4df2569ff543",
+        "area_nodeid": "4882121e-715e-11ee-9e57-4df2569ff543",
+        "agency_nodeid": "4882121b-715e-11ee-9e57-4df2569ff543",
     },
     "Historic Structure": {
-        "Nodegroup": "ad51e45d-715e-11ee-9e57-4df2569ff543",
-        "County": "ad51e461-715e-11ee-9e57-4df2569ff543",
-        "FPAN Region": "ad51e460-715e-11ee-9e57-4df2569ff543",
-        "Management Area": "ad51e45f-715e-11ee-9e57-4df2569ff543",
-        "Management Agency": "ad51e462-715e-11ee-9e57-4df2569ff543",
+        "nodegroupid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+        "county_nodeid": "ad51e461-715e-11ee-9e57-4df2569ff543",
+        "region_nodeid": "ad51e460-715e-11ee-9e57-4df2569ff543",
+        "area_nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
+        "agency_nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
     },
 }
 
