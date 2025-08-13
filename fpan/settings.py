@@ -135,6 +135,8 @@ LOG_LEVEL = 'INFO'
 ## make sure this stays False
 SESSION_SAVE_EVERY_REQUEST = False
 
+ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID = "4d11bac0-d535-11e7-a1b3-94659cf754d0"
+
 ## Full config with node ids used in spatial join
 SPATIAL_JOIN_GRAPHID_LOOKUP = {
     "Archaeological Site": {
@@ -143,7 +145,6 @@ SPATIAL_JOIN_GRAPHID_LOOKUP = {
         "FPAN Region": "4d1dc620-715c-11ee-9e57-4df2569ff543",
         "Management Area": "877fefaa-715c-11ee-9e57-4df2569ff543",
         "Management Agency": "58908172-715d-11ee-9e57-4df2569ff543",
-        "Assigned To": "4d11bac0-d535-11e7-a1b3-94659cf754d0",
     },
     "Historic Cemetery": {
         "Nodegroup": "48821219-715e-11ee-9e57-4df2569ff543",
