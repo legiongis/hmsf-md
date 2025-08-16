@@ -23,6 +23,8 @@ from fpan.views.resource import (
 )
 from hms.views import server_error
 
+from fpan.views.api import EXPERIMENT_get_task_result, EXPERIMENT_run_task
+
 handler500 = server_error
 favicon_view = RedirectView.as_view(url=f'{settings.STATIC_URL}img/favicon/favicon.ico', permanent=True)
 
@@ -64,6 +66,14 @@ urlpatterns = [
     url(r"^search/export_results$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.export_results), name="export_results"),
     url(r"^search/get_export_file$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_export_file), name="get_export_file"),
     url(r"^search/get_dsl$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_dsl_from_search_string), name="get_dsl"),
+
+    # EXPERIMENTS BY IAN -------------------------------
+
+    path('experiments/run-task/<str:text>', view=EXPERIMENT_run_task),
+    path('experiments/get-result/<str:taskid>', view=EXPERIMENT_get_task_result),
+
+    # --------------------------------------------------
+
 
     # now include HMS urls
     url(r'^', include('hms.urls')),

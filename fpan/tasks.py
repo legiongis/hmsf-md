@@ -38,3 +38,13 @@ def run_full_spatial_join():
     for res in ResourceInstance.objects.filter(graph__name__in=resource_graphs):
         logger.debug(f"spatial join resource: {res.pk}")
         joiner.update_resource(res)
+
+
+@shared_task
+def EXPERIMENT_make_hello_world_file(text):
+    from pathlib import Path
+    from time import sleep
+    # sleep(3)
+    filepath = Path("EXPERIMENT/text.txt")
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    filepath.write_text(text)
