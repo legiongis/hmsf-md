@@ -249,6 +249,105 @@ class ResourceIdLookup(APIBase):
         return JSONResponse(response)
 
 
+################################################################################
+################################################################################
+# IAN'S ADDITIONS
+
+from arches.app.models.models import Node
+from arches.app.models.tile import Tile
+
+
+# TODO: FIX ME: i am a mutilation of a make_file_list method
+def photos_list(resourceid: str) -> list:
+    # TODO: make this not a list -- only need one
+    resources = []
+    id = resourceid
+
+    ## collect resources from arguments
+    r = Resource.objects.get(pk=id)
+    resources.append(r)
+
+    ## make list of individual resource entries
+    output = []
+    for res in resources:
+        entry = process_resource(res)
+        output.append(entry)
+
+    ## make list of names for file nodes
+    node_columns = set()
+    for res in output:
+        for node_name in res["file_data"].keys():
+            node_columns.add(node_name)
+    
+    ## iterate all resource entries and create a row (list) for each one
+    rows = []
+    for res in output:
+        row = [res["resourceid"], res["name"]]
+        for file_node in node_columns:
+            row.append(res["file_data"].get(file_node))
+        rows.append(row)
+
+    # output = [
+    #     ["resourceid", "name"] + list(node_columns)
+    # ]
+    output = []
+    for row in rows:
+        output.append(row)
+
+    PHOTO_FILENAME_INDEX = 2
+
+    output = list(map(lambda item: item[PHOTO_FILENAME_INDEX], output))[0]
+
+    print()
+    print("OUTPUT OF PHOTOS LIST")
+    print(output)
+    print()
+
+    return output
+
+
+# TODO: FIX ME: i am a mutilation of a make_file_list method
+def process_resource(resource):
+    ## get all file-list nodes for this resource's graph
+    nodes = Node.objects.filter(datatype="file-list", graph__name=resource.graph.name)
+
+    ## create lookup of node id to node name (to use later)
+    node_lookup = {str(i.pk):i.name for i in nodes}
+
+    ## stub out entry for this resource
+    output = {
+        "name": resource.displayname(),
+        "resourceid": str(resource.pk),
+        "file_data": {}
+    }
+
+    ## stub out file data dict with all possible nodes for this resource
+    stage_data = {str(i.pk): [] for i in nodes}
+
+    ## get all tiles for this resource that contain any relevant nodes
+    nodegroups = [i.nodegroup for i in nodes]
+    tiles = Tile.objects.filter(nodegroup__in=nodegroups, resourceinstance=resource)
+
+    ## iterate tiles and collect node data into
+    for tile in tiles:
+        for k, v in tile.data.items():
+            if k in node_lookup:
+                # lose a little fidelity here by collapsing multiple instances of nodes but oh well
+                if v:
+                    stage_data[k] += v
+
+    ## use staged data and node_lookup to transform UUIDs to readable strings
+    for k, v in stage_data.items():
+        if len(v) > 0:
+            output["file_data"][node_lookup[k]] = [i["name"] for i in v]
+
+    return output
+
+
+################################################################################
+# IAN'S ENDPOINTS
+
+
 from fpan.tasks import REPORT_PHOTOS_ZIP_DIR, zip_photos_for_download
 from typing import TypedDict, Literal
 
@@ -261,19 +360,12 @@ class GetDownloadResponse(TypedDict):
     message: str
 
 
-def EXPERIMENT_run_task(request: HttpRequest):
+def request_report_photos(request: HttpRequest, resourceid: str) -> JSONResponse | HttpResponseBadRequest:
     if request.method != 'GET':
         return HttpResponseBadRequest(b'na')
 
-    photos = (
-        "2-stones.webp",
-        "arch.jpeg",
-        # "bird-poop-large.jpg",
-        # "bird-poop-small.jpeg",
-        # "birds-on-roof.jpg",
-        # "easter-island.jpg",
-        # "stone-henge.jpg",
-    )
+    # TODO: error handling
+    photos = photos_list(resourceid)
 
     task = zip_photos_for_download.delay(*photos)
     state: CeleryTaskState = task.state
@@ -305,7 +397,9 @@ class DownloadPhotosStatusResponse(TypedDict):
     message: str
 
 
-def EXPERIMENT_get_task_result(request: HttpRequest, taskid: str):
+def get_report_photos(
+    request: HttpRequest, taskid: str
+) -> FileResponse | JSONResponse | HttpResponseBadRequest:
     if request.method != 'GET':
         return HttpResponseBadRequest(b'na')
 
@@ -336,4 +430,8 @@ def EXPERIMENT_get_task_result(request: HttpRequest, taskid: str):
             return FileResponse(
                 filepath.open("rb"), as_attachment=True, filename=filepath.name
             )
+
+    return HttpResponseBadRequest(
+        b"If you see me, we have an unexpected task state."
+    )
  

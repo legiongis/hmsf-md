@@ -23,7 +23,7 @@ from fpan.views.resource import (
 )
 from hms.views import server_error
 
-from fpan.views.api import EXPERIMENT_get_task_result, EXPERIMENT_run_task
+from fpan.views.api import get_report_photos, request_report_photos
 
 handler500 = server_error
 favicon_view = RedirectView.as_view(url=f'{settings.STATIC_URL}img/favicon/favicon.ico', permanent=True)
@@ -69,8 +69,8 @@ urlpatterns = [
 
     # EXPERIMENTS BY IAN -------------------------------
 
-    path('experiments/run-task/', view=EXPERIMENT_run_task),
-    path('experiments/get-result/<str:taskid>', view=EXPERIMENT_get_task_result),
+    path('report/photos/req/<str:resourceid>', view=request_report_photos),
+    path('report/photos/get/<str:taskid>', view=get_report_photos),
 
     # --------------------------------------------------
 
