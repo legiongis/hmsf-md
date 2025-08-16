@@ -1,6 +1,6 @@
 import logging
 from django.core.cache import cache
-from django.http import FileResponse, Http404, HttpRequest, HttpResponse, HttpResponseBadRequest
+from django.http import Http404, HttpRequest, HttpResponse
 from django.db import connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
@@ -252,8 +252,15 @@ class ResourceIdLookup(APIBase):
 ################################################################################
 # Download Report Photos
 
-from fpan.tasks import REPORT_PHOTOS_ZIP_DIR, zip_photos_for_download
 from typing import TypedDict, Literal
+from pathlib import Path
+
+from django.contrib.auth.views import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.http import FileResponse
+
+from celery.result import AsyncResult
+from fpan.tasks import REPORT_PHOTOS_ZIP_DIR, zip_photos_for_download
 
 CeleryTaskState = Literal["PENDING", "STARTED", "RETRY", "FAILURE", "SUCCESS"]
 
@@ -264,71 +271,71 @@ class RequestReportPhotosResponse(TypedDict):
     message: str
 
 
-# TODO: permissions?
-def request_report_photos(request: HttpRequest, resourceid: str) -> JSONResponse | HttpResponseBadRequest:
-    if request.method != 'GET':
-        return HttpResponseBadRequest(b'na')
-
-    task = zip_photos_for_download.delay(resourceid)
-    state: CeleryTaskState = task.state
-
-    # TODO: error handling -- how can this fail?
-    if state == "FAILURE":
-        return JSONResponse(
-            RequestReportPhotosResponse(
-                taskid="",
-                task_state=state,
-                message="Failed to start the task. Please try again."
-            )
-        )
-
-    return JSONResponse(
-        RequestReportPhotosResponse(
-            taskid=task.id, task_state=state, message="Started task."
-        )
-    )
-
-
-from pathlib import Path
-from celery.result import AsyncResult
-
-
 class GetReportPhotosResponse(TypedDict):
     taskid: str
-    task_state: CeleryTaskState 
+    task_state: CeleryTaskState
     message: str
 
 
-def get_report_photos(
-    request: HttpRequest, taskid: str
-) -> FileResponse | JSONResponse | HttpResponseBadRequest:
-    if request.method != 'GET':
-        return HttpResponseBadRequest(b'na')
+# TODO: permissions? CSRF?
+# TODO: error handling: make sure rabbitmq server is alive! -- it's currently queueing requests regardless of whether server is available (once server runs, tasks complete)
+@method_decorator(csrf_exempt, name='dispatch')  # TEMP
+class GetReportPhotosAPI(APIBase):
+    def post(self, request: HttpRequest):
+        """
+        Start the background task of zipping the photos associated with a given report [resource] id.
+        """
+        resourceid = request.POST.get('resourceid')
+        task = zip_photos_for_download.delay(resourceid)
+        state: CeleryTaskState = task.state
 
-    task = AsyncResult(taskid)
-    state: CeleryTaskState = task.state
+        # TODO: error handling -- how can this fail?
+        if state == "FAILURE":
+            return JSONResponse(
+                RequestReportPhotosResponse(
+                    taskid="",
+                    task_state=state,
+                    message="Failed to start the task. Please try again."
+                )
+            )
 
-    status_response = JSONResponse(
-        GetReportPhotosResponse(
-            taksid=taskid, task_state=task.state, message=""
+        return JSONResponse(
+            RequestReportPhotosResponse(
+                taskid=task.id, task_state=state, message="Started task."
+            )
         )
-    )
-    match state:  # exhaustive, except for SUCCESS
-        case "PENDING":
-            status_response["message"] = "Task is queued."
-            return status_response
-        case "STARTED":
-            status_response["message"] = "Started."
-            return status_response
-        case "RETRY":
-            status_response["message"] = "Retrying."
-            return status_response
-        case "FAILURE":
-            status_response["message"] = "Task failed. Please try again."
-            return status_response
 
-    # task state is success
-    filepath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/photos.zip")
-    return FileResponse(
-        filepath.open("rb"), as_attachment=True, filename=filepath.name
-    )
+
+    def get(self, request: HttpRequest):
+        """
+        Return the zip file created by `self.post()`.
+        """
+        taskid = request.GET.get("tid")
+        task = AsyncResult(taskid)
+        state: CeleryTaskState = task.state
+
+        status_response = JSONResponse(
+            GetReportPhotosResponse(
+                taksid=taskid, task_state=task.state, message=""
+            )
+        )
+        match state:  # exhaustive, except for SUCCESS
+            case "PENDING":
+                status_response["message"] = "Task is queued."
+                return status_response
+            case "STARTED":
+                status_response["message"] = "Started."
+                return status_response
+            case "RETRY":
+                status_response["message"] = "Retrying."
+                return status_response
+            case "FAILURE":
+                status_response["message"] = "Task failed. Please try again."
+                return status_response
+
+        # task state is success
+        filepath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/photos.zip")
+        return FileResponse(
+            filepath.open("rb"), as_attachment=True, filename=filepath.name
+        )
+
