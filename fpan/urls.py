@@ -67,13 +67,9 @@ urlpatterns = [
     url(r"^search/get_export_file$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_export_file), name="get_export_file"),
     url(r"^search/get_dsl$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_dsl_from_search_string), name="get_dsl"),
 
-    # EXPERIMENTS BY IAN -------------------------------
-
+    # download report photos
     path('report/photos/req/<str:resourceid>', view=request_report_photos),
     path('report/photos/get/<str:taskid>', view=get_report_photos),
-
-    # --------------------------------------------------
-
 
     # now include HMS urls
     url(r'^', include('hms.urls')),
