@@ -69,7 +69,7 @@ urlpatterns = [
 
     # EXPERIMENTS BY IAN -------------------------------
 
-    path('experiments/run-task/<str:text>', view=EXPERIMENT_run_task),
+    path('experiments/run-task/', view=EXPERIMENT_run_task),
     path('experiments/get-result/<str:taskid>', view=EXPERIMENT_get_task_result),
 
     # --------------------------------------------------

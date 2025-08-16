@@ -40,11 +40,26 @@ def run_full_spatial_join():
         joiner.update_resource(res)
 
 
+REPORT_PHOTOS_SOURCE_DIR = "fpan/uploadedfiles"
+REPORT_PHOTOS_ZIP_DIR = "EXPERIMENT"
+
+
 @shared_task
-def EXPERIMENT_make_hello_world_file(text):
+def zip_photos_for_download(*filenames):
     from pathlib import Path
-    from time import sleep
-    # sleep(3)
-    filepath = Path("EXPERIMENT/text.txt")
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    filepath.write_text(text)
+    from zipfile import ZipFile
+
+    zippath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/photos.zip")
+    zippath.parent.mkdir(parents=True, exist_ok=True)  # add parent dirs of DEST_DIR if needed (like bash mkdir)
+
+    with ZipFile(zippath, "w") as zip_file:
+        for filename in filenames:
+
+            # TODO: error handling - how could this fail?
+            # - file does not exist somehow
+
+            # TODO: remove extraneous dir structure from zip contents
+            
+            photo_path = Path(f"{REPORT_PHOTOS_SOURCE_DIR}/{filename}")
+            zip_file.write(photo_path)
+    
