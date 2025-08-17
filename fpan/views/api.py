@@ -265,13 +265,7 @@ from fpan.tasks import REPORT_PHOTOS_ZIP_DIR, zip_photos_for_download
 CeleryTaskState = Literal["PENDING", "STARTED", "RETRY", "FAILURE", "SUCCESS"]
 
 
-class RequestReportPhotosResponse(TypedDict):
-    taskid: str
-    task_state: CeleryTaskState
-    message: str
-
-
-class GetReportPhotosResponse(TypedDict):
+class ReportPhotosAPIResponse(TypedDict):
     taskid: str
     task_state: CeleryTaskState
     message: str
@@ -280,7 +274,7 @@ class GetReportPhotosResponse(TypedDict):
 # TODO: permissions? CSRF?
 # TODO: error handling: make sure rabbitmq server is alive! -- it's currently queueing requests regardless of whether server is available (once server runs, tasks complete)
 @method_decorator(csrf_exempt, name='dispatch')  # TEMP
-class GetReportPhotosAPI(APIBase):
+class ReportPhotosAPI(APIBase):
     def post(self, request: HttpRequest):
         """
         Start the background task of zipping the photos associated with a given report [resource] id.
@@ -292,15 +286,15 @@ class GetReportPhotosAPI(APIBase):
         # TODO: error handling -- how can this fail?
         if state == "FAILURE":
             return JSONResponse(
-                RequestReportPhotosResponse(
-                    taskid="",
+                ReportPhotosAPIResponse(
+                    taskid=task.id,
                     task_state=state,
                     message="Failed to start the task. Please try again."
                 )
             )
 
         return JSONResponse(
-            RequestReportPhotosResponse(
+            ReportPhotosAPIResponse(
                 taskid=task.id, task_state=state, message="Started task."
             )
         )
@@ -312,26 +306,25 @@ class GetReportPhotosAPI(APIBase):
         """
         taskid = request.GET.get("tid")
         task = AsyncResult(taskid)
-        state: CeleryTaskState = task.state
 
-        status_response = JSONResponse(
-            GetReportPhotosResponse(
-                taksid=taskid, task_state=task.state, message=""
-            )
+        status_response = ReportPhotosAPIResponse(
+            taksid=taskid, task_state=task.state, message=""
         )
+
+        state: CeleryTaskState = task.state
         match state:  # exhaustive, except for SUCCESS
             case "PENDING":
                 status_response["message"] = "Task is queued."
-                return status_response
+                return JSONResponse(status_response)
             case "STARTED":
                 status_response["message"] = "Started."
-                return status_response
+                return JSONResponse(status_response)
             case "RETRY":
                 status_response["message"] = "Retrying."
-                return status_response
+                return JSONResponse(status_response)
             case "FAILURE":
                 status_response["message"] = "Task failed. Please try again."
-                return status_response
+                return JSONResponse(status_response)
 
         # task state is success
         filepath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/photos.zip")
