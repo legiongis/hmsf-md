@@ -283,32 +283,30 @@ class ReportPhotosAPI(APIBase):
         task = zip_photos_for_download.delay(resourceid)
         state: CeleryTaskState = task.state
 
-        # TODO: error handling -- how can this fail?
-        if state == "FAILURE":
-            return JSONResponse(
-                ReportPhotosAPIResponse(
-                    taskid=task.id,
-                    task_state=state,
-                    message="Failed to start the task. Please try again."
-                )
-            )
-
-        return JSONResponse(
-            ReportPhotosAPIResponse(
-                taskid=task.id, task_state=state, message="Started task."
-            )
+        response = ReportPhotosAPIResponse(
+            taskid=task.id,
+            task_state=state,
+            message="Started task.",
         )
+
+        # TODO: error handling -- how can this fail?
+        # TODO: will this accurately reflect a failure? if the rabbitmq server isn't running, state is PENDING
+        if state == "FAILURE":
+            response["message"] = "Failed to start the task. Please try again."
+            return JSONResponse(response)
+
+        return JSONResponse(response)
 
 
     def get(self, request: HttpRequest):
         """
         Return the zip file created by `self.post()`.
         """
-        taskid = request.GET.get("tid")
+        taskid: str = request.GET.get("tid")
         task = AsyncResult(taskid)
 
         status_response = ReportPhotosAPIResponse(
-            taksid=taskid, task_state=task.state, message=""
+            taskid=taskid, task_state=task.state, message=""
         )
 
         state: CeleryTaskState = task.state
