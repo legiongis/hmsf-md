@@ -302,7 +302,7 @@ class ReportPhotosAPI(APIBase):
         """
         Return the zip file created by `self.post()`.
         """
-        taskid: str = request.GET.get("tid")
+        taskid = str(request.GET.get("tid"))
         task = AsyncResult(taskid)
 
         status_response = ReportPhotosAPIResponse(
@@ -325,7 +325,8 @@ class ReportPhotosAPI(APIBase):
                 return JSONResponse(status_response)
 
         # task state is success
-        filepath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/photos.zip")
+        reportid = str(task.get())
+        filepath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/{reportid}")
         return FileResponse(
             filepath.open("rb"), as_attachment=True, filename=filepath.name
         )

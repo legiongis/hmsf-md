@@ -45,31 +45,49 @@ def run_full_spatial_join():
 ################################################################################
 # Download Report Photos
 
-# TODO: move these constants to fpan settings
+# TODO: move constants to fpan settings
 # TODO: where will we store zip downloads?
-# TODO: are we always looking in S3 for uploads? assume yes
+# TODO: are we always looking in S3 for uploads? assume yes -- but how often is the S3 dump happening?
 # TODO: swap local source dir for S3 bucket && update file zipping logic
+# TODO: clean up the cache periodically
+# TODO: logging
+
+from pathlib import Path
+from zipfile import ZipFile
+from celery.utils.log import get_task_logger
+
+logger = get_task_logger(__name__)
+
 REPORT_PHOTOS_SOURCE_DIR = "fpan/uploadedfiles"
 REPORT_PHOTOS_ZIP_DIR = "fpan/report_photo_downloads"
 
-
 @shared_task
-def zip_photos_for_download(resourceid):
-    from pathlib import Path
-    from zipfile import ZipFile
+def zip_photos_for_download(reportid) -> str:
+    """
+    Gather photos related to `reportid`, zip them, and return the filename of
+    the zip file.
+    """
+    zip_filename = f"{reportid}.zip"
+    zippath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/{zip_filename}")
 
-    photos = photos_list(resourceid)
 
-    zippath = Path(f"{REPORT_PHOTOS_ZIP_DIR}/photos.zip")
-    zippath.parent.mkdir(parents=True, exist_ok=True)  # add parent dirs of DEST_DIR if needed (like bash mkdir)
+    # TODO: will caching cause issues? is it worth the trade off to not cache?
+    if zippath.exists():
+        return zip_filename
+
+    # add parent dirs of dest dir if needed (like bash mkdir)
+    zippath.parent.mkdir(parents=True, exist_ok=True)
+
+    photo_filenames = photos_list(reportid)
 
     with ZipFile(zippath, "w") as zip_file:
-        for filename in photos:
+        for filename in photo_filenames:
             # TODO: error handling - how could this fail?
             # - file does not exist somehow
-            # TODO: remove extraneous dir structure from zip contents
             photo_path = Path(f"{REPORT_PHOTOS_SOURCE_DIR}/{filename}")
-            zip_file.write(photo_path)
+            zip_file.write(photo_path, arcname=filename)
+
+    return zip_filename
 
 
 ################################################################################
@@ -84,7 +102,7 @@ from arches.app.models.tile import Tile
 #     - does this return only photo filenames?
 #     - does this gather MORE than the given report's associated filenames?
 #         or does it recurse thru all related notes, gathering associate filenames?
-def photos_list(resourceid: str) -> list:
+def photos_list(resourceid: str) -> list[str]:
     # TODO: make this not a list -- only need one
     resources = []
     id = resourceid
