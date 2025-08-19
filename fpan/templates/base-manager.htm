@@ -3,6 +3,19 @@
 {% load template_tags %}
 {% load i18n %}
 
+{# Insert requirejs config path entry (provided by templates/javscript.htm) #}
+{% block paths %}
+
+{#
+WHY DOESN'T THIS WORK?
+- arches>template/javascript.htm provides [ block path ] seemingly to be filled in by a descendant
+- arches>template/base.htm INCLUDES javscript.htm
+- fpan>base-manager.htm (this file) EXTENDS base.htm
+#}
+
+'jszip': '{{ STATIC_URL }}packages/jszip/dist/jszip.min',
+
+{% endblock paths %}
 
 {% block body %}
 

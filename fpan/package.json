@@ -5,6 +5,7 @@
         "type": "git"
     },
     "dependencies": {
-        "arches": "git+https://github.com/legiongis/arches.git#dev/6.2.x-hms-cli"
+        "arches": "git+https://github.com/legiongis/arches.git#dev/6.2.x-hms-cli",
+        "jszip": "^3.10.1"
     }
 }

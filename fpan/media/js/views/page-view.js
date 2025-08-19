@@ -9,10 +9,11 @@ define([
     'views/provisional-history-list',
     'views/notifications-list',
     'view-data',
+    'jszip',
     'bindings/scrollTo',
     'bootstrap',
-    'bindings/slide'
-], function($, _, Backbone, ko, moment, arches,  AlertViewModel, ProvisionalHistoryList, NotificationsList, viewData) {
+    'bindings/slide',
+], function($, _, Backbone, ko, moment, arches, AlertViewModel, ProvisionalHistoryList, NotificationsList, viewData, JSZip) {
     /**
     * A backbone view representing a basic page in arches.  It sets up the
     * viewModel defaults, optionally accepts additional view model data and
@@ -114,10 +115,29 @@ define([
                 },
                 downloadPhotos: function() {
                     // TODO: try the dumb way 1st -- all browser-native -- no ko 
-                    var photos = document.querySelectorAll("[class='img-responsive'],[data-bind='attr: {src: url, alt: name']");
-                    var fakeLink = document.createElement('a');
-                    fakeLink.href = photos[0].src;
-                    fakeLink.click();
+                    var photoImgs = document.querySelectorAll("[class='img-responsive'],[data-bind='attr: {src: url, alt: name']");
+
+                    var zip = new JSZip();
+
+                    var imgSrcFetches = Array.from(photoImgs).map(img => {
+                        return fetch(img.src)
+                            .then(file => file.blob())
+                            .then(blob => {
+                                var filename = img.alt
+                                zip.file(filename, blob)
+                            });
+                    });
+                    Promise.all(imgSrcFetches)
+                        .then(() => {
+                            return zip.generateAsync({ type: "blob" });
+                        })
+                        .then(zipData => {
+                            var link = document.createElement('a');
+                            link.href = URL.createObjectURL(zipData);
+                            link.download = "report-photos.zip";
+                            link.click();
+                            link.remove();
+                        });
                 },
             });
             self.viewModel.notifsList.items.subscribe(function(list) {
