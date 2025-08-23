@@ -12,6 +12,7 @@ fpan/management-area-uploads
 fpan/media/packages
 fpan/tileserver
 fpan/uploadedfiles
+fpan/report_photo_downloads
 fpan/settings_local.py
 private_logs/
 fpan/static/
