@@ -21,8 +21,8 @@ RUN apt-get update
 RUN apt-get install -y postgresql-client-14
 
 
-# Highest version compatible with legiongis/arches#dev/6.2.x-hms-cli
-FROM python:3.10
+# Highest python version compatible with legiongis/arches#dev/6.2.x-hms-cli
+FROM python:3.10-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
