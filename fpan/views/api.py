@@ -1,6 +1,6 @@
 import logging
 from django.core.cache import cache
-from django.http import Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
 from django.db import connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
@@ -247,3 +247,163 @@ class ResourceIdLookup(APIBase):
                 response['resources'].append((g.name, siteid, res.resourceinstanceid))
 
         return JSONResponse(response)
+
+
+from pathlib import Path
+
+# NOTE: neither Django nor Arches' `MEDIA_ROOT`s point to "fpan/fpan"
+from fpan.settings import MEDIA_ROOT
+
+REPORT_PHOTOS_ZIP_DIR = Path(MEDIA_ROOT + "/report_photo_downloads")
+REPORT_PHOTOS_SOURCE_DIR = Path(MEDIA_ROOT + "/uploadedfiles")
+
+
+class DownloadScoutReportPhotos(APIBase):
+
+    def get(self, request):
+        if not (reportid := request.GET.get("rid", None)):
+            return HttpResponseNotFound(b"Expected url param `rid`.")
+
+        logger.info("Zipped photos were requested for scout report: " + reportid)
+
+        try:
+            zipfile_path = Path(zip_photos_for_download(reportid))
+            return FileResponse((REPORT_PHOTOS_ZIP_DIR / zipfile_path).open("rb"))
+        except OSError as e:
+            msg = "Coudn't create the zip file: " + str(e)
+        except Exception as e:
+            msg = "An unexpected error occured when trying to create the zip file: " + str(e)
+
+        logger.warning(msg)
+        return HttpResponseServerError(msg)
+
+
+################################################################################
+# HELPERS FOR DOWNLOAD REPORT PHOTOS
+
+# TODO: where will we store zip downloads?
+# TODO: swap local source dir for S3 bucket && update file zipping logic
+# TODO: validate that returned objects are images
+
+
+def zip_photos_for_download(reportid) -> Path:
+    """
+    Gathers photos related to `reportid`, zip them, and return a `Path` object
+    representing the zip file.
+
+    Raises an `OSError` via `ZipFile.write()` if there's an issue writing the file.
+    """
+    from zipfile import ZipFile
+
+    zipfile_path = REPORT_PHOTOS_ZIP_DIR / f"report-photos-{reportid}.zip"
+
+    # add parent dirs of dest dir if needed (like bash mkdir)
+    zipfile_path.parent.mkdir(parents=True, exist_ok=True)
+
+    photo_filenames = photos_list(reportid)
+
+    with ZipFile(zipfile_path, "w") as zip_file:
+        for filename in photo_filenames:
+            photo_path = Path(REPORT_PHOTOS_SOURCE_DIR / filename)
+            zip_file.write(photo_path, arcname=filename)
+
+    return zipfile_path
+
+
+################################################################################
+# HELPERS FOR zip_photos_for_download
+
+
+# TODO: FIX ME: i am a hastily hacked version of a method from make_file_list method
+# TODO: TEST ME
+#     - does this return only photo filenames?
+#     - does this gather MORE than the given report's associated filenames?
+#         or does it recurse thru all related nodes, gathering associated filenames?
+def photos_list(resourceid: str) -> list[str]:
+    # TODO: make this not a list -- only need one
+    resources = []
+    id = resourceid
+
+    ## collect resources from arguments
+    r = Resource.objects.get(pk=id)
+    resources.append(r)
+
+    ## make list of individual resource entries
+    output = []
+    for res in resources:
+        entry = processed_resource(res)
+        output.append(entry)
+
+    ## make list of names for file nodes
+    node_columns = set()
+    for res in output:
+        for node_name in res["file_data"].keys():
+            node_columns.add(node_name)
+
+    ## iterate all resource entries and create a row (list) for each one
+    rows = []
+    for res in output:
+        row = [res["resourceid"], res["name"]]
+        for file_node in node_columns:
+            row.append(res["file_data"].get(file_node))
+        rows.append(row)
+
+    # output = [
+    #     ["resourceid", "name"] + list(node_columns)
+    # ]
+    output = []
+    for row in rows:
+        output.append(row)
+
+    PHOTO_FILENAME_INDEX = 2
+
+    output = list(map(lambda item: item[PHOTO_FILENAME_INDEX], output))[0]
+
+    print()
+    print("OUTPUT OF PHOTOS LIST")
+    print(output)
+    print()
+
+    return output
+
+
+# TODO: FIX ME: i am a hastily hacked version of a method from make_file_list method
+# TODO: TEST ME
+def processed_resource(resource):
+    from arches.app.models.models import Node
+    from arches.app.models.tile import Tile
+
+    ## get all file-list nodes for this resource's graph
+    nodes = Node.objects.filter(datatype="file-list", graph__name=resource.graph.name)
+
+    ## create lookup of node id to node name (to use later)
+    node_lookup = {str(i.pk):i.name for i in nodes}
+
+    ## stub out entry for this resource
+    output = {
+        "name": resource.displayname(),
+        "resourceid": str(resource.pk),
+        "file_data": {}
+    }
+
+    ## stub out file data dict with all possible nodes for this resource
+    stage_data = {str(i.pk): [] for i in nodes}
+
+    ## get all tiles for this resource that contain any relevant nodes
+    nodegroups = [i.nodegroup for i in nodes]
+    tiles = Tile.objects.filter(nodegroup__in=nodegroups, resourceinstance=resource)
+
+    ## iterate tiles and collect node data into
+    for tile in tiles:
+        for k, v in tile.data.items():
+            if k in node_lookup:
+                # lose a little fidelity here by collapsing multiple instances of nodes but oh well
+                if v:
+                    stage_data[k] += v
+
+    ## use staged data and node_lookup to transform UUIDs to readable strings
+    for k, v in stage_data.items():
+        if len(v) > 0:
+            output["file_data"][node_lookup[k]] = [i["name"] for i in v]
+
+    return output

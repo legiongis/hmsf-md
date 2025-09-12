@@ -9,7 +9,7 @@ from django.conf import settings
 
 from arches.app.views import search
 
-from fpan.views.api import MVT, ResourceIdLookup
+from fpan.views.api import MVT, DownloadScoutReportPhotos, ResourceIdLookup
 from fpan.views.user import FPANUserManagerView
 from fpan.views.resource import (
     FPANResourceListView,
@@ -64,6 +64,9 @@ urlpatterns = [
     url(r"^search/export_results$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.export_results), name="export_results"),
     url(r"^search/get_export_file$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_export_file), name="get_export_file"),
     url(r"^search/get_dsl$", user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_dsl_from_search_string), name="get_dsl"),
+
+    # download report photos
+    path('report/photos/', view=DownloadScoutReportPhotos.as_view()),  # param = resourceid (post) or taskid (get)
 
     # now include HMS urls
     url(r'^', include('hms.urls')),
