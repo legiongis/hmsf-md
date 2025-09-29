@@ -220,16 +220,20 @@ class ManagementAreaImporter(BaseImportModule):
         ds = DataSource(self.file_path)
         lyr = ds[0]
         name_field = [i for i in lyr.fields if i.lower() == "name"][0]
-
+        logger.debug("name field: " + name_field)
         try:
             with transaction.atomic():
                 for feature in lyr:
+                    logger.debug(feature)
                     geom = GEOSGeometry(feature.geom.wkt)
                     if geom.geom_type == "Polygon":
                         geom = MultiPolygon([geom])
                     with connection.cursor() as cursor:
                         cursor.execute(f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));")
                         wkt = cursor.fetchone()[0]
+                    logger.debug("geom handled")
+                    name = feature.get(name_field)
+                    logger.debug("name: " + name)
                     ma = ManagementArea.objects.create(
                         geom=wkt,
                         name=feature.get(name_field),
@@ -238,6 +242,7 @@ class ManagementAreaImporter(BaseImportModule):
                         management_level=self.level,
                         load_id=self.loadid,
                     )
+                    logger.debug("obj created")
                     if self.group:
                         self.group.areas.add(ma)
                     ma.save()
@@ -338,6 +343,7 @@ class ManagementAreaImporter(BaseImportModule):
 
     def run_sequence(self, loadid=None, file_dir=None, ma_group=None, ma_category=None, ma_agency=None, ma_level=None, description=""):
 
+        logger.debug("begin run_sequence...")
         # the loadid may or may not be created already, but now it must be
         # and added to this instance for use in all the subsequent operations.
         if loadid is None:
@@ -372,19 +378,23 @@ class ManagementAreaImporter(BaseImportModule):
         )
 
         # START THE PROCESS
+        logger.debug("initialize load event...")
         self.initialize_load_event(load_description=description)
 
         # RUN FILE VALIDATION
+        logger.debug("validate files...")
         self.validate_files(file_dir)
         if self.reporter.success is False:
             return self.abort_load()
 
         # READ FEATURES FROM THE INPUT SHAPEFILE
+        logger.debug("read input shapefile...")
         self.read_features_from_shapefile()
         if self.reporter.success is False:
             return self.abort_load()
 
         # APPLY THE SPATIAL JOIN WITH ALL INTERSECTING FEATURES
+        logger.debug("apply spatial join...")
         self.apply_spatial_join()
         if self.reporter.success is False:
             return self.abort_load()
