@@ -2,7 +2,6 @@ import csv
 import logging
 from datetime import datetime
 
-from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
@@ -14,7 +13,6 @@ from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.views.generic import View
 
@@ -87,8 +85,8 @@ class LoginView(View):
             try:
                 user = request.user
             except Exception as e:
-                logger.warn(e)
-                return redirect(f"/")
+                logger.warning(e)
+                return redirect("/")
 
             if user_is_scout(user):
                 login_type = "scout"
