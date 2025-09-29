@@ -65,7 +65,7 @@ field_maps = {
             {"field": "D_NRLISTED", "source": "shp"},
         ],
         "Ownership": [
-            {"field": "Ownership", "source": "csv"},
+            {"field": "OwnType", "source": "csv"},
         ],
         "Plot Type": [
             {"field": "PLOTTYPE", "source": "shp"},
