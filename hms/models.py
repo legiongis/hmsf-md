@@ -13,7 +13,7 @@ from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.gis.geos import MultiPolygon
-from django.utils.safestring import mark_safe
+from django.utils.safestring import mark_safe, SafeText
 
 from arches.app.models.resource import Resource
 from arches.app.models.models import (
@@ -26,7 +26,7 @@ from fpan.search.components.rule_filter import RuleFilter, Rule
 
 logger = logging.getLogger("fpan")
 
-def format_json_display(data):
+def format_json_display(data) -> SafeText:
     """very nice from here:
     https://www.laurencegellert.com/2018/09/django-tricks-for-processing-and-storing-json/"""
 
@@ -224,7 +224,7 @@ class ScoutProfile(models.Model):
 
         return RuleFilter().get_resources_from_rule(rule, ids_only=ids_only)
 
-    def site_access_rules_formatted(self):
+    def site_access_rules_formatted(self) -> SafeText:
         content = {}
         content["Archaeological Site"] = self.get_graph_rule("Archaeological Site").serialize()
         content["Scout Report"] = self.get_graph_rule("Scout Report").serialize()
@@ -377,7 +377,7 @@ class LandManager(models.Model):
         logger.debug(f"get_allowed_resources: {time.time()-start}")
         return id_list
 
-    def site_access_rules_formatted(self):
+    def site_access_rules_formatted(self) -> format_json_display:
         content = {}
         content["Archaeological Site"] = self.get_graph_rule("Archaeological Site").serialize()
         content["Scout Report"] = self.get_graph_rule("Scout Report").serialize()

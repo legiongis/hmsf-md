@@ -9,14 +9,12 @@ import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.gdal.datasource import DataSource
 from django.contrib.gis.db.models import Union
 from django.db import connection
-from django.db.models import Q
 from django.db.utils import IntegrityError, ProgrammingError
-from django.utils.translation import ugettext as _
-from django.core.files import File
 from django.core.files.storage import default_storage
 from django.conf import settings
 
@@ -244,14 +242,14 @@ FILENAME_LOOKUP = {
 }
 
 class FMSFImporter(BaseImportModule):
-    def __init__(self, request=None):
 
-        if request:
-            loadid = request.POST.get("load_id")
+    reporter: ETLOperationResult
+
+    def __init__(self, request=None):
 
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.loadid = None
+        self.loadid = request.POST.get("load_id") if request else None
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
 
@@ -805,7 +803,7 @@ class FMSFImporter(BaseImportModule):
             self.update_status_and_load_details("indexing")
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
-                cursor.execute(f"REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
+                cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
@@ -875,11 +873,11 @@ class FMSFImporter(BaseImportModule):
             loadid = str(uuid.uuid4())
         self.loadid = loadid
 
-        if truncate is None:
-            truncate_str = "false"
         if truncate is not None:
             truncate = int(truncate)
             truncate_str = str(truncate)
+        else:
+            truncate_str = "false"
 
         if file_dir is None:
             file_dir = self.get_uploaded_files_location()
@@ -1006,7 +1004,7 @@ class FMSFImporter(BaseImportModule):
             self.blank_tile_lookup[nodegroupid] = blank_tile
         return blank_tile
 
-    def get_nodegroup(self, nodegroupid):
+    def get_nodegroup(self, nodegroupid) -> NodeGroup:
         nodegroup = self.nodegroup_lookup.get(nodegroupid)
         if nodegroup is None:
             nodegroup = NodeGroup.objects.get(pk=nodegroupid)
@@ -1015,6 +1013,10 @@ class FMSFImporter(BaseImportModule):
 
 
 class FMSFResource():
+
+    siteid: str
+    resourceid: str
+    parent_tile_lookup: dict
 
     def __init__(self):
 
@@ -1037,7 +1039,9 @@ class FMSFResource():
             node = importer.get_node(node_name)
             node_config = node.config if node.config else {}
             datatype_instance = importer.datatype_factory.get_instance(node.datatype)
-            nodegroupid = str(node.nodegroup_id)
+            if node.nodegroup is None:
+                continue
+            nodegroupid = str(node.nodegroup.pk)
             if node.datatype in ['concept-list', 'concept']:
                 values = []
                 source_values = []
@@ -1087,17 +1091,18 @@ class FMSFResource():
         tiles = []
         for nid in dict_by_nodegroup:
             ng = importer.get_nodegroup(nid)
-            if ng.parentnodegroup_id is not None:
-                pt = self.parent_tile_lookup.get(ng.parentnodegroup_id)
+            if ng.parentnodegroup is not None:
+                parentnodegroup_id = str(ng.parentnodegroup.pk)
+                pt = self.parent_tile_lookup.get(parentnodegroup_id)
 
                 # if this is the first time the parent tile has been encountered for
                 # this resource, create it and add a blank tile for it.
                 if pt is None:
-                    pt = Tile().get_blank_tile(nodegroupid, resourceid=self.resourceid)
+                    pt = Tile().get_blank_tile(nid, resourceid=self.resourceid)
                     pt.tileid = uuid.uuid4()
-                    self.parent_tile_lookup[ng.parentnodegroup_id] = pt
+                    self.parent_tile_lookup[parentnodegroup_id] = pt
                     tiles.append((
-                        ng.parentnodegroup_id,
+                        parentnodegroup_id,
                         self.siteid,        # legacyid
                         self.resourceid,    # resourceid
                         pt.tileid,

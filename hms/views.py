@@ -8,7 +8,7 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpResponseServerError
+from django.http import HttpResponseServerError, Http404
 from django.shortcuts import render, redirect, HttpResponse
 from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
@@ -192,7 +192,7 @@ def scout_signup(request):
         context['scout_form'] = scout_form
         return render(request, 'scout-signup.htm', context)
 
-    if request.method == "POST":
+    elif request.method == "POST":
         form = ScoutForm(request.POST)
         if form.is_valid():
             scout, encoded_uid, token = create_scout_from_valid_form(form)
@@ -219,6 +219,9 @@ def scout_signup(request):
 
         context['scout_form'] = form
         return render(request, 'scout-signup.htm', context)
+
+    else:
+        raise Http404
 
 def scouts_dropdown(request):
     resourceid = request.GET.get('resourceid', None)
