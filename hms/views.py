@@ -2,19 +2,17 @@ import csv
 import logging
 from datetime import datetime
 
-from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpResponseServerError
+from django.http import HttpResponseServerError, Http404
 from django.shortcuts import render, redirect, HttpResponse
 from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
-from django.utils.translation import ugettext as _
 from django.urls import reverse
 from django.views.generic import View
 
@@ -87,8 +85,8 @@ class LoginView(View):
             try:
                 user = request.user
             except Exception as e:
-                logger.warn(e)
-                return redirect(f"/")
+                logger.warning(e)
+                return redirect("/")
 
             if user_is_scout(user):
                 login_type = "scout"
@@ -192,7 +190,7 @@ def scout_signup(request):
         context['scout_form'] = scout_form
         return render(request, 'scout-signup.htm', context)
 
-    if request.method == "POST":
+    elif request.method == "POST":
         form = ScoutForm(request.POST)
         if form.is_valid():
             scout, encoded_uid, token = create_scout_from_valid_form(form)
@@ -219,6 +217,9 @@ def scout_signup(request):
 
         context['scout_form'] = form
         return render(request, 'scout-signup.htm', context)
+
+    else:
+        raise Http404
 
 def scouts_dropdown(request):
     resourceid = request.GET.get('resourceid', None)

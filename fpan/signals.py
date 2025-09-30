@@ -19,4 +19,4 @@ def join_management_areas_to_resourceinstance(sender, instance, created, **kwarg
             joiner = SpatialJoin()
             joiner.update_resource(instance.resourceinstance)
         except Exception as e:
-            logger.error(f"error encoutered: {e}")
+            logger.error(f"error encoutered during spatial join: {e}")

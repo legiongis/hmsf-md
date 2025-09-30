@@ -9,29 +9,28 @@ import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING, Union
 
-from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.db.models import Union
+from django.contrib.gis.gdal.datasource import DataSource
+from django.contrib.gis.gdal.feature import Feature
+from django.contrib.gis.db.models import Union as UnionGeoms
 from django.db import connection
-from django.db.models import Q
 from django.db.utils import IntegrityError, ProgrammingError
-from django.utils.translation import ugettext as _
-from django.core.files import File
 from django.core.files.storage import default_storage
 from django.conf import settings
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.concept import Concept
-from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule
+from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule, ResourceInstance
 from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
 
 from hms.models import ManagementArea
-from fpan.tasks import run_sequence_as_task
-from fpan.utils import ETLOperationResult
+from fpan.tasks import run_fmsf_import_as_task
+from fpan.utils import ETLOperationResult, SpatialJoin
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +66,7 @@ field_maps = {
             {"field": "D_NRLISTED", "source": "shp"},
         ],
         "Ownership": [
-            {"field": "Ownership", "source": "csv"},
+            {"field": "OwnType", "source": "csv"},
         ],
         "Plot Type": [
             {"field": "PLOTTYPE", "source": "shp"},
@@ -244,14 +243,14 @@ FILENAME_LOOKUP = {
 }
 
 class FMSFImporter(BaseImportModule):
-    def __init__(self, request=None):
 
-        if request:
-            loadid = request.POST.get("load_id")
+    reporter: ETLOperationResult
+
+    def __init__(self, request=None):
 
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.loadid = None
+        self.loadid = request.POST.get("load_id") if request else None
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
 
@@ -301,7 +300,7 @@ class FMSFImporter(BaseImportModule):
             try:
                 siteid = resource.get_node_values("FMSF ID")[0]
             except IndexError:
-                logger.warn(f"orphan resource: {resource.pk} has no FMSF ID")
+                logger.warning(f"orphan resource: {resource.pk} has no FMSF ID")
                 continue
             self.resource_lookup[siteid] = resource
 
@@ -448,7 +447,6 @@ class FMSFImporter(BaseImportModule):
             for fieldset in self.field_map.values():
                 required += [i['field'] for i in fieldset if i["source"] == "shp" and not i['field'] == "geom"]
 
-            print(layer_fields)
             return [i for i in required if i not in layer_fields]
 
         def validate_csv_fields(csv_fields):
@@ -571,7 +569,7 @@ class FMSFImporter(BaseImportModule):
             logger.debug("unioning Management Areas")
             filter_areas = ManagementArea.objects.exclude(category__name__in=["FPAN Region", "County"])
             try:
-                union_results = filter_areas.aggregate(Union('geom'))
+                union_results = filter_areas.aggregate(UnionGeoms('geom'))
             except Exception as e:
                 self.reporter.success = False
                 self.reporter.message = str(e)
@@ -590,7 +588,7 @@ class FMSFImporter(BaseImportModule):
                     INSERT INTO historic_structures_tmp VALUES {values_str};
                     """
                 )
-                logger.debug(f"performing intersect operation")
+                logger.debug("performing intersect operation")
                 cursor.execute(
                     f"""SELECT siteid, geom FROM historic_structures_tmp
                         WHERE ST_Intersects(geom, '{union_geom.wkt}');"""
@@ -598,7 +596,7 @@ class FMSFImporter(BaseImportModule):
                 rows = cursor.fetchall()
                 geom_matches = [i[0] for i in rows]
                 cursor.execute(
-                    f"""DROP TABLE IF EXISTS historic_structures_tmp;"""
+                    """DROP TABLE IF EXISTS historic_structures_tmp;"""
                 )
             logger.debug(f"intersect complete, {len(geom_matches)} matching features.")
 
@@ -664,13 +662,13 @@ class FMSFImporter(BaseImportModule):
                     logger.debug(percent)
                 current_percent = percent
 
-            res = FMSFResource().from_shp_feature(feature)
+            res = FMSFResource.from_shp_feature(feature)
             if res.siteid in self.resource_lookup:
                 res.resource = self.resource_lookup[res.siteid]
-                res.resourceid = str(res.resource.pk)
+                res.resourceid = str(self.resource_lookup[res.siteid].pk)
             else:
                 res.resource = None
-                res.resourceid = uuid.uuid4()
+                res.resourceid = str(uuid.uuid4())
 
             tiles = res.generate_tiles(self)
 
@@ -749,7 +747,7 @@ class FMSFImporter(BaseImportModule):
             with connection.cursor() as cursor:
                 cursor.execute("""SELECT * FROM __arches_staging_to_tile(%s)""", [self.loadid])
                 row = cursor.fetchall()
-            self.reporter.message = f"all tiles written to tile table"
+            self.reporter.message = "all tiles written to tile table"
             if row[0][0]:
                 with connection.cursor() as cursor:
                     cursor.execute(
@@ -781,13 +779,31 @@ class FMSFImporter(BaseImportModule):
         self.reporter.log(logger)
         return
 
+    def run_spatial_join(self):
+
+        self.update_status_and_load_details("joining management areas")
+
+        logger.debug("running spatial join on resources")
+        resids = [i.resourceid for i in self.fmsf_resources]
+        try:
+            joiner = SpatialJoin()
+            resources = ResourceInstance.objects.filter(pk__in=resids)
+            for resource in resources:
+                joiner.update_resource(resource)
+        except Exception as e:
+            self.reporter.success = False
+            self.reporter.message = str(e)
+
+        self.reporter.log(logger)
+        return
+
     def finalize_indexing(self):
 
         try:
             self.update_status_and_load_details("indexing")
             index_resources_by_transaction(self.loadid, quiet=True, use_multiprocessing=False)
             with connection.cursor() as cursor:
-                cursor.execute(f"REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
+                cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
@@ -801,7 +817,8 @@ class FMSFImporter(BaseImportModule):
         self.reporter.log(logger)
         return
 
-    def run_web_import(self, request):
+    @staticmethod
+    def run_web_import(request):
 
         # handle values coming from frontend configuration
         resource_type = request.POST.get('resourceType')
@@ -810,7 +827,6 @@ class FMSFImporter(BaseImportModule):
         description = request.POST.get('loadDescription')
         only_extra_ids = request.POST.get('onlySiteIdList')
         loadid = request.POST.get('loadId')
-        self.resource_type = resource_type
         if truncate == "0":
             truncate = None
         if dry_run == "true":
@@ -822,7 +838,14 @@ class FMSFImporter(BaseImportModule):
         else:
             only_extra_ids = False
 
-        run_sequence_as_task.delay(loadid, resource_type, truncate=truncate, dry_run=dry_run, description=description, only_extra_ids=only_extra_ids)
+        run_fmsf_import_as_task.delay( # pyright: ignore[reportFunctionMemberAccess]
+            loadid,
+            resource_type,
+            truncate=truncate,
+            dry_run=dry_run,
+            description=description,
+            only_extra_ids=only_extra_ids
+        )
 
         return {
             "message": "import task submitted",
@@ -857,11 +880,11 @@ class FMSFImporter(BaseImportModule):
             loadid = str(uuid.uuid4())
         self.loadid = loadid
 
-        if truncate is None:
-            truncate_str = "false"
         if truncate is not None:
             truncate = int(truncate)
             truncate_str = str(truncate)
+        else:
+            truncate_str = "false"
 
         if file_dir is None:
             file_dir = self.get_uploaded_files_location()
@@ -921,19 +944,23 @@ class FMSFImporter(BaseImportModule):
         if dry_run is True:
             self.reporter.message = f"Dry run completed successfully with {len(self.fmsf_resources)} resources."
             self.finalize_indexing()
-        else:
-            self.write_tiles_from_load_staging()
-            if self.reporter.success is False:
-                return self.abort_load()
+            return self.reporter.serialize()
 
-            # write the cumulative reporter data to load_details in the final step
-            self.finalize_indexing()
-            if self.reporter.success is False:
-                return self.abort_load()
+        self.write_tiles_from_load_staging()
+        if self.reporter.success is False:
+            return self.abort_load()
 
-            self.reporter.message = "completed without error"
+        # RUN SPATIAL JOIN ON ALL NEW RESOURCES
+        self.run_spatial_join()
+        if self.reporter.success is False:
+            return self.abort_load()
 
-        return self.reporter.serialize()
+        # write the cumulative reporter data to load_details in the final step
+        self.finalize_indexing()
+        if self.reporter.success is False:
+            return self.abort_load()
+
+        self.reporter.message = "completed without error"
 
     def update_status_and_load_details(self, status):
         """
@@ -984,7 +1011,7 @@ class FMSFImporter(BaseImportModule):
             self.blank_tile_lookup[nodegroupid] = blank_tile
         return blank_tile
 
-    def get_nodegroup(self, nodegroupid):
+    def get_nodegroup(self, nodegroupid) -> NodeGroup:
         nodegroup = self.nodegroup_lookup.get(nodegroupid)
         if nodegroup is None:
             nodegroup = NodeGroup.objects.get(pk=nodegroupid)
@@ -994,75 +1021,37 @@ class FMSFImporter(BaseImportModule):
 
 class FMSFResource():
 
-    def __init__(self):
+    siteid: str
+    resource: Union[Resource, None]
+    resourceid: str
+    feature: Feature
+    parent_tile_lookup: dict
 
-        self.siteid = None
-        self.feature = None
+    def __init__(self, siteid: str):
+
+        self.siteid = siteid
         self.parent_tile_lookup = {}
 
-    def from_shp_feature(self, feature):
+    @staticmethod
+    def from_shp_feature(feature: Feature) -> "FMSFResource":
 
-        self.siteid = feature.get("SITEID")
-        if not self.siteid:
+        siteid = feature.get("SITEID")
+        if not siteid:
             raise Exception("bad shapefile feature: missing or empty SITEID field")
-        self.feature = feature
-        return self
-
-    def management_areas_from_geom(self, geojson):
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f'''SELECT id FROM hms_managementarea
-                        WHERE ST_Intersects(ST_GeomFromGeoJSON('{geojson}'), hms_managementarea.geom);'''
-            )
-            rows = cursor.fetchall()
-        pks = [i[0] for i in rows if len(i) > 0]
-        return ManagementArea.objects.filter(pk__in=pks)
-
-    def generate_management_area_node_objs(self, management_areas, importer):
-
-        values_dict = {
-            "FPAN Region": [],
-            "County": [],
-            "Management Area": [],
-            "Management Agency": [],
-        }
-        for ma in management_areas:
-            if ma.category.name == "FPAN Region":
-                values_dict["FPAN Region"].append(ma)
-            elif ma.category.name == "County":
-                values_dict["County"].append(ma)
-            else:
-                values_dict["Management Area"].append(ma)
-                if ma.management_agency is not None:
-                    values_dict["Management Agency"].append(ma.management_agency)
-
-        node_objs = []
-        nodegroupid = None
-        for node_name, value in values_dict.items():
-            node = importer.get_node(node_name)
-            if nodegroupid is None:
-                nodegroupid = str(node.nodegroup_id)
-            node_objs.append({
-                str(node.nodeid): {
-                    "value": [str(i.pk) for i in value],
-                    "valid": True,
-                    "source": [str(i.pk) for i in value],
-                    "notes": "",
-                    "datatype": node.datatype,
-                }
-            })
-        return nodegroupid, node_objs
+        res = FMSFResource(siteid)
+        res.feature = feature
+        return res
 
     def generate_tiles(self, importer: FMSFImporter):
 
         dict_by_nodegroup = {}
-        management_areas = []
         for node_name, fieldset in importer.field_map.items():
             node = importer.get_node(node_name)
             node_config = node.config if node.config else {}
             datatype_instance = importer.datatype_factory.get_instance(node.datatype)
-            nodegroupid = str(node.nodegroup_id)
+            if node.nodegroup is None:
+                continue
+            nodegroupid = str(node.nodegroup.pk)
             if node.datatype in ['concept-list', 'concept']:
                 values = []
                 source_values = []
@@ -1091,10 +1080,12 @@ class FMSFResource():
                     geom = self.feature.geom
                     with connection.cursor() as cursor:
                         cursor.execute(f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));")
-                        geojson = cursor.fetchone()[0]
+                        result = cursor.fetchone()
+                        if not result:
+                            logger.warning("Error sanitizing geometry for tile.")
+                            continue
+                        geojson = result[0]
                     source_value = geojson
-                    # also, run spatial intersection to find overlapping management areas
-                    management_areas += self.management_areas_from_geom(geojson)
                 else:
                     source_value = self.feature.get(fieldset[0]['field'])
                 value = datatype_instance.transform_value_for_tile(source_value, **node_config)
@@ -1111,24 +1102,21 @@ class FMSFResource():
             }
             dict_by_nodegroup[nodegroupid] = dict_by_nodegroup.get(nodegroupid, []) + [node_obj]
 
-        # generate tiles for the management area nodegroup
-        ma_nodegroupid, ma_node_objs = self.generate_management_area_node_objs(management_areas, importer)
-        dict_by_nodegroup[ma_nodegroupid] = ma_node_objs
-
         tiles = []
         for nid in dict_by_nodegroup:
             ng = importer.get_nodegroup(nid)
-            if ng.parentnodegroup_id is not None:
-                pt = self.parent_tile_lookup.get(ng.parentnodegroup_id)
+            if ng.parentnodegroup is not None:
+                parentnodegroup_id = str(ng.parentnodegroup.pk)
+                pt = self.parent_tile_lookup.get(parentnodegroup_id)
 
                 # if this is the first time the parent tile has been encountered for
                 # this resource, create it and add a blank tile for it.
                 if pt is None:
-                    pt = Tile().get_blank_tile(nodegroupid, resourceid=self.resourceid)
+                    pt = Tile().get_blank_tile(nid, resourceid=self.resourceid)
                     pt.tileid = uuid.uuid4()
-                    self.parent_tile_lookup[ng.parentnodegroup_id] = pt
+                    self.parent_tile_lookup[parentnodegroup_id] = pt
                     tiles.append((
-                        ng.parentnodegroup_id,
+                        parentnodegroup_id,
                         self.siteid,        # legacyid
                         self.resourceid,    # resourceid
                         pt.tileid,

@@ -176,7 +176,7 @@ class RuleFilter(BaseSearchFilter):
                 if graph_name == "Archaeological Site":
                     rule = Rule("attribute_filter",
                         graph_name=graph_name,
-                        node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP["Archaeological Site"]["Assigned To"],
+                        node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
                         value=[user.username],
                     )
 
@@ -184,7 +184,7 @@ class RuleFilter(BaseSearchFilter):
                     from hms.models import report_rule_from_arch_rule
                     arch_rule = Rule("attribute_filter",
                         graph_name="Archaeological Site",
-                        node_id=settings.SPATIAL_JOIN_GRAPHID_LOOKUP["Archaeological Site"]["Assigned To"],
+                        node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
                         value=[user.username],
                     )
                     rule = report_rule_from_arch_rule(arch_rule)
