@@ -269,6 +269,8 @@ class DownloadScoutReportPhotos(APIBase):
         try:
             zipfile_path = Path(zip_photos_for_download(reportid))
             return FileResponse((REPORT_PHOTOS_ZIP_DIR / zipfile_path).open("rb"))
+        except ValueError as e:
+            msg = e
         except OSError as e:
             msg = "Coudn't create the zip file: " + str(e)
         except Exception as e:
@@ -278,13 +280,8 @@ class DownloadScoutReportPhotos(APIBase):
         return HttpResponseServerError(msg)
 
 
-################################################################################
-# HELPERS FOR DOWNLOAD REPORT PHOTOS
-
 # TODO: where will we store zip downloads?
 # TODO: swap local source dir for S3 bucket && update file zipping logic
-# TODO: validate that returned objects are images
-
 
 def zip_photos_for_download(reportid) -> Path:
     """
@@ -295,12 +292,12 @@ def zip_photos_for_download(reportid) -> Path:
     """
     from zipfile import ZipFile
 
+    photo_filenames = photos_list(reportid)
+
     zipfile_path = REPORT_PHOTOS_ZIP_DIR / f"report-photos-{reportid}.zip"
 
     # add parent dirs of dest dir if needed (like bash mkdir)
     zipfile_path.parent.mkdir(parents=True, exist_ok=True)
-
-    photo_filenames = photos_list(reportid)
 
     with ZipFile(zipfile_path, "w") as zip_file:
         for filename in photo_filenames:
@@ -310,65 +307,22 @@ def zip_photos_for_download(reportid) -> Path:
     return zipfile_path
 
 
-################################################################################
-# HELPERS FOR zip_photos_for_download
-
-
-# TODO: FIX ME: i am a hastily hacked version of a method from make_file_list method
 # TODO: TEST ME
-#     - does this return only photo filenames?
-#     - does this gather MORE than the given report's associated filenames?
-#         or does it recurse thru all related nodes, gathering associated filenames?
+#     - what if there are no photos?
 def photos_list(resourceid: str) -> list[str]:
-    # TODO: make this not a list -- only need one
-    resources = []
-    id = resourceid
-
-    ## collect resources from arguments
-    r = Resource.objects.get(pk=id)
-    resources.append(r)
-
-    ## make list of individual resource entries
-    output = []
-    for res in resources:
-        entry = processed_resource(res)
-        output.append(entry)
-
-    ## make list of names for file nodes
-    node_columns = set()
-    for res in output:
-        for node_name in res["file_data"].keys():
-            node_columns.add(node_name)
-
-    ## iterate all resource entries and create a row (list) for each one
-    rows = []
-    for res in output:
-        row = [res["resourceid"], res["name"]]
-        for file_node in node_columns:
-            row.append(res["file_data"].get(file_node))
-        rows.append(row)
-
-    # output = [
-    #     ["resourceid", "name"] + list(node_columns)
-    # ]
-    output = []
-    for row in rows:
-        output.append(row)
-
-    PHOTO_FILENAME_INDEX = 2
-
-    output = list(map(lambda item: item[PHOTO_FILENAME_INDEX], output))[0]
-
-    print()
-    print("OUTPUT OF PHOTOS LIST")
-    print(output)
-    print()
-
-    return output
+    try:
+        r = Resource.objects.get(pk=resourceid)
+    except Exception as e:
+        raise ValueError(f"resource not found: resource id: {resourceid}: {e}")
+    r = processed_resource(r)
+    photo_filenames = r["file_data"].get("Photo")
+    if photo_filenames is None:
+        raise ValueError(f"Resource does not have photos. resource id: {resourceid}")
+    return photo_filenames
 
 
-# TODO: FIX ME: i am a hastily hacked version of a method from make_file_list method
 # TODO: TEST ME
+#     - what if there are no photos?
 def processed_resource(resource):
     from arches.app.models.models import Node
     from arches.app.models.tile import Tile
@@ -377,7 +331,7 @@ def processed_resource(resource):
     nodes = Node.objects.filter(datatype="file-list", graph__name=resource.graph.name)
 
     ## create lookup of node id to node name (to use later)
-    node_lookup = {str(i.pk):i.name for i in nodes}
+    node_lookup = {str(i.pk): i.name for i in nodes}
 
     ## stub out entry for this resource
     output = {
