@@ -13,6 +13,8 @@ define([
             params.configKeys = ['nodes'];
             ReportViewModel.apply(this, [params]);
 
+            self.hasImages = true; // used to show/hide Save Images button
+
             self.imgs = ko.computed(function() {
                 var imgs = [];
                 var nodes = ko.unwrap(self.nodes);
@@ -39,6 +41,7 @@ define([
                     }, self);
                 }, self);
                 if (imgs.length === 0) {
+                    self.hasImages = false;
                     imgs = [{
                         src: arches.urls.media + 'img/photo_missing.png',
                         alt: ''
@@ -62,6 +65,41 @@ define([
                     return ko.unwrap(node.datatype) === 'file-list';
                 })
             );
+
+            self.downloadPhotos = function (baseUrl) {
+                var url = baseUrl + self.report.get('resourceid');
+                var response;
+                fetch(url)
+                    .then(function (resp) {
+                        /*
+                        not handling bad status codes because...
+                        - if no photos associated with report, user doesn't see
+                        Save Images button, so they can't make the request anyway
+                        - this resource and its id must exist because we click
+                        Save Images from the report view, so the server will always
+                        get this request with a qualifying report (resource) id
+                        */
+                        response = resp;
+                        return resp.blob();
+                    })
+                    .then(function (blob) {
+                        var filename = response.headers.get('Content-Disposition')
+                            .match(/filename="(.+)"/)[1]
+                            || 'report-photos.zip'
+
+                        // download by clicking a temp link
+                        var a = document.createElement('a');
+                        a.download = filename;
+                        a.href = URL.createObjectURL(blob);;
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(blob);
+                    })
+                    .catch(function(err) {
+                        console.error(err)
+                        alert("Couldn't reach the server. Please try again later.")
+                    });
+            }
         },
         template: {
             require: 'text!report-templates/image'

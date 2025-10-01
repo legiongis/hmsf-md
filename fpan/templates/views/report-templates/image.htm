@@ -4,13 +4,14 @@
 {% block header %}
 
 <!-- Save Images button (hide when editing resource) -->
-<!-- ko if: !editorContext -->
+<!-- ko if: !editorContext && hasImages -->
 <div style="position: relative;">
-    <a data-bind="attr: { href: '{% url 'download-report-photos' %}?rid=' + report.get('resourceid') }"
-        download
+    <button data-bind="click: function () {
+            downloadPhotos('{% url 'download-report-photos' %}?rid=')
+        }"
         class="btn btn-rr btn-labeled btn-lg fa fa-image dz-clickable"
         style="position: absolute; right: 0; margin: 1rem; z-index: 10; box-shadow: 0.1rem 0.1rem 0.6rem #00000066"
-        >Save Images</a>
+        >Save Images</button>
 </div>
 <!-- /ko -->
 
