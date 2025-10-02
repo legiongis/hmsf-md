@@ -67,37 +67,39 @@ define([
             );
 
             self.downloadPhotos = function (baseUrl) {
-                var url = baseUrl + self.report.get('resourceid');
+                var resourceid = self.report.get('resourceid');
+                var url = baseUrl + resourceid;
                 var response;
                 fetch(url)
                     .then(function (resp) {
-                        /*
-                        not handling bad status codes because...
-                        - if no photos associated with report, user doesn't see
-                        Save Images button, so they can't make the request anyway
-                        - this resource and its id must exist because we click
-                        Save Images from the report view, so the server will always
-                        get this request with a qualifying report (resource) id
-                        */
+                        if (resp.status == 500) {
+                            err = new Error();
+                            err.isServerErr = true;
+                            throw err;
+                        }
                         response = resp;
                         return resp.blob();
                     })
                     .then(function (blob) {
                         var filename = response.headers.get('Content-Disposition')
                             .match(/filename="(.+)"/)[1]
-                            || 'report-photos.zip'
-
+                            || `report-photos-${resourceid}.zip`;
                         // download by clicking a temp link
                         var a = document.createElement('a');
                         a.download = filename;
-                        a.href = URL.createObjectURL(blob);;
+                        a.href = URL.createObjectURL(blob);
                         a.click();
                         a.remove();
                         URL.revokeObjectURL(blob);
                     })
                     .catch(function(err) {
-                        console.error(err)
-                        alert("Couldn't reach the server. Please try again later.")
+                        msg = "Please check your internet connection.";
+                        if (err.isServerErr) {
+                            msg = "There was an issue on the server.\
+                                   Please try downloading again later.";
+                        }
+                        console.error(msg + ': ' +  err);
+                        alert(msg);
                     });
             }
         },
