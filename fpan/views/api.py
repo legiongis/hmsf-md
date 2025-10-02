@@ -282,12 +282,15 @@ class DownloadScoutReportPhotos(APIBase):
             photo_filenames = photos_metadata["photo_filenames"]
 
             zipfile_name = f"report-photos-{reportid}.zip"
-            zipfile_path = REPORT_PHOTOS_ZIP_DIR / zipfile_name
-            # make sure parent dir exists
-            zipfile_path.parent.mkdir(parents=True, exist_ok=True)
-            zip_to(zipfile_path, REPORT_PHOTOS_SRC_DIR, photo_filenames)
 
-            return FileResponse(zipfile_path.open("rb"))
+            zipbuf = zipfile_buffer(REPORT_PHOTOS_SRC_DIR, photo_filenames)
+
+            return FileResponse(
+                zipbuf,
+                filename=zipfile_name,
+                content_type="application/zip",
+                as_attachment=True,
+            )
         except ValueError as e:
             msg = e
             response = HttpResponseNotFound(msg)
@@ -302,18 +305,24 @@ class DownloadScoutReportPhotos(APIBase):
         return response
 
 
-def zip_to(zip_path: Path, src_path: Path, filenames: list[str]):
+from io import BytesIO
+
+
+def zipfile_buffer(src_path: Path, filenames: list[str]) -> BytesIO:
     """
-    Returns a `Path` representing the zip file containing `filenames`.
+    Returns a `BytesIO` representing the zip file containing `filenames`.
 
     Raises:
         OSError: If there's an issue writing the file.
     """
     from zipfile import ZipFile
-    with ZipFile(zip_path, "w") as zipfile:
+    zip_buf = BytesIO()
+    with ZipFile(zip_buf, "w") as zip_file:
         for filename in filenames:
             photo_path = Path(src_path / filename)
-            zipfile.write(photo_path, arcname=filename)
+            zip_file.write(photo_path, arcname=filename)
+    zip_buf.seek(0)
+    return zip_buf
 
 
 from typing import TypedDict
