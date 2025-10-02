@@ -1,6 +1,13 @@
 import logging
 from django.core.cache import cache
-from django.http import FileResponse, Http404, HttpResponse, HttpResponseNotFound, HttpResponseServerError
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+    HttpResponseServerError
+)
 from django.db import connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
@@ -262,7 +269,7 @@ class DownloadScoutReportPhotos(APIBase):
 
     def get(self, request):
         if not (reportid := request.GET.get("rid", None)):
-            return HttpResponseNotFound(b"Expected url param `rid`.")
+            return HttpResponseBadRequest(b"Expected url param `rid`.")
 
         logger.info("Zipped photos were requested for scout report: " + reportid)
 
@@ -271,93 +278,94 @@ class DownloadScoutReportPhotos(APIBase):
             return FileResponse((REPORT_PHOTOS_ZIP_DIR / zipfile_path).open("rb"))
         except ValueError as e:
             msg = e
+            response = HttpResponseNotFound(msg)
         except OSError as e:
             msg = "Coudn't create the zip file: " + str(e)
+            response = HttpResponseServerError(msg)
         except Exception as e:
             msg = "An unexpected error occured when trying to create the zip file: " + str(e)
+            response = HttpResponseServerError(msg)
 
         logger.warning(msg)
-        return HttpResponseServerError(msg)
+        return response
 
 
 # TODO: where will we store zip downloads?
 # TODO: swap local source dir for S3 bucket && update file zipping logic
+# TODO: how do we want to name the zip file?
 
 def zip_photos_for_download(reportid) -> Path:
     """
-    Gathers photos related to `reportid`, zip them, and return a `Path` object
-    representing the zip file.
+    Returns a Path representing the zip file to be downloaded by the client.
 
-    Raises an `OSError` via `ZipFile.write()` if there's an issue writing the file.
+    Raises:
+        OSError: If there's an issue writing the file.
     """
     from zipfile import ZipFile
 
-    photo_filenames = photos_list(reportid)
+    photos_metadata = resource_photos_metadata(reportid)
+    photo_filenames = photos_metadata["photo_filenames"]
 
-    zipfile_path = REPORT_PHOTOS_ZIP_DIR / f"report-photos-{reportid}.zip"
+    zipfile_name = f"report-photos-{reportid}.zip"
+    zipfile_path = REPORT_PHOTOS_ZIP_DIR / zipfile_name
 
     # add parent dirs of dest dir if needed (like bash mkdir)
     zipfile_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with ZipFile(zipfile_path, "w") as zip_file:
+    with ZipFile(zipfile_path, "w") as zipfile:
         for filename in photo_filenames:
             photo_path = Path(REPORT_PHOTOS_SOURCE_DIR / filename)
-            zip_file.write(photo_path, arcname=filename)
+            zipfile.write(photo_path, arcname=filename)
 
     return zipfile_path
 
 
-# TODO: TEST ME
-#     - what if there are no photos?
-def photos_list(resourceid: str) -> list[str]:
-    try:
-        r = Resource.objects.get(pk=resourceid)
-    except Exception as e:
-        raise ValueError(f"resource not found: resource id: {resourceid}: {e}")
-    r = processed_resource(r)
-    photo_filenames = r["file_data"].get("Photo")
-    if photo_filenames is None:
-        raise ValueError(f"Resource does not have photos. resource id: {resourceid}")
-    return photo_filenames
+def resource_photos_metadata(resourceid: str) -> dict[str, str | list[str]]:
+    """
+    Returns metadata for all photos associated with a resource.
 
-
-# TODO: TEST ME
-#     - what if there are no photos?
-def processed_resource(resource):
+    Raises:
+        ValueError: If resource not found
+        LookupError: If resource has no photos
+    """
     from arches.app.models.models import Node
     from arches.app.models.tile import Tile
 
-    ## get all file-list nodes for this resource's graph
-    nodes = Node.objects.filter(datatype="file-list", graph__name=resource.graph.name)
+    r: Resource
+    try:
+        r = Resource.objects.get(pk=resourceid)
+    except Exception as e:
+        raise ValueError(
+            f"resource not found: resource id: {resourceid}: {e}"
+        ) from e
 
-    ## create lookup of node id to node name (to use later)
-    node_lookup = {str(i.pk): i.name for i in nodes}
-
-    ## stub out entry for this resource
     output = {
-        "name": resource.displayname(),
-        "resourceid": str(resource.pk),
-        "file_data": {}
+        "resourceid": str(r.pk),
+        "resource_name": r.displayname(),
+        "photo_filenames": []
     }
 
-    ## stub out file data dict with all possible nodes for this resource
-    stage_data = {str(i.pk): [] for i in nodes}
+    # get photo node info to use to:
+    #     - get only photo tiles
+    #     - find photos within tiles
+    photo_node = Node.objects.get(name="Photo")
 
-    ## get all tiles for this resource that contain any relevant nodes
-    nodegroups = [i.nodegroup for i in nodes]
-    tiles = Tile.objects.filter(nodegroup__in=nodegroups, resourceinstance=resource)
+    photo_tiles = Tile.objects.filter(
+      nodegroup=photo_node.nodegroup,
+      resourceinstance=r,
+    )
 
-    ## iterate tiles and collect node data into
-    for tile in tiles:
-        for k, v in tile.data.items():
-            if k in node_lookup:
-                # lose a little fidelity here by collapsing multiple instances of nodes but oh well
-                if v:
-                    stage_data[k] += v
+    for tile in photo_tiles:
+        # list of photo metadata dicts in this tile
+        photos = tile.data.get(str(photo_node.pk))
+        for photo in photos:
+            output["photo_filenames"].append(photo["name"])
 
-    ## use staged data and node_lookup to transform UUIDs to readable strings
-    for k, v in stage_data.items():
-        if len(v) > 0:
-            output["file_data"][node_lookup[k]] = [i["name"] for i in v]
+    if not output["photo_filenames"]:
+        # should never see this
+        # Save Images button only shows when report has photos
+        raise LookupError(
+            f"Resource does not have photos. resource id: {resourceid}"
+        )
 
     return output
