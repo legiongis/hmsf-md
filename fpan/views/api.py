@@ -261,21 +261,33 @@ from pathlib import Path
 # NOTE: neither Django nor Arches' `MEDIA_ROOT`s point to "fpan/fpan"
 from fpan.settings import MEDIA_ROOT
 
+REPORT_PHOTOS_SRC_DIR = Path(MEDIA_ROOT + "/uploadedfiles")
 REPORT_PHOTOS_ZIP_DIR = Path(MEDIA_ROOT + "/report_photo_downloads")
-REPORT_PHOTOS_SOURCE_DIR = Path(MEDIA_ROOT + "/uploadedfiles")
+
+# TODO: where will we store zip downloads?
+# TODO: swap local source dir for S3 bucket && update file zipping logic
+# TODO: how do we want to name the zip file?
 
 
 class DownloadScoutReportPhotos(APIBase):
 
     def get(self, request):
-        if not (reportid := request.GET.get("rid", None)):
+        if not (reportid := request.GET.get("rid")):
             return HttpResponseBadRequest(b"Expected url param `rid`.")
 
         logger.info("Zipped photos were requested for scout report: " + reportid)
 
         try:
-            zipfile_path = Path(zip_photos_for_download(reportid))
-            return FileResponse((REPORT_PHOTOS_ZIP_DIR / zipfile_path).open("rb"))
+            photos_metadata = resource_photos_metadata(reportid)
+            photo_filenames = photos_metadata["photo_filenames"]
+
+            zipfile_name = f"report-photos-{reportid}.zip"
+            zipfile_path = REPORT_PHOTOS_ZIP_DIR / zipfile_name
+            # make sure parent dir exists
+            zipfile_path.parent.mkdir(parents=True, exist_ok=True)
+            zip_to(zipfile_path, REPORT_PHOTOS_SRC_DIR, photo_filenames)
+
+            return FileResponse(zipfile_path.open("rb"))
         except ValueError as e:
             msg = e
             response = HttpResponseNotFound(msg)
@@ -290,37 +302,30 @@ class DownloadScoutReportPhotos(APIBase):
         return response
 
 
-# TODO: where will we store zip downloads?
-# TODO: swap local source dir for S3 bucket && update file zipping logic
-# TODO: how do we want to name the zip file?
-
-def zip_photos_for_download(reportid) -> Path:
+def zip_to(zip_path: Path, src_path: Path, filenames: list[str]):
     """
-    Returns a Path representing the zip file to be downloaded by the client.
+    Returns a `Path` representing the zip file containing `filenames`.
 
     Raises:
         OSError: If there's an issue writing the file.
     """
     from zipfile import ZipFile
-
-    photos_metadata = resource_photos_metadata(reportid)
-    photo_filenames = photos_metadata["photo_filenames"]
-
-    zipfile_name = f"report-photos-{reportid}.zip"
-    zipfile_path = REPORT_PHOTOS_ZIP_DIR / zipfile_name
-
-    # add parent dirs of dest dir if needed (like bash mkdir)
-    zipfile_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with ZipFile(zipfile_path, "w") as zipfile:
-        for filename in photo_filenames:
-            photo_path = Path(REPORT_PHOTOS_SOURCE_DIR / filename)
+    with ZipFile(zip_path, "w") as zipfile:
+        for filename in filenames:
+            photo_path = Path(src_path / filename)
             zipfile.write(photo_path, arcname=filename)
 
-    return zipfile_path
+
+from typing import TypedDict
 
 
-def resource_photos_metadata(resourceid: str) -> dict[str, str | list[str]]:
+class ResourcePhotosMetadata(TypedDict):
+    resourceid: str
+    resource_name: str
+    photo_filenames: list[str]
+
+
+def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
     """
     Returns metadata for all photos associated with a resource.
 
@@ -339,26 +344,26 @@ def resource_photos_metadata(resourceid: str) -> dict[str, str | list[str]]:
             f"resource not found: resource id: {resourceid}: {e}"
         ) from e
 
-    output = {
-        "resourceid": str(r.pk),
-        "resource_name": r.displayname(),
-        "photo_filenames": []
-    }
+    output = ResourcePhotosMetadata(
+        resourceid = str(r.pk),
+        resource_name = r.displayname(),
+        photo_filenames = []
+    )
 
     # get photo node info to use to:
     #     - get only photo tiles
     #     - find photos within tiles
     photo_node = Node.objects.get(name="Photo")
 
-    photo_tiles = Tile.objects.filter(
+    resource_photo_tiles = Tile.objects.filter(
       nodegroup=photo_node.nodegroup,
       resourceinstance=r,
     )
 
-    for tile in photo_tiles:
-        # list of photo metadata dicts in this tile
-        photos = tile.data.get(str(photo_node.pk))
-        for photo in photos:
+    for tile in resource_photo_tiles:
+        # list of photo metadata dicts
+        tile_photos = tile.data.get(str(photo_node.pk))
+        for photo in tile_photos:
             output["photo_filenames"].append(photo["name"])
 
     if not output["photo_filenames"]:
