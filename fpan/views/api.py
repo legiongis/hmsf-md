@@ -278,8 +278,8 @@ class DownloadScoutReportPhotos(APIBase):
         logger.info("Zipped photos were requested for scout report: " + reportid)
 
         try:
-            photos_metadata = resource_photos_metadata(reportid)
-            photo_filenames = photos_metadata["photo_filenames"]
+            photos_mdata = resource_photos_metadata(reportid)
+            photo_filenames = [ p["filename"] for p in photos_mdata["photos"] ]
 
             zipfile_name = f"report-photos-{reportid}.zip"
 
@@ -328,10 +328,15 @@ def zipfile_buffer(src_path: Path, filenames: list[str]) -> BytesIO:
 from typing import TypedDict
 
 
+class ResourcePhotoMetadata(TypedDict):
+    filename: str
+    url: str
+
+
 class ResourcePhotosMetadata(TypedDict):
     resourceid: str
     resource_name: str
-    photo_filenames: list[str]
+    photos: list[ResourcePhotoMetadata]
 
 
 def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
@@ -354,9 +359,9 @@ def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
         ) from e
 
     output = ResourcePhotosMetadata(
-        resourceid = str(r.pk),
-        resource_name = r.displayname(),
-        photo_filenames = []
+        resourceid=str(r.pk),
+        resource_name=r.displayname(),
+        photos=[]
     )
 
     # get photo node info to use to:
@@ -369,13 +374,13 @@ def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
       resourceinstance=r,
     )
 
-    for tile in resource_photo_tiles:
-        # list of photo metadata dicts
-        tile_photos = tile.data.get(str(photo_node.pk))
-        for photo in tile_photos:
-            output["photo_filenames"].append(photo["name"])
+    output["photos"] = [
+        ResourcePhotoMetadata(filename=photo["name"], url=photo["url"])
+        for tile in resource_photo_tiles
+        for photo in tile.data.get(str(photo_node.pk)) # list[dict[photo mdata]]
+    ]
 
-    if not output["photo_filenames"]:
+    if not output["photos"]:
         # should never see this
         # Save Images button only shows when report has photos
         raise LookupError(
