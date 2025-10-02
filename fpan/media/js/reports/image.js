@@ -90,7 +90,7 @@ define([
                         a.href = URL.createObjectURL(blob);
                         a.click();
                         a.remove();
-                        URL.revokeObjectURL(blob);
+                        URL.revokeObjectURL(a.href);
                     })
                     .catch(function(err) {
                         msg = "Please check your internet connection.";
