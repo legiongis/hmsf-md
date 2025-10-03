@@ -13,6 +13,8 @@ define([
             params.configKeys = ['nodes'];
             ReportViewModel.apply(this, [params]);
 
+            self.hasImages = true; // used to show/hide Save Images button
+
             self.imgs = ko.computed(function() {
                 var imgs = [];
                 var nodes = ko.unwrap(self.nodes);
@@ -39,6 +41,7 @@ define([
                     }, self);
                 }, self);
                 if (imgs.length === 0) {
+                    self.hasImages = false;
                     imgs = [{
                         src: arches.urls.media + 'img/photo_missing.png',
                         alt: ''
@@ -62,6 +65,43 @@ define([
                     return ko.unwrap(node.datatype) === 'file-list';
                 })
             );
+
+            self.downloadPhotos = function (baseUrl) {
+                var resourceid = self.report.get('resourceid');
+                var url = baseUrl + resourceid;
+                var response;
+                fetch(url)
+                    .then(function (resp) {
+                        if (resp.status == 500) {
+                            err = new Error();
+                            err.isServerErr = true;
+                            throw err;
+                        }
+                        response = resp;
+                        return resp.blob();
+                    })
+                    .then(function (blob) {
+                        var filename = response.headers.get('Content-Disposition')
+                            .match(/filename="(.+)"/)[1]
+                            || `report-photos-${resourceid}.zip`;
+                        // download by clicking a temp link
+                        var a = document.createElement('a');
+                        a.download = filename;
+                        a.href = URL.createObjectURL(blob);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(a.href);
+                    })
+                    .catch(function(err) {
+                        msg = "Please check your internet connection.";
+                        if (err.isServerErr) {
+                            msg = "There was an issue on the server.\
+                                   Please try downloading again later.";
+                        }
+                        console.error(msg + ': ' +  err);
+                        alert(msg);
+                    });
+            }
         },
         template: {
             require: 'text!report-templates/image'

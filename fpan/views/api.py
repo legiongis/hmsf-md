@@ -1,6 +1,13 @@
 import logging
 from django.core.cache import cache
-from django.http import Http404, HttpResponse
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+    HttpResponseServerError
+)
 from django.db import connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
@@ -247,3 +254,160 @@ class ResourceIdLookup(APIBase):
                 response['resources'].append((g.name, siteid, res.resourceinstanceid))
 
         return JSONResponse(response)
+
+
+from pathlib import Path
+
+# TODO: confirm that default_storage abstracts away s3 fetching (see zip func)
+# TODO: zip file name?
+
+
+class DownloadScoutReportPhotos(APIBase):
+
+    def get(self, request):
+        """
+        Respond with a zip file of photos for a given Scout Report.
+        """
+        if not (reportid := request.GET.get("rid")):
+            return HttpResponseBadRequest(b"Expected url param `rid`.")
+
+        logger.info("Zipped photos were requested for scout report: " + reportid)
+
+        try:
+            zipfile_name = f"report-photos-{reportid}.zip"
+            photos_mdata = resource_photos_metadata(reportid)
+            zipbuf = zipped_photos_buffer(photos_mdata)
+            return FileResponse(
+                zipbuf,
+                filename=zipfile_name,
+                content_type="application/zip",
+                as_attachment=True,
+            )
+        except ValueError as e:
+            msg = e
+            response = HttpResponseNotFound(msg)
+        except OSError as e:
+            msg = "Coudn't create the zip file: " + str(e)
+            response = HttpResponseServerError(msg)
+        except Exception as e:
+            msg = "An unexpected error occured when trying to create the zip file: " + str(e)
+            response = HttpResponseServerError(msg)
+
+        logger.warning(msg)
+        return response
+
+
+from io import BytesIO
+from typing import TypedDict
+
+
+class ResourcePhotoMetadata(TypedDict):
+    file_id: str
+    filename: str
+    file_loc: str
+
+
+class ResourcePhotosMetadata(TypedDict):
+    resourceid: str
+    resource_name: str
+    photos: list[ResourcePhotoMetadata]
+
+
+def zipped_photos_buffer(photos_metadata: ResourcePhotosMetadata) -> BytesIO:
+    """
+    Returns a `BytesIO` representing the zip file containing `filenames`.
+    Files are read from Django's `default_storage`.
+
+    Raises:
+        OSError: If there's an issue reading files or creating the zip.
+        FileNotFoundError: If a photo file doesn't exist in storage.
+        MemoryError: If files are too large to fit in memory.
+    """
+    from zipfile import ZipFile
+    from django.core.files.storage import default_storage
+
+    zip_buf = BytesIO()
+    with ZipFile(zip_buf, "w") as zip_file:
+        for photo in photos_metadata["photos"]:
+            with default_storage.open(photo["file_loc"]) as content:
+                zip_file.writestr(photo["filename"], content.read())
+    zip_buf.seek(0)
+    return zip_buf
+
+
+def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
+    """
+    Returns metadata for all photos associated with a resource.
+
+    Raises:
+        ValueError: If resource not found
+        LookupError: If resource has no photos
+    """
+    from arches.app.models.models import File
+    from arches.app.models.models import Node
+    from arches.app.models.tile import Tile
+
+    resource: Resource
+    try:
+        resource = Resource.objects.get(pk=resourceid)
+    except Exception as e:
+        raise ValueError(
+            f"resource not found: resource id: {resourceid}: {e}"
+        ) from e
+
+    # get photo node info to use to:
+    #     - get only photo tiles
+    #     - find photos within tiles
+    photo_node = Node.objects.get(name="Photo")
+
+    resource_photo_tiles = Tile.objects.filter(
+      nodegroup=photo_node.nodegroup,
+      resourceinstance=resource,
+    )
+
+    # NOTE: Must get file ids from the tile data.
+    # If we get all photo files associated with a resource,
+    # we also get photos that were removed from the resource,
+    # if they still exist in the `File` table and storage.
+    curr_photo_file_ids = [
+        photo["file_id"]
+        for tile in resource_photo_tiles
+        for photo in tile.data.get(str(photo_node.pk))
+    ]
+
+    # NOTE: Later, we might want additional tile data for:
+    # - including `Comment` and `Photo Type` node data in the output,
+    #     e.g. to be included in a text file in the zipped photos
+    # - using the display name (tile.photo.name), as opposed to file.path.name,
+    #     which includes the true filename on disk/S3, which will differ from
+    #     the display name when multiple files of the same name have been
+    #     uploaded
+    # In this case, we'd query the db for `Comment` and `Photo Type` `Nodes`,
+    # and use those PKs to get the node data as in:
+    # `tile.data.get(str(comment_node.pk))`
+
+    # get current photo `Files` for this resource
+    # the `path.name`s will be used by the caller to query `default_storage`
+    resource_photo_files = File.objects.filter(pk__in=curr_photo_file_ids)
+
+    output_photos = [
+        ResourcePhotoMetadata(
+            file_id=f.pk,
+            filename=f.path.name.split("/")[-1],
+            file_loc=f.path.name,
+        )
+        for f in resource_photo_files
+    ]
+
+    if not output_photos:
+        # should never see this
+        # Save Images button only shows when report has photos
+        raise LookupError(
+            f"Resource does not have photos. resource id: {resourceid}"
+        )
+
+    return ResourcePhotosMetadata(
+        resourceid=str(resource.pk),
+        resource_name=resource.displayname(),
+        photos=output_photos
+    )

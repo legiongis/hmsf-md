@@ -725,3 +725,38 @@ input[type='text'] {
   /* keeping above in case we decide we want images in the future, but for now, hide all images */
   .rp-card-section:has(img) { display: none; }
 }
+
+/*
+FIXES:
+    - "Hide Null Values" switch overlaps page content
+    - Screen width < 768px causes toolbars to overlap image carousel
+ */
+.report-toolbar-preview.ep-form-toolbar {
+    display: flex;
+    flex-wrap: wrap; /* stack [scout report h4] and [report date, hide null vals switch] vertically when screen width isn't sufficient */
+    justify-content: space-between;
+    align-items: start;
+}
+
+.ep-form-toolbar-tools.mar-no {
+    margin-bottom: -3.5rem !important; /* trim bottom from hide null values switch component */
+}
+
+/* ~768px screen width, left toolbar moves to top, pushing down top toolbar -- this keeps the latter from overlapping the page content */
+@media (max-width: 768px) {
+    .report-toolbar-preview.ep-form-toolbar {
+        margin-top: 4.5rem; /* move page content down */
+        height: fit-content; /* keep children from overlapping page content */
+    }
+
+    .report-toolbar-title {
+        width: fit-content !important; /* allow sibling to get close before wrapping under self */
+        padding-bottom: 0 !important; /* this and margin-bottom remove excess space between self and sibling when they stack vertically */
+        margin-bottom: 0 !important;
+    }
+
+    .ep-form-toolbar-tools.mar-no {
+        padding-left: 2rem; /* align report date and hide null vals switch with report-toolbar-title */
+    }
+}
+
