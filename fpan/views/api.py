@@ -258,33 +258,25 @@ class ResourceIdLookup(APIBase):
 
 from pathlib import Path
 
-# NOTE: neither Django nor Arches' `MEDIA_ROOT`s point to "fpan/fpan"
-from fpan.settings import MEDIA_ROOT
-
-REPORT_PHOTOS_SRC_DIR = Path(MEDIA_ROOT + "/uploadedfiles")
-REPORT_PHOTOS_ZIP_DIR = Path(MEDIA_ROOT + "/report_photo_downloads")
-
-# TODO: where will we store zip downloads?
-# TODO: swap local source dir for S3 bucket && update file zipping logic
-# TODO: how do we want to name the zip file?
+# TODO: confirm that default_storage abstracts away s3 fetching (see zip func)
+# TODO: zip file name?
 
 
 class DownloadScoutReportPhotos(APIBase):
 
     def get(self, request):
+        """
+        Respond with a zip file of photos for a given Scout Report.
+        """
         if not (reportid := request.GET.get("rid")):
             return HttpResponseBadRequest(b"Expected url param `rid`.")
 
         logger.info("Zipped photos were requested for scout report: " + reportid)
 
         try:
-            photos_mdata = resource_photos_metadata(reportid)
-            photo_filenames = [ p["filename"] for p in photos_mdata["photos"] ]
-
             zipfile_name = f"report-photos-{reportid}.zip"
-
-            zipbuf = zipfile_buffer(REPORT_PHOTOS_SRC_DIR, photo_filenames)
-
+            photos_mdata = resource_photos_metadata(reportid)
+            zipbuf = zipped_photos_buffer(photos_mdata)
             return FileResponse(
                 zipbuf,
                 filename=zipfile_name,
@@ -306,37 +298,41 @@ class DownloadScoutReportPhotos(APIBase):
 
 
 from io import BytesIO
-
-
-def zipfile_buffer(src_path: Path, filenames: list[str]) -> BytesIO:
-    """
-    Returns a `BytesIO` representing the zip file containing `filenames`.
-
-    Raises:
-        OSError: If there's an issue writing the file.
-    """
-    from zipfile import ZipFile
-    zip_buf = BytesIO()
-    with ZipFile(zip_buf, "w") as zip_file:
-        for filename in filenames:
-            photo_path = Path(src_path / filename)
-            zip_file.write(photo_path, arcname=filename)
-    zip_buf.seek(0)
-    return zip_buf
-
-
 from typing import TypedDict
 
 
 class ResourcePhotoMetadata(TypedDict):
+    file_id: str
     filename: str
-    url: str
+    file_loc: str
 
 
 class ResourcePhotosMetadata(TypedDict):
     resourceid: str
     resource_name: str
     photos: list[ResourcePhotoMetadata]
+
+
+def zipped_photos_buffer(photos_metadata: ResourcePhotosMetadata) -> BytesIO:
+    """
+    Returns a `BytesIO` representing the zip file containing `filenames`.
+    Files are read from Django's `default_storage`.
+
+    Raises:
+        OSError: If there's an issue reading files or creating the zip.
+        FileNotFoundError: If a photo file doesn't exist in storage.
+        MemoryError: If files are too large to fit in memory.
+    """
+    from zipfile import ZipFile
+    from django.core.files.storage import default_storage
+
+    zip_buf = BytesIO()
+    with ZipFile(zip_buf, "w") as zip_file:
+        for photo in photos_metadata["photos"]:
+            with default_storage.open(photo["file_loc"]) as content:
+                zip_file.writestr(photo["filename"], content.read())
+    zip_buf.seek(0)
+    return zip_buf
 
 
 def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
@@ -347,22 +343,17 @@ def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
         ValueError: If resource not found
         LookupError: If resource has no photos
     """
+    from arches.app.models.models import File
     from arches.app.models.models import Node
     from arches.app.models.tile import Tile
 
-    r: Resource
+    resource: Resource
     try:
-        r = Resource.objects.get(pk=resourceid)
+        resource = Resource.objects.get(pk=resourceid)
     except Exception as e:
         raise ValueError(
             f"resource not found: resource id: {resourceid}: {e}"
         ) from e
-
-    output = ResourcePhotosMetadata(
-        resourceid=str(r.pk),
-        resource_name=r.displayname(),
-        photos=[]
-    )
 
     # get photo node info to use to:
     #     - get only photo tiles
@@ -371,20 +362,52 @@ def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
 
     resource_photo_tiles = Tile.objects.filter(
       nodegroup=photo_node.nodegroup,
-      resourceinstance=r,
+      resourceinstance=resource,
     )
 
-    output["photos"] = [
-        ResourcePhotoMetadata(filename=photo["name"], url=photo["url"])
+    # NOTE: Must get file ids from the tile data.
+    # If we get all photo files associated with a resource,
+    # we also get photos that were removed from the resource,
+    # if they still exist in the `File` table and storage.
+    curr_photo_file_ids = [
+        photo["file_id"]
         for tile in resource_photo_tiles
-        for photo in tile.data.get(str(photo_node.pk)) # list[dict[photo mdata]]
+        for photo in tile.data.get(str(photo_node.pk))
     ]
 
-    if not output["photos"]:
+    # NOTE: Later, we might want additional tile data for:
+    # - including `Comment` and `Photo Type` node data in the output,
+    #     e.g. to be included in a text file in the zipped photos
+    # - using the display name (tile.photo.name), as opposed to file.path.name,
+    #     which includes the true filename on disk/S3, which will differ from
+    #     the display name when multiple files of the same name have been
+    #     uploaded
+    # In this case, we'd query the db for `Comment` and `Photo Type` `Nodes`,
+    # and use those PKs to get the node data as in:
+    # `tile.data.get(str(comment_node.pk))`
+
+    # get current photo `Files` for this resource
+    # the `path.name`s will be used by the caller to query `default_storage`
+    curr_photo_files = File.objects.filter(pk__in=curr_photo_file_ids)
+
+    output_photos = [
+        ResourcePhotoMetadata(
+            file_id=f.pk,
+            filename=f.path.name.split("/")[-1],
+            file_loc=f.path.name,
+        )
+        for f in curr_photo_files
+    ]
+
+    if not output_photos:
         # should never see this
         # Save Images button only shows when report has photos
         raise LookupError(
             f"Resource does not have photos. resource id: {resourceid}"
         )
 
-    return output
+    return ResourcePhotosMetadata(
+        resourceid=str(resource.pk),
+        resource_name=resource.displayname(),
+        photos=output_photos
+    )
