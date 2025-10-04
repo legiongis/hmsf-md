@@ -3,17 +3,19 @@
 
 {% block header %}
 
-<!-- Save Images button (hide when editing resource) -->
-<!-- ko if: !editorContext && hasImages -->
-<div style="position: relative;">
-    <button data-bind="click: function () {
-            downloadPhotos('{% url 'download-report-photos' %}?rid=')
-        }"
-        class="btn btn-rr btn-labeled btn-lg fa fa-image dz-clickable"
-        style="position: absolute; right: 0; margin: 1rem; z-index: 10; box-shadow: 0.1rem 0.1rem 0.6rem #00000066"
-        >Save Images</button>
+<!-- Download Photos button -->
+<div data-bind="visible: !editorContext && hasImages"class="relative">
+    <button data-bind="
+        click: function () { downloadPhotos('{% url 'download-report-photos' %}?rid=') }"
+        class="btn btn-rr btn-labeled btn-lg dz-clickable fa btn-download-photos"
+    >
+        <div class="btn-download-photos__icon-wrapper">
+            <i data-bind="
+                css: { 'fa-image': !isDownloadingPhotos(), 'fa-spinner fa-spin': isDownloadingPhotos() }"
+                class="fa"></i></div>
+        <span data-bind="text: isDownloadingPhotos() ? 'Downloading Photos...' : 'Save Photos'"></span>
+    </button>
 </div>
-<!-- /ko -->
 
 <div data-bind="carousel: { content: { name: 'carouselItemTemplate', data: imgs } }"></div>
 

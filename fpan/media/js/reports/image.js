@@ -66,13 +66,25 @@ define([
                 })
             );
 
+            /*
+            `isDownloadingPhotos` binds to a spinner in the Download Photos
+            button. The user needs immediate feedback that the server has
+            started the job because:
+                - the browser won't show feedback about the download until the
+                    server responds
+                - the initial response will take a while to arrive (fetching
+                    from S3 and zipping photos)
+            */
+            self.isDownloadingPhotos = ko.observable(false)
+
             self.downloadPhotos = function (baseUrl) {
+                self.isDownloadingPhotos(true);
                 var resourceid = self.report.get('resourceid');
                 var url = baseUrl + resourceid;
                 var response;
                 fetch(url)
                     .then(function (resp) {
-                        if (resp.status == 500) {
+                        if (!resp.ok) {
                             err = new Error();
                             err.isServerErr = true;
                             throw err;
@@ -84,7 +96,6 @@ define([
                         var filename = response.headers.get('Content-Disposition')
                             .match(/filename="(.+)"/)[1]
                             || `report-photos-${resourceid}.zip`;
-                        // download by clicking a temp link
                         var a = document.createElement('a');
                         a.download = filename;
                         a.href = URL.createObjectURL(blob);
@@ -93,14 +104,14 @@ define([
                         URL.revokeObjectURL(a.href);
                     })
                     .catch(function(err) {
-                        msg = "Please check your internet connection.";
-                        if (err.isServerErr) {
-                            msg = "There was an issue on the server.\
-                                   Please try downloading again later.";
-                        }
+                        // need this check to silence the error alert when the
+                        // user leaves the page during the downlaod
+                        if (!err.isServerErr) return;
+                        var msg = "There was an issue on the server.\nPlease try downloading again later.";
                         console.error(msg + ': ' +  err);
                         alert(msg);
-                    });
+                    })
+                    .finally(function() { self.isDownloadingPhotos(false); });
             }
         },
         template: {

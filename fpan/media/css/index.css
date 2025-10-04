@@ -760,3 +760,21 @@ FIXES:
     }
 }
 
+.btn-download-photos {
+    position: absolute;
+    right: 0;
+    z-index: 10;
+    margin: 1rem;
+    padding-left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0.1rem 0.1rem 0.6rem #00000066;
+}
+
+.btn-download-photos__icon-wrapper {
+    background: #8d89e2;
+    padding-inline: 1.6rem;
+    padding-block: 1rem;
+    margin-right: 1.3rem;
+}
