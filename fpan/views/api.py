@@ -315,13 +315,13 @@ class ResourcePhotosMetadata(TypedDict):
 
 def zipped_photos_buffer(photos_metadata: ResourcePhotosMetadata) -> BytesIO:
     """
-    Returns a `BytesIO` representing the zip file containing `filenames`.
-    Files are read from Django's `default_storage`.
+    Returns an in-memory zip file containing photo files referenced in
+    `photos_metadata`. Files are read from Django's `default_storage`.
 
     Raises:
-        OSError: If there's an issue reading files or creating the zip.
-        FileNotFoundError: If a photo file doesn't exist in storage.
-        MemoryError: If files are too large to fit in memory.
+        OSError: If there's an issue reading files or creating the zip
+        FileNotFoundError: If a photo file doesn't exist in storage
+        MemoryError: If files are too large to fit in memory
     """
     from zipfile import ZipFile
     from django.core.files.storage import default_storage
@@ -392,7 +392,7 @@ def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
 
     output_photos = [
         ResourcePhotoMetadata(
-            file_id=f.pk,
+            file_id=str(f.pk),
             filename=f.path.name.split("/")[-1],
             file_loc=f.path.name,
         )
