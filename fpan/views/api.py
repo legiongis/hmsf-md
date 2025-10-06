@@ -256,12 +256,6 @@ class ResourceIdLookup(APIBase):
         return JSONResponse(response)
 
 
-from pathlib import Path
-
-# TODO: confirm that default_storage abstracts away s3 fetching (see zip func)
-# TODO: zip file name?
-
-
 class DownloadScoutReportPhotos(APIBase):
 
     def get(self, request):
@@ -269,16 +263,15 @@ class DownloadScoutReportPhotos(APIBase):
         Respond with a zip file of photos for a given Scout Report.
         """
         if not (reportid := request.GET.get("rid")):
-            return HttpResponseBadRequest(b"Expected url param `rid`.")
+            return HttpResponseBadRequest(b"Expected url param `rid` (resource id).")
 
         logger.info("Zipped photos were requested for scout report: " + reportid)
 
         try:
             zipfile_name = f"report-photos-{reportid}.zip"
-            photos_mdata = resource_photos_metadata(reportid)
-            zipbuf = zipped_photos_buffer(photos_mdata)
+            photos = zipped_photos(reportid)
             return FileResponse(
-                zipbuf,
+                photos,
                 filename=zipfile_name,
                 content_type="application/zip",
                 as_attachment=True,
@@ -298,53 +291,23 @@ class DownloadScoutReportPhotos(APIBase):
 
 
 from io import BytesIO
-from typing import TypedDict
 
 
-class ResourcePhotoMetadata(TypedDict):
-    file_id: str
-    filename: str
-    file_loc: str
-
-
-class ResourcePhotosMetadata(TypedDict):
-    resourceid: str
-    resource_name: str
-    photos: list[ResourcePhotoMetadata]
-
-
-def zipped_photos_buffer(photos_metadata: ResourcePhotosMetadata) -> BytesIO:
+def zipped_photos(resourceid: str) -> BytesIO:
     """
-    Returns an in-memory zip file containing photo files referenced in
-    `photos_metadata`. Files are read from Django's `default_storage`.
+    Returns a buffer containing a zip file of photos for the provided resource.
+
+    Makes synchronous network calls to fetch files from S3.
 
     Raises:
+        ValueError: If resource not found
+        LookupError: If resource has no photos
         OSError: If there's an issue reading files or creating the zip
         FileNotFoundError: If a photo file doesn't exist in storage
         MemoryError: If files are too large to fit in memory
     """
     from zipfile import ZipFile
-    from django.core.files.storage import default_storage
-
-    zip_buf = BytesIO()
-    with ZipFile(zip_buf, "w") as zip_file:
-        for photo in photos_metadata["photos"]:
-            with default_storage.open(photo["file_loc"]) as content:
-                zip_file.writestr(photo["filename"], content.read())
-    zip_buf.seek(0)
-    return zip_buf
-
-
-def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
-    """
-    Returns metadata for all photos associated with a resource.
-
-    Raises:
-        ValueError: If resource not found
-        LookupError: If resource has no photos
-    """
-    from arches.app.models.models import File
-    from arches.app.models.models import Node
+    from arches.app.models.models import File, Node
     from arches.app.models.tile import Tile
 
     resource: Resource
@@ -361,8 +324,8 @@ def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
     photo_node = Node.objects.get(name="Photo")
 
     resource_photo_tiles = Tile.objects.filter(
-      nodegroup=photo_node.nodegroup,
-      resourceinstance=resource,
+        nodegroup=photo_node.nodegroup,
+        resourceinstance=resource,
     )
 
     # NOTE: Must get file ids from the tile data.
@@ -376,38 +339,22 @@ def resource_photos_metadata(resourceid: str) -> ResourcePhotosMetadata:
     ]
 
     # NOTE: Later, we might want additional tile data for:
-    # - including `Comment` and `Photo Type` node data in the output,
-    #     e.g. to be included in a text file in the zipped photos
-    # - using the display name (tile.photo.name), as opposed to file.path.name,
-    #     which includes the true filename on disk/S3, which will differ from
-    #     the display name when multiple files of the same name have been
-    #     uploaded
+    # - Including `Comment` and `Photo Type` node data in the output,
+    #     e.g. to be included in a text file in the zipped photos.
+    # - Using the display name (tile.photo.name), as opposed to file.path.name.
+    #     which includes the true filename on disk/S3, and may differ from the
+    #     display name when a file of the same name was previously uploaded.
     # In this case, we'd query the db for `Comment` and `Photo Type` `Nodes`,
     # and use those PKs to get the node data as in:
     # `tile.data.get(str(comment_node.pk))`
 
-    # get current photo `Files` for this resource
-    # the `path.name`s will be used by the caller to query `default_storage`
     curr_photo_files = File.objects.filter(pk__in=curr_photo_file_ids)
 
-    output_photos = [
-        ResourcePhotoMetadata(
-            file_id=str(f.pk),
-            filename=f.path.name.split("/")[-1],
-            file_loc=f.path.name,
-        )
-        for f in curr_photo_files
-    ]
+    zip_buf = BytesIO()
+    with ZipFile(zip_buf, "w") as zip_file:
+        for f in curr_photo_files:
+            with f.path.open("rb") as content:
+                zip_file.writestr(f.path.name.split("/")[-1], content.read())
+    zip_buf.seek(0)
 
-    if not output_photos:
-        # should never see this
-        # Save Images button only shows when report has photos
-        raise LookupError(
-            f"Resource does not have photos. resource id: {resourceid}"
-        )
-
-    return ResourcePhotosMetadata(
-        resourceid=str(resource.pk),
-        resource_name=resource.displayname(),
-        photos=output_photos
-    )
+    return zip_buf
