@@ -13,6 +13,8 @@ define([
             params.configKeys = ['nodes'];
             ReportViewModel.apply(this, [params]);
 
+            self.hasImages = true; // used to show/hide Save Images button
+
             self.imgs = ko.computed(function() {
                 var imgs = [];
                 var nodes = ko.unwrap(self.nodes);
@@ -39,6 +41,7 @@ define([
                     }, self);
                 }, self);
                 if (imgs.length === 0) {
+                    self.hasImages = false;
                     imgs = [{
                         src: arches.urls.media + 'img/photo_missing.png',
                         alt: ''
@@ -62,6 +65,54 @@ define([
                     return ko.unwrap(node.datatype) === 'file-list';
                 })
             );
+
+            /*
+            `isDownloadingPhotos` binds to a spinner in the Download Photos
+            button. The user needs immediate feedback that the server has
+            started the job because:
+                - the browser won't show feedback about the download until the
+                    server responds
+                - the initial response will take a while to arrive (fetching
+                    from S3 and zipping photos)
+            */
+            self.isDownloadingPhotos = ko.observable(false)
+
+            self.downloadPhotos = function (baseUrl) {
+                self.isDownloadingPhotos(true);
+                var resourceid = self.report.get('resourceid');
+                var url = baseUrl + resourceid;
+                var response;
+                fetch(url)
+                    .then(function (resp) {
+                        if (!resp.ok) {
+                            err = new Error();
+                            err.isServerErr = true;
+                            throw err;
+                        }
+                        response = resp;
+                        return resp.blob();
+                    })
+                    .then(function (blob) {
+                        var filename = response.headers.get('Content-Disposition')
+                            .match(/filename="(.+)"/)[1]
+                            || `report-photos-${resourceid}.zip`;
+                        var a = document.createElement('a');
+                        a.download = filename;
+                        a.href = URL.createObjectURL(blob);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(a.href);
+                    })
+                    .catch(function(err) {
+                        // need this check to silence the error alert when the
+                        // user leaves the page during the downlaod
+                        if (!err.isServerErr) return;
+                        var msg = "There was an issue on the server.\nPlease try downloading again later.";
+                        console.error(msg + ': ' +  err);
+                        alert(msg);
+                    })
+                    .finally(function() { self.isDownloadingPhotos(false); });
+            }
         },
         template: {
             require: 'text!report-templates/image'
