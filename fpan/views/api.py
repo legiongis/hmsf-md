@@ -1,6 +1,14 @@
+from __future__ import annotations
 import logging
 from django.core.cache import cache
-from django.http import Http404, HttpResponse
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseNotFound,
+    HttpResponseServerError
+)
 from django.db import connection
 from django.db.utils import IntegrityError
 from arches.app.models import models
@@ -247,3 +255,145 @@ class ResourceIdLookup(APIBase):
                 response['resources'].append((g.name, siteid, res.resourceinstanceid))
 
         return JSONResponse(response)
+
+
+class DownloadScoutReportPhotos(APIBase):
+
+    def get(self, request):
+        """
+        Respond with a zip file of photos for a given Scout Report.
+        """
+        if not (reportid := request.GET.get("rid")):
+            return HttpResponseBadRequest(b"Expected url param `rid` (resource id).")
+
+        logger.info("Zipped photos were requested for scout report: " + reportid)
+
+        try:
+            zipfile_name, photos = zipped_photos(reportid)
+            return FileResponse(
+                photos,
+                filename=zipfile_name,
+                content_type="application/zip",
+                as_attachment=True,
+            )
+        except ValueError as e:
+            msg = e
+            response = HttpResponseNotFound(msg)
+        except OSError as e:
+            msg = "Coudn't create the zip file: " + str(e)
+            response = HttpResponseServerError(msg)
+        except Exception as e:
+            msg = "An unexpected error occured when trying to create the zip file: " + str(e)
+            response = HttpResponseServerError(msg)
+
+        logger.warning(msg)
+        return response
+
+
+from io import BytesIO
+
+
+def zipped_photos(reportid: str) -> tuple[str, BytesIO]:
+    """
+    Returns a tuple containing:
+        - zip file name
+        - buffer containing a zip file of photos for the provided Scout Report
+
+    Makes synchronous network calls to fetch files from S3.
+
+    Raises:
+        ValueError: If resource not found
+        LookupError: If resource has no photos
+        OSError: If there's an issue reading files or creating the zip
+        FileNotFoundError: If a photo file doesn't exist in storage
+        MemoryError: If files are too large to fit in memory
+    """
+    from zipfile import ZipFile
+    from arches.app.models.models import File, Node
+    from arches.app.models.tile import Tile
+
+    report: Resource
+    try:
+        report = Resource.objects.get(pk=reportid)
+    except Exception as e:
+        raise ValueError(
+            f"report not found: resource id: {reportid}: {e}"
+        ) from e
+
+    # NOTE: Must get photo ids from the tile data.
+    # If we get all photo files associated with a resource,
+    # we also get photos that were removed from the resource,
+    # if they still exist in the `File` table and storage.
+
+    # NOTE: Later, we might want additional tile data for:
+    # - Including `Comment` and `Photo Type` node data in the output,
+    #     e.g. to be included in a text file in the zipped photos.
+    # - Using the display name (tile.photo.name), as opposed to file.path.name.
+    #     which includes the true filename on disk/S3, and may differ from the
+    #     display name when a file of the same name was previously uploaded.
+    # In this case, we'd query the db for `Comment` and `Photo Type` `Nodes`,
+    # and use those PKs to get the node data as in:
+    # `tile.data.get(str(comment_node.pk))`
+
+    photo_node = Node.objects.get(
+        name="Photo", graph__name="Scout Report"
+    )
+    resource_photo_tiles = Tile.objects.filter(
+        nodegroup=photo_node.nodegroup, resourceinstance=report,
+    )
+    curr_photo_file_ids = [
+        photo["file_id"]
+        for tile in resource_photo_tiles
+        for photo in tile.data.get(str(photo_node.pk))
+    ]
+    curr_photo_files = File.objects.filter(pk__in=curr_photo_file_ids)
+
+    if not curr_photo_files.exists():
+        # should never see this
+        # Save Images button only shows when report has photos
+        raise LookupError(
+            f"Report does not have photos. resource id: {reportid}"
+        )
+
+    zip_buf = BytesIO()
+    with ZipFile(zip_buf, "w") as zip_file:
+        for f in curr_photo_files:
+            with f.path.open("rb") as content:
+                zip_file.writestr(f.path.name.split("/")[-1], content.read())
+    zip_buf.seek(0)
+
+    fmsf_site_id = ""
+    fmsf_site_id_node = Node.objects.get(
+        name="FMSF Site ID", graph__name="Scout Report"
+    )
+    fmsf_site_id_tiles = Tile.objects.filter(
+        nodegroup=fmsf_site_id_node.nodegroup, resourceinstance=report
+    )
+    if fmsf_site_id_tiles.exists():
+        # filter has results -> must be exactly 1, and the site must exist
+        fmsf_site_resourceid = (
+            fmsf_site_id_tiles[0].data
+            .get(str(fmsf_site_id_node.pk))[0]
+            .get("resourceId")
+        )
+        # site display name = "{id} - {name}"
+        fmsf_site_id = (
+            Resource.objects.get(pk=fmsf_site_resourceid)
+            .displayname()
+            .split(" - ", maxsplit=1)[0]
+            .strip()
+        )
+
+    # report display name = "{report date} - {author,author,...}"
+    report_date, report_authors = report.displayname().split(" - ", maxsplit=1)
+    report_date = report_date.strip()
+    report_authors = "-".join(report_authors.split(","))
+
+    _ = "_"
+    zipfile_name = (
+        f"photos{_}{fmsf_site_id}{_}{report_date}{_}{report_authors}.zip"
+        if fmsf_site_id
+        else f"photos{_}{report_date}{_}{report_authors}.zip"
+    )
+
+    return zipfile_name, zip_buf
