@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 from django.core.cache import cache
 from django.http import (
