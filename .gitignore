@@ -1,3 +1,4 @@
+.db_backups
 .services
 celerybeat-schedule*
 fpan/logs
