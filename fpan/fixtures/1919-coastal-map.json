@@ -6,7 +6,7 @@
    "source": {
       "type": "raster",
       "tiles": [
-        "https://titiler.oldinsurancemaps.net/mosaicjson/tiles/{z}/{x}/{y}.png?TileMatrixSetId=WebMercatorQuad&url=https%3A%2F%2Flegion-maps.us-southeast-1.linodeobjects.com%2Ffpan%2Fcoastal-map%2F1919-coastal-map-mosaic.json"
+        "https://titiler.oldinsurancemaps.net/mosaicjson/tiles/WebMercatorQuad/{z}/{x}/{y}.png?url=https%3A%2F%2Flegion-maps.us-southeast-1.linodeobjects.com%2Ffpan%2Fcoastal-map%2F1919-coastal-map-mosaic.json"
       ]
     }
   }
