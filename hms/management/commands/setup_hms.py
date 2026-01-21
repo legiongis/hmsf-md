@@ -29,6 +29,7 @@ class Command(BaseCommand):
         db = settings.DATABASES['default']
         db_name = db['NAME']
         db_user = db['USER']
+        db_host = db['HOST']
 
         if options['use_existing_db'] is not True:
             if not input("\nDrop and recreate the database? y/N ").lower().startswith("y"):
@@ -37,7 +38,7 @@ class Command(BaseCommand):
             ## replacing the Arches setup_db command here
             # management.call_command('setup_db', force=True)
             print("\033[96m-- Initialize the DATABASE --\033[0m")
-            prefix = ["psql", "-U", "postgres"]
+            prefix = ["psql", "-U", "postgres", "-h", db_host]
             cmd1 = prefix + ["-c", f"DROP DATABASE IF EXISTS {db_name};"]
             subprocess.call(cmd1)
             cmd2 = prefix + ["-c", f"CREATE DATABASE {db_name} WITH OWNER {db_user};"]
