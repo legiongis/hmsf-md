@@ -76,7 +76,14 @@ This will get a fully function (if empty of real site data) installation of the 
 - Clone this project repo:
 
     ```
-    git clone https://github.com/legiongis/fpan
+    git clone https://github.com/legiongis/hmsf-md
+    ```
+
+- Install the local Python dependencies
+
+    ```
+    cd hmsf-md
+    pip install -e .
     ```
 
 - Enter the project and install js dependencies:
