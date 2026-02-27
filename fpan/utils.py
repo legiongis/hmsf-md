@@ -1,7 +1,7 @@
 import json
 import time
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 from pathlib import Path
 
 from django.conf import settings
@@ -64,7 +64,7 @@ class SpatialJoin():
         if index:
             resource.index()
 
-    def get_areas_for_resourceinstance(self, resourceinstance: ResourceInstance) -> list[ManagementArea]:
+    def get_areas_for_resourceinstance(self, resourceinstance: ResourceInstance) -> List[ManagementArea]:
 
         geom_tile = Tile.objects.get(
             nodegroup_id__in=settings.SPATIAL_COORDINATES_NODEGROUPS_IDS,

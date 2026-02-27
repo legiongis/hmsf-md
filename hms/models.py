@@ -4,6 +4,7 @@ import time
 import json
 from uuid import uuid4
 import logging
+from typing import List
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
@@ -561,7 +562,7 @@ class ManagementArea(models.Model):
     def concept_value_id(self):
         return get_concept_value_id(self.concept)
 
-    def get_intersecting_resource_ids(self) -> list[str]:
+    def get_intersecting_resource_ids(self) -> List[str]:
         if self.geom:
             with connection.cursor() as cursor:
                 cursor.execute(
