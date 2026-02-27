@@ -66,10 +66,14 @@ class SpatialJoin():
 
     def get_areas_for_resourceinstance(self, resourceinstance: ResourceInstance) -> List[ManagementArea]:
 
-        geom_tile = Tile.objects.get(
-            nodegroup_id__in=settings.SPATIAL_COORDINATES_NODEGROUPS_IDS,
-            resourceinstance=resourceinstance
-        )
+        try:
+            geom_tile = Tile.objects.get(
+                nodegroup_id__in=settings.SPATIAL_COORDINATES_NODEGROUPS_IDS,
+                resourceinstance=resourceinstance
+            )
+        except Tile.DoesNotExist:
+            return []
+
         resource_geojson = None
         if geom_tile.data:
             geom_node = Node.objects.get(graph=resourceinstance.graph, datatype="geojson-feature-collection")
