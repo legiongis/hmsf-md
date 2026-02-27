@@ -1,0 +1,270 @@
+{
+  "AL": {
+    "county": "Alachua",
+    "region": "Central"
+  },
+  "BA": {
+    "county": "Baker",
+    "region": "North Central"
+  },
+  "BY": {
+    "county": "Bay",
+    "region": "Northwest"
+  },
+  "BF": {
+    "county": "Bradford",
+    "region": "Central"
+  },
+  "BR": {
+    "county": "Brevard",
+    "region": "East Central"
+  },
+  "BD": {
+    "county": "Broward",
+    "region": "Southeast"
+  },
+  "CA": {
+    "county": "Calhoun",
+    "region": "Northwest"
+  },
+  "CH": {
+    "county": "Charlotte",
+    "region": "Southwest"
+  },
+  "CI": {
+    "county": "Citrus",
+    "region": "Central"
+  },
+  "CL": {
+    "county": "Clay",
+    "region": "Northeast"
+  },
+  "CR": {
+    "county": "Collier",
+    "region": "Southwest"
+  },
+  "CO": {
+    "county": "Columbia",
+    "region": "North Central"
+  },
+  "DA": {
+    "county": "Dade",
+    "region": "Southeast"
+  },
+  "DE": {
+    "county": "Desoto",
+    "region": "West Central"
+  },
+  "DI": {
+    "county": "Dixie",
+    "region": "North Central"
+  },
+  "DU": {
+    "county": "Duval",
+    "region": "Northeast"
+  },
+  "ES": {
+    "county": "Escambia",
+    "region": "Northwest"
+  },
+  "FL": {
+    "county": "Flagler",
+    "region": "Northeast"
+  },
+  "FR": {
+    "county": "Franklin",
+    "region": "North Central"
+  },
+  "GD": {
+    "county": "Gadsden",
+    "region": "North Central"
+  },
+  "GI": {
+    "county": "Gilchrist",
+    "region": "Central"
+  },
+  "GL": {
+    "county": "Glades",
+    "region": "Southwest"
+  },
+  "GU": {
+    "county": "Gulf",
+    "region": "Northwest"
+  },
+  "HA": {
+    "county": "Hamilton",
+    "region": "North Central"
+  },
+  "HR": {
+    "county": "Hardee",
+    "region": "West Central"
+  },
+  "HN": {
+    "county": "Hendry",
+    "region": "Southwest"
+  },
+  "HE": {
+    "county": "Hernando",
+    "region": "Central"
+  },
+  "HG": {
+    "county": "Highlands",
+    "region": "West Central"
+  },
+  "HI": {
+    "county": "Hillsborough",
+    "region": "West Central"
+  },
+  "HO": {
+    "county": "Holmes",
+    "region": "Northwest"
+  },
+  "IR": {
+    "county": "Indian River",
+    "region": "East Central"
+  },
+  "JA": {
+    "county": "Jackson",
+    "region": "Northwest"
+  },
+  "JE": {
+    "county": "Jefferson",
+    "region": "North Central"
+  },
+  "LF": {
+    "county": "Lafayette",
+    "region": "North Central"
+  },
+  "LA": {
+    "county": "Lake",
+    "region": "Central"
+  },
+  "LL": {
+    "county": "Lee",
+    "region": "Southwest"
+  },
+  "LE": {
+    "county": "Leon",
+    "region": "North Central"
+  },
+  "LV": {
+    "county": "Levy",
+    "region": "Central"
+  },
+  "LI": {
+    "county": "Liberty",
+    "region": "North Central"
+  },
+  "MD": {
+    "county": "Madison",
+    "region": "North Central"
+  },
+  "MA": {
+    "county": "Manatee",
+    "region": "West Central"
+  },
+  "MR": {
+    "county": "Marion",
+    "region": "Central"
+  },
+  "MT": {
+    "county": "Martin",
+    "region": "East Central"
+  },
+  "MO": {
+    "county": "Monroe",
+    "region": "Southeast"
+  },
+  "NA": {
+    "county": "Nassau",
+    "region": "Northeast"
+  },
+  "OK": {
+    "county": "Okaloosa",
+    "region": "Northwest"
+  },
+  "OB": {
+    "county": "Okeechobee",
+    "region": "East Central"
+  },
+  "OR": {
+    "county": "Orange",
+    "region": "East Central"
+  },
+  "OS": {
+    "county": "Osceola",
+    "region": "East Central"
+  },
+  "PB": {
+    "county": "Palm Beach",
+    "region": "Southeast"
+  },
+  "PA": {
+    "county": "Pasco",
+    "region": "West Central"
+  },
+  "PI": {
+    "county": "Pinellas",
+    "region": "West Central"
+  },
+  "PO": {
+    "county": "Polk",
+    "region": "West Central"
+  },
+  "PU": {
+    "county": "Putnam",
+    "region": "Northeast"
+  },
+  "SR": {
+    "county": "Santa Rosa",
+    "region": "Northwest"
+  },
+  "SO": {
+    "county": "Sarasota",
+    "region": "West Central"
+  },
+  "SE": {
+    "county": "Seminole",
+    "region": "East Central"
+  },
+  "SJ": {
+    "county": "St. Johns",
+    "region": "Northeast"
+  },
+  "SL": {
+    "county": "St. Lucie",
+    "region": "East Central"
+  },
+  "SM": {
+    "county": "Sumter",
+    "region": "Central"
+  },
+  "SU": {
+    "county": "Suwannee",
+    "region": "North Central"
+  },
+  "TA": {
+    "county": "Taylor",
+    "region": "North Central"
+  },
+  "UN": {
+    "county": "Union",
+    "region": "North Central"
+  },
+  "VO": {
+    "county": "Volusia",
+    "region": "Northeast"
+  },
+  "WA": {
+    "county": "Wakulla",
+    "region": "North Central"
+  },
+  "WL": {
+    "county": "Walton",
+    "region": "Northwest"
+  },
+  "WS": {
+    "county": "Washington",
+    "region": "Northwest"
+  }
+}
