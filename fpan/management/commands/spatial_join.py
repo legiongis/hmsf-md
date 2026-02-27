@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from arches.app.models.models import ResourceInstance
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
+from arches.app.utils.index_database import index_resources_by_type
 
 from fpan.utils import SpatialJoin
 from fpan.tasks import run_full_spatial_join
@@ -18,6 +19,10 @@ class Command(BaseCommand):
         parser.add_argument(
             '-r',
             '--resourceinstanceid',
+        )
+        parser.add_argument(
+            '-g',
+            '--graph',
         )
         parser.add_argument(
             '--all',
@@ -38,19 +43,20 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        resid = options['resourceinstanceid']
-        if resid:
-            resources = ResourceInstance.objects.filter(pk=resid)
+        start = datetime.now()
+        if options['resourceinstanceid']:
+            resource = ResourceInstance.objects.get(pk=options['resourceinstanceid'])
+            joiner = SpatialJoin(resource.graph.name)
+            joiner.update_resource(resource)
+        elif graph_name := options['graph']:
+            self.run_join_by_graph(graph_name)
         elif options['all']:
-            if options['background']:
-                print("running in the background")
-                run_full_spatial_join.delay()
-                exit()
-            resources = ResourceInstance.objects.filter(graph__name__in=[
+            for graph_name in [
                 "Archaeological Site",
                 "Historic Cemetery",
                 "Historic Structure",
-            ])
+            ]:
+                self.run_join_by_graph(graph_name)
         elif options["backfill"]:
             # find all empty FPAN Region nodes and use only these resources
             resids = []
@@ -79,10 +85,14 @@ class Command(BaseCommand):
         else:
             exit()
 
-        joiner = SpatialJoin()
+        print(f"completed. elapsed time: {datetime.now() - start}")
+
+    def run_join_by_graph(self, graph_name):
+        resources = ResourceInstance.objects.filter(graph__name=graph_name)
+        joiner = SpatialJoin(graph_name)
         total = resources.count()
-        start = datetime.now()
         for n, res in enumerate(resources, start=1):
             print(f'{n}/{total}: {str(res.pk)} ({res.graph.name})')
-            joiner.update_resource(res)
-        print(f"completed. elapsed time: {datetime.now() - start}")
+            joiner.update_resource(res, index=False)
+        graph = Graph.objects.get(name=graph_name)
+        index_resources_by_type([graph.pk])

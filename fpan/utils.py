@@ -2,18 +2,14 @@ import json
 import time
 import logging
 from typing import TYPE_CHECKING
-from datetime import datetime
 from pathlib import Path
 
 from django.conf import settings
-from django.db import connection, transaction
-from django.contrib.gis.db.models import Union
-from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
+from django.contrib.gis.geos import GEOSGeometry
 
 from arches.app.models.resource import Resource
 from arches.app.models.models import ResourceInstance, Node, Value
 from arches.app.models.tile import Tile
-from arches.app.utils.index_database import index_resources_using_singleprocessing
 
 from hms.models import ManagementArea, ManagementAgency
 
@@ -21,9 +17,10 @@ logger = logging.getLogger(__name__)
 
 class SpatialJoin():
 
-    def __init__(self):
+    def __init__(self, graph_name: str):
 
-        self.node_lookup = settings.SPATIAL_JOIN_NODE_LOOKUP
+        self.node_lookup = settings.SPATIAL_JOIN_NODE_LOOKUP[graph_name]
+
         self.valid_management_area_vals = [i.concept_value_id for i in ManagementArea.objects.all()]
         self.valid_management_agency_vals = [i.concept_value_id for i in ManagementAgency.objects.all()]
 
@@ -67,37 +64,8 @@ class SpatialJoin():
         if index:
             resource.index()
 
-    def join_management_area_to_resources(self, area):
-
-        logger.info(f"joining {area.name} to resources")
-
-        # first find a list of all resource geometries that overlap this area
-        with connection.cursor() as cursor:
-            cursor.execute(
-                '''SELECT resourceinstanceid FROM geojson_geometries
-                        WHERE ST_Intersects(
-                            ST_GeomFromText( %s, 4326 ),
-                            ST_Transform(geojson_geometries.geom, 4326)
-                        );''',
-                        (area.geom.wkt,)
-            )
-            rows = cursor.fetchall()
-        resids = [str(i[0]) for i in rows if len(i) > 0]
-
-        resinstances = ResourceInstance.objects.filter(pk__in=resids).exclude(graph__name="Arches System Settings")
-        logger.info(f"updating {resinstances.count()} resources overlapping this area")
-
-        # iterate all intersecting resources and apply this area's attributes to them
-        for resinstance in resinstances:
-            self.apply_management_area_attributes(resinstance, area)
-
-        # now index all resources
-        resources = Resource.objects.filter(pk__in=resids).exclude(graph__name="Arches System Settings")
-        logger.info(f"indexing {resources.count()} resources")
-        index_resources_using_singleprocessing(resources=resources, quiet=True)
-
     def get_areas_for_resourceinstance(self, resourceinstance: ResourceInstance) -> list[ManagementArea]:
-        start = datetime.now()
+
         geom_tile = Tile.objects.get(
             nodegroup_id__in=settings.SPATIAL_COORDINATES_NODEGROUPS_IDS,
             resourceinstance=resourceinstance
@@ -125,32 +93,29 @@ class SpatialJoin():
             category__name="FPAN Region"
         ).filter(pk__in=area_pks))
 
-        print("elapsed:", datetime.now() - start)
         return areas
 
     def get_management_tile(self, resourceinstance: ResourceInstance) -> Tile:
 
-        g_name = resourceinstance.graph.name
-        ng = self.node_lookup[g_name]['nodegroupid']
-        
         try:
-            tile = Tile.objects.get(nodegroup_id=ng, resourceinstance=resourceinstance)
+            tile = Tile.objects.get(nodegroup_id=self.node_lookup['nodegroupid'],
+                                    resourceinstance=resourceinstance)
         except Tile.DoesNotExist:
-            tile = Tile().get_blank_tile(ng, resourceid=resourceinstance.pk)
+            tile = Tile().get_blank_tile(self.node_lookup['nodegroupid'],
+                                         resourceid=resourceinstance.pk)
 
         if TYPE_CHECKING and not tile.data:
             return tile
 
         # set empty lists if the node value is None or nonexistent
-        n_lookup = self.node_lookup[g_name]
-        if not isinstance(tile.data.get(n_lookup['county_nodeid']), list):
-            tile.data[n_lookup['county_nodeid']] = []
-        if not isinstance(tile.data.get(n_lookup['region_nodeid']), list):
-            tile.data[n_lookup['region_nodeid']] = []
-        if not isinstance(tile.data.get(n_lookup['area_nodeid']), list):
-            tile.data[n_lookup['area_nodeid']] = []
-        if not isinstance(tile.data.get(n_lookup['agency_nodeid']), list):
-            tile.data[n_lookup['agency_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup['county_nodeid']), list):
+            tile.data[self.node_lookup['county_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup['region_nodeid']), list):
+            tile.data[self.node_lookup['region_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup['area_nodeid']), list):
+            tile.data[self.node_lookup['area_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup['agency_nodeid']), list):
+            tile.data[self.node_lookup['agency_nodeid']] = []
 
         return tile
 
@@ -163,21 +128,19 @@ class SpatialJoin():
         if TYPE_CHECKING and not tile.data:
             return
 
-        n_lookup = self.node_lookup[resourceinstance.graph.name]
-
         val = area.concept_value_id
-        tile.data[n_lookup['area_nodeid']].append(val)
+        tile.data[self.node_lookup['area_nodeid']].append(val)
 
         # add the agency if available
         if area.management_agency is not None:
-            tile.data[n_lookup['agency_nodeid']].append(area.management_agency.concept_value_id)
+            tile.data[self.node_lookup['agency_nodeid']].append(area.management_agency.concept_value_id)
 
         # finalize with some QA/QC
-        tile.data[n_lookup['area_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['area_nodeid']] if i in self.valid_management_area_vals]
+        tile.data[self.node_lookup['area_nodeid']] = list(set(
+            [i for i in tile.data[self.node_lookup['area_nodeid']] if i in self.valid_management_area_vals]
         ))
-        tile.data[n_lookup['agency_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['agency_nodeid']] if i in self.valid_management_agency_vals]
+        tile.data[self.node_lookup['agency_nodeid']] = list(set(
+            [i for i in tile.data[self.node_lookup['agency_nodeid']] if i in self.valid_management_agency_vals]
         ))
 
         tile.save(index=False)
@@ -185,28 +148,19 @@ class SpatialJoin():
     def apply_fpan_region_and_county_attributes(self, resourceinstance: ResourceInstance):
 
         tile = self.get_management_tile(resourceinstance)
-        n_lookup = self.node_lookup[resourceinstance.graph.name]
 
         if TYPE_CHECKING and not tile.data:
             return
 
         siteid = get_node_value(resourceinstance, "FMSF ID")
-        print(siteid)
         entry = self.county_lookup[siteid[:2]]
-        print(entry)
 
-        tile.data[n_lookup['county_nodeid']].append(entry['county_concept_value_id'])
-        tile.data[n_lookup['region_nodeid']].append(entry['region_concept_value_id'])
+        tile.data[self.node_lookup['county_nodeid']].append(entry['county_concept_value_id'])
+        tile.data[self.node_lookup['region_nodeid']].append(entry['region_concept_value_id'])
 
-        g_name = resourceinstance.graph.name
-        n_lookup = self.node_lookup[g_name]
         # finalize with some QA/QC
-        tile.data[n_lookup['area_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['area_nodeid']] if i in self.valid_management_area_vals]
-        ))
-        tile.data[n_lookup['agency_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['agency_nodeid']] if i in self.valid_management_agency_vals]
-        ))
+        tile.data[self.node_lookup['county_nodeid']] = list(set(tile.data[self.node_lookup['county_nodeid']]))
+        tile.data[self.node_lookup['region_nodeid']] = list(set(tile.data[self.node_lookup['region_nodeid']]))
 
         tile.save(index=False)
 

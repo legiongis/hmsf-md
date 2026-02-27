@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.gis.geos import MultiPolygon
 from django.utils.safestring import mark_safe, SafeText
+from django.db import connection
 
 from arches.app.models.resource import Resource
 from arches.app.models.models import (
@@ -559,6 +560,22 @@ class ManagementArea(models.Model):
     @property
     def concept_value_id(self):
         return get_concept_value_id(self.concept)
+
+    def get_intersecting_resource_ids(self) -> list[str]:
+        if self.geom:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    '''SELECT resourceinstanceid FROM geojson_geometries
+                            WHERE ST_Intersects(
+                                ST_GeomFromText( %s, 4326 ),
+                                ST_Transform(geojson_geometries.geom, 4326)
+                            );''',
+                            (self.geom.wkt,)
+                )
+                rows = cursor.fetchall()
+            return [str(i[0]) for i in rows if len(i) > 0]
+        else:
+            return []
 
     def save(self, *args, **kwargs):
 

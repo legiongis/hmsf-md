@@ -32,9 +32,9 @@ def run_management_area_import_as_task(loadid, ma_group=None, ma_category=None, 
 def run_full_spatial_join():
     from arches.app.models.models import ResourceInstance
     from fpan.utils import SpatialJoin
-    joiner = SpatialJoin()
 
-    resource_graphs = ["Archaeological Site", "Historic Cemetery", "Historic Structure"]
-    for res in ResourceInstance.objects.filter(graph__name__in=resource_graphs):
-        logger.debug(f"spatial join resource: {res.pk}")
-        joiner.update_resource(res)
+    for graph_name in ["Archaeological Site", "Historic Cemetery", "Historic Structure"]:
+        joiner = SpatialJoin(graph_name)
+        for res in ResourceInstance.objects.filter(graph__name=graph_name):
+            logger.debug(f"spatial join resource: {res.pk}")
+            joiner.update_resource(res)

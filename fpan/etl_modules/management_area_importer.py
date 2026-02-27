@@ -29,6 +29,7 @@ from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
+from arches.app.utils.index_database import index_resources_using_singleprocessing
 
 from hms.models import (
     ManagementArea,
@@ -259,10 +260,17 @@ class ManagementAreaImporter(BaseImportModule):
 
         self.update_status_and_load_details("running spatial join")
 
-        joiner = SpatialJoin()
+        all_resids = []
         for area in self.areas:
             self.update_status_and_load_details(f"processing {area.name}")
-            joiner.join_management_area_to_resources(area)
+            resids = area.get_intersecting_resource_ids()
+            resourceinstances = ResourceInstance.objects.filter(pk__in=resids)
+            for res in resourceinstances:
+                joiner = SpatialJoin(res.graph.name)
+                joiner.update_resource(res)
+            all_resids += resids
+        resources = Resource.objects.filter(pk__in=all_resids)
+        index_resources_using_singleprocessing(resources)
 
     def finalize_load(self):
 
