@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools >= 40.6.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hmsf-md"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+
+dependencies = [
+    "pygments==2.15.0",
+    "django-grappelli==2.15.5",
+    "django-tinymce==4.1.0",
+    "django-storages==1.13",
+    "boto3==1.24",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.13.1",
+    "django-docs==0.3.3",
+    "sphinx==7.1.2",
+    "myst-parser==2.0.0",
+    "sphinx-material==0.0.36",
+]
+
+[tool.setuptools]
+packages = [
+    "fpan"
+]
