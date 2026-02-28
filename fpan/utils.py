@@ -157,7 +157,15 @@ class SpatialJoin():
             return
 
         siteid = get_node_value(resourceinstance, "FMSF ID")
-        entry = self.county_lookup[siteid[:2]]
+        if not siteid:
+            logger.warning(f"missing FSMF site id on resource: {resourceinstance.pk}")
+            return
+
+        abbrev = siteid[:2].upper()
+        entry = self.county_lookup.get(abbrev)
+        if not entry:
+            logger.warning(f"no entry in county lookup for {abbrev}: {resourceinstance.pk}")
+            return
 
         tile.data[self.node_lookup['county_nodeid']].append(entry['county_concept_value_id'])
         tile.data[self.node_lookup['region_nodeid']].append(entry['region_concept_value_id'])
