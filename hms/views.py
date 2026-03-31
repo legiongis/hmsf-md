@@ -29,48 +29,66 @@ from hms.utils import account_activation_token, create_scout_from_valid_form
 
 logger = logging.getLogger(__name__)
 
+
 def index(request):
-    return render(request, 'index.htm', {
-        'main_script': 'index',
-        'active_page': 'Home',
-        'app_title': '{0} | Home'.format(settings.APP_NAME),
-        'page':'index'
-    })
+    return render(
+        request,
+        "index.htm",
+        {
+            "main_script": "index",
+            "active_page": "Home",
+            "app_title": "{0} | Home".format(settings.APP_NAME),
+            "page": "index",
+        },
+    )
+
 
 def about(request):
-    return render(request, 'about.htm', {
-        'main_script': 'about',
-        'active_page': 'About',
-        'app_title': '{0} | About the Database'.format(settings.APP_NAME),
-        'page':'about'
-    })
+    return render(
+        request,
+        "about.htm",
+        {
+            "main_script": "about",
+            "active_page": "About",
+            "app_title": "{0} | About the Database".format(settings.APP_NAME),
+            "page": "about",
+        },
+    )
+
 
 @user_passes_test(user_is_scout)
 def hms_home(request):
 
     if request.method == "POST":
         scout_profile_form = ScoutProfileForm(
-            request.POST,
-            instance=request.user.scout.scoutprofile)
+            request.POST, instance=request.user.scout.scoutprofile
+        )
         if scout_profile_form.is_valid():
             scout_profile_form.save()
-            messages.add_message(request, messages.INFO, 'Your profile has been updated.')
+            messages.add_message(
+                request, messages.INFO, "Your profile has been updated."
+            )
         else:
-            messages.add_message(request, messages.ERROR, 'Form was invalid.')
+            messages.add_message(request, messages.ERROR, "Form was invalid.")
 
-        return redirect(reverse('user_profile_manager'))
+        return redirect(reverse("user_profile_manager"))
 
     else:
         scout_profile_form = None
         try:
-            scout_profile_form = ScoutProfileForm(instance=request.user.scout.scoutprofile)
+            scout_profile_form = ScoutProfileForm(
+                instance=request.user.scout.scoutprofile
+            )
         except Scout.DoesNotExist:
             pass
-        return render(request, "home-hms.htm", {
-            'scout_profile': scout_profile_form,
-            'page':'home-hms'})
+        return render(
+            request,
+            "home-hms.htm",
+            {"scout_profile": scout_profile_form, "page": "home-hms"},
+        )
 
-def server_error(request, template_name='500.html'):
+
+def server_error(request, template_name="500.html"):
 
     t = get_template(template_name)
     return HttpResponseServerError(t.render(RequestContext(request).__dict__))
@@ -81,7 +99,6 @@ class LoginView(View):
 
         login_type = request.GET.get("t", "landmanager")
         if request.GET.get("logout", None) is not None:
-
             try:
                 user = request.user
             except Exception as e:
@@ -94,17 +111,23 @@ class LoginView(View):
             else:
                 login_type = "landmanager"
 
-            logger.info(f"logging out: {user.username} | redirect to /auth/ should follow")
+            logger.info(
+                f"logging out: {user.username} | redirect to /auth/ should follow"
+            )
             logout(request)
             # need to redirect to 'auth' so that the user is set to anonymous via the middleware
             return redirect(f"/auth/?t={login_type}")
         else:
             next = request.GET.get("next", None)
-            return render(request, "login.htm", {
-                "auth_failed": False,
-                "next": next,
-                "login_type": login_type,
-            })
+            return render(
+                request,
+                "login.htm",
+                {
+                    "auth_failed": False,
+                    "next": next,
+                    "login_type": login_type,
+                },
+            )
 
     def post(self, request):
         # POST request is taken to mean user is logging in
@@ -115,7 +138,6 @@ class LoginView(View):
         user = authenticate(username=username, password=password)
 
         if user is not None and user.is_active:
-
             auth_attempt_success = True
             # these conditionals ensure that scouts and land managers must
             # use the correct login portals
@@ -124,7 +146,7 @@ class LoginView(View):
 
             if user_is_scout(user) and login_type != "scout":
                 auth_attempt_success = False
-            
+
             # if user survives above checks, login
             if auth_attempt_success is True:
                 login(request, user)
@@ -136,20 +158,28 @@ class LoginView(View):
 
                 return redirect(next)
 
-        return render(request, "login.htm", {
-            "auth_failed": True,
-            "next": next,
-            "login_type": login_type
-        }, status=401)
+        return render(
+            request,
+            "login.htm",
+            {"auth_failed": True, "next": next, "login_type": login_type},
+            status=401,
+        )
+
 
 def login_patch(request, login_type):
     return redirect(f"/auth/?t={login_type}")
 
+
 def activate_page(request, uidb64, token):
-    
-    return render(request, "hms/email/activation_page.htm", {
-        "activation_link": f"/activate/?uidb64={uidb64}&token={token}",
-    })
+
+    return render(
+        request,
+        "hms/email/activation_page.htm",
+        {
+            "activation_link": f"/activate/?uidb64={uidb64}&token={token}",
+        },
+    )
+
 
 def activate(request):
 
@@ -160,12 +190,12 @@ def activate(request):
             uid = force_text(urlsafe_base64_decode(uidb64))
             logger.debug(f"activate user: {uid}")
             user = Scout.objects.get(pk=uid)
-        except(TypeError, ValueError, OverflowError, Scout.DoesNotExist) as e:
+        except (TypeError, ValueError, OverflowError, Scout.DoesNotExist) as e:
             logger.debug(f"error during account activation: {e}")
             return redirect("/auth/?t=scout")
         valid_token = account_activation_token.check_token(user, token)
         if not valid_token:
-            logger.debug(f"token is invalid (user already activated??)")
+            logger.debug("token is invalid (user already activated??)")
         if user is not None and valid_token:
             user.is_active = True
             user.save()
@@ -175,20 +205,21 @@ def activate(request):
 
     return redirect("/auth/?t=scout")
 
+
 def scout_signup(request):
 
     context = {
-            'main_script': 'scout-signup',
-            'active_page': 'Scout Signup',
-            'app_title': '{0} | Scout Signup'.format(settings.APP_NAME),
-            'scout_form': None,
-            'page':'scout-signup'
+        "main_script": "scout-signup",
+        "active_page": "Scout Signup",
+        "app_title": "{0} | Scout Signup".format(settings.APP_NAME),
+        "scout_form": None,
+        "page": "scout-signup",
     }
 
     if request.method == "GET":
         scout_form = ScoutForm()
-        context['scout_form'] = scout_form
-        return render(request, 'scout-signup.htm', context)
+        context["scout_form"] = scout_form
+        return render(request, "scout-signup.htm", context)
 
     elif request.method == "POST":
         form = ScoutForm(request.POST)
@@ -200,29 +231,36 @@ def scout_signup(request):
             if settings.HTTPS:
                 baseurl = f"https://{current_site.domain}"
             msg_vars = {
-                'user': scout,
-                'baseurl': baseurl,
-                'uid': encoded_uid,
-                'token': token,
+                "user": scout,
+                "baseurl": baseurl,
+                "uid": encoded_uid,
+                "token": token,
             }
-            message_txt = render_to_string('hms/email/account_activation_email.htm', msg_vars)
-            message_html = render_to_string('hms/email/account_activation_email_html.htm', msg_vars)
-            subject_line = settings.EMAIL_SUBJECT_PREFIX + 'Activate your account.'
+            message_txt = render_to_string(
+                "hms/email/account_activation_email.htm", msg_vars
+            )
+            message_html = render_to_string(
+                "hms/email/account_activation_email_html.htm", msg_vars
+            )
+            subject_line = settings.EMAIL_SUBJECT_PREFIX + "Activate your account."
             from_email = settings.DEFAULT_FROM_EMAIL
-            to_email = form.cleaned_data.get('email')
-            email = EmailMultiAlternatives(subject_line,message_txt,from_email,to=[to_email])
+            to_email = form.cleaned_data.get("email")
+            email = EmailMultiAlternatives(
+                subject_line, message_txt, from_email, to=[to_email]
+            )
             email.attach_alternative(message_html, "text/html")
             email.send()
-            return render(request, 'hms/email/please-confirm.htm')
+            return render(request, "hms/email/please-confirm.htm")
 
-        context['scout_form'] = form
-        return render(request, 'scout-signup.htm', context)
+        context["scout_form"] = form
+        return render(request, "scout-signup.htm", context)
 
     else:
         raise Http404
 
+
 def scouts_dropdown(request):
-    resourceid = request.GET.get('resourceid', None)
+    resourceid = request.GET.get("resourceid", None)
 
     ## get all scouts right off the bat
     if resourceid is None:
@@ -232,7 +270,9 @@ def scouts_dropdown(request):
 
         site_regions = []
         n = Node.objects.get(name="FPAN Region", graph__name="Archaeological Site")
-        region_tiles = Tile.objects.filter(resourceinstance=resourceid, nodegroup=n.nodegroup)
+        region_tiles = Tile.objects.filter(
+            resourceinstance=resourceid, nodegroup=n.nodegroup
+        )
         for t in region_tiles:
             for v in t.data[str(n.nodeid)]:
                 value = Value.objects.get(valueid=v)
@@ -251,15 +291,18 @@ def scouts_dropdown(request):
         display_name = f"{scout.user.username} | {', '.join(scout.site_interest_type)}"
         if scout.site_access_mode == "FULL":
             display_name += " | already has FULL access to sites"
-        return_scouts.append({
-            'id': scout.user_id,
-            'username': scout.user.username,
-            'display_name': display_name,
-            'site_interest_type': scout.site_interest_type,
-            'fpan_regions': [region.name for region in scout.fpan_regions.all()],
-        })
+        return_scouts.append(
+            {
+                "id": scout.user.pk,
+                "username": scout.user.username,
+                "display_name": display_name,
+                "site_interest_type": scout.site_interest_type,
+                "fpan_regions": [region.name for region in scout.fpan_regions.all()],
+            }
+        )
 
     return JSONResponse(return_scouts)
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def scout_list_download(request):
@@ -267,33 +310,33 @@ def scout_list_download(request):
     csvname = datetime.now().strftime("HMS_all_scouts_%d-%m-%y.csv")
 
     # create the HttpResponse object with the appropriate CSV header.
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename={}'.format(csvname)
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = "attachment; filename={}".format(csvname)
 
     # the keys here must match those returned by the Scout().serialize() method
     field_mapping = {
-        'username': "Scout ID",
-        'first_name': "First Name",
-        'last_name': "Last Name",
-        'email': "Email",
-        'street_address': "Street Address",
-        'city': "City",
-        'state': "State",
-        'zip_code': "Zip Code",
-        'phone': "Phone",
-        'site_interest_type': "Site Types",
-        'fpan_regions': "Regions",
-        'date_joined': "Signup Date",
-        'background': "Education/Occupation",
-        'relevant_experience': "Relevant Experience",
-        'interest_reason': "Interest Reasons",
+        "username": "Scout ID",
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Email",
+        "street_address": "Street Address",
+        "city": "City",
+        "state": "State",
+        "zip_code": "Zip Code",
+        "phone": "Phone",
+        "site_interest_type": "Site Types",
+        "fpan_regions": "Regions",
+        "date_joined": "Signup Date",
+        "background": "Education/Occupation",
+        "relevant_experience": "Relevant Experience",
+        "interest_reason": "Interest Reasons",
     }
 
     writer = csv.DictWriter(response, fieldnames=list(field_mapping.values()))
     writer.writeheader()
     for scout in Scout.objects.all():
         serialized = scout.serialize()
-        translate_row = {field_mapping[k]: serialized[k] for k in serialized.keys()}        
+        translate_row = {field_mapping[k]: serialized[k] for k in serialized.keys()}
         writer.writerow(translate_row)
 
     return response
