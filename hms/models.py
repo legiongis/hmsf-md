@@ -630,9 +630,7 @@ class ManagementArea(models.Model):
 
     def save(self, *args, **kwargs):
 
-        if self.category and self.category.name == "FPAN Region":
-            self.display_name = self.name.replace("FPAN ", "")
-        elif self.management_agency:
+        if self.management_agency:
             self.display_name = (
                 f"{self.name} | {self.category} | {self.management_agency.name}"
             )
@@ -643,22 +641,11 @@ class ManagementArea(models.Model):
 
         if self.pk and not self.concept:
             concept_label = f"{self.name} ({self.pk})"
-            if self.category.name == "FPAN Region":
-                concept = create_new_concept(
-                    concept_label,
-                    parent_lbl="FPAN Regions",
-                    collection_lbl="FPAN Regions",
-                )
-            elif self.category.name == "County":
-                concept = create_new_concept(
-                    concept_label, parent_lbl="Counties", collection_lbl="Counties"
-                )
-            else:
-                concept = create_new_concept(
-                    concept_label,
-                    parent_lbl="Management Areas",
-                    collection_lbl="Management Areas",
-                )
+            concept = create_new_concept(
+                concept_label,
+                parent_lbl="Management Areas",
+                collection_lbl="Management Areas",
+            )
             self.concept = concept
 
         return super(ManagementArea, self).save(*args, **kwargs)
