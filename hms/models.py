@@ -4,7 +4,7 @@ import time
 import json
 from uuid import uuid4
 import logging
-from typing import List
+from typing import List, TYPE_CHECKING
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
@@ -28,6 +28,9 @@ from arches.app.models.tile import Tile
 from arches.app.models.concept import Concept as ConceptProxy
 
 from fpan.search.components.rule_filter import RuleFilter, Rule
+
+if TYPE_CHECKING:
+    pass
 
 logger = logging.getLogger("fpan")
 
@@ -103,6 +106,9 @@ def report_rule_from_arch_rule(arch_rule):
 class Scout(User):
     middle_initial = models.CharField(max_length=1)
 
+    if TYPE_CHECKING:
+        scoutprofile: "ScoutProfile"
+
     class Meta:
         verbose_name = "Scout"
         verbose_name_plural = "Scouts"
@@ -122,7 +128,9 @@ class Scout(User):
             "background": self.scoutprofile.background,
             "relevant_experience": self.scoutprofile.relevant_experience,
             "interest_reason": self.scoutprofile.interest_reason,
-            "site_interest_type": ";".join(self.scoutprofile.site_interest_type),
+            "site_interest_type": ";".join(self.scoutprofile.site_interest_type)
+            if self.scoutprofile.site_interest_type
+            else [],
             "fpan_regions": ";".join(
                 [r.name for r in self.scoutprofile.fpan_regions.all()]
             ),
@@ -152,7 +160,9 @@ class ScoutProfile(models.Model):
         "<strong>FULL</strong> all sites"
     )
 
-    user = models.OneToOneField(Scout, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        Scout, on_delete=models.CASCADE, related_name="scoutprofile"
+    )
     site_access_mode = models.CharField(
         max_length=20,
         choices=ACCESS_MODE_CHOICES,
@@ -260,12 +270,12 @@ class ScoutProfile(models.Model):
         content["Scout Report"] = self.get_graph_rule("Scout Report").serialize()
         return format_json_display(content)
 
-    site_access_rules_formatted.short_description = "Derived Access Rules"
+    site_access_rules_formatted.short_description = "Derived Access Rules"  # type: ignore
 
     def accessible_sites_formatted(self):
         return format_json_display(self.get_allowed_resources("Archaeological Site"))
 
-    accessible_sites_formatted.short_description = "Accessible Sites"
+    accessible_sites_formatted.short_description = "Accessible Sites"  # type: ignore
 
 
 class LandManager(models.Model):
@@ -407,7 +417,7 @@ class LandManager(models.Model):
         logger.debug(f"get_allowed_resources: {time.time() - start}")
         return id_list
 
-    def site_access_rules_formatted(self) -> format_json_display:
+    def site_access_rules_formatted(self) -> SafeText:
         content = {}
         content["Archaeological Site"] = self.get_graph_rule(
             "Archaeological Site"
@@ -415,12 +425,12 @@ class LandManager(models.Model):
         content["Scout Report"] = self.get_graph_rule("Scout Report").serialize()
         return format_json_display(content)
 
-    site_access_rules_formatted.short_description = "Derived Access Rules"
+    site_access_rules_formatted.short_description = "Derived Access Rules"  # type: ignore
 
     def accessible_sites_formatted(self):
         return format_json_display(self.get_allowed_resources("Archaeological Site"))
 
-    accessible_sites_formatted.short_description = "Accessible Sites"
+    accessible_sites_formatted.short_description = "Accessible Sites"  # type: ignore
 
 
 def create_new_concept(label, parent_lbl, collection_lbl, concept_id=None):
