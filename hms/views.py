@@ -7,8 +7,8 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
-from django.http import HttpResponseServerError, Http404
-from django.shortcuts import render, redirect, HttpResponse
+from django.http import HttpResponseServerError, Http404, HttpResponse
+from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
 from django.utils.encoding import force_text
@@ -245,11 +245,12 @@ def scout_signup(request):
             subject_line = settings.EMAIL_SUBJECT_PREFIX + "Activate your account."
             from_email = settings.DEFAULT_FROM_EMAIL
             to_email = form.cleaned_data.get("email")
-            email = EmailMultiAlternatives(
-                subject_line, message_txt, from_email, to=[to_email]
-            )
-            email.attach_alternative(message_html, "text/html")
-            email.send()
+            if to_email is not None:
+                email = EmailMultiAlternatives(
+                    subject_line, message_txt, from_email, to=[to_email]
+                )
+                email.attach_alternative(message_html, "text/html")
+                email.send()
             return render(request, "hms/email/please-confirm.htm")
 
         context["scout_form"] = form
@@ -274,10 +275,11 @@ def scouts_dropdown(request):
             resourceinstance=resourceid, nodegroup=n.nodegroup
         )
         for t in region_tiles:
-            for v in t.data[str(n.nodeid)]:
-                value = Value.objects.get(valueid=v)
-                ma = ManagementArea.objects.get(concept=value.concept)
-                site_regions.append(ma.name)
+            if t.data:
+                for v in t.data[str(n.nodeid)]:
+                    value = Value.objects.get(valueid=v)
+                    ma = ManagementArea.objects.get(concept=value.concept)
+                    site_regions.append(ma.name)
 
         ## as the scout list gets big this may need some optimizing!
         for scout in ScoutProfile.objects.all():
@@ -288,7 +290,9 @@ def scouts_dropdown(request):
     # iterate scouts and create a list of objects to return for the dropdown
     return_scouts = []
     for scout in matched_scouts:
-        display_name = f"{scout.user.username} | {', '.join(scout.site_interest_type)}"
+        display_name = scout.user.username
+        if scout.site_interest_type:
+            display_name += ", ".join(scout.site_interest_type)
         if scout.site_access_mode == "FULL":
             display_name += " | already has FULL access to sites"
         return_scouts.append(
