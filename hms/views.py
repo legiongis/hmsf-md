@@ -298,7 +298,7 @@ def scouts_dropdown(request):
                 "username": scout.user.username,
                 "display_name": display_name,
                 "site_interest_type": scout.site_interest_type,
-                "fpan_regions": [region.name for region in scout.fpan_regions.all()],
+                "fpan_regions": [region.name for region in scout.fpan_regions2.all()],
             }
         )
 
