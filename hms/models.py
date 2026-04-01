@@ -429,10 +429,48 @@ class LandManager(models.Model):
 
     accessible_sites_formatted.short_description = "Accessible Sites"  # type: ignore
 
+def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
 
-def create_new_concept(label, parent_lbl, collection_lbl, concept_id=None):
+    collection = Value.objects.get(
+        value=collection_name, concept__nodetype__nodetype="Collection"
+    ).concept
+    concept_ids = Relation.objects.filter(
+        conceptfrom=collection, relationtype_id="member"
+    ).values_list("conceptto", flat=True)
+    return Value.objects.filter(
+        concept_id__in=concept_ids
+    ).values_list("value", "pk")
+
+def get_or_create_concept(label, parent_lbl, collection_lbl, concept_id=None):
     """Helper function that creates a new concept and adds it to the specified
     parent and collection."""
+
+    topconcept = Value.objects.get(
+        value=parent_lbl, concept__nodetype__nodetype="Concept"
+    ).concept
+    collection = Value.objects.get(
+        value=collection_lbl, concept__nodetype__nodetype="Collection"
+    ).concept
+
+    ## first check if this concept already exists. It must be under the specified
+    ## top concept (parent label) and also under the provided collection
+    for val in Value.objects.filter(
+            valuetype_id="prefLabel",
+            value=label,
+            language_id="en",
+        ):
+        if val.concept:
+            if Relation.objects.filter(
+                conceptfrom=topconcept,
+                conceptto=val.concept,
+                relationtype_id="narrower",
+            ).exists():
+                if Relation.objects.filter(
+                    conceptfrom=collection,
+                    conceptto=val.concept,
+                    relationtype_id="member",
+                ).exists():
+                    return val.concept
 
     if not concept_id:
         concept_id = str(uuid4())
@@ -449,20 +487,14 @@ def create_new_concept(label, parent_lbl, collection_lbl, concept_id=None):
         language_id="en",
     )
 
-    p = Value.objects.get(
-        value=parent_lbl, concept__nodetype__nodetype="Concept"
-    ).concept
     Relation.objects.create(
-        conceptfrom=p,
+        conceptfrom=topconcept,
         conceptto=concept,
         relationtype_id="narrower",
     )
 
-    c = Value.objects.get(
-        value=collection_lbl, concept__nodetype__nodetype="Collection"
-    ).concept
     Relation.objects.create(
-        conceptfrom=c,
+        conceptfrom=collection,
         conceptto=concept,
         relationtype_id="member",
     )
@@ -519,7 +551,7 @@ class ManagementAgency(models.Model):
     def save(self, *args, **kwargs):
 
         if self.pk and not self.concept:
-            self.concept = create_new_concept(
+            self.concept = get_or_create_concept(
                 f"{self.name} ({self.pk})",
                 parent_lbl="Management Agencies",
                 collection_lbl="Management Agencies",
@@ -638,7 +670,7 @@ class ManagementArea(models.Model):
 
         if self.pk and not self.concept:
             concept_label = f"{self.name} ({self.pk})"
-            concept = create_new_concept(
+            concept = get_or_create_concept(
                 concept_label,
                 parent_lbl="Management Areas",
                 collection_lbl="Management Areas",
