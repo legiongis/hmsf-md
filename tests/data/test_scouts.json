@@ -9,7 +9,7 @@
         "relevant_experience": "None",
         "password1": "TestAccount1!",
         "password2": "TestAccount1!",
-        "fpan_regions": [4,5],
+        "fpan_regions2": [4,5],
         "zip_code": 12345,
         "site_interest_type": ["Prehistoric","Historic"]
     },
@@ -23,7 +23,7 @@
         "relevant_experience": "",
         "password1": "TestAccount1!",
         "password2": "TestAccount1!",
-        "fpan_regions": [1,2],
+        "fpan_regions2": [1,2],
         "zip_code": 12345,
         "site_interest_type": ["Underwater"]
     },
@@ -36,7 +36,7 @@
         "relevant_experience": "None",
         "password1": "TestAccount1!",
         "password2": "TestAccount1!",
-        "fpan_regions": [6,7],
+        "fpan_regions2": [6,7],
         "zip_code": 12345,
         "site_interest_type": ["Prehistoric","Cemeteries"]
     },
@@ -50,7 +50,7 @@
         "relevant_experience": "None",
         "password1": "TestAccount1!",
         "password2": "TestAccount1!",
-        "fpan_regions": [5],
+        "fpan_regions2": [5],
         "zip_code": 12345,
         "site_interest_type": ["Prehistoric"]
     }
