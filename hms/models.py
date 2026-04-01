@@ -160,9 +160,7 @@ class ScoutProfile(models.Model):
         "<strong>FULL</strong> all sites"
     )
 
-    user = models.OneToOneField(
-        Scout, on_delete=models.CASCADE, related_name="scoutprofile"
-    )
+    user = models.OneToOneField(Scout, on_delete=models.CASCADE)
     site_access_mode = models.CharField(
         max_length=20,
         choices=ACCESS_MODE_CHOICES,
@@ -219,6 +217,10 @@ class ScoutProfile(models.Model):
         "ManagementArea",
         verbose_name="FPAN Regions",
         limit_choices_to={"category__name": "FPAN Region"},
+    )
+    fpan_regions2 = models.ManyToManyField(
+        "FPANRegion",
+        verbose_name="FPAN Regions",
     )
     ethics_agreement = models.BooleanField(default=True)
 
@@ -667,3 +669,15 @@ class ManagementAreaGroup(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class FPANRegion(models.Model):
+    class Meta:
+        verbose_name = "FPAN Region"
+        verbose_name_plural = "FPAN Regions"
+
+    name = models.CharField(max_length=100)
+    geom = models.MultiPolygonField()
+
+    def __str__(self):
+        return self.name if self.name else f"FPAN Region ({self.pk})"
