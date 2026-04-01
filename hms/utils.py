@@ -154,12 +154,12 @@ def create_scout_from_valid_form(form, pk=None):
     s.save()
 
     # now add some ScoutProfile info from the same form
-    s.scoutprofile.fpan_regions.set(form.cleaned_data.get('fpan_regions', []))
-    s.scoutprofile.zip_code = form.cleaned_data.get('zip_code')
-    s.scoutprofile.background = form.cleaned_data.get('background')
-    s.scoutprofile.relevant_experience = form.cleaned_data.get('relevant_experience')
-    s.scoutprofile.interest_reason = form.cleaned_data.get('interest_reason')
-    s.scoutprofile.site_interest_type = form.cleaned_data.get('site_interest_type')
+    s.scoutprofile.fpan_regions2.set(form.cleaned_data.get("fpan_regions2", []))
+    s.scoutprofile.zip_code = form.cleaned_data.get("zip_code")
+    s.scoutprofile.background = form.cleaned_data.get("background")
+    s.scoutprofile.relevant_experience = form.cleaned_data.get("relevant_experience")
+    s.scoutprofile.interest_reason = form.cleaned_data.get("interest_reason")
+    s.scoutprofile.site_interest_type = form.cleaned_data.get("site_interest_type")
     s.scoutprofile.save()
 
     token = account_activation_token.make_token(s)

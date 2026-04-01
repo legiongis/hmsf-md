@@ -590,7 +590,7 @@
                                     <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px; background:url({% static 'img/fpan/ricepaper.png' %});">
                                         {% for scout in scout_list %}
                                         <li><strong>{{scout.username}}</strong> | <em>regions:</em>
-                                            {% for region in scout.fpan_regions %}
+                                            {% for region in scout.fpan_regions2 %}
                                                 {{ region }}{% if not forloop.last %},{% endif %}
                                             {% endfor %} | <em>interests:</em>
                                             {% for interest in scout.site_interest_type %}

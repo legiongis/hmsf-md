@@ -131,8 +131,8 @@ class Scout(User):
             "site_interest_type": ";".join(self.scoutprofile.site_interest_type)
             if self.scoutprofile.site_interest_type
             else [],
-            "fpan_regions": ";".join(
-                [r.name for r in self.scoutprofile.fpan_regions.all()]
+            "fpan_regions2": ";".join(
+                [r.name for r in self.scoutprofile.fpan_regions2.all()]
             ),
             "date_joined": self.date_joined.strftime("%Y-%m-%d"),
         }

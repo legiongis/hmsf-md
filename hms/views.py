@@ -68,10 +68,15 @@ def hms_home(request):
             messages.add_message(
                 request, messages.INFO, "Your profile has been updated."
             )
+            return redirect(reverse("user_profile_manager"))
         else:
             messages.add_message(request, messages.ERROR, "Form was invalid.")
+            return render(
+                request,
+                "home-hms.htm",
+                {"scout_profile": scout_profile_form, "page": "home-hms"},
+            )
 
-        return redirect(reverse("user_profile_manager"))
 
     else:
         scout_profile_form = None
@@ -292,7 +297,7 @@ def scouts_dropdown(request):
     for scout in matched_scouts:
         display_name = scout.user.username
         if scout.site_interest_type:
-            display_name += ", ".join(scout.site_interest_type)
+            display_name += " | " + ", ".join(scout.site_interest_type)
         if scout.site_access_mode == "FULL":
             display_name += " | already has FULL access to sites"
         return_scouts.append(
@@ -329,7 +334,7 @@ def scout_list_download(request):
         "zip_code": "Zip Code",
         "phone": "Phone",
         "site_interest_type": "Site Types",
-        "fpan_regions": "Regions",
+        "fpan_regions2": "Regions",
         "date_joined": "Signup Date",
         "background": "Education/Occupation",
         "relevant_experience": "Relevant Experience",

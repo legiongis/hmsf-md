@@ -5,7 +5,7 @@ from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from .models import Scout, ScoutProfile
 
-from hms.models import ManagementArea
+from hms.models import FPANRegion
 
 
 class ScoutForm(UserCreationForm):
@@ -35,9 +35,9 @@ class ScoutForm(UserCreationForm):
         widget=forms.PasswordInput(attrs={'class':'form-control', 'required':'true'}),
         label="Re-enter Password"
     )
-    fpan_regions = forms.ModelMultipleChoiceField(
+    fpan_regions2 = forms.ModelMultipleChoiceField(
         label="In which regions can you monitor sites?",
-        queryset=ManagementArea.objects.filter(category__name="FPAN Region"),
+        queryset=FPANRegion.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
         help_text='Required. You can change this preference anytime after signing up, '\
             'but you must you pick at least one region before an archaeological site can be '\
@@ -93,7 +93,7 @@ class ScoutForm(UserCreationForm):
         model = Scout
         fields = (
             'first_name', 'middle_initial', 'last_name', 'email', 'password1', 'password2', 
-            'fpan_regions', 'zip_code',
+            'fpan_regions2', 'zip_code',
             'background', 'relevant_experience', 'interest_reason', 'site_interest_type',
         )
     
@@ -113,6 +113,7 @@ class ScoutForm(UserCreationForm):
                         code="unique",
                     ),
                 )
+        return cleaned_data
 
 
 class ScoutProfileForm(forms.ModelForm):
@@ -129,7 +130,7 @@ class ScoutProfileForm(forms.ModelForm):
             'relevant_experience',
             'interest_reason',
             'site_interest_type',
-            'fpan_regions'
+            'fpan_regions2'
         )
         
         widgets = {
@@ -143,7 +144,7 @@ class ScoutProfileForm(forms.ModelForm):
             'site_interest_type': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
-    fpan_regions = forms.ModelMultipleChoiceField(
-        queryset=ManagementArea.objects.filter(category__name="FPAN Region"),
+    fpan_regions2 = forms.ModelMultipleChoiceField(
+        queryset=FPANRegion.objects.all(),
         widget=forms.CheckboxSelectMultiple()
     )
