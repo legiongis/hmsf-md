@@ -4,7 +4,7 @@ import json
 import random
 import string
 import logging
-from typing import Iterable
+from typing import Iterable, Tuple
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -225,7 +225,7 @@ def generate_password():
     )
 
 
-def get_collection_values(collection_name: str) -> Iterable[tuple[(str, str)]]:
+def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
 
     collection = Value.objects.get(
         value=collection_name, concept__nodetype__nodetype="Collection"
