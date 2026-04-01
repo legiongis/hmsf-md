@@ -1,4 +1,6 @@
 import csv
+import json
+from pathlib import Path
 import logging
 from datetime import datetime
 
@@ -17,12 +19,11 @@ from django.urls import reverse
 from django.views.generic import View
 
 from arches.app.utils.response import JSONResponse
-from arches.app.models.tile import Tile
-from arches.app.models.models import Node, Value
 from arches.app.models.system_settings import settings
 
+from hms.fmsf import FMSFResource
 from hms.forms import ScoutForm, ScoutProfileForm
-from hms.models import Scout, ScoutProfile, ManagementArea
+from hms.models import Scout, ScoutProfile
 from hms.permissions_backend import user_is_land_manager, user_is_scout
 from hms.utils import account_activation_token, create_scout_from_valid_form
 
@@ -268,29 +269,20 @@ def scout_signup(request):
 def scouts_dropdown(request):
     resourceid = request.GET.get("resourceid", None)
 
-    ## get all scouts right off the bat
+    matched_scouts = []
+
+    ## if no resource id provided, allow all scouts to match
     if resourceid is None:
         matched_scouts = ScoutProfile.objects.all()
+    ## otherwise, get region for this resource, and only return scouts
+    ## who are intersted in scouting in that region
     else:
-        matched_scouts = []
-
-        site_regions = []
-        n = Node.objects.get(name="FPAN Region", graph__name="Archaeological Site")
-        region_tiles = Tile.objects.filter(
-            resourceinstance=resourceid, nodegroup=n.nodegroup
-        )
-        for t in region_tiles:
-            if t.data:
-                for v in t.data[str(n.nodeid)]:
-                    value = Value.objects.get(valueid=v)
-                    ma = ManagementArea.objects.get(concept=value.concept)
-                    site_regions.append(ma.name)
-
-        ## as the scout list gets big this may need some optimizing!
-        for scout in ScoutProfile.objects.all():
-            for region in scout.fpan_regions.all():
-                if region.name in site_regions:
-                    matched_scouts.append(scout)
+        with open(Path(settings.APP_ROOT, "data", "county_lookup.json"), "r") as o:
+            lookup = json.load(o)
+        res = FMSFResource(resourceid)
+        if res.siteid:
+            entry = lookup.get(res.siteid[:2])
+            matched_scouts = ScoutProfile.objects.filter(fpan_regions2__name__contains=entry['region'])
 
     # iterate scouts and create a list of objects to return for the dropdown
     return_scouts = []
