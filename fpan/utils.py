@@ -15,6 +15,8 @@ from hms.models import ManagementArea, ManagementAgency
 
 logger = logging.getLogger(__name__)
 
+legal_value_ids = [str(i) for i in Value.objects.all().values_list("pk", flat=True)]
+
 class SpatialJoin():
 
     def __init__(self, graph_name: str):
@@ -171,8 +173,8 @@ class SpatialJoin():
         tile.data[self.node_lookup['region_nodeid']].append(entry['region_concept_value_id'])
 
         # finalize with some QA/QC
-        tile.data[self.node_lookup['county_nodeid']] = list(set(tile.data[self.node_lookup['county_nodeid']]))
-        tile.data[self.node_lookup['region_nodeid']] = list(set(tile.data[self.node_lookup['region_nodeid']]))
+        tile.data[self.node_lookup['county_nodeid']] = list(set([i for i in tile.data[self.node_lookup['county_nodeid']] if i in legal_value_ids]))
+        tile.data[self.node_lookup['region_nodeid']] = list(set([i for i in tile.data[self.node_lookup['region_nodeid']] if i in legal_value_ids]))
 
         tile.save(index=False)
 
