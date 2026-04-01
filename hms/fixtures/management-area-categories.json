@@ -1,13 +1,6 @@
 [
 {
   "model": "hms.managementareacategory",
-  "pk": 1,
-  "fields": {
-    "name": "FPAN Region"
-  }
-},
-{
-  "model": "hms.managementareacategory",
   "pk": 2,
   "fields": {
     "name": "State Park"

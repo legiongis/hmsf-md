@@ -4,7 +4,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.core import management
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from arches.app.models.models import MapLayer
 
@@ -101,11 +101,13 @@ class Command(BaseCommand):
             i.save()
         print(" done.\033[0m")
 
+        print("\033[96m-- Load FPAN REGIONS --\033[0m")
+        management.call_command('loaddata', 'fpan-regions')
+
         print("\033[96m-- Load MANAGEMENT AREA CATEGORIES --\033[0m")
         management.call_command('loaddata', 'management-area-categories')
 
         print("\033[96m-- Load MANAGEMENT AREAS --\033[0m")
-        management.call_command('loaddata', 'management-areas-fpan-region')
         management.call_command('loaddata', 'management-areas-state-park')
         management.call_command('loaddata', 'management-areas-state-forest')
         management.call_command('loaddata', 'management-areas-fwcc')
@@ -113,7 +115,7 @@ class Command(BaseCommand):
         management.call_command('loaddata', 'management-areas-aquatic-preserve')
         management.call_command('loaddata', 'management-areas-hillsborough-co-elapp')
         management.call_command('loaddata', 'management-areas-hillsborough-co-parks')
-        management.call_command('loaddata', 'management-areas-july2021')
+        # management.call_command('loaddata', 'management-areas-july2021')
 
         print("\033[37mRe-saving all objects to generate display_name and RDM concepts...", end="")
         for i in ManagementArea.objects.all():

@@ -4,7 +4,7 @@ import time
 import json
 from uuid import uuid4
 import logging
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Tuple, Iterable
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
@@ -212,11 +212,6 @@ class ScoutProfile(models.Model):
         default=list,
         null=True,
         blank=True,
-    )
-    fpan_regions = models.ManyToManyField(
-        "ManagementArea",
-        verbose_name="FPAN Regions",
-        limit_choices_to={"category__name": "FPAN Region"},
     )
     fpan_regions2 = models.ManyToManyField(
         "FPANRegion",
