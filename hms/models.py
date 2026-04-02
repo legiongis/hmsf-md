@@ -4,7 +4,8 @@ import time
 import json
 from uuid import uuid4
 import logging
-from typing import List, TYPE_CHECKING, Tuple, Iterable, TypeAlias
+from typing_extensions import TypeAlias
+from typing import List, TYPE_CHECKING, Tuple, Iterable
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer

@@ -3,6 +3,7 @@ django-grappelli==2.15.5
 django-tinymce==4.1.0
 django-storages==1.13
 boto3==1.24
+typing_extensions==4.13.2
 
 ## for docs
 django-docs==0.3.3
