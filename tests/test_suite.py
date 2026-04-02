@@ -5,8 +5,8 @@ from arches.app.models.graph import Graph
 from hms.models import (
     Scout,
     LandManager,
-    ManagementArea,
     ManagementAreaCategory,
+    FPANRegion,
 )
 
 from .base_test import HMSTestCase
@@ -16,15 +16,15 @@ class AccountTests(HMSTestCase):
     def test_001_load_fpan_regions(self, dry_run=False):
 
         management.call_command("loaddata", "management-area-categories")
-        self.assertEqual(ManagementAreaCategory.objects.all().count(), 8)
+        self.assertEqual(ManagementAreaCategory.objects.all().count(), 7)
 
-        management.call_command("loaddata", "management-areas-fpan-region")
-        self.assertEqual(ManagementArea.objects.all().count(), 8)
+        management.call_command("loaddata", "fpan-regions")
+        self.assertEqual(FPANRegion.objects.all().count(), 8)
 
     def test_002_scout_creation(self, dry_run=False):
 
         management.call_command("loaddata", "management-area-categories")
-        management.call_command("loaddata", "management-areas-fpan-region")
+        management.call_command("loaddata", "fpan-regions")
 
         from hms.utils import TestUtils
 
