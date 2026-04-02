@@ -43,6 +43,38 @@
                 },
                 {
                     "active": true,
+                    "cardid": "2ec9a730-d8cc-4816-b592-b524ed5fd973",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [
+                        {
+                            "card_id": "2ec9a730-d8cc-4816-b592-b524ed5fd973",
+                            "constraintid": "f61de2a0-528c-425f-b844-26ee1c562e6e",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        },
+                        {
+                            "card_id": "2ec9a730-d8cc-4816-b592-b524ed5fd973",
+                            "constraintid": "e749e4df-a283-4393-892e-ee9d5ae0a7de",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        }
+                    ],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
+                    "helpenabled": false,
+                    "helptext": null,
+                    "helptitle": null,
+                    "instructions": null,
+                    "is_editable": true,
+                    "name": "Photos",
+                    "nodegroup_id": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "sortorder": null,
+                    "visible": true
+                },
+                {
+                    "active": true,
                     "cardid": "4882121a-715e-11ee-9e57-4df2569ff543",
                     "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
                     "config": null,
@@ -278,6 +310,21 @@
                     "widget_id": "10000000-0000-0000-0000-000000000002"
                 },
                 {
+                    "card_id": "2ec9a730-d8cc-4816-b592-b524ed5fd973",
+                    "config": {
+                        "acceptedFiles": "",
+                        "label": "Image File(s)",
+                        "maxFilesize": "20",
+                        "rerender": true
+                    },
+                    "id": "19eb549b-83dc-46d9-9af2-3a295c844719",
+                    "label": "Image File(s)",
+                    "node_id": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "sortorder": 1,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000019"
+                },
+                {
                     "card_id": "210c6343-dbab-11e7-9743-94659cf754d0",
                     "config": {
                         "defaultValue": "",
@@ -289,6 +336,21 @@
                     "label": "Plot Type (for polygons)",
                     "node_id": "210c634d-dbab-11e7-933c-94659cf754d0",
                     "sortorder": 2,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                },
+                {
+                    "card_id": "2ec9a730-d8cc-4816-b592-b524ed5fd973",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Photo Type",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "2945cf11-0e58-4a8e-bfdc-11cfc8eb128f",
+                    "label": "Photo Type",
+                    "node_id": "c2ed161c-2ece-11f1-9687-67d160908e70",
+                    "sortorder": 0,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000002"
                 },
@@ -351,6 +413,23 @@
                     "sortorder": 1,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000012"
+                },
+                {
+                    "card_id": "2ec9a730-d8cc-4816-b592-b524ed5fd973",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Comments",
+                        "maxLength": null,
+                        "placeholder": "Enter text",
+                        "uneditable": false,
+                        "width": "100%"
+                    },
+                    "id": "59b32db5-1973-45f3-86aa-4c7273aa0783",
+                    "label": "Comments",
+                    "node_id": "cd68e27e-2ece-11f1-9687-67d160908e70",
+                    "sortorder": 2,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
                 },
                 {
                     "card_id": "4882121a-715e-11ee-9e57-4df2569ff543",
@@ -690,6 +769,15 @@
                 },
                 {
                     "description": null,
+                    "domainnode_id": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "edgeid": "434acbd1-10be-4436-a760-bee9f9d21421",
+                    "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "c2ed161c-2ece-11f1-9687-67d160908e70"
+                },
+                {
+                    "description": null,
                     "domainnode_id": "48821219-715e-11ee-9e57-4df2569ff543",
                     "edgeid": "48821220-715e-11ee-9e57-4df2569ff543",
                     "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
@@ -727,11 +815,29 @@
                 {
                     "description": null,
                     "domainnode_id": "73889291-d536-11e7-8e02-94659cf754d0",
+                    "edgeid": "51880b31-5a84-4c85-be07-dae90eeac9c6",
+                    "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "b8dff130-2ece-11f1-9687-67d160908e70"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "73889291-d536-11e7-8e02-94659cf754d0",
                     "edgeid": "72877424-9508-4a8e-832a-7eafb8305ecb",
                     "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
                     "name": null,
                     "ontologyproperty": null,
                     "rangenode_id": "48821219-715e-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "edgeid": "e76a7bf4-6dea-4ec2-90b7-2734280c5c90",
+                    "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "cd68e27e-2ece-11f1-9687-67d160908e70"
                 },
                 {
                     "description": null,
@@ -938,6 +1044,12 @@
                     "parentnodegroup_id": null
                 },
                 {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "parentnodegroup_id": null
+                },
+                {
                     "cardinality": "1",
                     "legacygroupid": null,
                     "nodegroupid": "f253fbef-d536-11e7-a5d3-94659cf754d0",
@@ -1056,7 +1168,7 @@
                     "nodeid": "210c6347-dbab-11e7-9890-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 1
                 },
                 {
                     "alias": "plot_type",
@@ -1120,7 +1232,7 @@
                     "nodeid": "48821219-715e-11ee-9e57-4df2569ff543",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 4
                 },
                 {
                     "alias": "management_agency",
@@ -1231,6 +1343,72 @@
                     "sortorder": null
                 },
                 {
+                    "alias": "photo",
+                    "config": {
+                        "activateMax": false,
+                        "maxFileSize": null,
+                        "maxFiles": 10
+                    },
+                    "datatype": "file-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Photo",
+                    "nodegroup_id": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "nodeid": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 5
+                },
+                {
+                    "alias": "photo_type",
+                    "config": {
+                        "rdmCollection": "0f3ffa2f-1381-4f98-8147-0705bde72d4e"
+                    },
+                    "datatype": "concept",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Photo Type",
+                    "nodegroup_id": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "nodeid": "c2ed161c-2ece-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "comments",
+                    "config": null,
+                    "datatype": "string",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "73889292-d536-11e7-b3b3-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Comments",
+                    "nodegroup_id": "b8dff130-2ece-11f1-9687-67d160908e70",
+                    "nodeid": "cd68e27e-2ece-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
                     "alias": "cemetery_details",
                     "config": {
                         "fillColor": "rgba(233,112,111,0.8)"
@@ -1250,7 +1428,7 @@
                     "nodeid": "f253fbef-d536-11e7-a5d3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 3
                 },
                 {
                     "alias": "cemetery_type",
@@ -1400,7 +1578,7 @@
                     "nodeid": "f3cc6b22-d536-11e7-9d02-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 2
                 },
                 {
                     "alias": "fmsf_name",
@@ -1484,7 +1662,7 @@
                     "nodeid": "f64affb4-d536-11e7-9be2-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_assessment",
