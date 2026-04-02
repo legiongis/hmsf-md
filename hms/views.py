@@ -269,20 +269,16 @@ def scout_signup(request):
 def scouts_dropdown(request):
     resourceid = request.GET.get("resourceid", None)
 
-    matched_scouts = []
-
-    ## if no resource id provided, allow all scouts to match
-    if resourceid is None:
-        matched_scouts = ScoutProfile.objects.all()
+    matched_scouts = ScoutProfile.objects.all().prefetch_related("fpan_regions2")
     ## otherwise, get region for this resource, and only return scouts
     ## who are intersted in scouting in that region
-    else:
+    if resourceid:
         with open(Path(settings.APP_ROOT, "data", "county_lookup.json"), "r") as o:
             lookup = json.load(o)
         res = FMSFResource(resourceid)
         if res.siteid:
             entry = lookup.get(res.siteid[:2])
-            matched_scouts = ScoutProfile.objects.filter(fpan_regions2__name__contains=entry['region'])
+            matched_scouts = matched_scouts.filter(fpan_regions2__name__contains=entry['region']).distinct()
 
     # iterate scouts and create a list of objects to return for the dropdown
     return_scouts = []
@@ -302,7 +298,7 @@ def scouts_dropdown(request):
             }
         )
 
-    return JSONResponse(return_scouts)
+    return JSONResponse(sorted(return_scouts, key=lambda k: k['username']))
 
 
 @user_passes_test(lambda u: u.is_superuser)
