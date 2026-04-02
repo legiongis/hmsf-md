@@ -1,5 +1,4 @@
 import os
-import subprocess
 from pathlib import Path
 
 from django.conf import settings
@@ -7,7 +6,6 @@ from django.core import management
 from django.core.management.base import BaseCommand
 
 from arches.app.models.models import MapLayer
-
 from hms.models import ManagementArea, ManagementAgency
 from hms.utils import TestUtils
 
@@ -32,19 +30,21 @@ class Command(BaseCommand):
         db_host = db['HOST']
 
         if options['use_existing_db'] is not True:
-            if not input("\nDrop and recreate the database? y/N ").lower().startswith("y"):
-                print("cancelled")
-                exit()
+            # if not input("\nDrop and recreate the database? y/N ").lower().startswith("y"):
+            #     print("cancelled")
+            #     exit()
             ## replacing the Arches setup_db command here
             # management.call_command('setup_db', force=True)
-            print("\033[96m-- Initialize the DATABASE --\033[0m")
-            prefix = ["psql", "-U", "postgres", "-h", db_host]
-            cmd1 = prefix + ["-c", f"DROP DATABASE IF EXISTS {db_name};"]
-            subprocess.call(cmd1)
-            cmd2 = prefix + ["-c", f"CREATE DATABASE {db_name} WITH OWNER {db_user};"]
-            subprocess.call(cmd2)
-            cmd3 = prefix + ["-d", db_name, "-c", "CREATE EXTENSION postgis; CREATE EXTENSION \"uuid-ossp\";"]
-            subprocess.call(cmd3)
+            # print("\033[96m-- Initialize the DATABASE --\033[0m")
+            # prefix = ["psql", "-U", "postgres", "-h", db_host]
+            # cmd1 = prefix + ["-c", f"DROP DATABASE IF EXISTS {db_name};"]
+            # subprocess.call(cmd1)
+            # cmd2 = prefix + ["-c", f"CREATE DATABASE {db_name} WITH OWNER {db_user};"]
+            # subprocess.call(cmd2)
+            # cmd3 = prefix + ["-d", db_name, "-c", "CREATE EXTENSION postgis; CREATE EXTENSION \"uuid-ossp\";"]
+            # subprocess.call(cmd3)
+
+            print("\033[96m-- Initialize ELASTICSEARCH --\033[0m")
 
             management.call_command("es", operation="delete_indexes")
 
@@ -115,7 +115,6 @@ class Command(BaseCommand):
         management.call_command('loaddata', 'management-areas-aquatic-preserve')
         management.call_command('loaddata', 'management-areas-hillsborough-co-elapp')
         management.call_command('loaddata', 'management-areas-hillsborough-co-parks')
-        # management.call_command('loaddata', 'management-areas-july2021')
 
         print("\033[37mRe-saving all objects to generate display_name and RDM concepts...", end="")
         for i in ManagementArea.objects.all():
@@ -146,9 +145,6 @@ class Command(BaseCommand):
         if options['test_resources']:
             print("\033[96m-- Loading test resources --\033[0m")
             TestUtils().load_test_resources()
-            ## don't need to call this here now that there is a signal triggered on
-            ## save of the coordinates nodegroup
-            # management.call_command("spatial_join", all=True)
 
     def update_map_layers(self):
 
