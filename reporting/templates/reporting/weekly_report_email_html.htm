@@ -8,7 +8,7 @@ New sites visited: {{ new_sites_visited_ct }}</p>
 {% if info.ct != 0 %}
 <ul>
 {% for report in info.reports %}
-  <li>{{ report.fmsfid }}{% if report.new_site == True %}*{% endif %} - <a href="https://{{domain}}/report/{{ report.resid }}">view report</a></li>
+  <li>{{ report.fmsfid }}{% if report.new_site == True %}*{% endif %} - <a href="https://hms.fpan.us/report/{{ report.resid }}">view report</a></li>
 {% endfor %}
 </ul>
 {% endif %}
