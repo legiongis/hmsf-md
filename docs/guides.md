@@ -30,6 +30,7 @@ Typically, scouts register on their own through the sign-up form. However, in so
 5. Save Scout.
 6. Now, go back to the main admin page, and click the **Users** link near the top. This is a list of all user accounts on the site. Find and edit the new user you created.
 7. In the edit page, you should see **Invalid password format or unknown hashing algorithm** in the password field. Use the provided link to change the password to something that you can send to the user.
+8. Finally, in the edit page, assign the user to both the **Resource Editor** and **Crowdsource Editor** groups, and click **Save**.
 
 ## Handling Land Manager accounts
 
@@ -40,9 +41,11 @@ Land Managers are users whose access to Archeaological Sites is determined by a 
 1. Log in as `admin` and go to the admin interface, https://hms.fpan.us/admin
 2. Find **Land Mangers** in the HMS app, and go to **+ Add Land Manager**
 3. In the **User** field, click **+** to create a new user and set their password
-  - Choose a randomized password that can be shared with the land manager by email, and instruct them to change this password when they login for the first time.
+    - Choose a randomized password that can be shared with the land manager by email, and instruct them to change this password when they login for the first time.
+4. After the user has been created, click the **&rarr;** button next to its name to open a full edit window for that user.
+5. Assign the user to both the **Resource Editor** and **Crowdsource Editor** groups, and then click **Save** to close the window.
 
-That's all! The land manager account has been created, but it has no access to any Archaelogical Sites. Now we'll set up the user's permission rules.
+That's all! The user's land manager account has been created, but it has no access to any Archaelogical Sites. Now we'll set up the user's permission rules.
 
 ### Setting Land Manager permissions
 
