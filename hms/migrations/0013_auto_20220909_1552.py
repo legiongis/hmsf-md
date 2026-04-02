@@ -5,15 +5,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0012_delete_userxresourceinstanceaccess'),
+        ("hms", "0012_delete_userxresourceinstanceaccess"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='scoutprofile',
-            name='site_interest_type',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, choices=[('Prehistoric', 'Prehistoric'), ('Historic', 'Historic'), ('Cemeteries', 'Cemeteries'), ('Underwater', 'Underwater'), ('Other', 'Other')], max_length=30), blank=True, default=list, null=True, size=None),
+            model_name="scoutprofile",
+            name="site_interest_type",
+            field=django.contrib.postgres.fields.ArrayField(
+                base_field=models.CharField(
+                    blank=True,
+                    choices=[
+                        ("Prehistoric", "Prehistoric"),
+                        ("Historic", "Historic"),
+                        ("Cemeteries", "Cemeteries"),
+                        ("Underwater", "Underwater"),
+                        ("Other", "Other"),
+                    ],
+                    max_length=30,
+                ),
+                blank=True,
+                default=list,
+                null=True,
+                size=None,
+            ),
         ),
     ]

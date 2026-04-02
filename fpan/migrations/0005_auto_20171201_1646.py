@@ -6,15 +6,25 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('fpan', '0004_auto_20171127_1259'),
+        ("fpan", "0004_auto_20171127_1259"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='managedarea',
-            name='category',
-            field=models.CharField(choices=[(b'State Parks', b'State Parks'), (b'State Forest', b'State Forest'), (b'Fish and Wildlife Conservation Commission', b'Fish and Wildlife Conservation Commission'), (b'Aquatic Preserve', b'Aquatic Preserve')], max_length=254),
+            model_name="managedarea",
+            name="category",
+            field=models.CharField(
+                choices=[
+                    (b"State Parks", b"State Parks"),
+                    (b"State Forest", b"State Forest"),
+                    (
+                        b"Fish and Wildlife Conservation Commission",
+                        b"Fish and Wildlife Conservation Commission",
+                    ),
+                    (b"Aquatic Preserve", b"Aquatic Preserve"),
+                ],
+                max_length=254,
+            ),
         ),
     ]

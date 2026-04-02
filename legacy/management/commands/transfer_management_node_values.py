@@ -1,51 +1,65 @@
-import os
-import csv
-import uuid
-from datetime import datetime
-from django.conf import settings
-from django.db.models import CharField
-from django.db.models.functions import Lower
-from django.core.management.base import BaseCommand, CommandError
-from arches.app.models.models import NodeGroup, Node, Value
+from django.core.management.base import BaseCommand
+from arches.app.models.models import Node, Value
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 
-from hms.models import ManagementArea, ManagementAgency
+from hms.models import ManagementArea
+
 
 class Command(BaseCommand):
-
-    help = '2021 July 9 - this command supports the transfer of existing '\
-        'management area-related nodes to corresponding nodes in the new '\
-        'Management branch.'
+    help = (
+        "2021 July 9 - this command supports the transfer of existing "
+        "management area-related nodes to corresponding nodes in the new "
+        "Management branch."
+    )
 
     matched = {}
     no_match = {}
     missing_res_list = []
 
     def add_arguments(self, parser):
-        parser.add_argument("--dry-run",
+        parser.add_argument(
+            "--dry-run",
             action="store_true",
-            help='print out old and new values without altering Tiles'
+            help="print out old and new values without altering Tiles",
         )
-        parser.add_argument("--resourceid",
-            help='specify single resourceid to update'
-        )
+        parser.add_argument("--resourceid", help="specify single resourceid to update")
 
     def handle(self, *args, **options):
 
         self.region_lookup = {
             "Central": str(ManagementArea.objects.get(name="FPAN Central Region").pk),
-            "East Central": str(ManagementArea.objects.get(name="FPAN East Central Region").pk),
-            "North Central": str(ManagementArea.objects.get(name="FPAN North Central Region").pk),
-            "Northeast": str(ManagementArea.objects.get(name="FPAN Northeast Region").pk),
-            "Northwest": str(ManagementArea.objects.get(name="FPAN Northwest Region").pk),
-            "Southeast": str(ManagementArea.objects.get(name="FPAN Southeast Region").pk),
-            "Southwest": str(ManagementArea.objects.get(name="FPAN Southwest Region").pk),
-            "West Central": str(ManagementArea.objects.get(name="FPAN West Central Region").pk), 
+            "East Central": str(
+                ManagementArea.objects.get(name="FPAN East Central Region").pk
+            ),
+            "North Central": str(
+                ManagementArea.objects.get(name="FPAN North Central Region").pk
+            ),
+            "Northeast": str(
+                ManagementArea.objects.get(name="FPAN Northeast Region").pk
+            ),
+            "Northwest": str(
+                ManagementArea.objects.get(name="FPAN Northwest Region").pk
+            ),
+            "Southeast": str(
+                ManagementArea.objects.get(name="FPAN Southeast Region").pk
+            ),
+            "Southwest": str(
+                ManagementArea.objects.get(name="FPAN Southwest Region").pk
+            ),
+            "West Central": str(
+                ManagementArea.objects.get(name="FPAN West Central Region").pk
+            ),
         }
 
-        for graph_name in ["Archaeological Site", "Historic Cemetery", "Historic Structure"]:
-            self.process_graph(graph_name, dry_run=options['dry_run'], resourceid=options["resourceid"])
+        for graph_name in [
+            "Archaeological Site",
+            "Historic Cemetery",
+            "Historic Structure",
+        ]:
+            self.process_graph(
+                graph_name, dry_run=options["dry_run"], resourceid=options["resourceid"]
+            )
 
         self.report()
 
@@ -56,7 +70,7 @@ class Command(BaseCommand):
         try:
             ma = ManagementArea.objects.get(name=v.value)
         except ManagementArea.DoesNotExist:
-            ma = None    
+            ma = None
         return ma
 
     def values_to_strings(self, value_uuid_list):
@@ -72,7 +86,7 @@ class Command(BaseCommand):
         for value in value_uuid_list:
             v = Value.objects.get(pk=value)
             outlist.append(v.value)
- 
+
         return outlist
 
     def process_graph(self, graph_name, dry_run=False, resourceid=None):
@@ -82,22 +96,23 @@ class Command(BaseCommand):
 
         self.node_lookup = {
             # old nodes
-            "Managing Agency": Node.objects.get(name="Managing Agency", graph=g), 
+            "Managing Agency": Node.objects.get(name="Managing Agency", graph=g),
             "Managed Area Name": Node.objects.get(name="Managed Area Name", graph=g),
             "HMS-Region": Node.objects.get(name="HMS-Region", graph=g),
-             # new node
+            # new node
             "Management Area": Node.objects.get(name="Management Area", graph=g),
             "Management Agency": Node.objects.get(name="Management Agency", graph=g),
             "FPAN Region": Node.objects.get(name="FPAN Region", graph=g),
             "County": Node.objects.get(name="County", graph=g),
         }
 
-        tiles = Tile.objects.filter(nodegroup_id=self.node_lookup["Managing Agency"].nodegroup)
+        tiles = Tile.objects.filter(
+            nodegroup_id=self.node_lookup["Managing Agency"].nodegroup
+        )
         tiles_ct = tiles.count()
         print(tiles_ct)
 
         for n, tile in enumerate(tiles, start=1):
-            
             resid = str(tile.resourceinstance_id)
             if resourceid and resid != resourceid:
                 continue
@@ -108,7 +123,7 @@ class Command(BaseCommand):
                 print(f"{n} - done")
 
             self.process_tile(tile, dry_run=dry_run)
-    
+
     def process_tile(self, tile, dry_run=False):
 
         resid = str(tile.resourceinstance_id)
@@ -126,13 +141,16 @@ class Command(BaseCommand):
         region_new = self.translate_region(region_old_s)
 
         if dry_run is False:
-
             new_ngid = self.node_lookup["Management Area"].nodegroup_id
             try:
-                new_tile = Tile.objects.get(nodegroup_id=new_ngid, resourceinstance_id=resid)
+                new_tile = Tile.objects.get(
+                    nodegroup_id=new_ngid, resourceinstance_id=resid
+                )
             except Tile.DoesNotExist:
-                new_tile = Tile().get_blank_tile_from_nodegroup_id(new_ngid, resourceid=resid)
-            
+                new_tile = Tile().get_blank_tile_from_nodegroup_id(
+                    new_ngid, resourceid=resid
+                )
+
             new_tile.data = {
                 str(self.node_lookup["Management Area"].nodeid): area_new,
                 str(self.node_lookup["Management Agency"].nodeid): agency_new,

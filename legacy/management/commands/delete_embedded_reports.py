@@ -1,18 +1,10 @@
-import os
-import csv
-import json
-import uuid
-from django.core import management
-from django.core.management.base import BaseCommand, CommandError
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.models.resource import Resource
-from arches.app.models.models import Node, NodeGroup, Value
-from arches.app.models.graph import Graph
+from django.core.management.base import BaseCommand
+from arches.app.models.models import Node
 from arches.app.models.tile import Tile
 
-class Command(BaseCommand):
 
-    help = 'collects stats needed for FPAN year-end reporting'
+class Command(BaseCommand):
+    help = "collects stats needed for FPAN year-end reporting"
 
     def add_arguments(self, parser):
         pass
@@ -29,7 +21,9 @@ class Command(BaseCommand):
         for rm_id in model_ids:
             report_node = Node.objects.get(name="Scout Report", graph_id=rm_id)
             report_toptiles = Tile.objects.filter(nodegroup_id=report_node.nodegroup_id)
-            confirm = raw_input("delete {} scout report tiles? Y/n  ".format(len(report_toptiles)))
+            confirm = raw_input(
+                "delete {} scout report tiles? Y/n  ".format(len(report_toptiles))
+            )
             if confirm.lower().startswith("n"):
                 continue
             for t in report_toptiles:

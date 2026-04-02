@@ -1,36 +1,39 @@
-import os
-import csv
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from arches.app.models.resource import Resource
 from arches.app.models.graph import Graph
 from arches.app.search.search_engine_factory import SearchEngineInstance as se
 
-class Command(BaseCommand):
 
-    help = 'Checks the current ElasticSearch resource index against the ORM '\
-    'objects and prints a list of missing resources to the logs directory.'
+class Command(BaseCommand):
+    help = (
+        "Checks the current ElasticSearch resource index against the ORM "
+        "objects and prints a list of missing resources to the logs directory."
+    )
 
     def add_arguments(self, parser):
 
-        parser.add_argument("--index",
+        parser.add_argument(
+            "--index",
             action="store_true",
             default=False,
-            help="attempt to index resources that aren't in index."
+            help="attempt to index resources that aren't in index.",
         )
 
     def handle(self, *args, **options):
 
         es_contents = self.get_es_contents()
 
-        graphs = Graph.objects.filter(isresource=True).exclude(name="Arches System Settings")
+        graphs = Graph.objects.filter(isresource=True).exclude(
+            name="Arches System Settings"
+        )
 
         for graph in graphs:
-
             print(graph.name)
 
             missing = []
-            uuid_resids = Resource.objects.filter(graph=graph).values_list('resourceinstanceid', flat=True)
+            uuid_resids = Resource.objects.filter(graph=graph).values_list(
+                "resourceinstanceid", flat=True
+            )
             db_resourceids = set([str(i) for i in uuid_resids])
 
             try:
@@ -63,14 +66,12 @@ class Command(BaseCommand):
                                 print(e)
                                 break
 
-
-
     def get_es_contents(self):
 
         summary = dict()
-        for resinfo in self.iterate_all_documents(se, 'resources'):
+        for resinfo in self.iterate_all_documents(se, "resources"):
             resid, graphid = resinfo
-            if graphid != 'None':
+            if graphid != "None":
                 if graphid in summary:
                     summary[graphid].add(resid)
                 else:
@@ -85,22 +86,22 @@ class Command(BaseCommand):
         is_first = True
         while True:
             # Scroll next
-            if is_first: # Initialize scroll
-                result = se.search(index=index, scroll="1m", body={
-                    "size": pagesize
-                })
+            if is_first:  # Initialize scroll
+                result = se.search(index=index, scroll="1m", body={"size": pagesize})
                 is_first = False
             else:
                 ## note: need to access the ElasticSearch() instance directly
                 ## here, (.es), because the Arches se object doesn't inherit .scroll()
-                result = se.es.scroll(body={
-                    "scroll_id": scroll_id,
-                    "scroll": scroll_timeout
-                })
+                result = se.es.scroll(
+                    body={"scroll_id": scroll_id, "scroll": scroll_timeout}
+                )
             scroll_id = result["_scroll_id"]
             hits = result["hits"]["hits"]
             # Stop after no more docs
             if not hits:
                 break
             # Yield each entry
-            yield from ((hit['_source']['resourceinstanceid'], hit['_source']['graph_id']) for hit in hits)
+            yield from (
+                (hit["_source"]["resourceinstanceid"], hit["_source"]["graph_id"])
+                for hit in hits
+            )

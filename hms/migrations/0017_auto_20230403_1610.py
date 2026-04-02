@@ -4,19 +4,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0016_merge_20230209_2317'),
+        ("hms", "0016_merge_20230209_2317"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='scoutprofile',
-            name='region_choices',
+            model_name="scoutprofile",
+            name="region_choices",
         ),
         migrations.AlterField(
-            model_name='scoutprofile',
-            name='fpan_regions',
-            field=models.ManyToManyField(limit_choices_to={'category__name': 'FPAN Region'}, to='hms.ManagementArea', verbose_name='FPAN Regions'),
+            model_name="scoutprofile",
+            name="fpan_regions",
+            field=models.ManyToManyField(
+                limit_choices_to={"category__name": "FPAN Region"},
+                to="hms.ManagementArea",
+                verbose_name="FPAN Regions",
+            ),
         ),
     ]

@@ -1,26 +1,21 @@
 import os
-import csv
 import json
 import uuid
-from django.core import management
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.models.resource import Resource
-from arches.app.models.models import Node, NodeGroup, Value
-from arches.app.models.graph import Graph
-from arches.app.models.tile import Tile
+from arches.app.models.models import Node, Value
+
 
 class Command(BaseCommand):
-
-    help = 'collects stats needed for FPAN year-end reporting'
+    help = "collects stats needed for FPAN year-end reporting"
 
     def add_arguments(self, parser):
         pass
         # parser.add_argument("uuid",help='input the uuid string to find')
 
     def handle(self, *args, **options):
-         
+
         photo_lookup = self.photo_type_conversion()
         exportdir = os.path.join(os.path.dirname(settings.APP_ROOT), "exports")
 
@@ -37,16 +32,18 @@ class Command(BaseCommand):
 
         # load the single exported new Scout Report resource and get information from it
         refdatadir = os.path.join("fpan", "management", "commands", "refdata")
-        scoutreport_model = os.path.join(refdatadir, "Scout_Report_2019-08-14_15-46-41.json")
+        scoutreport_model = os.path.join(
+            refdatadir, "Scout_Report_2019-08-14_15-46-41.json"
+        )
         with open(scoutreport_model, "r") as f:
             data = json.loads(f.read())
 
-        res = data['business_data']['resources'][0]
-        newgraphid = res['resourceinstance']['graph_id']
-        
+        res = data["business_data"]["resources"][0]
+        newgraphid = res["resourceinstance"]["graph_id"]
+
         all_nodes = list()
-        for t in res['tiles']:
-            all_nodes += t['data'].keys()
+        for t in res["tiles"]:
+            all_nodes += t["data"].keys()
 
         nodeidlookup = {
             "f212980f-d534-11e7-8ca8-94659cf754d0": {},
@@ -56,24 +53,24 @@ class Command(BaseCommand):
 
         for i in set(all_nodes):
             n = Node.objects.get(nodeid=i)
-            
+
             # this is very sloppy, but making three separate sections for the dictionary
             # based on the uuids of the v1 resource models.
             nodeidlookup["f212980f-d534-11e7-8ca8-94659cf754d0"][n.name] = {
-                "oldnode":None,
-                "newnode":i,
+                "oldnode": None,
+                "newnode": i,
                 "oldnodegroupid": None,
                 "newnodegroupid": str(n.nodegroup_id),
             }
             nodeidlookup["73889292-d536-11e7-b3b3-94659cf754d0"][n.name] = {
-                "oldnode":None,
-                "newnode":i,
+                "oldnode": None,
+                "newnode": i,
                 "oldnodegroupid": None,
                 "newnodegroupid": str(n.nodegroup_id),
             }
             nodeidlookup["c67216bf-8cc2-11e7-883c-06ed184dc22c"][n.name] = {
-                "oldnode":None,
-                "newnode":i,
+                "oldnode": None,
+                "newnode": i,
                 "oldnodegroupid": None,
                 "newnodegroupid": str(n.nodegroup_id),
             }
@@ -81,54 +78,60 @@ class Command(BaseCommand):
         # here's an output dictionary we'll use to split the input v1 file into multiple
         # files per resource type.
         sorted_v1_resources = {}
-        
+
         # now load the old resource data export from the v1 database
         with open(resfile, "r") as f:
             data = json.loads(f.read())
-            
-        resources = data['business_data']['resources']
+
+        resources = data["business_data"]["resources"]
 
         # iterate the resources until our lookup dictionaries is fully populated
         for rm, subset in nodeidlookup.items():
-        
-            subresources = [i for i in resources if i['resourceinstance']['graph_id'] == rm]
-            
-            # put this list in the 
+            subresources = [
+                i for i in resources if i["resourceinstance"]["graph_id"] == rm
+            ]
+
+            # put this list in the
             sorted_v1_resources[rm] = {
                 "resources": list(subresources),
-                "resourceids": [i['resourceinstance']['resourceinstanceid'] for i in subresources]
+                "resourceids": [
+                    i["resourceinstance"]["resourceinstanceid"] for i in subresources
+                ],
             }
 
             print(f"{rm} {len(subresources)}")
             for ct, res in enumerate(subresources):
+                for tile in res["tiles"]:
+                    all_nodes = tile["data"].keys()
 
-                for tile in res['tiles']:
-                    all_nodes = tile['data'].keys()
-
-                    if None in [v['oldnode'] for k, v in subset.iteritems()]:
+                    if None in [v["oldnode"] for k, v in subset.iteritems()]:
                         for nodeid in set(all_nodes):
-                                # if not i in [v['oldnode'] for k, v in subset.iteritems()]:
+                            # if not i in [v['oldnode'] for k, v in subset.iteritems()]:
                             nn = Node.objects.get(nodeid=nodeid)
-                            if not nn.name in nodeidlookup[rm]:
+                            if nn.name not in nodeidlookup[rm]:
                                 continue
-                            subset[nn.name]['oldnode'] = nodeid
-                            subset[nn.name]['oldnodegroupid'] = tile['nodegroup_id']
+                            subset[nn.name]["oldnode"] = nodeid
+                            subset[nn.name]["oldnodegroupid"] = tile["nodegroup_id"]
 
         sr_resources = list()
 
         for index, res in enumerate(resources):
-
-            oldresid = res['resourceinstance']['resourceinstanceid']
-            resgraphid = res['resourceinstance']['graph_id']
+            oldresid = res["resourceinstance"]["resourceinstanceid"]
+            resgraphid = res["resourceinstance"]["graph_id"]
 
             # use the graphid to get the node lookup for this resource model
             subsetlookup = nodeidlookup[resgraphid]
 
-            report_node = Node.objects.get(name="Scout Report", graph_id=res['resourceinstance']['graph_id'])
-            report_toptiles = [i for i in res['tiles'] if i['nodegroup_id'] == str(report_node.nodegroup_id)]
+            report_node = Node.objects.get(
+                name="Scout Report", graph_id=res["resourceinstance"]["graph_id"]
+            )
+            report_toptiles = [
+                i
+                for i in res["tiles"]
+                if i["nodegroup_id"] == str(report_node.nodegroup_id)
+            ]
 
             for t in report_toptiles:
-
                 newresid = str(uuid.uuid4())
                 newres = {
                     "resourceinstance": {
@@ -139,37 +142,49 @@ class Command(BaseCommand):
                     "tiles": [],
                 }
 
-                child_tiles = [i for i in res['tiles'] if i['parenttile_id'] == t['tileid']]
+                child_tiles = [
+                    i for i in res["tiles"] if i["parenttile_id"] == t["tileid"]
+                ]
                 for ctile in child_tiles:
-                    newres['tiles'].append(self.transform_tile(ctile, newresid, subsetlookup, photo_lookup))
+                    newres["tiles"].append(
+                        self.transform_tile(ctile, newresid, subsetlookup, photo_lookup)
+                    )
 
-                if len(newres['tiles']) > 0:
-
+                if len(newres["tiles"]) > 0:
                     # comment this out if the resources that these reports reference will not be loaded
-                    newres['tiles'].append(self.make_resource_instance_tile(newresid, oldresid))
+                    newres["tiles"].append(
+                        self.make_resource_instance_tile(newresid, oldresid)
+                    )
 
                     sr_resources.append((oldresid, newres))
             if index % 200 == 0:
                 print(index)
             if index % 25 == 0:
                 print(index, end="")
-            elif index == len(resources)-1:
+            elif index == len(resources) - 1:
                 print(index)
 
         for rm, data in sorted_v1_resources.items():
-
-            outv1resfile = rm+".json"
-            outresdata = {"business_data": {"resources": data['resources']}}
-            outjson = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outresdata)))
+            outv1resfile = rm + ".json"
+            outresdata = {"business_data": {"resources": data["resources"]}}
+            outjson = JSONDeserializer().deserialize(
+                JSONSerializer().serialize(
+                    JSONSerializer().serializeToPython(outresdata)
+                )
+            )
 
             with open(os.path.join("exports", outv1resfile), "wb") as outf:
                 json.dump(outjson, outf, indent=1)
 
-            scout_reports = [s[1] for s in sr_resources if s[0] in data['resourceids']]
+            scout_reports = [s[1] for s in sr_resources if s[0] in data["resourceids"]]
             print(len(scout_reports))
-            outsrfile = rm+"-ScoutReports.json"
+            outsrfile = rm + "-ScoutReports.json"
             outsrdata = {"business_data": {"resources": scout_reports}}
-            outsrjson = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outsrdata)))
+            outsrjson = JSONDeserializer().deserialize(
+                JSONSerializer().serialize(
+                    JSONSerializer().serializeToPython(outsrdata)
+                )
+            )
             with open(os.path.join("exports", outsrfile), "wb") as outsrf:
                 json.dump(outsrjson, outsrf, indent=1)
 
@@ -177,48 +192,47 @@ class Command(BaseCommand):
         # outfile = "scout-reports"+resfile[-25:]
         # with open(os.path.join(exportdir, outfile), "w") as f:
 
-            # export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outbusiness_data)))
-            # json.dump(export, f, indent=1)
+        # export = JSONDeserializer().deserialize(JSONSerializer().serialize(JSONSerializer().serializeToPython(outbusiness_data)))
+        # json.dump(export, f, indent=1)
 
     def transform_tile(self, intile, resid, subsetlookup, photo_lookup):
-        
-        nidlookup = {i['oldnode']:i['newnode'] for i in subsetlookup.values()}
-        ngidlookup = {i['oldnodegroupid']:i['newnodegroupid'] for i in subsetlookup.values()}
+
+        nidlookup = {i["oldnode"]: i["newnode"] for i in subsetlookup.values()}
+        ngidlookup = {
+            i["oldnodegroupid"]: i["newnodegroupid"] for i in subsetlookup.values()
+        }
         newtile = {
-            "resourceinstance_id": resid, 
-            "provisionaledits": None, 
-            "parenttile_id": None, 
-            "nodegroup_id": ngidlookup[intile['nodegroup_id']], 
-            "sortorder": 0, 
-            "data": {}, 
-            "tileid": str(uuid.uuid4())
+            "resourceinstance_id": resid,
+            "provisionaledits": None,
+            "parenttile_id": None,
+            "nodegroup_id": ngidlookup[intile["nodegroup_id"]],
+            "sortorder": 0,
+            "data": {},
+            "tileid": str(uuid.uuid4()),
         }
 
-        for k, v in intile['data'].items():
-            
+        for k, v in intile["data"].items():
             nnn = Node.objects.get(nodeid=k)
-            if nnn.datatype == "concept-list" and not v is None:
+            if nnn.datatype == "concept-list" and v is not None:
                 if not isinstance(v, list):
                     v = [v]
-            
+
             value = self.check_value(v, photo_lookup)
-            newtile['data'][nidlookup[k]] = value
+            newtile["data"][nidlookup[k]] = value
 
         return newtile
 
     def make_resource_instance_tile(self, resid, otherresid):
 
         return {
-            "data": {
-                "a103e68f-bf7f-11e9-aa39-94659cf754d0": otherresid
-             }, 
-             "provisionaledits": None, 
-             "parenttile_id": None, 
-             "nodegroup_id": "a103e68f-bf7f-11e9-aa39-94659cf754d0", 
-             "sortorder": 0, 
-             "resourceinstance_id": resid, 
-             "tileid": str(uuid.uuid4())
-         }
+            "data": {"a103e68f-bf7f-11e9-aa39-94659cf754d0": otherresid},
+            "provisionaledits": None,
+            "parenttile_id": None,
+            "nodegroup_id": "a103e68f-bf7f-11e9-aa39-94659cf754d0",
+            "sortorder": 0,
+            "resourceinstance_id": resid,
+            "tileid": str(uuid.uuid4()),
+        }
 
     def check_value(self, invalue, photo_lookup):
 
@@ -233,17 +247,17 @@ class Command(BaseCommand):
                     continue
                 try:
                     valueobj = Value.objects.get(valueid=val)
-                except Value.DoesNotExist as e:
+                except Value.DoesNotExist:
                     print(f"this is not a valid Value and it's in a list: {val}")
         else:
             try:
                 uuid.UUID(invalue)
                 valueobj = Value.objects.get(valueid=invalue)
-            except TypeError as e:
+            except TypeError:
                 pass
-            except ValueError as e:
+            except ValueError:
                 pass
-            except Value.DoesNotExist as e:
+            except Value.DoesNotExist:
                 if invalue in photo_lookup:
                     invalue = photo_lookup[invalue]
                 else:
@@ -251,11 +265,10 @@ class Command(BaseCommand):
 
         return invalue
 
-
     def photo_type_conversion(self):
-        
+
         v1_dict = {
-            "4157929b-6d16-47fd-876f-6b8724a995e8": "Overview", 
+            "4157929b-6d16-47fd-876f-6b8724a995e8": "Overview",
             "8b3f3c97-408f-4d99-88b9-df9b7b6eb4cf": "Close-up",
             "fb33287f-8075-4550-97ff-55a1aa131851": "Unique Feature",
             "45e1edf4-7c18-4c1f-8049-26bac2843117": "Close-up",

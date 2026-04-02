@@ -233,6 +233,4 @@ def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
     concept_ids = Relation.objects.filter(
         conceptfrom=collection, relationtype_id="member"
     ).values_list("conceptto", flat=True)
-    return Value.objects.filter(
-        concept_id__in=concept_ids
-    ).values_list("value", "pk")
+    return Value.objects.filter(concept_id__in=concept_ids).values_list("value", "pk")

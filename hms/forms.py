@@ -11,50 +11,59 @@ from hms.models import FPANRegion
 class ScoutForm(UserCreationForm):
     first_name = forms.CharField(
         max_length=30,
-        help_text='Required',
-        widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
+        help_text="Required",
+        widget=forms.TextInput(attrs={"class": "form-control", "required": "true"}),
+    )
     last_name = forms.CharField(
         max_length=30,
-        help_text='Required',
-        widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
+        help_text="Required",
+        widget=forms.TextInput(attrs={"class": "form-control", "required": "true"}),
+    )
     middle_initial = forms.CharField(
         max_length=1,
-        help_text='Required',
-        widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
+        help_text="Required",
+        widget=forms.TextInput(attrs={"class": "form-control", "required": "true"}),
+    )
     email = forms.EmailField(
         max_length=200,
-        help_text='Required',
-        widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'}))
+        help_text="Required",
+        widget=forms.TextInput(attrs={"class": "form-control", "required": "true"}),
+    )
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={'class':'form-control', 'required':'true'}),
-        help_text='Required',
-        label="Enter Password"
-    )    
+        widget=forms.PasswordInput(attrs={"class": "form-control", "required": "true"}),
+        help_text="Required",
+        label="Enter Password",
+    )
     password2 = forms.CharField(
-        help_text='Required',
-        widget=forms.PasswordInput(attrs={'class':'form-control', 'required':'true'}),
-        label="Re-enter Password"
+        help_text="Required",
+        widget=forms.PasswordInput(attrs={"class": "form-control", "required": "true"}),
+        label="Re-enter Password",
     )
     fpan_regions2 = forms.ModelMultipleChoiceField(
         label="In which regions can you monitor sites?",
         queryset=FPANRegion.objects.all(),
         widget=forms.CheckboxSelectMultiple(),
-        help_text='Required. You can change this preference anytime after signing up, '\
-            'but you must you pick at least one region before an archaeological site can be '\
-            'assigned to you for monitoring.',
+        help_text="Required. You can change this preference anytime after signing up, "
+        "but you must you pick at least one region before an archaeological site can be "
+        "assigned to you for monitoring.",
     )
     zip_code = forms.CharField(
         label="Your zip code",
         max_length=5,
-        help_text='Required',
-        widget=forms.TextInput(attrs={'class':'form-control', 'required':'true'})
+        help_text="Required",
+        widget=forms.TextInput(attrs={"class": "form-control", "required": "true"}),
     )
     background = forms.CharField(
         label="Please let us know a little about your education and occupation",
         required=False,
         help_text="Optional",
         widget=forms.Textarea(
-            attrs={'class': 'form-control','rows': 1, 'cols': 40, 'style': 'height: 3em;'}
+            attrs={
+                "class": "form-control",
+                "rows": 1,
+                "cols": 40,
+                "style": "height: 3em;",
+            }
         ),
     )
     relevant_experience = forms.CharField(
@@ -62,7 +71,12 @@ class ScoutForm(UserCreationForm):
         required=False,
         help_text="Optional",
         widget=forms.Textarea(
-            attrs={'class': 'form-control','rows': 1, 'cols': 40, 'style': 'height: 3em;'}
+            attrs={
+                "class": "form-control",
+                "rows": 1,
+                "cols": 40,
+                "style": "height: 3em;",
+            }
         ),
     )
     interest_reason = forms.CharField(
@@ -71,32 +85,47 @@ class ScoutForm(UserCreationForm):
         required=False,
         help_text="Optional",
         widget=forms.Textarea(
-            attrs={'class': 'form-control','rows': 1, 'cols': 40, 'style': 'height: 3em;'}
+            attrs={
+                "class": "form-control",
+                "rows": 1,
+                "cols": 40,
+                "style": "height: 3em;",
+            }
         ),
     )
     SITE_INTEREST_CHOICES = (
-        ('Prehistoric', 'Prehistoric'),
-        ('Historic', 'Historic'),
-        ('Cemeteries', 'Cemeteries'),
-        ('Underwater', 'Underwater'),
-        ('Other', 'Other'),)
+        ("Prehistoric", "Prehistoric"),
+        ("Historic", "Historic"),
+        ("Cemeteries", "Cemeteries"),
+        ("Underwater", "Underwater"),
+        ("Other", "Other"),
+    )
 
     site_interest_type = forms.MultipleChoiceField(
         required=False,
         choices=SITE_INTEREST_CHOICES,
-        help_text="Knowing this helps us decide which sites to assign to you, "\
-            "but it is optional and you can change it anytime after signing up.",
+        help_text="Knowing this helps us decide which sites to assign to you, "
+        "but it is optional and you can change it anytime after signing up.",
         widget=forms.CheckboxSelectMultiple(attrs={"class": "form-list-multiselect"}),
     )
 
     class Meta:
         model = Scout
         fields = (
-            'first_name', 'middle_initial', 'last_name', 'email', 'password1', 'password2', 
-            'fpan_regions2', 'zip_code',
-            'background', 'relevant_experience', 'interest_reason', 'site_interest_type',
+            "first_name",
+            "middle_initial",
+            "last_name",
+            "email",
+            "password1",
+            "password2",
+            "fpan_regions2",
+            "zip_code",
+            "background",
+            "relevant_experience",
+            "interest_reason",
+            "site_interest_type",
         )
-    
+
     def clean(self):
         """disallow new accounts with the same e-mail as existing accounts."""
         cleaned_data = super(ScoutForm, self).clean()
@@ -106,10 +135,12 @@ class ScoutForm(UserCreationForm):
                 self.add_error(
                     "email",
                     forms.ValidationError(
-                        mark_safe(_(
-                            "This email address has already been registered with the system. \
+                        mark_safe(
+                            _(
+                                "This email address has already been registered with the system. \
                             <a href='/password_reset/'>Click here</a> to reset your password."
-                        )),
+                            )
+                        ),
                         code="unique",
                     ),
                 )
@@ -117,34 +148,32 @@ class ScoutForm(UserCreationForm):
 
 
 class ScoutProfileForm(forms.ModelForm):
-
     class Meta:
         model = ScoutProfile
         fields = (
-            'street_address',
-            'city',
-            'state',
-            'zip_code',
-            'phone',
-            'background',
-            'relevant_experience',
-            'interest_reason',
-            'site_interest_type',
-            'fpan_regions2'
+            "street_address",
+            "city",
+            "state",
+            "zip_code",
+            "phone",
+            "background",
+            "relevant_experience",
+            "interest_reason",
+            "site_interest_type",
+            "fpan_regions2",
         )
-        
+
         widgets = {
-            'street_address': forms.TextInput(attrs={'class': 'form-control'}),
-            'city': forms.TextInput(attrs={'class': 'form-control'}),
-            'state': forms.TextInput(attrs={'class': 'form-control'}),
-            'zip_code': forms.TextInput(attrs={'class': 'form-control'}),
-            'background': forms.Textarea(attrs={'class': 'form-control'}),
-            'relevant_experience': forms.Textarea(attrs={'class': 'form-control'}),
-            'interest_reason': forms.Textarea(attrs={'class': 'form-control'}),
-            'site_interest_type': forms.TextInput(attrs={'class': 'form-control'}),
+            "street_address": forms.TextInput(attrs={"class": "form-control"}),
+            "city": forms.TextInput(attrs={"class": "form-control"}),
+            "state": forms.TextInput(attrs={"class": "form-control"}),
+            "zip_code": forms.TextInput(attrs={"class": "form-control"}),
+            "background": forms.Textarea(attrs={"class": "form-control"}),
+            "relevant_experience": forms.Textarea(attrs={"class": "form-control"}),
+            "interest_reason": forms.Textarea(attrs={"class": "form-control"}),
+            "site_interest_type": forms.TextInput(attrs={"class": "form-control"}),
         }
 
     fpan_regions2 = forms.ModelMultipleChoiceField(
-        queryset=FPANRegion.objects.all(),
-        widget=forms.CheckboxSelectMultiple()
+        queryset=FPANRegion.objects.all(), widget=forms.CheckboxSelectMultiple()
     )

@@ -1,20 +1,14 @@
 import os
-import csv
-import json
-import uuid
-from django.core import management
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from arches.app.models.system_settings import settings
 from arches.app.utils.data_management.resources.exporter import ResourceExporter
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
 from arches.app.models.resource import Resource
-from arches.app.models.models import Node, NodeGroup, Value
-from arches.app.models.graph import Graph
+from arches.app.models.models import Node
 from arches.app.models.tile import Tile
 
-class Command(BaseCommand):
 
-    help = 'collects stats needed for FPAN year-end reporting'
+class Command(BaseCommand):
+    help = "collects stats needed for FPAN year-end reporting"
 
     def add_arguments(self, parser):
         pass
@@ -43,9 +37,9 @@ class Command(BaseCommand):
             resrep = [i for i in resources if i.resourceinstanceid in resids]
             print(f"resources with reports: {len(resrep)}")
 
-        resource_exporter = ResourceExporter('json', single_file=True)
+        resource_exporter = ResourceExporter("json", single_file=True)
         data = resource_exporter.export(resourceinstanceids=list(exportresids))
         for file in data:
-            file['name'] = "resources-with-scout-reports"+file['name'][-25:]
-            with open(os.path.join(exportdir, file['name']), 'wb') as f:
-                f.write(file['outputfile'].getvalue())
+            file["name"] = "resources-with-scout-reports" + file["name"][-25:]
+            with open(os.path.join(exportdir, file["name"]), "wb") as f:
+                f.write(file["outputfile"].getvalue())

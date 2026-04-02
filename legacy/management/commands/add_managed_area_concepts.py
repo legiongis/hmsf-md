@@ -1,10 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from arches.app.models.models import Value, Concept, Relation, DLanguage, DValueType
 from fpan.models import ManagedArea
 
-class Command(BaseCommand):
 
-    help = 'bulk addition of user accounts from a csv file'
+class Command(BaseCommand):
+    help = "bulk addition of user accounts from a csv file"
 
     def add_arguments(self, parser):
         pass
@@ -56,7 +56,6 @@ class Command(BaseCommand):
         ma_name_coll_v.save()
 
         for ma in ManagedArea.objects.all():
-
             # create and save the new concept
             c = Concept()
             c.nodetype_id = "Concept"

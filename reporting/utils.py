@@ -21,6 +21,7 @@ weekday_lookup = {
     6: "Sunday",
 }
 
+
 def get_past_week_report_counts(use_date=None):
 
     if use_date is None:
@@ -61,24 +62,27 @@ def get_past_week_report_counts(use_date=None):
 
         report_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
         if report_date >= week_ago and report_date < today:
-
             resid = str(report.resourceinstanceid)
 
             report_day_of_week = report_date.weekday()
             count_dict[report_date]["ct"] += 1
-            count_dict[report_date]["reports"].append({
-                "resid": resid,
-                "fmsfid": fmsfid,
-            })
+            count_dict[report_date]["reports"].append(
+                {
+                    "resid": resid,
+                    "fmsfid": fmsfid,
+                }
+            )
 
         else:
             sites_with_reports_already.append(fmsfid)
 
     for k, v in count_dict.items():
-        for report in v['reports']:
+        for report in v["reports"]:
             report["new_site"] = report["fmsfid"] in sites_with_reports_already
 
-    logger.info(f"report count generation completed | {datetime.datetime.now() - start} seconds")
+    logger.info(
+        f"report count generation completed | {datetime.datetime.now() - start} seconds"
+    )
     return count_dict
 
 
@@ -103,13 +107,13 @@ def send_weekly_summary(use_date=None):
 
     # current_site = get_current_site(request)
     msg_vars = {
-        'total_reports_ct': total_reports_ct,
-        'new_sites_visited_ct': new_sites_visited_ct,
-        'count_data': formatted_counts,
-        'domain': settings.DEFAULT_FROM_EMAIL.split("@")[1],
+        "total_reports_ct": total_reports_ct,
+        "new_sites_visited_ct": new_sites_visited_ct,
+        "count_data": formatted_counts,
+        "domain": settings.DEFAULT_FROM_EMAIL.split("@")[1],
     }
-    message_txt = render_to_string('reporting/weekly_report_email_text.htm', msg_vars)
-    message_html = render_to_string('reporting/weekly_report_email_html.htm', msg_vars)
+    message_txt = render_to_string("reporting/weekly_report_email_text.htm", msg_vars)
+    message_html = render_to_string("reporting/weekly_report_email_html.htm", msg_vars)
     subject_line = f"{settings.EMAIL_SUBJECT_PREFIX}- Week of {startend_date_str}"
     from_email = settings.DEFAULT_FROM_EMAIL
     to_emails = [i[1] for i in settings.FPAN_ADMINS]

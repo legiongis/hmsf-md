@@ -429,6 +429,7 @@ class LandManager(models.Model):
 
     accessible_sites_formatted.short_description = "Accessible Sites"  # type: ignore
 
+
 def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
 
     collection = Value.objects.get(
@@ -437,9 +438,8 @@ def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
     concept_ids = Relation.objects.filter(
         conceptfrom=collection, relationtype_id="member"
     ).values_list("conceptto", flat=True)
-    return Value.objects.filter(
-        concept_id__in=concept_ids
-    ).values_list("value", "pk")
+    return Value.objects.filter(concept_id__in=concept_ids).values_list("value", "pk")
+
 
 def get_or_create_concept(label, parent_lbl, collection_lbl, concept_id=None):
     """Helper function that creates a new concept and adds it to the specified
@@ -455,10 +455,10 @@ def get_or_create_concept(label, parent_lbl, collection_lbl, concept_id=None):
     ## first check if this concept already exists. It must be under the specified
     ## top concept (parent label) and also under the provided collection
     for val in Value.objects.filter(
-            valuetype_id="prefLabel",
-            value=label,
-            language_id="en",
-        ):
+        valuetype_id="prefLabel",
+        value=label,
+        language_id="en",
+    ):
         if val.concept:
             if Relation.objects.filter(
                 conceptfrom=topconcept,

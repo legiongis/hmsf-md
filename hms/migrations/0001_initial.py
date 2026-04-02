@@ -10,47 +10,105 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('fpan', '0001_initial'),
-        ('auth', '0007_alter_validators_add_error_messages'),
+        ("fpan", "0001_initial"),
+        ("auth", "0007_alter_validators_add_error_messages"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Scout',
+            name="Scout",
             fields=[
-                ('user_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to=settings.AUTH_USER_MODEL)),
-                ('middle_initial', models.CharField(max_length=1)),
+                (
+                    "user_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                ("middle_initial", models.CharField(max_length=1)),
             ],
             options={
-                'abstract': False,
-                'verbose_name': 'user',
-                'verbose_name_plural': 'users',
+                "abstract": False,
+                "verbose_name": "user",
+                "verbose_name_plural": "users",
             },
-            bases=('auth.user',),
+            bases=("auth.user",),
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
         migrations.CreateModel(
-            name='ScoutProfile',
+            name="ScoutProfile",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('street_address', models.CharField(max_length=30)),
-                ('city', models.CharField(max_length=30)),
-                ('state', models.CharField(default='Florida', max_length=30)),
-                ('zip_code', models.CharField(max_length=5)),
-                ('phone', models.CharField(max_length=12)),
-                ('background', models.TextField(blank=True, verbose_name='Please let us know a little about your education and occupation.')),
-                ('relevant_experience', models.TextField(blank=True, verbose_name='Please let us know about any relevant experience.')),
-                ('interest_reason', models.TextField(blank=True, verbose_name='Why are you interested in becoming a Heritage Monitoring Scout?')),
-                ('site_interest_type', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, choices=[('Prehistoric', 'Prehistoric'), ('Historic', 'Historic'), ('Cemeteries', 'Cemeteries'), ('Underwater', 'Underwater'), ('Other', 'Other')], max_length=30), blank=True, default=list, size=None)),
-                ('ethics_agreement', models.BooleanField(default=True)),
-                ('region_choices', models.ManyToManyField(to='fpan.Region')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='hms.Scout')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("street_address", models.CharField(max_length=30)),
+                ("city", models.CharField(max_length=30)),
+                ("state", models.CharField(default="Florida", max_length=30)),
+                ("zip_code", models.CharField(max_length=5)),
+                ("phone", models.CharField(max_length=12)),
+                (
+                    "background",
+                    models.TextField(
+                        blank=True,
+                        verbose_name="Please let us know a little about your education and occupation.",
+                    ),
+                ),
+                (
+                    "relevant_experience",
+                    models.TextField(
+                        blank=True,
+                        verbose_name="Please let us know about any relevant experience.",
+                    ),
+                ),
+                (
+                    "interest_reason",
+                    models.TextField(
+                        blank=True,
+                        verbose_name="Why are you interested in becoming a Heritage Monitoring Scout?",
+                    ),
+                ),
+                (
+                    "site_interest_type",
+                    django.contrib.postgres.fields.ArrayField(
+                        base_field=models.CharField(
+                            blank=True,
+                            choices=[
+                                ("Prehistoric", "Prehistoric"),
+                                ("Historic", "Historic"),
+                                ("Cemeteries", "Cemeteries"),
+                                ("Underwater", "Underwater"),
+                                ("Other", "Other"),
+                            ],
+                            max_length=30,
+                        ),
+                        blank=True,
+                        default=list,
+                        size=None,
+                    ),
+                ),
+                ("ethics_agreement", models.BooleanField(default=True)),
+                ("region_choices", models.ManyToManyField(to="fpan.Region")),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="hms.Scout"
+                    ),
+                ),
             ],
         ),
     ]

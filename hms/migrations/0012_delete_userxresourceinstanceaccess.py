@@ -4,13 +4,12 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0011_auto_20210823_1602'),
+        ("hms", "0011_auto_20210823_1602"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='UserXResourceInstanceAccess',
+            name="UserXResourceInstanceAccess",
         ),
     ]

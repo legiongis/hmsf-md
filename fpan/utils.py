@@ -17,14 +17,18 @@ logger = logging.getLogger(__name__)
 
 legal_value_ids = [str(i) for i in Value.objects.all().values_list("pk", flat=True)]
 
-class SpatialJoin():
 
+class SpatialJoin:
     def __init__(self, graph_name: str):
 
         self.node_lookup = settings.SPATIAL_JOIN_NODE_LOOKUP[graph_name]
 
-        self.valid_management_area_vals = [i.concept_value_id for i in ManagementArea.objects.all()]
-        self.valid_management_agency_vals = [i.concept_value_id for i in ManagementAgency.objects.all()]
+        self.valid_management_area_vals = [
+            i.concept_value_id for i in ManagementArea.objects.all()
+        ]
+        self.valid_management_agency_vals = [
+            i.concept_value_id for i in ManagementAgency.objects.all()
+        ]
 
         self.county_lookup = self.hydrate_county_lookup()
 
@@ -40,7 +44,7 @@ class SpatialJoin():
                 language_id="en",
                 valuetype_id="prefLabel",
             )
-            entry['county_concept_value_id'] = str(county_value.pk)
+            entry["county_concept_value_id"] = str(county_value.pk)
 
             region_label = f"FPAN {entry['region']} Region"
             region_value = Value.objects.get(
@@ -48,7 +52,7 @@ class SpatialJoin():
                 language_id="en",
                 valuetype_id="prefLabel",
             )
-            entry['region_concept_value_id'] = str(region_value.pk)
+            entry["region_concept_value_id"] = str(region_value.pk)
 
         return lookup
 
@@ -66,23 +70,29 @@ class SpatialJoin():
         if index:
             resource.index()
 
-    def get_areas_for_resourceinstance(self, resourceinstance: ResourceInstance) -> List[ManagementArea]:
+    def get_areas_for_resourceinstance(
+        self, resourceinstance: ResourceInstance
+    ) -> List[ManagementArea]:
 
         try:
             geom_tile = Tile.objects.get(
                 nodegroup_id__in=settings.SPATIAL_COORDINATES_NODEGROUPS_IDS,
-                resourceinstance=resourceinstance
+                resourceinstance=resourceinstance,
             )
         except Tile.DoesNotExist:
             return []
 
         resource_geojson = None
         if geom_tile.data:
-            geom_node = Node.objects.get(graph=resourceinstance.graph, datatype="geojson-feature-collection")
+            geom_node = Node.objects.get(
+                graph=resourceinstance.graph, datatype="geojson-feature-collection"
+            )
             try:
                 resource_geojson = geom_tile.data[str(geom_node.pk)]
             except KeyError:
-                logger.warning(f"no geojson node data in this resource: {resourceinstance.pk}")
+                logger.warning(
+                    f"no geojson node data in this resource: {resourceinstance.pk}"
+                )
                 return []
         if not resource_geojson:
             print("no data in this geom tile")
@@ -92,40 +102,49 @@ class SpatialJoin():
         for feat in resource_geojson["features"]:
             geom_str = json.dumps(feat["geometry"])
             geom = GEOSGeometry(geom_str)
-            pks = ManagementArea.objects.filter(geom__intersects=geom).values_list("pk", flat=True)
+            pks = ManagementArea.objects.filter(geom__intersects=geom).values_list(
+                "pk", flat=True
+            )
             area_pks += pks
 
-        areas = list(ManagementArea.objects.exclude(
-            category__name="FPAN Region"
-        ).filter(pk__in=area_pks))
+        areas = list(
+            ManagementArea.objects.exclude(category__name="FPAN Region").filter(
+                pk__in=area_pks
+            )
+        )
 
         return areas
 
     def get_management_tile(self, resourceinstance: ResourceInstance) -> Tile:
 
         try:
-            tile = Tile.objects.get(nodegroup_id=self.node_lookup['nodegroupid'],
-                                    resourceinstance=resourceinstance)
+            tile = Tile.objects.get(
+                nodegroup_id=self.node_lookup["nodegroupid"],
+                resourceinstance=resourceinstance,
+            )
         except Tile.DoesNotExist:
-            tile = Tile().get_blank_tile(self.node_lookup['nodegroupid'],
-                                         resourceid=resourceinstance.pk)
+            tile = Tile().get_blank_tile(
+                self.node_lookup["nodegroupid"], resourceid=resourceinstance.pk
+            )
 
         if TYPE_CHECKING and not tile.data:
             return tile
 
         # set empty lists if the node value is None or nonexistent
-        if not isinstance(tile.data.get(self.node_lookup['county_nodeid']), list):
-            tile.data[self.node_lookup['county_nodeid']] = []
-        if not isinstance(tile.data.get(self.node_lookup['region_nodeid']), list):
-            tile.data[self.node_lookup['region_nodeid']] = []
-        if not isinstance(tile.data.get(self.node_lookup['area_nodeid']), list):
-            tile.data[self.node_lookup['area_nodeid']] = []
-        if not isinstance(tile.data.get(self.node_lookup['agency_nodeid']), list):
-            tile.data[self.node_lookup['agency_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup["county_nodeid"]), list):
+            tile.data[self.node_lookup["county_nodeid"]] = []
+        if not isinstance(tile.data.get(self.node_lookup["region_nodeid"]), list):
+            tile.data[self.node_lookup["region_nodeid"]] = []
+        if not isinstance(tile.data.get(self.node_lookup["area_nodeid"]), list):
+            tile.data[self.node_lookup["area_nodeid"]] = []
+        if not isinstance(tile.data.get(self.node_lookup["agency_nodeid"]), list):
+            tile.data[self.node_lookup["agency_nodeid"]] = []
 
         return tile
 
-    def apply_management_area_attributes(self, resourceinstance: ResourceInstance, area: ManagementArea):
+    def apply_management_area_attributes(
+        self, resourceinstance: ResourceInstance, area: ManagementArea
+    ):
         """Takes in a resource instance and a ManagementArea, and attaches the ManagementArea
         and ManagementAgency concepts to the resource."""
 
@@ -135,23 +154,39 @@ class SpatialJoin():
             return
 
         val = area.concept_value_id
-        tile.data[self.node_lookup['area_nodeid']].append(val)
+        tile.data[self.node_lookup["area_nodeid"]].append(val)
 
         # add the agency if available
         if area.management_agency is not None:
-            tile.data[self.node_lookup['agency_nodeid']].append(area.management_agency.concept_value_id)
+            tile.data[self.node_lookup["agency_nodeid"]].append(
+                area.management_agency.concept_value_id
+            )
 
         # finalize with some QA/QC
-        tile.data[self.node_lookup['area_nodeid']] = list(set(
-            [i for i in tile.data[self.node_lookup['area_nodeid']] if i in self.valid_management_area_vals]
-        ))
-        tile.data[self.node_lookup['agency_nodeid']] = list(set(
-            [i for i in tile.data[self.node_lookup['agency_nodeid']] if i in self.valid_management_agency_vals]
-        ))
+        tile.data[self.node_lookup["area_nodeid"]] = list(
+            set(
+                [
+                    i
+                    for i in tile.data[self.node_lookup["area_nodeid"]]
+                    if i in self.valid_management_area_vals
+                ]
+            )
+        )
+        tile.data[self.node_lookup["agency_nodeid"]] = list(
+            set(
+                [
+                    i
+                    for i in tile.data[self.node_lookup["agency_nodeid"]]
+                    if i in self.valid_management_agency_vals
+                ]
+            )
+        )
 
         tile.save(index=False)
 
-    def apply_fpan_region_and_county_attributes(self, resourceinstance: ResourceInstance):
+    def apply_fpan_region_and_county_attributes(
+        self, resourceinstance: ResourceInstance
+    ):
 
         tile = self.get_management_tile(resourceinstance)
 
@@ -166,17 +201,40 @@ class SpatialJoin():
         abbrev = siteid[:2].upper()
         entry = self.county_lookup.get(abbrev)
         if not entry:
-            logger.warning(f"no entry in county lookup for {abbrev}: {resourceinstance.pk}")
+            logger.warning(
+                f"no entry in county lookup for {abbrev}: {resourceinstance.pk}"
+            )
             return
 
-        tile.data[self.node_lookup['county_nodeid']].append(entry['county_concept_value_id'])
-        tile.data[self.node_lookup['region_nodeid']].append(entry['region_concept_value_id'])
+        tile.data[self.node_lookup["county_nodeid"]].append(
+            entry["county_concept_value_id"]
+        )
+        tile.data[self.node_lookup["region_nodeid"]].append(
+            entry["region_concept_value_id"]
+        )
 
         # finalize with some QA/QC
-        tile.data[self.node_lookup['county_nodeid']] = list(set([i for i in tile.data[self.node_lookup['county_nodeid']] if i in legal_value_ids]))
-        tile.data[self.node_lookup['region_nodeid']] = list(set([i for i in tile.data[self.node_lookup['region_nodeid']] if i in legal_value_ids]))
+        tile.data[self.node_lookup["county_nodeid"]] = list(
+            set(
+                [
+                    i
+                    for i in tile.data[self.node_lookup["county_nodeid"]]
+                    if i in legal_value_ids
+                ]
+            )
+        )
+        tile.data[self.node_lookup["region_nodeid"]] = list(
+            set(
+                [
+                    i
+                    for i in tile.data[self.node_lookup["region_nodeid"]]
+                    if i in legal_value_ids
+                ]
+            )
+        )
 
         tile.save(index=False)
+
 
 def get_node_value(resource, node_name):
     """this just flattens the response from Resource().get_node_values()"""
@@ -192,8 +250,7 @@ def get_node_value(resource, node_name):
     return value
 
 
-class ETLOperationResult():
-
+class ETLOperationResult:
     def __init__(self, operation, loadid=None, success=True, message="", data={}):
         self.operation = operation
         self.loadid = loadid
@@ -205,11 +262,11 @@ class ETLOperationResult():
 
     def __str__(self):
         return str(self.serialize())
-    
+
     def stop_timer(self):
         self.seconds = round(time.time() - self.start_time, 2)
 
-    def log(self, logger, level='info'):
+    def log(self, logger, level="info"):
         level_lookup = {
             "critical": 50,
             "error": 40,
@@ -228,13 +285,13 @@ class ETLOperationResult():
         the returned data.
         """
         details = dict(self.data)
-        details['Message'] = self.message
+        details["Message"] = self.message
         return json.dumps(details)
 
     def serialize(self):
 
         details = dict(self.data)
-        details['Message'] = self.message
+        details["Message"] = self.message
 
         return {
             "operation": self.operation,

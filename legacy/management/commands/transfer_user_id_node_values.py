@@ -1,64 +1,77 @@
 import os
 import csv
-import uuid
 from datetime import datetime
 from django.conf import settings
 from django.db.models import CharField
 from django.db.models.functions import Lower
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from arches.app.models.models import NodeGroup, Node
-from arches.app.models.graph import Graph
+from arches.app.models.models import Node
 from arches.app.models.tile import Tile
 
-class Command(BaseCommand):
 
-    help = '2021 June 8 - this command supports the transfer of existing '\
-        '"Visiting Scout ID" nodes to a new node in the same tile. This new '\
-        'node must be called "User Id" and it should use the username-widget, '\
-        'which means that only values which are valid user names should be '\
-        'transferred, all others should remain in the existing field and be logged.'
+class Command(BaseCommand):
+    help = (
+        "2021 June 8 - this command supports the transfer of existing "
+        '"Visiting Scout ID" nodes to a new node in the same tile. This new '
+        'node must be called "User Id" and it should use the username-widget, '
+        "which means that only values which are valid user names should be "
+        "transferred, all others should remain in the existing field and be logged."
+    )
 
     def add_arguments(self, parser):
-        parser.add_argument("--erase",
+        parser.add_argument(
+            "--erase",
             action="store_true",
-            help='erases fully matched values from the existing node'
+            help="erases fully matched values from the existing node",
         )
-        parser.add_argument("--dry-run",
+        parser.add_argument(
+            "--dry-run",
             action="store_true",
-            help='print out old and new values without altering Tiles'
+            help="print out old and new values without altering Tiles",
         )
-        parser.add_argument("--resourceid",
-            help='specify single resourceid to update'
-        )
+        parser.add_argument("--resourceid", help="specify single resourceid to update")
 
     def handle(self, *args, **options):
 
         CharField.register_lookup(Lower)
 
         lookups = {
-            'rfboggs': ['rboggs', 'rboggs8', 'boggs8', 'bogg8', '8bogg', '8boggs'],
-            'ejmurray': ['emurray8', 'ejmuray', 'emjay', 'em jay', 'emurray8 with julie'],
-            'meharrold': ['meharrold8'],
-            'semiller': ['semiller8', 'semilller'],
-            'rjkangas1': ['rkangas', 'rkangas3', 'r. kangas'],
-            'kagentry2': ['kgentry', 'kgentry3'],
-            'twinriverssf': ['waytetwinrivers5', 'waytetwinrivers', 'waytetwinriver5', 'waytetwinsrivers5'],
-            'fl_bar': ['bar', 'flbar'],
-            'fortgeorgeislandculturalsp': ['fortgeorgeislandculturalsp (park staff: aeflisek)',
-                                           'fortgeorgeislandculturalsp (park staff: agconboy',
-                                           'fortgeorgeislandculturalsp (park staff: aeflisek'],
-            'sebastianinletsp': ['amy bauer) sebastianinletsp'],
-            'seayersrigsby': ['sayersrigsby', 'rigsby7'],
-            'jcendonino': ['jendonino'],
-            'fisheatingcreekwma': ['fisheating creek wma', 'fisheatingcreeekwma'],
-            'westcentral': ['west central'],
-            'alfredbmaclaygardenssp': ['AlfredBMaclayGardenSP'],
-            'hrtorres': ['htorres7'],
-            'semangram2': ['smangram4'],
-            'tlferraro': ['tferraro7'],
-            'terobinson': ['trobinson4'],
-            'vvkirilova': ['wkirilova'],
+            "rfboggs": ["rboggs", "rboggs8", "boggs8", "bogg8", "8bogg", "8boggs"],
+            "ejmurray": [
+                "emurray8",
+                "ejmuray",
+                "emjay",
+                "em jay",
+                "emurray8 with julie",
+            ],
+            "meharrold": ["meharrold8"],
+            "semiller": ["semiller8", "semilller"],
+            "rjkangas1": ["rkangas", "rkangas3", "r. kangas"],
+            "kagentry2": ["kgentry", "kgentry3"],
+            "twinriverssf": [
+                "waytetwinrivers5",
+                "waytetwinrivers",
+                "waytetwinriver5",
+                "waytetwinsrivers5",
+            ],
+            "fl_bar": ["bar", "flbar"],
+            "fortgeorgeislandculturalsp": [
+                "fortgeorgeislandculturalsp (park staff: aeflisek)",
+                "fortgeorgeislandculturalsp (park staff: agconboy",
+                "fortgeorgeislandculturalsp (park staff: aeflisek",
+            ],
+            "sebastianinletsp": ["amy bauer) sebastianinletsp"],
+            "seayersrigsby": ["sayersrigsby", "rigsby7"],
+            "jcendonino": ["jendonino"],
+            "fisheatingcreekwma": ["fisheating creek wma", "fisheatingcreeekwma"],
+            "westcentral": ["west central"],
+            "alfredbmaclaygardenssp": ["AlfredBMaclayGardenSP"],
+            "hrtorres": ["htorres7"],
+            "semangram2": ["smangram4"],
+            "tlferraro": ["tferraro7"],
+            "terobinson": ["trobinson4"],
+            "vvkirilova": ["wkirilova"],
         }
 
         lookups_flat = {}
@@ -80,12 +93,10 @@ class Command(BaseCommand):
         partial_matched = 0
         unmatched_ct = 0
         unmatched = {}
-        rows = [
-            ("resourceid", "original_value", "matching_usernames", "match")
-        ]
+        rows = [("resourceid", "original_value", "matching_usernames", "match")]
         for tile in tiles:
             resid = str(tile.resourceinstance_id)
-            if options['resourceid'] and resid != options['resourceid']:
+            if options["resourceid"] and resid != options["resourceid"]:
                 continue
             match = "None"
             old_value = tile.data.get(old_nodeid, None)
@@ -112,7 +123,7 @@ class Command(BaseCommand):
                     u = User.objects.get(username__lower=uname)
                     matched_users.append(u)
                 except User.DoesNotExist:
-                    if not uname in unmatched:
+                    if uname not in unmatched:
                         unmatched[uname] = 1
                     else:
                         unmatched[uname] += 1
@@ -127,21 +138,25 @@ class Command(BaseCommand):
             else:
                 unmatched_ct += 1
 
-            if options['dry_run'] is True:
-                print(f"{resid}: {old_value} --> {','.join([str(i.username) for i in matched_users])}")
+            if options["dry_run"] is True:
+                print(
+                    f"{resid}: {old_value} --> {','.join([str(i.username) for i in matched_users])}"
+                )
             else:
                 Tile().update_node_value(new_nodeid, new_value, tileid=tile.tileid)
-                if match == "Full" and options['erase'] is True:
+                if match == "Full" and options["erase"] is True:
                     Tile().update_node_value(old_nodeid, None, tileid=tile.tileid)
 
-                rows.append((
-                    resid,
-                    old_value,
-                    ",".join([str(i.username) for i in matched_users]),
-                    match
-                ))
+                rows.append(
+                    (
+                        resid,
+                        old_value,
+                        ",".join([str(i.username) for i in matched_users]),
+                        match,
+                    )
+                )
 
-        unmatched_frequency = sorted(unmatched.items(), key=lambda x:x[1])
+        unmatched_frequency = sorted(unmatched.items(), key=lambda x: x[1])
         for k in unmatched_frequency:
             print(k)
 

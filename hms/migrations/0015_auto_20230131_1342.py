@@ -5,9 +5,10 @@ from django.db import migrations, models
 from fpan.decorators import deprecated_migration_operation
 from hms.models import ScoutProfile, ManagementArea
 
+
 @deprecated_migration_operation
 def migrate_region_choices(apps, schema_editor):
-    """ Populate the new fpan_regions field with ManagementArea
+    """Populate the new fpan_regions field with ManagementArea
     instances based on the existing region_choices field which uses
     the deprecated Region model"""
     region_lookup = {
@@ -18,7 +19,7 @@ def migrate_region_choices(apps, schema_editor):
         "Northwest": "FPAN Northwest Region",
         "Southeast": "FPAN Southeast Region",
         "Southwest": "FPAN Southwest Region",
-        "West Central": "FPAN West Central Region", 
+        "West Central": "FPAN West Central Region",
     }
 
     for s in ScoutProfile.objects.all():
@@ -29,17 +30,17 @@ def migrate_region_choices(apps, schema_editor):
             except ManagementArea.DoesNotExist:
                 pass
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('hms', '0014_auto_20230131_1331'),
+        ("hms", "0014_auto_20230131_1331"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='scoutprofile',
-            name='fpan_regions',
-            field=models.ManyToManyField(to='hms.ManagementArea'),
+            model_name="scoutprofile",
+            name="fpan_regions",
+            field=models.ManyToManyField(to="hms.ManagementArea"),
         ),
-        migrations.RunPython(migrate_region_choices)
+        migrations.RunPython(migrate_region_choices),
     ]

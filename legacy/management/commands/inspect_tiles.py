@@ -1,28 +1,24 @@
 import uuid
-from django.core.management.base import BaseCommand, CommandError
-from arches.app.models.models import NodeGroup, Node
-from arches.app.models.graph import Graph
+from django.core.management.base import BaseCommand
+from arches.app.models.models import Node
 from arches.app.models.tile import Tile
 
-class Command(BaseCommand):
 
-    help = 'facilitates bulk updates to nodes across the database'
+class Command(BaseCommand):
+    help = "facilitates bulk updates to nodes across the database"
 
     def add_arguments(self, parser):
-        parser.add_argument("node",
-            help='specify the name of the node whose values will be updated.'
+        parser.add_argument(
+            "node", help="specify the name of the node whose values will be updated."
         )
-        parser.add_argument("--set-value",
-            help='the value to assign to the nodes.'
-        )
-        parser.add_argument("--set-empty",
+        parser.add_argument("--set-value", help="the value to assign to the nodes.")
+        parser.add_argument(
+            "--set-empty",
             action="store_true",
             default=False,
-            help='set all node values to empty. can be used to initialize '\
-                 'newly created nodes. ERASES ALL EXISTING VALUES.'
+            help="set all node values to empty. can be used to initialize "
+            "newly created nodes. ERASES ALL EXISTING VALUES.",
         )
-
-
 
     def handle(self, *args, **options):
 
@@ -43,14 +39,15 @@ class Command(BaseCommand):
             print("multiple nodes match this name:")
             for node in nodes:
                 print(f"{node.name} - {node.pk} - {node.graph.name}")
-            print("\nAll of these nodes will be updated. To choose a specific "\
-                  "one, rerun this command using the node id instead of name.")
+            print(
+                "\nAll of these nodes will be updated. To choose a specific "
+                "one, rerun this command using the node id instead of name."
+            )
             if not input("\nproceed? y/N ").lower().startswith("y"):
                 print("cancelled")
                 exit()
 
         for node in nodes:
-
             print(f"{node.name} - {node.pk} - {node.graph.name}")
             tiles = Tile.objects.filter(nodegroup_id=node.nodegroup)
 

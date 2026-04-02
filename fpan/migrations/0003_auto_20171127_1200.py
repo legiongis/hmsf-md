@@ -7,15 +7,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('fpan', '0002_managedarea'),
+        ("fpan", "0002_managedarea"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='managedarea',
-            name='geom',
+            model_name="managedarea",
+            name="geom",
             field=django.contrib.gis.db.models.fields.PolygonField(srid=4326),
         ),
     ]

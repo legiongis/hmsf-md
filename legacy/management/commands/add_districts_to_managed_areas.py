@@ -1,11 +1,11 @@
 import os
 import csv
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from fpan.models import ManagedArea
 
-class Command(BaseCommand):
 
-    help = 'adds the district number to state parks based on a pre-made csv lookup'
+class Command(BaseCommand):
+    help = "adds the district number to state parks based on a pre-made csv lookup"
 
     def add_arguments(self, parser):
         pass

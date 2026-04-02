@@ -7,6 +7,7 @@ from django.core import management
 
 from fpan.decorators import deprecated_migration_operation
 
+
 @deprecated_migration_operation
 def load_managedareas(apps, schema_editor):
 
@@ -20,20 +21,21 @@ def load_managedareas(apps, schema_editor):
     ## these operations add some extra info to some of the managed areas
     ## that is not included in the fixture files.
     from fpan.utils.legacy_utils import add_fwcc_nicknames
+
     add_fwcc_nicknames()
+
 
 @deprecated_migration_operation
 def remove_managedareas(apps, schema_editor):
 
     from fpan.models import ManagedArea
+
     ManagedArea.objects.all().delete()
 
+
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('fpan', '0009_alter_ma_for_wmd'),
+        ("fpan", "0009_alter_ma_for_wmd"),
     ]
 
-    operations = [
-        migrations.RunPython(load_managedareas, remove_managedareas)
-    ]
+    operations = [migrations.RunPython(load_managedareas, remove_managedareas)]

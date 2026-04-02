@@ -6,12 +6,15 @@ from fpan.models import ManagedArea
 ## some methods below are still used by old migrations. Refactoring those
 ## migrations (somehow) could allow for the removal of this file.
 
+
 def add_fwcc_nicknames():
     """this function is used after all of the fixtures have been loaded
     to add nicknames to the FWC areas, because they are not included in
     the data fixtures."""
 
-    lmus = ManagedArea.objects.filter(category="Fish and Wildlife Conservation Commission")
+    lmus = ManagedArea.objects.filter(
+        category="Fish and Wildlife Conservation Commission"
+    )
 
     abbreviations = (
         ("WildlifeManagementArea", "WMA"),
@@ -44,10 +47,13 @@ def add_fwcc_nicknames():
             print("ERROR saving managed area: {}".format(lmu.name))
             print(e)
 
+
 def add_state_park_districts():
 
     lookup = {}
-    lookupfile = os.path.join(settings.APP_ROOT, "utils", "reference_data", "FSP_Districts.csv")
+    lookupfile = os.path.join(
+        settings.APP_ROOT, "utils", "reference_data", "FSP_Districts.csv"
+    )
     with open(lookupfile, "r") as f:
         reader = csv.reader(f)
         next(reader)
@@ -63,10 +69,13 @@ def add_state_park_districts():
         except KeyError:
             print("Invalid park name: {}".format(sp.name))
 
+
 def add_water_management_districts():
 
     lookup = {}
-    lookupfile = os.path.join(settings.APP_ROOT, "utils", "reference_data", "WMD_Districts.csv")
+    lookupfile = os.path.join(
+        settings.APP_ROOT, "utils", "reference_data", "WMD_Districts.csv"
+    )
     with open(lookupfile, "r") as f:
         reader = csv.reader(f)
         next(reader)
@@ -82,6 +91,7 @@ def add_water_management_districts():
         except KeyError:
             print("Invalid park name: {}".format(wmd.name))
 
+
 def make_managed_area_nicknames():
     """this is a helper function that was written to make acceptable usernames
     (no spaces or punctuation, and < 30 characters) from the names of Managed
@@ -90,17 +100,19 @@ def make_managed_area_nicknames():
     all = ManagedArea.objects.all()
 
     agency_dict = {
-        "FL Fish and Wildlife Conservation Commission":"FWC",
-        "FL Dept. of Environmental Protection, Div. of Recreation and Parks":"StatePark",
-        "FL Dept. of Environmental Protection, Florida Coastal Office":"FL_AquaticPreserve",
-        "FL Dept. of Agriculture and Consumer Services, Florida Forest Service":"FL_Forestry"
+        "FL Fish and Wildlife Conservation Commission": "FWC",
+        "FL Dept. of Environmental Protection, Div. of Recreation and Parks": "StatePark",
+        "FL Dept. of Environmental Protection, Florida Coastal Office": "FL_AquaticPreserve",
+        "FL Dept. of Agriculture and Consumer Services, Florida Forest Service": "FL_Forestry",
     }
 
     ## note 8/1/18
     ## when creating individual accounts for fwcc units, more nickname handling was done in
     ## excel. This is now accounted for in add_fwcc_nicknames()
 
-    agencies = [i[0] for i in ManagedArea.objects.order_by().values_list('agency').distinct()]
+    agencies = [
+        i[0] for i in ManagedArea.objects.order_by().values_list("agency").distinct()
+    ]
     d = {}
     join_dict = {}
     for a in agencies:
@@ -111,49 +123,46 @@ def make_managed_area_nicknames():
         a_ma = all.filter(agency=a)
         print(len(a_ma))
         ct = 0
-        abbreviations1 = {
-            "Historic State Park":"HSP",
-            "State Forest and Park":"SFP"
-        }
+        abbreviations1 = {"Historic State Park": "HSP", "State Forest and Park": "SFP"}
 
         abbreviations2 = {
-            "State Forest":"SF",
-            "State Park":"SP",
-            "State Trail":"ST",
-            "National Estuarine Research Reserve":"NERR",
-            "Agricultural and Conservation Easement":"ACE"
+            "State Forest": "SF",
+            "State Park": "SP",
+            "State Trail": "ST",
+            "National Estuarine Research Reserve": "NERR",
+            "Agricultural and Conservation Easement": "ACE",
         }
 
-        strip_chars = [" ",".","#","-","'"]
+        strip_chars = [" ", ".", "#", "-", "'"]
 
         for ma in a_ma:
             sn = ma.name
-            for k,v in abbreviations1.iteritems():
+            for k, v in abbreviations1.iteritems():
                 if k in sn:
                     abbr = v
-                sn = sn.replace(k,v)
-            for k,v in abbreviations2.iteritems():
+                sn = sn.replace(k, v)
+            for k, v in abbreviations2.iteritems():
                 if k in sn:
                     abbr = v
-                sn = sn.replace(k,v)
-            sn = "".join([i for i in sn if not i in strip_chars])
-            if len(sn)>30:
-                sn = ma.name.split(" ")[0]+ma.name.split(" ")[1]+abbr
-                sn = "".join([i for i in sn if not i in strip_chars])
+                sn = sn.replace(k, v)
+            sn = "".join([i for i in sn if i not in strip_chars])
+            if len(sn) > 30:
+                sn = ma.name.split(" ")[0] + ma.name.split(" ")[1] + abbr
+                sn = "".join([i for i in sn if i not in strip_chars])
                 print(sn)
-            if len(sn)>30:
-                ct+=1
+            if len(sn) > 30:
+                ct += 1
                 print(sn)
             join_dict[ma.name] = sn
 
         print(f"{ct} are too long")
-        d[lookup]=ct
+        d[lookup] = ct
 
     print(len(join_dict))
     names = join_dict.keys()
     names.sort()
-    with open(os.path.join(settings.LOG_DIR,"nicknames.csv"),"wb") as csvout:
+    with open(os.path.join(settings.LOG_DIR, "nicknames.csv"), "wb") as csvout:
         writer = csv.writer(csvout)
-        writer.writerow(['name','nickname'])
+        writer.writerow(["name", "nickname"])
         for n in names:
-            writer.writerow([n,join_dict[n]])
+            writer.writerow([n, join_dict[n]])

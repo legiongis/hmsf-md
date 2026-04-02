@@ -4,25 +4,27 @@ from django.db import migrations
 from fpan.decorators import deprecated_migration_operation
 from hms.models import ManagementArea, ManagementAreaCategory
 
+
 @deprecated_migration_operation
 def load_districts(apps, schema_editor):
-    cat, created = ManagementAreaCategory.objects.get_or_create(name="NR Historic District")
+    cat, created = ManagementAreaCategory.objects.get_or_create(
+        name="NR Historic District"
+    )
     management.call_command("loaddata", "pen-fb-sa-historic-disctricts.json")
     for nr in ManagementArea.objects.filter(load_id="nr-districts-Sept2022"):
         nr.category = cat
         nr.save()
+
 
 @deprecated_migration_operation
 def remove_districts(apps, schema_editor):
     ManagementArea.objects.filter(load_id="nr-districts-Sept2022").delete()
     ManagementAreaCategory.objects.filter(name="NR Historic District").delete()
 
+
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0013_auto_20220909_1552'),
+        ("hms", "0013_auto_20220909_1552"),
     ]
 
-    operations = [
-        migrations.RunPython(load_districts, remove_districts)
-    ]
+    operations = [migrations.RunPython(load_districts, remove_districts)]

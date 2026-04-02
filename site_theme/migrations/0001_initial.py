@@ -5,35 +5,88 @@ import tinymce.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ProfileContent',
+            name="ProfileContent",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('content', tinymce.models.HTMLField()),
-                ('sortorder_scout', models.IntegerField(default=0, help_text='use 1 for this content to appear on the Scout profile page')),
-                ('sortorder_landmanager', models.IntegerField(default=0, help_text='use 1 for this content to appear on the Land Manager profile page')),
-                ('sortorder_admin', models.IntegerField(default=0, help_text='use 1 for this content to appear on the Admin profile page')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("content", tinymce.models.HTMLField()),
+                (
+                    "sortorder_scout",
+                    models.IntegerField(
+                        default=0,
+                        help_text="use 1 for this content to appear on the Scout profile page",
+                    ),
+                ),
+                (
+                    "sortorder_landmanager",
+                    models.IntegerField(
+                        default=0,
+                        help_text="use 1 for this content to appear on the Land Manager profile page",
+                    ),
+                ),
+                (
+                    "sortorder_admin",
+                    models.IntegerField(
+                        default=0,
+                        help_text="use 1 for this content to appear on the Admin profile page",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ProfileLink',
+            name="ProfileLink",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('desc', models.CharField(blank=True, max_length=500, null=True)),
-                ('url', models.CharField(blank=True, max_length=500, null=True)),
-                ('file', models.FileField(blank=True, null=True, upload_to='uploadedfiles')),
-                ('sortorder_scout', models.IntegerField(default=0, help_text='use 0 if you DO NOT want this link to appear on the Scout profile page')),
-                ('sortorder_landmanager', models.IntegerField(default=0, help_text='use 0 if you DO NOT want this link to appear on the Land Manager profile page')),
-                ('sortorder_admin', models.IntegerField(default=0, help_text='use 0 if you DO NOT want this link to appear on the Admin profile page')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("desc", models.CharField(blank=True, max_length=500, null=True)),
+                ("url", models.CharField(blank=True, max_length=500, null=True)),
+                (
+                    "file",
+                    models.FileField(blank=True, null=True, upload_to="uploadedfiles"),
+                ),
+                (
+                    "sortorder_scout",
+                    models.IntegerField(
+                        default=0,
+                        help_text="use 0 if you DO NOT want this link to appear on the Scout profile page",
+                    ),
+                ),
+                (
+                    "sortorder_landmanager",
+                    models.IntegerField(
+                        default=0,
+                        help_text="use 0 if you DO NOT want this link to appear on the Land Manager profile page",
+                    ),
+                ),
+                (
+                    "sortorder_admin",
+                    models.IntegerField(
+                        default=0,
+                        help_text="use 0 if you DO NOT want this link to appear on the Admin profile page",
+                    ),
+                ),
             ],
         ),
     ]

@@ -4,11 +4,12 @@ from django.test import TestCase
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
 from arches.app.models.system_settings import settings
-from arches.app.utils.betterJSONSerializer import JSONSerializer, JSONDeserializer
-from arches.app.utils.data_management.resource_graphs.importer import import_graph as ResourceGraphImporter
+from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.data_management.resource_graphs.importer import (
+    import_graph as ResourceGraphImporter,
+)
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
 from django.db import connection
-from django.contrib.auth.models import User
 from django.core import management
 from arches.app.search.mappings import (
     prepare_terms_index,
@@ -23,8 +24,10 @@ from arches.app.search.mappings import (
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
 
 OAUTH_CLIENT_ID = "AAac4uRQSqybRiO6hu7sHT50C4wmDp9fAmsPlCj9"
-OAUTH_CLIENT_SECRET = "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
+OAUTH_CLIENT_SECRET = (
+    "7fos0s7qIhFqUmalDI1QiiYj0rAtEdVMY4hYQDQjOxltbRCBW3dIydOeMD4MytDM9ogCPiYFiMBW6o6ye5bMh5dkeU7pg1cH86wF6B\
         ap9Ke2aaAZaeMPejzafPSj96ID"
+)
 CREATE_TOKEN_SQL = """
         INSERT INTO public.oauth2_provider_accesstoken(
             token, expires, scope, application_id, user_id, created, updated)
@@ -49,7 +52,11 @@ def setUpTestPackage():
             'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
     """
 
-    sql = sql.format(user_id=1, oauth_client_id=OAUTH_CLIENT_ID, oauth_client_secret=OAUTH_CLIENT_SECRET)
+    sql = sql.format(
+        user_id=1,
+        oauth_client_id=OAUTH_CLIENT_ID,
+        oauth_client_secret=OAUTH_CLIENT_SECRET,
+    )
     cursor.execute(sql)
 
     prepare_terms_index(create=True)
@@ -85,10 +92,17 @@ class HMSTestCase(TestCase):
         if settings.DEFAULT_BOUNDS is None:
             print("in the default bounds thing")
             management.call_command("migrate")
-            with open(os.path.join("tests/fixtures/system_settings/Arches_System_Settings_Model.json"), "rU") as f:
+            with open(
+                os.path.join(
+                    "tests/fixtures/system_settings/Arches_System_Settings_Model.json"
+                ),
+                "rU",
+            ) as f:
                 archesfile = JSONDeserializer().deserialize(f)
             ResourceGraphImporter(archesfile["graph"], True)
-            BusinessDataImporter("tests/fixtures/system_settings/Arches_System_Settings_Local.json").import_business_data()
+            BusinessDataImporter(
+                "tests/fixtures/system_settings/Arches_System_Settings_Local.json"
+            ).import_business_data()
             settings.update_from_db()
 
     @classmethod

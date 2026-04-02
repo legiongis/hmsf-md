@@ -4,32 +4,45 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0008_load_extra_management_areas'),
+        ("hms", "0008_load_extra_management_areas"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='landmanager',
-            name='apply_agency_filter',
+            model_name="landmanager",
+            name="apply_agency_filter",
         ),
         migrations.RemoveField(
-            model_name='landmanager',
-            name='apply_area_filter',
+            model_name="landmanager",
+            name="apply_area_filter",
         ),
         migrations.RemoveField(
-            model_name='landmanager',
-            name='full_access',
+            model_name="landmanager",
+            name="full_access",
         ),
         migrations.AddField(
-            model_name='landmanager',
-            name='site_access_mode',
-            field=models.CharField(blank=True, choices=[('NONE', 'NONE'), ('AREA', 'AREA'), ('AGENCY', 'AGENCY'), ('FULL', 'FULL')], default='NONE', help_text="<em>NONE</em> no access, <em>AREA</em> sites within specified areas or grouped areas, <em>AGENCY</em> sites managed by land manager's agency, <em>FULL</em> all sites", max_length=20, null=True),
+            model_name="landmanager",
+            name="site_access_mode",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("NONE", "NONE"),
+                    ("AREA", "AREA"),
+                    ("AGENCY", "AGENCY"),
+                    ("FULL", "FULL"),
+                ],
+                default="NONE",
+                help_text="<em>NONE</em> no access, <em>AREA</em> sites within specified areas or grouped areas, <em>AGENCY</em> sites managed by land manager's agency, <em>FULL</em> all sites",
+                max_length=20,
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='landmanager',
-            name='username',
-            field=models.CharField(blank=True, editable=False, max_length=200, null=True),
+            model_name="landmanager",
+            name="username",
+            field=models.CharField(
+                blank=True, editable=False, max_length=200, null=True
+            ),
         ),
     ]

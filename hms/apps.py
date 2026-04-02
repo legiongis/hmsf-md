@@ -4,7 +4,7 @@ from django.apps import AppConfig
 
 
 class HmsConfig(AppConfig):
-    name = 'hms'
+    name = "hms"
 
     def ready(self):
         from . import signals  # noqa: F401

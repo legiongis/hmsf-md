@@ -3,21 +3,27 @@ import csv
 import json
 from datetime import datetime
 from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth.models import User, Group
-from hms.models import LandManager, ManagementArea, ManagementAgency, ManagementAreaGroup
+from django.core.management.base import BaseCommand
+from django.contrib.auth.models import User
+from hms.models import (
+    LandManager,
+    ManagementArea,
+    ManagementAreaGroup,
+)
 
 
 class Command(BaseCommand):
-
-    help = 'Aug 9th 2021 - command to add LandManager profiles for all existing'\
-        'Land Manager accounts (during transition to proper LM profiles)'
+    help = (
+        "Aug 9th 2021 - command to add LandManager profiles for all existing"
+        "Land Manager accounts (during transition to proper LM profiles)"
+    )
 
     matched = []
     unmatched = []
 
     def add_arguments(self, parser):
-        parser.add_argument("--overwrite",
+        parser.add_argument(
+            "--overwrite",
             action="store_true",
         )
         parser.add_argument("--name", "-n")
@@ -32,12 +38,12 @@ class Command(BaseCommand):
             with open(info_file, "r") as op:
                 data = json.loads(op.read())
 
-        self.known_missing_areas = data.get('known_missing_areas', [])
-        self.special_cases = data.get('special_cases', {})
-        self.agency_accounts = data.get('agency_accounts', [])
-        self.deactivate_accounts = data.get('deactivate_accounts', {})
+        self.known_missing_areas = data.get("known_missing_areas", [])
+        self.special_cases = data.get("special_cases", {})
+        self.agency_accounts = data.get("agency_accounts", [])
+        self.deactivate_accounts = data.get("deactivate_accounts", {})
 
-        self.add_profiles(overwrite=options['overwrite'], name=options['name'])
+        self.add_profiles(overwrite=options["overwrite"], name=options["name"])
 
         self.report()
 
@@ -49,7 +55,6 @@ class Command(BaseCommand):
 
         users = User.objects.filter(groups__name="Land Manager")
         for u in users:
-
             if name is not None and u.username != name:
                 continue
 
@@ -76,7 +81,7 @@ class Command(BaseCommand):
             if u.username in self.known_missing_areas:
                 self.set_area_filter(p, no_area=True)
                 continue
-            
+
             elif u.username in self.agency_accounts:
                 self.set_agency_filter(p)
 
@@ -90,20 +95,35 @@ class Command(BaseCommand):
                 self.set_agency_filter(p)
 
             elif u.username.startswith("SPDistrict"):
-                m = ManagementAreaGroup.objects.get(name=f"SP District {u.username[-1]}")
+                m = ManagementAreaGroup.objects.get(
+                    name=f"SP District {u.username[-1]}"
+                )
                 self.set_area_filter(p, grouped_areas=[m])
 
             elif u.username.startswith("SJRWMD"):
-
-                wmd_n = ManagementAreaGroup.objects.get(name="Water Management District - North")
-                wmd_nc = ManagementAreaGroup.objects.get(name="Water Management District - North Central")
-                wmd_s = ManagementAreaGroup.objects.get(name="Water Management District - South")
-                wmd_sw = ManagementAreaGroup.objects.get(name="Water Management District - Southwest")
-                wmd_sc = ManagementAreaGroup.objects.get(name="Water Management District - South Central")
-                wmd_w = ManagementAreaGroup.objects.get(name="Water Management District - West")
+                wmd_n = ManagementAreaGroup.objects.get(
+                    name="Water Management District - North"
+                )
+                wmd_nc = ManagementAreaGroup.objects.get(
+                    name="Water Management District - North Central"
+                )
+                wmd_s = ManagementAreaGroup.objects.get(
+                    name="Water Management District - South"
+                )
+                wmd_sw = ManagementAreaGroup.objects.get(
+                    name="Water Management District - Southwest"
+                )
+                wmd_sc = ManagementAreaGroup.objects.get(
+                    name="Water Management District - South Central"
+                )
+                wmd_w = ManagementAreaGroup.objects.get(
+                    name="Water Management District - West"
+                )
 
                 if u.username == "SJRWMD_Admin":
-                    self.set_area_filter(p, grouped_areas=[wmd_sw, wmd_n, wmd_nc, wmd_s, wmd_sc, wmd_w])
+                    self.set_area_filter(
+                        p, grouped_areas=[wmd_sw, wmd_n, wmd_nc, wmd_s, wmd_sc, wmd_w]
+                    )
                 elif u.username == "SJRWMD_NorthRegion":
                     self.set_area_filter(p, grouped_areas=[wmd_n, wmd_nc, wmd_w])
                 elif u.username == "SJRWMD_SouthRegion":
@@ -135,7 +155,9 @@ class Command(BaseCommand):
                     if u.username in mock_nicknames:
                         self.set_area_filter(p, areas=[mock_nicknames[u.username]])
                     elif u.username in self.special_cases:
-                        a = ManagementArea.objects.get(nickname=self.special_cases[u.username])
+                        a = ManagementArea.objects.get(
+                            nickname=self.special_cases[u.username]
+                        )
                         self.set_area_filter(p, areas=[a])
                     else:
                         self.unmatched.append(p.user.username)
@@ -164,8 +186,8 @@ class Command(BaseCommand):
             ("JohnCandMarianaJones", "JCandMJ"),
         ]
 
-        strip_chars = [" ",".","#","-","'"]
-        name = "".join([i for i in name if not i in strip_chars])
+        strip_chars = [" ", ".", "#", "-", "'"]
+        name = "".join([i for i in name if i not in strip_chars])
 
         for o, a in abbreviations:
             if o in name:
@@ -194,7 +216,9 @@ class Command(BaseCommand):
         profile.save()
 
         if no_area:
-            self.matched.append((profile.user.username, "area", "<no area>", "known missing area"))
+            self.matched.append(
+                (profile.user.username, "area", "<no area>", "known missing area")
+            )
 
         if len(areas) > 0:
             for area in areas:
@@ -214,7 +238,9 @@ class Command(BaseCommand):
 
         profile.site_access_mode = "AGENCY"
         profile.save()
-        self.matched.append((profile.user.username, "agency", profile.management_agency.pk, ""))
+        self.matched.append(
+            (profile.user.username, "agency", profile.management_agency.pk, "")
+        )
 
     def set_full_access(self, profile):
 
@@ -234,7 +260,7 @@ class Command(BaseCommand):
         for i in self.unmatched:
             print(i)
         print(f"{len(self.unmatched)} still need profiles")
-        
+
         d = datetime.now().strftime("%m%d%Y")
         filename = f"lm_account_migration-{d}.csv"
         filepath = os.path.join(settings.LOG_DIR, filename)

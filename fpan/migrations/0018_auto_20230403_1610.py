@@ -4,17 +4,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0017_auto_20230403_1610'),
-        ('fpan', '0017_fix_sitetype_siteculture_tiles'),
+        ("hms", "0017_auto_20230403_1610"),
+        ("fpan", "0017_fix_sitetype_siteculture_tiles"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='ManagedArea',
+            name="ManagedArea",
         ),
         migrations.DeleteModel(
-            name='Region',
+            name="Region",
         ),
     ]

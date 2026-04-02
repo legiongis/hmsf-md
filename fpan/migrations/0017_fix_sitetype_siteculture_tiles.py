@@ -6,6 +6,7 @@ from arches.app.models.resource import Resource
 
 logger = logging.getLogger(__name__)
 
+
 def fix_tiles(apps, schema_editor):
 
     tiles = Tile.objects.filter(nodegroup_id="03643bd0-d550-11e7-9629-94659cf754d0")
@@ -22,16 +23,14 @@ def fix_tiles(apps, schema_editor):
         if updated is True:
             t.save()
             Resource.objects.get(pk=t.resourceinstance_id).index()
-            ct +=1
+            ct += 1
 
     logger.info(f"{ct} resources fixed")
 
+
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('fpan', '0016_register_site_filter'),
+        ("fpan", "0016_register_site_filter"),
     ]
 
-    operations = [
-        migrations.RunPython(fix_tiles)
-    ]
+    operations = [migrations.RunPython(fix_tiles)]
