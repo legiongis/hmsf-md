@@ -4,23 +4,25 @@ from django.db import migrations, models
 
 from fpan.decorators import deprecated_migration_operation
 
+
 @deprecated_migration_operation
 def update_existing_management_areas(apps, schema_editor):
     from hms.models import ManagementArea
+
     for ma in ManagementArea.objects.all():
-        ma.save(update_fields=['display_name'])
+        ma.save(update_fields=["display_name"])
+
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0006_userxresourceinstanceaccess'),
+        ("hms", "0006_userxresourceinstanceaccess"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='managementarea',
-            name='display_name',
+            model_name="managementarea",
+            name="display_name",
             field=models.CharField(blank=True, max_length=254, null=True),
         ),
-        migrations.RunPython(update_existing_management_areas)
+        migrations.RunPython(update_existing_management_areas),
     ]

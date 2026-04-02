@@ -15,7 +15,7 @@ if is_testing:
     os.environ["TESTING"] = "True"
     cov = coverage.coverage(
         source=["fpan", "hms", "reporting"],
-        omit=["*/tests/*", "*/migrations/*", "*/commands/*"]
+        omit=["*/tests/*", "*/migrations/*", "*/commands/*"],
     )
     cov.set_option("report:show_missing", True)
     cov.set_option("report:skip_covered", True)

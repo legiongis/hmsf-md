@@ -1,34 +1,24 @@
-import gc
 import os
-import csv
-import copy
-import time
 import uuid
-import inspect
 import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
 
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
-from django.contrib.gis.gdal import DataSource, SpatialReference
-from django.contrib.gis.db.models import Union
+from django.contrib.gis.gdal import DataSource  # type: ignore
 from django.db import connection, transaction
-from django.db.models import Q
-from django.db.utils import IntegrityError, ProgrammingError
-from django.utils.translation import ugettext as _
-from django.core.files import File
 from django.core.files.storage import default_storage
 from django.conf import settings
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
-from arches.app.models.concept import Concept
-from arches.app.models.models import GraphModel, Node, NodeGroup, ETLModule, ResourceInstance
-from arches.app.models.tile import Tile
+from arches.app.models.models import (
+    Node,
+    ETLModule,
+    ResourceInstance,
+)
 from arches.app.models.resource import Resource
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.utils.index_database import index_resources_by_transaction
 from arches.app.utils.index_database import index_resources_using_singleprocessing
 
 from hms.models import (
@@ -51,25 +41,29 @@ details = {
     "componentname": "management-area-importer",
     "modulename": "management_area_importer.py",
     "classname": "ManagementAreaImporter",
-    "config": {"circleColor": "rgb(80, 176, 198)", "bgColor": "rgb(68, 136, 157)", "show": True},
+    "config": {
+        "circleColor": "rgb(80, 176, 198)",
+        "bgColor": "rgb(68, 136, 157)",
+        "show": True,
+    },
     "icon": "fa fa-upload",
-    "slug": "management-area-importer"
+    "slug": "management-area-importer",
 }
 
 
 class ManagementAreaImporter(BaseImportModule):
+    # ETLResult object that will be assigned at the beginning of run_sequence()
+    reporter: ETLOperationResult
+    loadid: str
+
     def __init__(self, request=None):
 
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.loadid = None
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
 
-        # ETLResult object that will be assigned at the beginning of run_sequence()
-        self.reporter = None
-
-        # these are passed into the two different import process methods
+        # passed into the two different import process methods
         self.file_dir = None
 
         # these are set at the beginning of run_sequence
@@ -88,19 +82,32 @@ class ManagementAreaImporter(BaseImportModule):
 
     def _get_node_lookup(self, graph_name):
 
-        if not graph_name in self.node_lookups:
+        if graph_name not in self.node_lookups:
             self.node_lookups[graph_name] = {
-                "FPAN Region": str(Node.objects.get(graph__name=graph_name, name="FPAN Region").pk),
-                "County": str(Node.objects.get(graph__name=graph_name, name="County").pk),
-                "Management Area": str(Node.objects.get(graph__name=graph_name, name="Management Area").pk),
-                "Management Agency": str(Node.objects.get(graph__name=graph_name, name="Management Agency").pk),
+                "FPAN Region": str(
+                    Node.objects.get(graph__name=graph_name, name="FPAN Region").pk
+                ),
+                "County": str(
+                    Node.objects.get(graph__name=graph_name, name="County").pk
+                ),
+                "Management Area": str(
+                    Node.objects.get(graph__name=graph_name, name="Management Area").pk
+                ),
+                "Management Agency": str(
+                    Node.objects.get(
+                        graph__name=graph_name, name="Management Agency"
+                    ).pk
+                ),
             }
         return self.node_lookups[graph_name]
 
     def _get_nodegroup(self, graph_name):
 
-        if not graph_name in self.nodegroup_lookup:
-            self.nodegroup_lookup[graph_name] = str(Node.objects.get(graph__name=graph_name, name="Site Management").nodegroup.pk)
+        if graph_name not in self.nodegroup_lookup:
+            node = Node.objects.get(graph__name=graph_name, name="Site Management")
+            if node.nodegroup is None:
+                return None
+            self.nodegroup_lookup[graph_name] = str(node.nodegroup.pk)
         return self.nodegroup_lookup[graph_name]
 
     def get_uploaded_files_location(self):
@@ -127,13 +134,13 @@ class ManagementAreaImporter(BaseImportModule):
             self.loadid = str(uuid.uuid4())
 
         response = {
-            'operation': 'read_zip',
-            'success': True,
-            'message': "",
-            'data': {
-                'Files': [],
-                'loadid': self.loadid,
-            }
+            "operation": "read_zip",
+            "success": True,
+            "message": "",
+            "data": {
+                "Files": [],
+                "loadid": self.loadid,
+            },
         }
 
         content = request.FILES.get("file")
@@ -141,7 +148,7 @@ class ManagementAreaImporter(BaseImportModule):
 
         try:
             self.delete_from_default_storage(upload_dir)
-        except (FileNotFoundError):
+        except FileNotFoundError:
             pass
         except Exception as e:
             logger.error(e)
@@ -157,16 +164,18 @@ class ManagementAreaImporter(BaseImportModule):
                     files = zip_ref.infolist()
                     zip_ref.extractall(upload_dir)
                     for file in files:
-                        response['data']['Files'].append(file.filename)
+                        response["data"]["Files"].append(file.filename)
             else:
-                logger.warn(f"uploaded content_type is not zip, is {content.content_type}")
-                response['success'] = False
-                response['message'] = "Uploaded file must be a .zip file."
+                logger.warn(
+                    f"uploaded content_type is not zip, is {content.content_type}"
+                )
+                response["success"] = False
+                response["message"] = "Uploaded file must be a .zip file."
                 return response
         except Exception as e:
             logger.error(e)
-            response['success'] = False
-            response['message'] = str(e)
+            response["success"] = False
+            response["message"] = str(e)
             return response
 
         return response
@@ -178,7 +187,7 @@ class ManagementAreaImporter(BaseImportModule):
 
         shp_file = [i for i in file_dir.glob("*.shp")][0]
         self.file_path = shp_file
-        self.reporter.data['File name'] = self.file_path.name
+        self.reporter.data["File name"] = self.file_path.name
 
         try:
             ds = DataSource(self.file_path)
@@ -190,7 +199,9 @@ class ManagementAreaImporter(BaseImportModule):
                 self.reporter.message = "Shapefile is missing 'name' field"
             if lyr.srs.srid != 4326:
                 self.reporter.success = False
-                self.reporter.message = "Shapefile must be reprojected to WGS84 / EPSG:4326"
+                self.reporter.message = (
+                    "Shapefile must be reprojected to WGS84 / EPSG:4326"
+                )
         except Exception as e:
             self.reporter.success = False
             self.reporter.message = str(e)
@@ -208,12 +219,20 @@ class ManagementAreaImporter(BaseImportModule):
         with connection.cursor() as cursor:
             cursor.execute(
                 """INSERT INTO load_event (loadid, complete, status, load_description, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
-                (self.loadid, False, "running", load_description, self.moduleid, self.reporter.get_load_details(), datetime.now(), self.userid),
+                (
+                    self.loadid,
+                    False,
+                    "running",
+                    load_description,
+                    self.moduleid,
+                    self.reporter.get_load_details(),
+                    datetime.now(),
+                    self.userid,
+                ),
             )
 
         self.reporter.message = f"etl started with loadid: {self.loadid}"
         return
-
 
     def read_features_from_shapefile(self):
 
@@ -230,8 +249,14 @@ class ManagementAreaImporter(BaseImportModule):
                     if geom.geom_type == "Polygon":
                         geom = MultiPolygon([geom])
                     with connection.cursor() as cursor:
-                        cursor.execute(f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));")
-                        wkt = cursor.fetchone()[0]
+                        cursor.execute(
+                            f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));"
+                        )
+                        result = cursor.fetchone()
+                        if result is None or len(result) == 0:
+                            logger.warning("error during geom.wkt postgis repair")
+                            continue
+                        wkt = result[0]
                     logger.debug("geom handled")
                     name = feature.get(name_field)
                     logger.debug("name: " + name)
@@ -266,8 +291,11 @@ class ManagementAreaImporter(BaseImportModule):
             resids = area.get_intersecting_resource_ids()
             resourceinstances = ResourceInstance.objects.filter(pk__in=resids)
             for res in resourceinstances:
-                joiner = SpatialJoin(res.graph.name)
-                joiner.update_resource(res)
+                if res.graph and res.graph.name:
+                    joiner = SpatialJoin(res.graph.name)
+                    joiner.update_resource(res)
+                else:
+                    logger.warning(f"no graph on this resource instance: {res.pk}")
             all_resids += resids
         resources = Resource.objects.filter(pk__in=all_resids)
         index_resources_using_singleprocessing(resources)
@@ -279,7 +307,14 @@ class ManagementAreaImporter(BaseImportModule):
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
-                    ("completed", datetime.now(), True, True, self.reporter.get_load_details(), self.loadid),
+                    (
+                        "completed",
+                        datetime.now(),
+                        True,
+                        True,
+                        self.reporter.get_load_details(),
+                        self.loadid,
+                    ),
                 )
             self.reporter.message = "management area import complete"
         except Exception as e:
@@ -292,19 +327,19 @@ class ManagementAreaImporter(BaseImportModule):
     def run_web_import(self, request):
 
         # handle values coming from frontend configuration
-        ma_group = request.POST.get('maGroup')
-        ma_category = request.POST.get('maCategory')
-        ma_agency = request.POST.get('maAgency')
-        ma_level = request.POST.get('maLevel')
-        description = request.POST.get('loadDescription')
-        loadid = request.POST.get('loadId')
+        ma_group = request.POST.get("maGroup")
+        ma_category = request.POST.get("maCategory")
+        ma_agency = request.POST.get("maAgency")
+        ma_level = request.POST.get("maLevel")
+        description = request.POST.get("loadDescription")
+        loadid = request.POST.get("loadId")
 
         ma_group = None if ma_group == "---" else ma_group
         ma_category = None if ma_category == "---" else ma_category
         ma_agency = None if ma_agency == "---" else ma_agency
         ma_level = None if ma_level == "---" else ma_level
 
-        run_management_area_import_as_task.delay(
+        run_management_area_import_as_task.delay(  # pyright: ignore[reportFunctionMemberAccess]
             loadid,
             ma_group=ma_group,
             ma_category=ma_category,
@@ -333,23 +368,35 @@ class ManagementAreaImporter(BaseImportModule):
 
         return self.reporter.serialize()
 
-    def reverse_load(self, **kwargs):
+    def reverse_load(self, *args, **kwargs):
 
         loadid = kwargs.get("loadid")
         if loadid is None:
             logger.error("loadid must be provided. Cancelling load reversal.")
-            raise(Exception("No loadid provided"))
+            raise (Exception("No loadid provided"))
 
         objs = ManagementArea.objects.filter(load_id=loadid)
-        logger.info(f"removing {objs.count()} Management Areas matching loadid {loadid}")
+        logger.info(
+            f"removing {objs.count()} Management Areas matching loadid {loadid}"
+        )
         objs.delete()
         with connection.cursor() as cursor:
             cursor.execute(
-                """DELETE FROM load_event WHERE loadid = %s""", (loadid,),
+                """DELETE FROM load_event WHERE loadid = %s""",
+                (loadid,),
             )
         return
 
-    def run_sequence(self, loadid=None, file_dir=None, ma_group=None, ma_category=None, ma_agency=None, ma_level=None, description=""):
+    def run_sequence(
+        self,
+        loadid=None,
+        file_dir=None,
+        ma_group=None,
+        ma_category=None,
+        ma_agency=None,
+        ma_level=None,
+        description="",
+    ):
 
         logger.debug("begin run_sequence...")
         # the loadid may or may not be created already, but now it must be
@@ -374,15 +421,17 @@ class ManagementAreaImporter(BaseImportModule):
         self.level = ma_level
 
         self.reporter = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
+            "management_area_import",
             loadid=self.loadid,
             data={
                 "Load ID": self.loadid,
                 "Management Area Group": self.group.name if self.group else "---",
-                "Management Area Category": self.category.name if self.category else "---",
+                "Management Area Category": self.category.name
+                if self.category
+                else "---",
                 "Management Agency": self.agency.name if self.agency else "---",
                 "Management Area Level": self.level,
-            }
+            },
         )
 
         # START THE PROCESS
@@ -435,7 +484,14 @@ class ManagementAreaImporter(BaseImportModule):
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, error_message, load_details, complete, successful) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
-                (status, self.reporter.message, self.reporter.get_load_details(), True, True, self.loadid),
+                (
+                    status,
+                    self.reporter.message,
+                    self.reporter.get_load_details(),
+                    True,
+                    True,
+                    self.loadid,
+                ),
             )
 
     def get_blank_tile(self, nodegroupid):
@@ -444,7 +500,10 @@ class ManagementAreaImporter(BaseImportModule):
         if blank_tile is None:
             blank_tile = {}
             with connection.cursor() as cursor:
-                cursor.execute("""SELECT nodeid FROM nodes WHERE datatype <> 'semantic' AND nodegroupid = %s;""", [nodegroupid])
+                cursor.execute(
+                    """SELECT nodeid FROM nodes WHERE datatype <> 'semantic' AND nodegroupid = %s;""",
+                    [nodegroupid],
+                )
                 for row in cursor.fetchall():
                     (nodeid,) = row
                     blank_tile[str(nodeid)] = None

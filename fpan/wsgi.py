@@ -1,7 +1,8 @@
 import os
 import sys
 import inspect
-path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
+path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))  # pyright: ignore[reportArgumentType]
 
 if path not in sys.path:
     sys.path.append(path)

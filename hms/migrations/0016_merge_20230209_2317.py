@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0014_load_nr_historic_districts'),
-        ('hms', '0015_auto_20230131_1342'),
+        ("hms", "0014_load_nr_historic_districts"),
+        ("hms", "0015_auto_20230131_1342"),
     ]
 
-    operations = [
-    ]
+    operations = []

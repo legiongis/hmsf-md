@@ -3,9 +3,11 @@ from django.core import management
 
 from fpan.decorators import deprecated_migration_operation
 
+
 @deprecated_migration_operation
 def migrate_areas(apps, schema_editor):
     management.call_command("areas", "migrate-legacy-areas", "--quiet")
+
 
 @deprecated_migration_operation
 def remove_areas(apps, schema_editor):
@@ -17,6 +19,7 @@ def remove_areas(apps, schema_editor):
         ManagementAreaCategory,
         ManagementAgency,
     )
+
     ManagementAreaGroup.objects.get(name="SP District 1").delete()
     ManagementAreaGroup.objects.get(name="SP District 2").delete()
     ManagementAreaGroup.objects.get(name="SP District 3").delete()
@@ -24,10 +27,16 @@ def remove_areas(apps, schema_editor):
     ManagementAreaGroup.objects.get(name="SP District 5").delete()
 
     ManagementAreaGroup.objects.get(name="Water Management District - North").delete()
-    ManagementAreaGroup.objects.get(name="Water Management District - North Central").delete()
+    ManagementAreaGroup.objects.get(
+        name="Water Management District - North Central"
+    ).delete()
     ManagementAreaGroup.objects.get(name="Water Management District - South").delete()
-    ManagementAreaGroup.objects.get(name="Water Management District - Southwest").delete()
-    ManagementAreaGroup.objects.get(name="Water Management District - South Central").delete()
+    ManagementAreaGroup.objects.get(
+        name="Water Management District - Southwest"
+    ).delete()
+    ManagementAreaGroup.objects.get(
+        name="Water Management District - South Central"
+    ).delete()
     ManagementAreaGroup.objects.get(name="Water Management District - West").delete()
 
     ManagementAreaCategory.objects.get(name="State Park").delete()
@@ -36,8 +45,12 @@ def remove_areas(apps, schema_editor):
     ManagementAgency.objects.get(name="Florida Forest Service", code="FFS").delete()
     ManagementAreaCategory.objects.get(name="Aquatic Preserve").delete()
     ManagementAgency.objects.get(name="Florida Coastal Office", code="FCO").delete()
-    ManagementAreaCategory.objects.get(name="Fish and Wildlife Conservation Commission").delete()
-    ManagementAgency.objects.get(name="Fish and Wildlife Conservation Commission", code="FWCC").delete()
+    ManagementAreaCategory.objects.get(
+        name="Fish and Wildlife Conservation Commission"
+    ).delete()
+    ManagementAgency.objects.get(
+        name="Fish and Wildlife Conservation Commission", code="FWCC"
+    ).delete()
     ManagementAreaCategory.objects.get(name="Conservation Area").delete()
     ManagementAgency.objects.get(name="Office of Water Policy", code="OWP").delete()
 
@@ -45,11 +58,8 @@ def remove_areas(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0007_managementarea_display_name'),
+        ("hms", "0007_managementarea_display_name"),
     ]
 
-    operations = [
-        migrations.RunPython(migrate_areas, remove_areas)
-    ]
+    operations = [migrations.RunPython(migrate_areas, remove_areas)]

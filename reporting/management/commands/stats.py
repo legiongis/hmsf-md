@@ -2,7 +2,7 @@ import os
 import csv
 import uuid
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.contrib.gis.geos import GEOSGeometry
 
 from arches.app.utils.betterJSONSerializer import JSONSerializer
@@ -11,9 +11,9 @@ from arches.app.models.models import Node, Value
 from arches.app.models.graph import Graph
 from arches.app.models.tile import Tile
 
-class Command(BaseCommand):
 
-    help = 'collects stats needed for FPAN year-end reporting'
+class Command(BaseCommand):
+    help = "collects stats needed for FPAN year-end reporting"
 
     def add_arguments(self, parser):
         pass
@@ -35,17 +35,15 @@ class Command(BaseCommand):
         #
         # for rm_name in resource_models:
         #     print(rm_name)
-            # graph = Graph.objects.get(name=rm_name)
-            # report_node = Node.objects.get(name="Scout Report", graph_id=graph.graphid)
-            #
-            # report_ng = NodeGroup.objects.get(nodegroupid=report_node.nodegroup_id)
-            # report_toptiles = Tile.objects.filter(nodegroup_id=report_ng)
-            #
-            # resids = [r.resourceinstance_id for r in report_toptiles]
+        # graph = Graph.objects.get(name=rm_name)
+        # report_node = Node.objects.get(name="Scout Report", graph_id=graph.graphid)
+        #
+        # report_ng = NodeGroup.objects.get(nodegroupid=report_node.nodegroup_id)
+        # report_toptiles = Tile.objects.filter(nodegroup_id=report_ng)
+        #
+        # resids = [r.resourceinstance_id for r in report_toptiles]
 
-
-
-            #self.make_report_csv(rm_name, report_toptiles)
+        # self.make_report_csv(rm_name, report_toptiles)
 
     def load_lookup_table(self):
 
@@ -91,7 +89,7 @@ class Command(BaseCommand):
                 for k, v in c.data.items():
                     n = Node.objects.get(nodeid=k)
                     # print n.name
-                    if not n.name in node_names:
+                    if n.name not in node_names:
                         continue
 
                     if n.name in report_info:
@@ -109,19 +107,19 @@ class Command(BaseCommand):
                     try:
                         uuid.UUID(i)
                         transformed.append(Value.objects.get(valueid=i).value)
-                    except Exception as e:
+                    except Exception:
                         transformed.append(i)
                 outdict[k] = ";".join(transformed)
             outrows.append(outdict)
 
-        outfile = resource_model.lower().replace(" ","-")+"-reports.csv"
+        outfile = resource_model.lower().replace(" ", "-") + "-reports.csv"
         fieldnames = [
             "FMSF ID",
             "Visiting Scout ID",
             "Scout Visit Priority Evaluation",
             "Scout Visit Overall Condition",
             "Scout Visit Location Verification",
-            "Scout Visit Date"
+            "Scout Visit Date",
         ]
         with open(outfile, "w") as f:
             writer = csv.DictWriter(f, fieldnames)
@@ -132,7 +130,6 @@ class Command(BaseCommand):
     def get_sorted_reports(self):
 
         lookup = self.load_lookup_table()
-
 
         all_reports = Resource.objects.filter(graph__name="Scout Report")
         sorted_reports = {
@@ -180,12 +177,12 @@ class Command(BaseCommand):
         geo_nodes = {}
         for rm in list(outdict.keys()):
             graph = Graph.objects.get(name=rm)
-            spatial_node = Node.objects.get(name="Geospatial Coordinates",
-                                            graph_id=graph)
+            spatial_node = Node.objects.get(
+                name="Geospatial Coordinates", graph_id=graph
+            )
             geo_nodes[rm] = spatial_node
 
         for res, ct in report_counter.items():
-
             name = self.get_node_value(res, "FMSF Name")
             site_id = self.get_node_value(res, "FMSF ID")
             region = self.get_node_value(res, "HMS-Region")
@@ -195,8 +192,17 @@ class Command(BaseCommand):
             agency = self.get_node_value(res, "Managing Agency")
             eval = self.get_node_value(res, "Survey Evaluation")
 
-            row = [str(res.resourceinstanceid), name, site_id, region, ownership,
-                area_name, area_cat, agency, eval]
+            row = [
+                str(res.resourceinstanceid),
+                name,
+                site_id,
+                region,
+                ownership,
+                area_name,
+                area_cat,
+                agency,
+                eval,
+            ]
 
             row.append(ct)
 
@@ -207,11 +213,13 @@ class Command(BaseCommand):
 
             spatial_node = geo_nodes[rn_name]
             try:
-                coord_tile = Tile.objects.get(resourceinstance_id=res.resourceinstanceid,
-                                              nodegroup_id=spatial_node.nodegroup_id)
+                coord_tile = Tile.objects.get(
+                    resourceinstance_id=res.resourceinstanceid,
+                    nodegroup_id=spatial_node.nodegroup_id,
+                )
                 coords = coord_tile.data[str(spatial_node.nodeid)]
-                feature = coords['features'][0]
-                geom = GEOSGeometry(JSONSerializer().serialize(feature['geometry'])).wkt
+                feature = coords["features"][0]
+                geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"])).wkt
             except Tile.DoesNotExist:
                 geom = ""
 
@@ -223,9 +231,18 @@ class Command(BaseCommand):
         for resource_model, outrows in outdict.items():
             outfile = resource_model.lower().replace(" ", "-") + "-resource-summary.csv"
 
-            headers = ["resource id", "FMSF name", "FMSF id", "region",
-                "ownership", "managed area name", "managed area category", "managing agency",
-                "nris eval", "scout reports ct"]
+            headers = [
+                "resource id",
+                "FMSF name",
+                "FMSF id",
+                "region",
+                "ownership",
+                "managed area name",
+                "managed area category",
+                "managing agency",
+                "nris eval",
+                "scout reports ct",
+            ]
             if resource_model == "Archaeological Site":
                 headers.append("archaeological site type")
 

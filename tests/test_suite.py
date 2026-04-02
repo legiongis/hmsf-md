@@ -1,6 +1,3 @@
-import os
-import json
-from django.conf import settings
 from django.core import management
 
 from arches.app.models.graph import Graph
@@ -8,28 +5,29 @@ from arches.app.models.graph import Graph
 from hms.models import (
     Scout,
     LandManager,
-    ManagementArea,
     ManagementAreaCategory,
+    FPANRegion,
 )
 
 from .base_test import HMSTestCase
 
-class AccountTests(HMSTestCase):
 
+class AccountTests(HMSTestCase):
     def test_001_load_fpan_regions(self, dry_run=False):
 
         management.call_command("loaddata", "management-area-categories")
-        self.assertEqual(ManagementAreaCategory.objects.all().count(), 8)
+        self.assertEqual(ManagementAreaCategory.objects.all().count(), 7)
 
-        management.call_command("loaddata", "management-areas-fpan-region")
-        self.assertEqual(ManagementArea.objects.all().count(), 8)
+        management.call_command("loaddata", "fpan-regions")
+        self.assertEqual(FPANRegion.objects.all().count(), 8)
 
     def test_002_scout_creation(self, dry_run=False):
 
         management.call_command("loaddata", "management-area-categories")
-        management.call_command("loaddata", "management-areas-fpan-region")
+        management.call_command("loaddata", "fpan-regions")
 
         from hms.utils import TestUtils
+
         TestUtils().create_test_scouts()
         self.assertEqual(Scout.objects.all().count(), 4)
 
@@ -44,12 +42,12 @@ class AccountTests(HMSTestCase):
         management.call_command("loaddata", "management-areas-state-park")
 
         from hms.utils import TestUtils
+
         TestUtils().create_test_landmanagers()
         self.assertEqual(LandManager.objects.all().count(), 5)
 
 
 class LoadingTests(HMSTestCase):
-
     @classmethod
     def setUpClass(cls):
         management.call_command("setup_hms", use_existing_db=True)
@@ -63,7 +61,6 @@ class LoadingTests(HMSTestCase):
 
 
 class ETLTests(HMSTestCase):
-
     @classmethod
     def tearDownClass(cls):
         pass

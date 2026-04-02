@@ -78,7 +78,6 @@ def hms_home(request):
                 {"scout_profile": scout_profile_form, "page": "home-hms"},
             )
 
-
     else:
         scout_profile_form = None
         try:
@@ -278,7 +277,9 @@ def scouts_dropdown(request):
         res = FMSFResource(resourceid)
         if res.siteid:
             entry = lookup.get(res.siteid[:2])
-            matched_scouts = matched_scouts.filter(fpan_regions2__name__contains=entry['region']).distinct()
+            matched_scouts = ScoutProfile.objects.filter(
+                fpan_regions2__name__contains=entry["region"]
+            ).distinct()
 
     # iterate scouts and create a list of objects to return for the dropdown
     return_scouts = []

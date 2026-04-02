@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0019_auto_20260401_1033'),
+        ("hms", "0019_auto_20260401_1033"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='scoutprofile',
-            name='fpan_regions',
+            model_name="scoutprofile",
+            name="fpan_regions",
         ),
     ]

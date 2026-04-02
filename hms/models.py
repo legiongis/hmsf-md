@@ -4,6 +4,7 @@ import time
 import json
 from uuid import uuid4
 import logging
+from typing_extensions import TypeAlias
 from typing import List, TYPE_CHECKING, Tuple, Iterable
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
@@ -31,6 +32,11 @@ from fpan.search.components.rule_filter import RuleFilter, Rule
 
 if TYPE_CHECKING:
     pass
+
+ManagementAgencyAlias: TypeAlias = "ManagementAgency"
+FPANRegionAlias: TypeAlias = "FPANRegion"
+ManagementAreaAlias: TypeAlias = "ManagementArea"
+ManagementAreaGroupAlias: TypeAlias = "ManagementAreaGroup"
 
 logger = logging.getLogger("fpan")
 
@@ -214,7 +220,7 @@ class ScoutProfile(models.Model):
         blank=True,
     )
     fpan_regions2 = models.ManyToManyField(
-        "FPANRegion",
+        FPANRegionAlias,
         verbose_name="FPAN Regions",
     )
     ethics_agreement = models.BooleanField(default=True)
@@ -313,10 +319,10 @@ class LandManager(models.Model):
         null=True,
     )
     management_agency = models.ForeignKey(
-        "ManagementAgency", null=True, blank=True, on_delete=models.CASCADE
+        ManagementAgencyAlias, null=True, blank=True, on_delete=models.CASCADE
     )
-    individual_areas = models.ManyToManyField("ManagementArea", blank=True)
-    grouped_areas = models.ManyToManyField("ManagementAreaGroup", blank=True)
+    individual_areas = models.ManyToManyField(ManagementAreaAlias, blank=True)
+    grouped_areas = models.ManyToManyField(ManagementAreaGroupAlias, blank=True)
 
     def __str__(self):
         return self.user.username
@@ -429,6 +435,7 @@ class LandManager(models.Model):
 
     accessible_sites_formatted.short_description = "Accessible Sites"  # type: ignore
 
+
 def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
 
     collection = Value.objects.get(
@@ -437,9 +444,8 @@ def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
     concept_ids = Relation.objects.filter(
         conceptfrom=collection, relationtype_id="member"
     ).values_list("conceptto", flat=True)
-    return Value.objects.filter(
-        concept_id__in=concept_ids
-    ).values_list("value", "pk")
+    return Value.objects.filter(concept_id__in=concept_ids).values_list("value", "pk")
+
 
 def get_or_create_concept(label, parent_lbl, collection_lbl, concept_id=None):
     """Helper function that creates a new concept and adds it to the specified
@@ -455,10 +461,10 @@ def get_or_create_concept(label, parent_lbl, collection_lbl, concept_id=None):
     ## first check if this concept already exists. It must be under the specified
     ## top concept (parent label) and also under the provided collection
     for val in Value.objects.filter(
-            valuetype_id="prefLabel",
-            value=label,
-            language_id="en",
-        ):
+        valuetype_id="prefLabel",
+        value=label,
+        language_id="en",
+    ):
         if val.concept:
             if Relation.objects.filter(
                 conceptfrom=topconcept,

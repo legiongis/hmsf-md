@@ -6,25 +6,72 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('fpan', '0008_alter_state_park_category_value'),
+        ("fpan", "0008_alter_state_park_category_value"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='managedarea',
-            name='wmd_district',
-            field=models.CharField(blank=True, choices=[(b'North', b'North'), (b'North Central', b'North Central'), (b'West', b'West'), (b'South', b'South'), (b'Southwest', b'Southwest'), (b'South Central', b'South Central')], max_length=20, null=True),
+            model_name="managedarea",
+            name="wmd_district",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    (b"North", b"North"),
+                    (b"North Central", b"North Central"),
+                    (b"West", b"West"),
+                    (b"South", b"South"),
+                    (b"Southwest", b"Southwest"),
+                    (b"South Central", b"South Central"),
+                ],
+                max_length=20,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='managedarea',
-            name='agency',
-            field=models.CharField(choices=[(b'FL Dept. of Environmental Protection, Div. of Recreation and Parks', b'FL Dept. of Environmental Protection, Div. of Recreation and Parks'), (b'FL Dept. of Agriculture and Consumer Services, Florida Forest Service', b'FL Dept. of Agriculture and Consumer Services, Florida Forest Service'), (b'FL Fish and Wildlife Conservation Commission', b'FL Fish and Wildlife Conservation Commission'), (b'FL Dept. of Environmental Protection, Florida Coastal Office', b'FL Dept. of Environmental Protection, Florida Coastal Office'), (b'FL Dept. of Environmental Protection, Office of Water Policy', b'FL Dept. of Environmental Protection, Office of Water Policy')], max_length=254),
+            model_name="managedarea",
+            name="agency",
+            field=models.CharField(
+                choices=[
+                    (
+                        b"FL Dept. of Environmental Protection, Div. of Recreation and Parks",
+                        b"FL Dept. of Environmental Protection, Div. of Recreation and Parks",
+                    ),
+                    (
+                        b"FL Dept. of Agriculture and Consumer Services, Florida Forest Service",
+                        b"FL Dept. of Agriculture and Consumer Services, Florida Forest Service",
+                    ),
+                    (
+                        b"FL Fish and Wildlife Conservation Commission",
+                        b"FL Fish and Wildlife Conservation Commission",
+                    ),
+                    (
+                        b"FL Dept. of Environmental Protection, Florida Coastal Office",
+                        b"FL Dept. of Environmental Protection, Florida Coastal Office",
+                    ),
+                    (
+                        b"FL Dept. of Environmental Protection, Office of Water Policy",
+                        b"FL Dept. of Environmental Protection, Office of Water Policy",
+                    ),
+                ],
+                max_length=254,
+            ),
         ),
         migrations.AlterField(
-            model_name='managedarea',
-            name='category',
-            field=models.CharField(choices=[(b'State Park', b'State Park'), (b'State Forest', b'State Forest'), (b'Fish and Wildlife Conservation Commission', b'Fish and Wildlife Conservation Commission'), (b'Aquatic Preserve', b'Aquatic Preserve'), (b'Water Management District', b'Water Management District')], max_length=254),
+            model_name="managedarea",
+            name="category",
+            field=models.CharField(
+                choices=[
+                    (b"State Park", b"State Park"),
+                    (b"State Forest", b"State Forest"),
+                    (
+                        b"Fish and Wildlife Conservation Commission",
+                        b"Fish and Wildlife Conservation Commission",
+                    ),
+                    (b"Aquatic Preserve", b"Aquatic Preserve"),
+                    (b"Water Management District", b"Water Management District"),
+                ],
+                max_length=254,
+            ),
         ),
     ]

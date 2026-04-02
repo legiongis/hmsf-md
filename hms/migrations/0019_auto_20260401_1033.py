@@ -5,27 +5,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('hms', '0018_auto_20231022_2218'),
+        ("hms", "0018_auto_20231022_2218"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FPANRegion',
+            name="FPANRegion",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('geom', django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "geom",
+                    django.contrib.gis.db.models.fields.MultiPolygonField(srid=4326),
+                ),
             ],
             options={
-                'verbose_name': 'FPAN Region',
-                'verbose_name_plural': 'FPAN Regions',
+                "verbose_name": "FPAN Region",
+                "verbose_name_plural": "FPAN Regions",
             },
         ),
         migrations.AddField(
-            model_name='scoutprofile',
-            name='fpan_regions2',
-            field=models.ManyToManyField(to='hms.FPANRegion', verbose_name='FPAN Regions'),
+            model_name="scoutprofile",
+            name="fpan_regions2",
+            field=models.ManyToManyField(
+                to="hms.FPANRegion", verbose_name="FPAN Regions"
+            ),
         ),
     ]

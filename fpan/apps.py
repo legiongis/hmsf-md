@@ -4,7 +4,7 @@ from django.apps import AppConfig
 
 
 class FpanConfig(AppConfig):
-    name = 'fpan'
+    name = "fpan"
 
     def ready(self):
         from . import signals  # noqa: F401
