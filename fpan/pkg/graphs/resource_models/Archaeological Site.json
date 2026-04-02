@@ -5,6 +5,38 @@
             "cards": [
                 {
                     "active": true,
+                    "cardid": "00fdbfe4-c72e-47d3-b0d6-61f298c9a775",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [
+                        {
+                            "card_id": "00fdbfe4-c72e-47d3-b0d6-61f298c9a775",
+                            "constraintid": "b64e0a55-148e-4e78-b983-109d7a16690d",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        },
+                        {
+                            "card_id": "00fdbfe4-c72e-47d3-b0d6-61f298c9a775",
+                            "constraintid": "4340b1b1-cc39-4417-b07b-faf2675af3ff",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        }
+                    ],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "helpenabled": false,
+                    "helptext": null,
+                    "helptitle": null,
+                    "instructions": null,
+                    "is_editable": true,
+                    "name": "Photos",
+                    "nodegroup_id": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "sortorder": null,
+                    "visible": true
+                },
+                {
+                    "active": true,
                     "cardid": "036462e1-d550-11e7-848f-94659cf754d0",
                     "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
                     "config": null,
@@ -269,6 +301,36 @@
                     "widget_id": "10000000-0000-0000-0000-000000000012"
                 },
                 {
+                    "card_id": "00fdbfe4-c72e-47d3-b0d6-61f298c9a775",
+                    "config": {
+                        "acceptedFiles": "",
+                        "label": "Image File(s)",
+                        "maxFilesize": "20",
+                        "rerender": true
+                    },
+                    "id": "08fb6794-c98a-4c0a-aa46-20f2cd582925",
+                    "label": "Image File(s)",
+                    "node_id": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "sortorder": 1,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000019"
+                },
+                {
+                    "card_id": "00fdbfe4-c72e-47d3-b0d6-61f298c9a775",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Photo Type",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "2186d3c5-4516-4681-8a76-f65d585fd27f",
+                    "label": "Photo Type",
+                    "node_id": "6c005f80-2ece-11f1-9687-67d160908e70",
+                    "sortorder": 0,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                },
+                {
                     "card_id": "036462e1-d550-11e7-848f-94659cf754d0",
                     "config": {
                         "defaultValue": "",
@@ -342,6 +404,23 @@
                     "sortorder": 2,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000002"
+                },
+                {
+                    "card_id": "00fdbfe4-c72e-47d3-b0d6-61f298c9a775",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Comments",
+                        "maxLength": null,
+                        "placeholder": "Enter text",
+                        "uneditable": false,
+                        "width": "100%"
+                    },
+                    "id": "3bd22a3f-dbf2-4c8f-a0e0-4ad78b44b87e",
+                    "label": "Comments",
+                    "node_id": "7fcfefda-2ece-11f1-9687-67d160908e70",
+                    "sortorder": 2,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
                 },
                 {
                     "card_id": "e6929a4f-b31c-4108-99e7-847b37c33843",
@@ -714,6 +793,15 @@
                 },
                 {
                     "description": null,
+                    "domainnode_id": "f2127100-d534-11e7-b2c3-94659cf754d0",
+                    "edgeid": "12421104-b39d-459e-aeb0-518120218875",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "51a13736-2ece-11f1-9687-67d160908e70"
+                },
+                {
+                    "description": null,
                     "domainnode_id": "3067ed10-dbaa-11e7-87be-94659cf754d0",
                     "edgeid": "30681434-dbaa-11e7-b08a-94659cf754d0",
                     "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
@@ -909,6 +997,24 @@
                     "name": null,
                     "ontologyproperty": null,
                     "rangenode_id": "64f9a4da-715c-11ee-9e57-4df2569ff543"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "edgeid": "b1f941c4-c6dc-4830-917a-63905ed5ef49",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "7fcfefda-2ece-11f1-9687-67d160908e70"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "edgeid": "bd40994f-fcb8-4113-9b45-d3453ba22892",
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "6c005f80-2ece-11f1-9687-67d160908e70"
                 }
             ],
             "functions_x_graphs": [
@@ -1014,6 +1120,12 @@
                     "legacygroupid": null,
                     "nodegroupid": "5006429e-d535-11e7-bbbc-94659cf754d0",
                     "parentnodegroup_id": "50061b90-d535-11e7-9348-94659cf754d0"
+                },
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "parentnodegroup_id": null
                 }
             ],
             "nodes": [
@@ -1571,6 +1683,30 @@
                     "sortorder": null
                 },
                 {
+                    "alias": "photo",
+                    "config": {
+                        "activateMax": false,
+                        "maxFileSize": null,
+                        "maxFiles": 10
+                    },
+                    "datatype": "file-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Photo",
+                    "nodegroup_id": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "nodeid": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
                     "alias": "management_agency",
                     "config": {
                         "rdmCollection": "fffcacef-cabb-4d5a-aaa1-c9b823be9911"
@@ -1610,6 +1746,48 @@
                     "name": "County",
                     "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
                     "nodeid": "64f9a4da-715c-11ee-9e57-4df2569ff543",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "photo_type",
+                    "config": {
+                        "rdmCollection": "0f3ffa2f-1381-4f98-8147-0705bde72d4e"
+                    },
+                    "datatype": "concept",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Photo Type",
+                    "nodegroup_id": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "nodeid": "6c005f80-2ece-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "comments",
+                    "config": null,
+                    "datatype": "string",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Comments",
+                    "nodegroup_id": "51a13736-2ece-11f1-9687-67d160908e70",
+                    "nodeid": "7fcfefda-2ece-11f1-9687-67d160908e70",
                     "ontologyclass": null,
                     "parentproperty": null,
                     "sortorder": 0

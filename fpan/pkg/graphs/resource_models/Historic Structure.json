@@ -209,6 +209,38 @@
                 },
                 {
                     "active": true,
+                    "cardid": "c9375569-da20-4a51-87a4-a0a1aed1c125",
+                    "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
+                    "config": null,
+                    "constraints": [
+                        {
+                            "card_id": "c9375569-da20-4a51-87a4-a0a1aed1c125",
+                            "constraintid": "498279af-f42a-4200-96d8-db98f2eb878b",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        },
+                        {
+                            "card_id": "c9375569-da20-4a51-87a4-a0a1aed1c125",
+                            "constraintid": "75756478-841d-4329-ba46-a73f9179cf0e",
+                            "nodes": [],
+                            "uniquetoallinstances": false
+                        }
+                    ],
+                    "cssclass": null,
+                    "description": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "helpenabled": false,
+                    "helptext": null,
+                    "helptitle": null,
+                    "instructions": null,
+                    "is_editable": true,
+                    "name": "Photos",
+                    "nodegroup_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "sortorder": null,
+                    "visible": true
+                },
+                {
+                    "active": true,
                     "cardid": "efe6cb60-dbab-11e7-9629-94659cf754d0",
                     "component_id": "f05e4d3a-53c1-11e8-b0ea-784f435179ea",
                     "config": null,
@@ -247,6 +279,21 @@
                 }
             ],
             "cards_x_nodes_x_widgets": [
+                {
+                    "card_id": "c9375569-da20-4a51-87a4-a0a1aed1c125",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Photo Type",
+                        "options": [],
+                        "placeholder": "Select an option"
+                    },
+                    "id": "10656e28-1ef5-4bd9-a5d2-0c39e4542085",
+                    "label": "Photo Type",
+                    "node_id": "5603aede-2ecf-11f1-9687-67d160908e70",
+                    "sortorder": 0,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000002"
+                },
                 {
                     "card_id": "ad51e45e-715e-11ee-9e57-4df2569ff543",
                     "config": {
@@ -336,6 +383,21 @@
                     "sortorder": 0,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000012"
+                },
+                {
+                    "card_id": "c9375569-da20-4a51-87a4-a0a1aed1c125",
+                    "config": {
+                        "acceptedFiles": "",
+                        "label": "Image File(s)",
+                        "maxFilesize": "200",
+                        "rerender": true
+                    },
+                    "id": "555a2dd4-7bf2-46da-982c-980c3b08dc78",
+                    "label": "Image File(s)",
+                    "node_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "sortorder": 1,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000019"
                 },
                 {
                     "card_id": "a6084bf1-d524-11e7-a155-94659cf754d0",
@@ -1798,6 +1860,23 @@
                     "widget_id": "10000000-0000-0000-0000-000000000002"
                 },
                 {
+                    "card_id": "c9375569-da20-4a51-87a4-a0a1aed1c125",
+                    "config": {
+                        "defaultValue": "",
+                        "label": "Comments",
+                        "maxLength": null,
+                        "placeholder": "Enter text",
+                        "uneditable": false,
+                        "width": "100%"
+                    },
+                    "id": "eb7dace1-17bd-414a-a317-b8e1eeeafa51",
+                    "label": "Comments",
+                    "node_id": "64ff9eca-2ecf-11f1-9687-67d160908e70",
+                    "sortorder": 2,
+                    "visible": true,
+                    "widget_id": "10000000-0000-0000-0000-000000000001"
+                },
+                {
                     "card_id": "efe6cb60-dbab-11e7-9629-94659cf754d0",
                     "config": {
                         "defaultValue": "",
@@ -2079,6 +2158,33 @@
                 },
                 {
                     "description": null,
+                    "domainnode_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "edgeid": "ba6da003-1f09-4a7b-8669-c2d8bc882648",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "64ff9eca-2ecf-11f1-9687-67d160908e70"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "edgeid": "d359ddcd-04d2-4877-92ea-a8c141c0268e",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "5603aede-2ecf-11f1-9687-67d160908e70"
+                },
+                {
+                    "description": null,
+                    "domainnode_id": "c67216be-8cc2-11e7-883c-06ed184dc22c",
+                    "edgeid": "d8d3a339-ed1b-44c6-a2e3-32fb654010fc",
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "name": null,
+                    "ontologyproperty": null,
+                    "rangenode_id": "4ab117e2-2ecf-11f1-9687-67d160908e70"
+                },
+                {
+                    "description": null,
                     "domainnode_id": "efe6cb5e-dbab-11e7-a327-94659cf754d0",
                     "edgeid": "efe6cb74-dbab-11e7-bdeb-94659cf754d0",
                     "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
@@ -2146,6 +2252,12 @@
             "jsonldcontext": null,
             "name": "Historic Structure",
             "nodegroups": [
+                {
+                    "cardinality": "n",
+                    "legacygroupid": null,
+                    "nodegroupid": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "parentnodegroup_id": null
+                },
                 {
                     "cardinality": "1",
                     "legacygroupid": null,
@@ -2220,6 +2332,72 @@
                 }
             ],
             "nodes": [
+                {
+                    "alias": "photo",
+                    "config": {
+                        "activateMax": false,
+                        "maxFileSize": null,
+                        "maxFiles": 10
+                    },
+                    "datatype": "file-list",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": true,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Photo",
+                    "nodegroup_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "nodeid": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "photo_type",
+                    "config": {
+                        "rdmCollection": "0f3ffa2f-1381-4f98-8147-0705bde72d4e"
+                    },
+                    "datatype": "concept",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Photo Type",
+                    "nodegroup_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "nodeid": "5603aede-2ecf-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
+                {
+                    "alias": "comments",
+                    "config": null,
+                    "datatype": "string",
+                    "description": null,
+                    "exportable": false,
+                    "fieldname": null,
+                    "graph_id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+                    "hascustomalias": false,
+                    "is_collector": false,
+                    "isrequired": false,
+                    "issearchable": true,
+                    "istopnode": false,
+                    "name": "Comments",
+                    "nodegroup_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
+                    "nodeid": "64ff9eca-2ecf-11f1-9687-67d160908e70",
+                    "ontologyclass": null,
+                    "parentproperty": null,
+                    "sortorder": 0
+                },
                 {
                     "alias": "structure_description",
                     "config": {
