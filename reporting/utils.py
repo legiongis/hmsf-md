@@ -40,7 +40,7 @@ def get_past_week_report_counts(use_date=None):
 
     start = datetime.datetime.now()
 
-    sites_with_reports_already = []
+    sites_with_reports_already = set()
     for report in all_reports:
         related_site = get_node_value(report, "FMSF Site ID")
         if not related_site or not isinstance(related_site, dict):
@@ -49,7 +49,7 @@ def get_past_week_report_counts(use_date=None):
         site_res = Resource.objects.get(resourceinstanceid=site_uuid)
         fmsfid = get_node_value(site_res, "FMSF ID")
 
-        report_date = report.createdtime
+        report_date = report.createdtime.date()
         if report_date is None:
             continue
 
@@ -65,11 +65,11 @@ def get_past_week_report_counts(use_date=None):
             )
 
         else:
-            sites_with_reports_already.append(fmsfid)
+            sites_with_reports_already.add(fmsfid)
 
     for k, v in count_dict.items():
         for report in v["reports"]:
-            report["new_site"] = report["fmsfid"] in sites_with_reports_already
+            report["new_site"] = not report["fmsfid"] in sites_with_reports_already
 
     logger.info(
         f"report count generation completed | {datetime.datetime.now() - start} seconds"
@@ -101,7 +101,6 @@ def send_weekly_summary(use_date=None):
         "total_reports_ct": total_reports_ct,
         "new_sites_visited_ct": new_sites_visited_ct,
         "count_data": formatted_counts,
-        "domain": settings.DEFAULT_FROM_EMAIL.split("@")[1],
     }
     message_txt = render_to_string("reporting/weekly_report_email_text.htm", msg_vars)
     message_html = render_to_string("reporting/weekly_report_email_html.htm", msg_vars)
