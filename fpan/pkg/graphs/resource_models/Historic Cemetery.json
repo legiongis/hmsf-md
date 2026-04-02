@@ -1168,7 +1168,7 @@
                     "nodeid": "210c6347-dbab-11e7-9890-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 1
                 },
                 {
                     "alias": "plot_type",
@@ -1232,7 +1232,7 @@
                     "nodeid": "48821219-715e-11ee-9e57-4df2569ff543",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 4
                 },
                 {
                     "alias": "management_agency",
@@ -1364,7 +1364,7 @@
                     "nodeid": "b8dff130-2ece-11f1-9687-67d160908e70",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 5
                 },
                 {
                     "alias": "photo_type",
@@ -1428,7 +1428,7 @@
                     "nodeid": "f253fbef-d536-11e7-a5d3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 3
                 },
                 {
                     "alias": "cemetery_type",
@@ -1578,7 +1578,7 @@
                     "nodeid": "f3cc6b22-d536-11e7-9d02-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 2
                 },
                 {
                     "alias": "fmsf_name",
@@ -1662,7 +1662,7 @@
                     "nodeid": "f64affb4-d536-11e7-9be2-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_assessment",

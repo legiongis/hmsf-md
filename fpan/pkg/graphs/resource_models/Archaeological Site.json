@@ -32,7 +32,7 @@
                     "is_editable": true,
                     "name": "Photos",
                     "nodegroup_id": "51a13736-2ece-11f1-9687-67d160908e70",
-                    "sortorder": null,
+                    "sortorder": 5,
                     "visible": true
                 },
                 {
@@ -280,7 +280,7 @@
                     "is_editable": true,
                     "name": "Management",
                     "nodegroup_id": "4259ff42-715c-11ee-9e57-4df2569ff543",
-                    "sortorder": null,
+                    "sortorder": 4,
                     "visible": true
                 }
             ],

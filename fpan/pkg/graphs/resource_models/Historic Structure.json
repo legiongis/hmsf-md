@@ -204,7 +204,7 @@
                     "is_editable": true,
                     "name": "Management",
                     "nodegroup_id": "ad51e45d-715e-11ee-9e57-4df2569ff543",
-                    "sortorder": null,
+                    "sortorder": 4,
                     "visible": true
                 },
                 {
@@ -236,7 +236,7 @@
                     "is_editable": true,
                     "name": "Photos",
                     "nodegroup_id": "4ab117e2-2ecf-11f1-9687-67d160908e70",
-                    "sortorder": null,
+                    "sortorder": 5,
                     "visible": true
                 },
                 {
