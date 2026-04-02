@@ -182,7 +182,7 @@
   "model": "hms.managementareagroup",
   "pk": 6,
   "fields": {
-    "name": "Water Management District - North",
+    "name": "SJRWMD - North",
     "note": "",
     "areas": [
       20,
@@ -210,7 +210,7 @@
   "model": "hms.managementareagroup",
   "pk": 7,
   "fields": {
-    "name": "Water Management District - North Central",
+    "name": "SJRWMD - North Central",
     "note": "",
     "areas": [
       28,
@@ -230,7 +230,7 @@
   "model": "hms.managementareagroup",
   "pk": 8,
   "fields": {
-    "name": "Water Management District - South",
+    "name": "SJRWMD - South",
     "note": "",
     "areas": [
       44,
@@ -249,7 +249,7 @@
   "model": "hms.managementareagroup",
   "pk": 9,
   "fields": {
-    "name": "Water Management District - Southwest",
+    "name": "SJRWMD - Southwest",
     "note": "",
     "areas": [
       48,
@@ -264,7 +264,7 @@
   "model": "hms.managementareagroup",
   "pk": 10,
   "fields": {
-    "name": "Water Management District - South Central",
+    "name": "SJRWMD - South Central",
     "note": "",
     "areas": [
       13,
@@ -284,7 +284,7 @@
   "model": "hms.managementareagroup",
   "pk": 11,
   "fields": {
-    "name": "Water Management District - West",
+    "name": "SJRWMD - West",
     "note": "",
     "areas": [
       32,
