@@ -42,29 +42,20 @@ def get_past_week_report_counts(use_date=None):
 
     sites_with_reports_already = []
     for report in all_reports:
-        date = get_node_value(report, "Scout Visit Date")
-        if date == "":
-            continue
-
-        # this split is needed because there are some existing reports with
-        # multiple dates (this shouldn't happen though)
-        date = date.split(";")[0]
-        # strip time info from end of date if necessary
-        if len(date) > 10:
-            date = date[:10]
-
         related_site = get_node_value(report, "FMSF Site ID")
-        if not related_site:
+        if not related_site or not isinstance(related_site, dict):
             continue
         site_uuid = related_site["resourceId"]
         site_res = Resource.objects.get(resourceinstanceid=site_uuid)
         fmsfid = get_node_value(site_res, "FMSF ID")
 
-        report_date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+        report_date = report.createdtime
+        if report_date is None:
+            continue
+
         if report_date >= week_ago and report_date < today:
             resid = str(report.resourceinstanceid)
 
-            report_day_of_week = report_date.weekday()
             count_dict[report_date]["ct"] += 1
             count_dict[report_date]["reports"].append(
                 {
