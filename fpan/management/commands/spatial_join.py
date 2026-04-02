@@ -43,6 +43,8 @@ class Command(BaseCommand):
         start = datetime.now()
         if options["resourceinstanceid"]:
             resource = ResourceInstance.objects.get(pk=options["resourceinstanceid"])
+            if not resource.graph or not resource.graph.name:
+                return
             joiner = SpatialJoin(resource.graph.name)
             joiner.update_resource(resource)
         elif graph_name := options["graph"]:

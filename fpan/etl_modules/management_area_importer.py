@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
-from django.contrib.gis.gdal import DataSource
+from django.contrib.gis.gdal import DataSource  # type: ignore
 from django.db import connection, transaction
 from django.core.files.storage import default_storage
 from django.conf import settings
@@ -52,18 +52,18 @@ details = {
 
 
 class ManagementAreaImporter(BaseImportModule):
+    # ETLResult object that will be assigned at the beginning of run_sequence()
+    reporter: ETLOperationResult
+    loadid: str
+
     def __init__(self, request=None):
 
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.loadid = None
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
 
-        # ETLResult object that will be assigned at the beginning of run_sequence()
-        self.reporter = None
-
-        # these are passed into the two different import process methods
+        # passed into the two different import process methods
         self.file_dir = None
 
         # these are set at the beginning of run_sequence
@@ -104,11 +104,10 @@ class ManagementAreaImporter(BaseImportModule):
     def _get_nodegroup(self, graph_name):
 
         if graph_name not in self.nodegroup_lookup:
-            self.nodegroup_lookup[graph_name] = str(
-                Node.objects.get(
-                    graph__name=graph_name, name="Site Management"
-                ).nodegroup.pk
-            )
+            node = Node.objects.get(graph__name=graph_name, name="Site Management")
+            if node.nodegroup is None:
+                return None
+            self.nodegroup_lookup[graph_name] = str(node.nodegroup.pk)
         return self.nodegroup_lookup[graph_name]
 
     def get_uploaded_files_location(self):
@@ -253,7 +252,11 @@ class ManagementAreaImporter(BaseImportModule):
                         cursor.execute(
                             f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));"
                         )
-                        wkt = cursor.fetchone()[0]
+                        result = cursor.fetchone()
+                        if result is None or len(result) == 0:
+                            logger.warning("error during geom.wkt postgis repair")
+                            continue
+                        wkt = result[0]
                     logger.debug("geom handled")
                     name = feature.get(name_field)
                     logger.debug("name: " + name)
@@ -288,8 +291,11 @@ class ManagementAreaImporter(BaseImportModule):
             resids = area.get_intersecting_resource_ids()
             resourceinstances = ResourceInstance.objects.filter(pk__in=resids)
             for res in resourceinstances:
-                joiner = SpatialJoin(res.graph.name)
-                joiner.update_resource(res)
+                if res.graph and res.graph.name:
+                    joiner = SpatialJoin(res.graph.name)
+                    joiner.update_resource(res)
+                else:
+                    logger.warning(f"no graph on this resource instance: {res.pk}")
             all_resids += resids
         resources = Resource.objects.filter(pk__in=all_resids)
         index_resources_using_singleprocessing(resources)
@@ -333,7 +339,7 @@ class ManagementAreaImporter(BaseImportModule):
         ma_agency = None if ma_agency == "---" else ma_agency
         ma_level = None if ma_level == "---" else ma_level
 
-        run_management_area_import_as_task.delay(
+        run_management_area_import_as_task.delay(  # pyright: ignore[reportFunctionMemberAccess]
             loadid,
             ma_group=ma_group,
             ma_category=ma_category,
@@ -362,7 +368,7 @@ class ManagementAreaImporter(BaseImportModule):
 
         return self.reporter.serialize()
 
-    def reverse_load(self, **kwargs):
+    def reverse_load(self, *args, **kwargs):
 
         loadid = kwargs.get("loadid")
         if loadid is None:

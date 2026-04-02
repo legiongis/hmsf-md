@@ -99,7 +99,7 @@ urlpatterns = [
     ),
     url(
         r"^search/resources$",
-        user_passes_test(is_not_anonymous, login_url="/auth/")(search.search_results),
+        user_passes_test(is_not_anonymous, login_url="/auth/")(search.search_results),  # type: ignore (this is an upstream issue in arches)
         name="search_results",
     ),
     url(
@@ -116,7 +116,7 @@ urlpatterns = [
     ),
     url(
         r"^search/get_export_file$",
-        user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_export_file),
+        user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_export_file),  # type: ignore (this is an upstream issue in arches)
         name="get_export_file",
     ),
     url(

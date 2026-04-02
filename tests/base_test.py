@@ -1,5 +1,4 @@
 import os
-from django.conf import settings
 from django.test import TestCase
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology

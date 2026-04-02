@@ -101,7 +101,7 @@ DEPRECATE_LEGACY_FIXTURE_LOAD_MSG = (
 
 # manually disable the shapefile exporter class. This creates a 500 error if
 # someone were to hit the shapefile export url somehow.
-RESOURCE_FORMATTERS["shp"] = None
+RESOURCE_FORMATTERS["shp"] = ""
 
 DISABLE_PROVISIONAL_EDITING = True
 HIDE_EMPTY_NODES_IN_REPORT = True

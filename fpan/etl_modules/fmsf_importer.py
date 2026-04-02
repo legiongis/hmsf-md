@@ -196,28 +196,32 @@ FILENAME_LOOKUP = {
 
 
 class FMSFImporter(BaseImportModule):
+    # ETLResult object that will be assigned at the beginning of run_sequence()
     reporter: ETLOperationResult
+    loadid: str
+
+    # these are passed into the two different import process methods
+    file_dir: Path
+    resource_type: str
+
+    # these are set in the _set_resource_type() method
+    resource_csv: Path
+    resource_shp: Path
 
     def __init__(self, request=None):
 
         self.request = request if request else None
         self.userid = request.user.id if request else None
-        self.loadid = request.POST.get("load_id") if request else None
+        if request:
+            loadid = request.POST.get("load_id")
+            if loadid is not None:
+                self.loadid = loadid
         self.moduleid = request.POST.get("module") if request else None
         self.datatype_factory = DataTypeFactory()
-
-        # ETLResult object that will be assigned at the beginning of run_sequence()
-        # self.reporter = None
-
-        # these are passed into the two different import process methods
-        self.file_dir = None
-        self.resource_type = None
 
         # these are set in the _set_resource_type() method
         self.graph = None
         self.field_map = {}
-        self.resource_csv = None
-        self.resource_shp = None
         self.extra_structures_csv = None
 
         # holding and managing feature content during the import process
