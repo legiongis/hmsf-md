@@ -615,7 +615,7 @@
                     "label": "County",
                     "node_id": "64f9a4da-715c-11ee-9e57-4df2569ff543",
                     "sortorder": 0,
-                    "visible": false,
+                    "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000012"
                 }
             ],
@@ -1686,9 +1686,9 @@
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 15.12 (Ubuntu 15.12-1.pgdg22.04+1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0, 64-bit",
-        "git hash": "3623b36a6 2023-02-24 16:27:56 +0000",
+        "db": "PostgreSQL 12.22 (Ubuntu 12.22-0ubuntu0.20.04.4) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit",
+        "git hash": "fatal: detected dubious ownership in repository at '/opt/hms/arches'",
         "os": "Linux",
-        "os version": "6.9.3-76060903-generic"
+        "os version": "6.14.3-x86_64-linode168"
     }
 }
