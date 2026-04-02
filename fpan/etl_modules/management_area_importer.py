@@ -1,6 +1,5 @@
 import os
 import uuid
-import inspect
 import logging
 import zipfile
 from datetime import datetime
@@ -416,7 +415,7 @@ class ManagementAreaImporter(BaseImportModule):
         self.level = ma_level
 
         self.reporter = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
+            "management_area_import",
             loadid=self.loadid,
             data={
                 "Load ID": self.loadid,

@@ -1,6 +1,14 @@
 import os
 from django.utils.translation import gettext_lazy as _
 
+# when setting the imported variables explicitly, got
+# an error from django compressor (seemingly):
+
+# .../site-packages/compressor/conf.py", line 115, in configure_url
+#     if not value.endswith('/'):
+# AttributeError: 'NoneType' object has no attribute 'endswith'
+
+# seems like all settings must be available directly here?
 from arches.settings import *  # noqa: F403
 
 DEBUG = False

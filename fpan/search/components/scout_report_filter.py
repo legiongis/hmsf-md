@@ -1,4 +1,5 @@
 import logging
+from typing import TYPE_CHECKING
 
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Query
@@ -35,6 +36,9 @@ class ScoutReportFilter(BaseSearchFilter):
         Only proceed with the replacement of the query if the filter is enabled.
         """
 
+        if TYPE_CHECKING and not self.request:
+            return
+
         if self.request.GET.get(details["componentname"]) == "enabled":
             # get original results here, and iterate them to get the ids to look for
             # in Scout Reports
@@ -55,9 +59,10 @@ class ScoutReportFilter(BaseSearchFilter):
             )
             reportids = []
             for t in report_tiles:
-                if len(t.data[str(site_node.pk)]) > 0:
-                    if t.data[str(site_node.pk)][0]["resourceId"] in resids:
-                        reportids.append(str(t.resourceinstance_id))
+                if t.data:
+                    if len(t.data[str(site_node.pk)]) > 0:
+                        if t.data[str(site_node.pk)][0]["resourceId"] in resids:
+                            reportids.append(str(t.resourceinstance.pk))
 
             # create new query using ids for the scout reports
             se = SearchEngineFactory().create()

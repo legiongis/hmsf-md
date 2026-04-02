@@ -22,10 +22,14 @@ def can_access_site_or_report(function):
         if resourceid is None:
             raise Http404
 
-        graphid = str(ResourceInstance.objects.get(pk=resourceid).graph_id)
+        graphid = str(ResourceInstance.objects.get(pk=resourceid).graph.pk)
         allowed = False
 
         rule = RuleFilter().compile_rules(request.user, graphids=[graphid], single=True)
+
+        if isinstance(rule, list):
+            logger.warning("unexpected multiple rules returned from compile_rules()")
+            raise Http404
 
         if rule.type == "full_access":
             allowed = True

@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+from typing import TYPE_CHECKING
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
@@ -65,7 +66,9 @@ class Rule(object):
                 value = [value]
 
             self.config["node_name"] = node.name
-            self.config["nodegroup_id"] = str(node.nodegroup_id)
+            if node.nodegroup is None:
+                raise (Exception(f"node error: No nodegroup on this node '{node_id}'"))
+            self.config["nodegroup_id"] = str(node.nodegroup.pk)
             self.config["value"] = value
 
         elif self.type == "resourceid_filter":
@@ -97,6 +100,9 @@ class RuleFilter(BaseSearchFilter):
         Many other methods of this class are used as helpers for generating
         the new dsl content, which is stored in self.paramount.
         """
+
+        if TYPE_CHECKING and not self.request:
+            return
 
         ## set some properties here, as this is the access method Arches uses
         ## to instantiate this class.
@@ -136,11 +142,21 @@ class RuleFilter(BaseSearchFilter):
         ## then honor the resource-type-filter if it exists
         type_filter = self.request.GET.get("resource-type-filter")
         if type_filter:
-            type_filter_params = JSONDeserializer().deserialize(type_filter)[0]
-            if type_filter_params["inverted"] is True:
-                graphids.remove(type_filter_params["graphid"])
+            deserialized_type_filter = JSONDeserializer().deserialize(type_filter)
+            if (
+                deserialized_type_filter
+                and isinstance(deserialized_type_filter, list)
+                and len(deserialized_type_filter) > 0
+            ):
+                type_filter_params = deserialized_type_filter[0]
+                if type_filter_params["inverted"] is True:
+                    graphids.remove(type_filter_params["graphid"])
+                else:
+                    graphids = [type_filter_params["graphid"]]
             else:
-                graphids = [type_filter_params["graphid"]]
+                logger.warning(
+                    f"unexpected resource-type-filter content: {deserialized_type_filter}"
+                )
 
         ## now create a user-determined rule for each graph in the request.
         ## collected rules are created with the rule generators above.
@@ -293,20 +309,29 @@ class RuleFilter(BaseSearchFilter):
     def add_geo_filter_clause(self, geometry):
 
         geojson_geom = JSONDeserializer().deserialize(geometry.geojson)
-        geoshape = GeoShape(
-            field="geometries.geom.features.geometry",
-            type=geojson_geom["type"],
-            coordinates=geojson_geom["coordinates"],
-        )
+        geoshape = None
+        if isinstance(geojson_geom, dict):
+            geom_type = geojson_geom.get("type")
+            geom_coords = geojson_geom.get("coordinates")
+            if geom_type and geom_coords:
+                geoshape = GeoShape(
+                    field="geometries.geom.features.geometry",
+                    type=geojson_geom["type"],
+                    coordinates=geojson_geom["coordinates"],
+                )
 
-        spatial_bool = Bool()
-        spatial_bool.filter(geoshape)
-        nested = Nested(path="geometries", query=spatial_bool)
+        if geoshape:
+            spatial_bool = Bool()
+            spatial_bool.filter(geoshape)
+            nested = Nested(path="geometries", query=spatial_bool)
 
-        if self.existing_query:
-            self.paramount.should(nested)
+            if self.existing_query:
+                self.paramount.should(nested)
+            else:
+                self.paramount.must(nested)
+
         else:
-            self.paramount.must(nested)
+            logger.warning(f"error constructing geoshape from geojson: {geojson_geom}")
 
     def get_resources_from_rule(self, rule, ids_only=False):
         """

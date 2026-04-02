@@ -4,7 +4,6 @@ import csv
 import copy
 import time
 import uuid
-import inspect
 import logging
 import zipfile
 from datetime import datetime
@@ -208,7 +207,7 @@ class FMSFImporter(BaseImportModule):
         self.datatype_factory = DataTypeFactory()
 
         # ETLResult object that will be assigned at the beginning of run_sequence()
-        self.reporter = None
+        # self.reporter = None
 
         # these are passed into the two different import process methods
         self.file_dir = None
@@ -793,14 +792,18 @@ class FMSFImporter(BaseImportModule):
 
         logger.debug("running spatial join on resources")
         resids = [i.resourceid for i in self.fmsf_resources]
-        try:
-            joiner = SpatialJoin(self.graph.name)
-            resources = ResourceInstance.objects.filter(pk__in=resids)
-            for resource in resources:
-                joiner.update_resource(resource)
-        except Exception as e:
+        if self.graph and self.graph.name:
+            try:
+                joiner = SpatialJoin(self.graph.name)
+                resources = ResourceInstance.objects.filter(pk__in=resids)
+                for resource in resources:
+                    joiner.update_resource(resource)
+            except Exception as e:
+                self.reporter.success = False
+                self.reporter.message = str(e)
+        else:
             self.reporter.success = False
-            self.reporter.message = str(e)
+            self.reporter.message = "Error: self.graph or self.graph.name is None"
 
         self.reporter.log(logger)
         return
@@ -920,7 +923,7 @@ class FMSFImporter(BaseImportModule):
             self.file_dir = file_dir
 
         self.reporter = ETLOperationResult(
-            inspect.currentframe().f_code.co_name,
+            "fmsf_import",
             loadid=self.loadid,
             data={
                 "Load ID": self.loadid,

@@ -25,7 +25,7 @@ class ScoutProfileAdmin(admin.ModelAdmin):
     def get_inline_instance(self, request, obj=None):
         if not obj:
             return list()
-        return super(ScoutProfileAdmin, self).get_inline_instance(request, obj)
+        return super(ScoutProfileAdmin, self).get_inline_instance(request, obj)  # pyright: ignore[reportAttributeAccessIssue]
 
 
 admin.site.register(Scout, ScoutProfileAdmin)

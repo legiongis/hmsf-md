@@ -188,23 +188,23 @@ class Command(BaseCommand):
 
         # rename the default Arches satellite layer
         try:
-            l = MapLayer.objects.get(name="satellite")
-            l.name = "Satellite"
-            l.icon = "fa fa-globe"
-            l.save()
+            ml = MapLayer.objects.get(name="satellite")
+            ml.name = "Satellite"
+            ml.icon = "fa fa-globe"
+            ml.save()
         except MapLayer.DoesNotExist:
             pass
         # remove the default Arches streets layer
         try:
-            l = MapLayer.objects.get(name="streets")
-            l.delete()
+            ml = MapLayer.objects.get(name="streets")
+            ml.delete()
         except MapLayer.DoesNotExist:
             pass
         # update the icon for the new HMS basemap
         try:
-            l = MapLayer.objects.get(name="HMS Basemap")
-            l.icon = "fa fa-stumbleupon"
-            l.addtomap = True
-            l.save()
+            ml = MapLayer.objects.get(name="HMS Basemap")
+            ml.icon = "fa fa-stumbleupon"
+            ml.addtomap = True
+            ml.save()
         except MapLayer.DoesNotExist:
             pass
