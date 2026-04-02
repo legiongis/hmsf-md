@@ -240,7 +240,7 @@
                     "id": "a55d15ac-bd5d-11e9-883f-94659cf754d0",
                     "label": "",
                     "node_id": "a55d15aa-bd5d-11e9-ab7f-94659cf754d0",
-                    "sortorder": 4,
+                    "sortorder": 5,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000001"
                 },
@@ -280,10 +280,11 @@
                                 "conceptid": "e5271673-3e5b-4347-bdc5-000d2668107e",
                                 "id": "c7df26b8-cc40-47f3-842c-d5c32c4fb876",
                                 "sortorder": "003",
-                                "text": "Not applicable = Site not found"
+                                "text": "N/A = Site not found"
                             }
                         ],
-                        "placeholder": "Select an option"
+                        "placeholder": "Select an option",
+                        "url": "/concepts/dropdown?conceptid=5c648046-7268-4c2b-b714-6729ec57d5c8"
                     },
                     "id": "a55d15ad-bd5d-11e9-99c3-94659cf754d0",
                     "label": "Overall Site Condition",
@@ -296,7 +297,7 @@
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
                         "defaultValue": null,
-                        "label": "Threats Observed (check all that apply)",
+                        "label": "Negative Impacts to Site (check all that apply; Please mark only negative effects you witness during your visit)",
                         "options": [
                             {
                                 "children": [],
@@ -391,7 +392,7 @@
                         "url": "/concepts/dropdown?conceptid=251413e3-8475-4317-ac55-8442b4723264"
                     },
                     "id": "a55d15ae-bd5d-11e9-a548-94659cf754d0",
-                    "label": "Threats Observed (check all that apply)",
+                    "label": "Negative Impacts to Site (check all that apply; Please mark only negative effects you witness during your visit)",
                     "node_id": "a55d15a7-bd5d-11e9-8572-94659cf754d0",
                     "sortorder": 1,
                     "visible": true,
@@ -406,41 +407,65 @@
                             {
                                 "children": [],
                                 "collector": "",
+                                "conceptid": "54620f94-82ab-45ae-a8af-49e2ca5317c3",
+                                "id": "f3cf7c56-2f96-4513-a073-d60b83331d3f",
+                                "sortorder": "000",
+                                "text": "Shell midden"
+                            },
+                            {
+                                "children": [],
+                                "collector": "",
                                 "conceptid": "70863b3d-8141-461a-b73b-9bde1a394db3",
                                 "id": "c1c172a6-c7d8-4806-9957-74c9ebc7f99a",
-                                "sortorder": "000",
-                                "text": "Prehistoric pottery"
+                                "sortorder": "001",
+                                "text": "Precontact pottery"
                             },
                             {
                                 "children": [],
                                 "collector": "",
                                 "conceptid": "5e29d361-9970-4387-8823-71be4159518f",
                                 "id": "caf4fecb-d308-40be-9bda-cbded7109474",
-                                "sortorder": "001",
-                                "text": "Lithics"
+                                "sortorder": "002",
+                                "text": "Stone artifacts (stone tools, flakes, etc.)"
                             },
                             {
                                 "children": [],
                                 "collector": "",
                                 "conceptid": "d2ebdc0f-7ced-49b3-a08d-a4e96cbbdda5",
                                 "id": "a5581ca6-1da5-4144-a53f-5a066219f6ce",
-                                "sortorder": "002",
+                                "sortorder": "003",
                                 "text": "Shell tool"
                             },
                             {
                                 "children": [],
                                 "collector": "",
-                                "conceptid": "68418e62-44a1-4d4c-b27b-89cce4e8a667",
-                                "id": "497e554c-fb93-4d2c-8ec3-a1a4bc28997d",
-                                "sortorder": "003",
-                                "text": "Historic ceramics"
+                                "conceptid": "2c63543d-7c22-484a-8e50-c784219b1acb",
+                                "id": "cb619d52-99f9-4279-ac82-993de59611e5",
+                                "sortorder": "004",
+                                "text": "Faunal remains"
+                            },
+                            {
+                                "children": [],
+                                "collector": "",
+                                "conceptid": "d652a3a7-a1ee-4ebe-8252-75ec2f8adb7e",
+                                "id": "220007bb-4fef-4f23-b55f-32e828cc6137",
+                                "sortorder": "005",
+                                "text": "Ship timbers"
+                            },
+                            {
+                                "children": [],
+                                "collector": "",
+                                "conceptid": "adf08b4a-a192-45ea-a292-6f0492cc0c90",
+                                "id": "6793b1d5-5c54-488c-af60-06ee8320a89e",
+                                "sortorder": "006",
+                                "text": "Ship sheathing or rigging"
                             },
                             {
                                 "children": [],
                                 "collector": "",
                                 "conceptid": "3cc0e3b0-4b85-461e-94be-ee0447afa564",
                                 "id": "a3b974b8-16bd-44d3-87d2-c565cdbe4061",
-                                "sortorder": "004",
+                                "sortorder": "007",
                                 "text": "Glass"
                             },
                             {
@@ -448,39 +473,64 @@
                                 "collector": "",
                                 "conceptid": "4bac0b65-42b9-4d06-adb2-b852099430f0",
                                 "id": "360157b2-162d-4dde-b44c-f401c4acdf85",
-                                "sortorder": "005",
-                                "text": "Architectural"
+                                "sortorder": "008",
+                                "text": "Architectural (nails, wire, bricks)"
+                            },
+                            {
+                                "children": [],
+                                "collector": "",
+                                "conceptid": "a80938f8-c21c-4797-99f5-f36d41ec9e27",
+                                "id": "06146b05-b86a-4c58-8739-f7315a88e8ef",
+                                "sortorder": "009",
+                                "text": "Grave markers"
+                            },
+                            {
+                                "children": [],
+                                "collector": "",
+                                "conceptid": "68418e62-44a1-4d4c-b27b-89cce4e8a667",
+                                "id": "497e554c-fb93-4d2c-8ec3-a1a4bc28997d",
+                                "sortorder": "009",
+                                "text": "Historic ceramics"
+                            },
+                            {
+                                "children": [],
+                                "collector": "",
+                                "conceptid": "c31e9c45-1ab6-4694-9437-f7d87878f14d",
+                                "id": "5a796e18-cabc-4c2f-afee-63d6e5f2cccd",
+                                "sortorder": "011",
+                                "text": "Ship anchor"
                             },
                             {
                                 "children": [],
                                 "collector": "",
                                 "conceptid": "7afcfebc-4e36-4d16-babd-c2a110021c67",
                                 "id": "561f2f7e-92a2-4cf3-bb9d-3264f7390775",
-                                "sortorder": "006",
+                                "sortorder": "012",
                                 "text": "Other (describe below)"
                             }
                         ],
-                        "placeholder": "Select an option"
+                        "placeholder": "Select an option",
+                        "url": "/concepts/dropdown?conceptid=7f4f8676-3b83-4275-8a9e-4d419e2ddfcf"
                     },
                     "id": "a55d15af-bd5d-11e9-889e-94659cf754d0",
                     "label": "Visible Artifacts (check all that apply)",
                     "node_id": "a55d15a6-bd5d-11e9-8850-94659cf754d0",
-                    "sortorder": 3,
+                    "sortorder": 4,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000013"
                 },
                 {
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
-                        "label": "Site Impact Comments",
+                        "label": "Condition Assessment Explanation and Impact Comments",
                         "maxLength": null,
                         "placeholder": "Enter text",
                         "width": "100%"
                     },
                     "id": "a55d15b0-bd5d-11e9-9517-94659cf754d0",
-                    "label": "Site Impact Comments",
+                    "label": "Condition Assessment Explanation and Impact Comments",
                     "node_id": "a55d15a9-bd5d-11e9-9e9c-94659cf754d0",
-                    "sortorder": 5,
+                    "sortorder": 3,
                     "visible": true,
                     "widget_id": "10000000-0000-0000-0000-000000000005"
                 },
@@ -529,14 +579,14 @@
                     "card_id": "a69c4c64-bd5d-11e9-8b6b-94659cf754d0",
                     "config": {
                         "defaultValue": "",
-                        "label": "Final Evaluation Notes",
+                        "label": "Site Priority Explanation and any Additional Notes",
                         "maxLength": null,
                         "placeholder": "enter text",
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a69c4c69-bd5d-11e9-acd6-94659cf754d0",
-                    "label": "Final Evaluation Notes",
+                    "label": "Site Priority Explanation and any Additional Notes",
                     "node_id": "a69c4c66-bd5d-11e9-835e-94659cf754d0",
                     "sortorder": 2,
                     "visible": true,
@@ -678,7 +728,7 @@
                     "label": "Type of Visit",
                     "node_id": "a72bbb28-bd5d-11e9-821e-94659cf754d0",
                     "sortorder": 2,
-                    "visible": true,
+                    "visible": false,
                     "widget_id": "10000000-0000-0000-0000-000000000009"
                 },
                 {
@@ -5879,13 +5929,13 @@
                     },
                     "datatype": "concept",
                     "description": "Represents a single node in a graph",
-                    "exportable": true,
+                    "exportable": false,
                     "fieldname": "VisitType",
                     "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
                     "hascustomalias": false,
                     "is_collector": false,
-                    "isrequired": true,
-                    "issearchable": true,
+                    "isrequired": false,
+                    "issearchable": false,
                     "istopnode": false,
                     "name": "Scout Visit Type",
                     "nodegroup_id": "a72bbb22-bd5d-11e9-b9ba-94659cf754d0",
@@ -5960,7 +6010,7 @@
                     "nodeid": "a7c11d50-bd5d-11e9-9317-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 5
+                    "sortorder": 0
                 },
                 {
                     "alias": "comments",
@@ -6034,9 +6084,9 @@
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0, 64-bit",
+        "db": "PostgreSQL 12.22 (Ubuntu 12.22-0ubuntu0.20.04.4) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit",
         "git hash": "fatal: detected dubious ownership in repository at '/opt/hms/arches'",
         "os": "Linux",
-        "os version": "6.2.9-x86_64-linode160"
+        "os version": "6.14.3-x86_64-linode168"
     }
 }

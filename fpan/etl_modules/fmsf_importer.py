@@ -786,7 +786,7 @@ class FMSFImporter(BaseImportModule):
         logger.debug("running spatial join on resources")
         resids = [i.resourceid for i in self.fmsf_resources]
         try:
-            joiner = SpatialJoin()
+            joiner = SpatialJoin(self.graph.name)
             resources = ResourceInstance.objects.filter(pk__in=resids)
             for resource in resources:
                 joiner.update_resource(resource)

@@ -16,7 +16,7 @@ def join_management_areas_to_resourceinstance(sender, instance, created, **kwarg
 
         logger.debug(f"run spatial join on resource: {instance.resourceinstance_id}")
         try:
-            joiner = SpatialJoin()
+            joiner = SpatialJoin(instance.resourceinstance.graph.name)
             joiner.update_resource(instance.resourceinstance)
         except Exception as e:
             logger.error(f"error encoutered during spatial join: {e}")

@@ -1,132 +1,182 @@
 import json
 import time
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List
+from pathlib import Path
 
 from django.conf import settings
-from django.db import connection, transaction
+from django.contrib.gis.geos import GEOSGeometry
 
 from arches.app.models.resource import Resource
-from arches.app.models.models import ResourceInstance, Node
+from arches.app.models.models import ResourceInstance, Node, Value
 from arches.app.models.tile import Tile
-from arches.app.utils.index_database import index_resources_using_singleprocessing
 
 from hms.models import ManagementArea, ManagementAgency
 
 logger = logging.getLogger(__name__)
 
+legal_value_ids = [str(i) for i in Value.objects.all().values_list("pk", flat=True)]
+
 class SpatialJoin():
 
-    def __init__(self):
+    def __init__(self, graph_name: str):
 
-        self.node_lookup = settings.SPATIAL_JOIN_NODE_LOOKUP
+        self.node_lookup = settings.SPATIAL_JOIN_NODE_LOOKUP[graph_name]
+
         self.valid_management_area_vals = [i.concept_value_id for i in ManagementArea.objects.all()]
         self.valid_management_agency_vals = [i.concept_value_id for i in ManagementAgency.objects.all()]
 
-    def update_resource(self, resourceinstance):
+        self.county_lookup = self.hydrate_county_lookup()
 
-        areas_pks = self.get_areas_for_resourceinstance(resourceinstance)
-        for area in ManagementArea.objects.filter(pk__in=areas_pks):
+    def hydrate_county_lookup(self) -> dict:
+
+        with open(Path(settings.APP_ROOT, "data", "county_lookup.json"), "r") as o:
+            lookup = json.load(o)
+
+        for entry in lookup.values():
+            county_label = f"{entry['county']} County"
+            county_value = Value.objects.get(
+                value=county_label,
+                language_id="en",
+                valuetype_id="prefLabel",
+            )
+            entry['county_concept_value_id'] = str(county_value.pk)
+
+            region_label = f"FPAN {entry['region']} Region"
+            region_value = Value.objects.get(
+                value__startswith=region_label,
+                language_id="en",
+                valuetype_id="prefLabel",
+            )
+            entry['region_concept_value_id'] = str(region_value.pk)
+
+        return lookup
+
+    def update_resource(self, resourceinstance, index: bool = True):
+
+        # get list of areas to pull info from
+        intersecting_areas = self.get_areas_for_resourceinstance(resourceinstance)
+
+        for area in intersecting_areas:
             self.apply_management_area_attributes(resourceinstance, area)
 
-    def join_management_area_to_resources(self, area):
+        resource = Resource.objects.get(pk=resourceinstance.pk)
+        self.apply_fpan_region_and_county_attributes(resource)
 
-        logger.info(f"joining {area.name} to resources")
-        resids = self.get_resources_for_area(area)
+        if index:
+            resource.index()
 
-        resinstances = ResourceInstance.objects.filter(pk__in=resids).exclude(graph__name="Arches System Settings")
-        logger.info(f"updating {resinstances.count()} resources overlapping this area")
+    def get_areas_for_resourceinstance(self, resourceinstance: ResourceInstance) -> List[ManagementArea]:
 
-        for resinstance in resinstances:
-            self.apply_management_area_attributes(resinstance, area, index_tile=False)
-
-        resources = Resource.objects.filter(pk__in=resids).exclude(graph__name="Arches System Settings")
-        logger.info(f"indexing {resources.count()} resources")
-        index_resources_using_singleprocessing(resources=resources, quiet=True)
-
-    def get_areas_for_resourceinstance(self, resourceinstance):
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                '''SELECT id FROM hms_managementarea
-                        WHERE ST_Intersects(
-                            (SELECT ST_Transform(ST_Union(geom), 4326) FROM geojson_geometries WHERE resourceinstanceid = %s), hms_managementarea.geom);''',
-                            (str(resourceinstance.pk), )
-            )
-            rows = cursor.fetchall()
-        return [i[0] for i in rows if len(i) > 0]
-
-    def get_resources_for_area(self, area):
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                '''SELECT resourceinstanceid FROM geojson_geometries
-                        WHERE ST_Intersects(
-                            ST_GeomFromText( %s, 4326 ),
-                            ST_Transform(geojson_geometries.geom, 4326)
-                        );''',
-                        (area.geom.wkt,)
-            )
-            rows = cursor.fetchall()
-        return [str(i[0]) for i in rows if len(i) > 0]
-
-    def apply_management_area_attributes(self, resourceinstance, area, index_tile=True):
-
-        g_name = resourceinstance.graph.name
-        n_lookup = self.node_lookup[g_name]
-        ng = self.node_lookup[g_name]['nodegroupid']
         try:
-            tile = Tile.objects.get(nodegroup_id=ng, resourceinstance=resourceinstance)
+            geom_tile = Tile.objects.get(
+                nodegroup_id__in=settings.SPATIAL_COORDINATES_NODEGROUPS_IDS,
+                resourceinstance=resourceinstance
+            )
         except Tile.DoesNotExist:
-            tile = Tile().get_blank_tile(ng, resourceid=resourceinstance.pk)
+            return []
+
+        resource_geojson = None
+        if geom_tile.data:
+            geom_node = Node.objects.get(graph=resourceinstance.graph, datatype="geojson-feature-collection")
+            try:
+                resource_geojson = geom_tile.data[str(geom_node.pk)]
+            except KeyError:
+                logger.warning(f"no geojson node data in this resource: {resourceinstance.pk}")
+                return []
+        if not resource_geojson:
+            print("no data in this geom tile")
+            return []
+
+        area_pks = []
+        for feat in resource_geojson["features"]:
+            geom_str = json.dumps(feat["geometry"])
+            geom = GEOSGeometry(geom_str)
+            pks = ManagementArea.objects.filter(geom__intersects=geom).values_list("pk", flat=True)
+            area_pks += pks
+
+        areas = list(ManagementArea.objects.exclude(
+            category__name="FPAN Region"
+        ).filter(pk__in=area_pks))
+
+        return areas
+
+    def get_management_tile(self, resourceinstance: ResourceInstance) -> Tile:
+
+        try:
+            tile = Tile.objects.get(nodegroup_id=self.node_lookup['nodegroupid'],
+                                    resourceinstance=resourceinstance)
+        except Tile.DoesNotExist:
+            tile = Tile().get_blank_tile(self.node_lookup['nodegroupid'],
+                                         resourceid=resourceinstance.pk)
+
+        if TYPE_CHECKING and not tile.data:
+            return tile
+
+        # set empty lists if the node value is None or nonexistent
+        if not isinstance(tile.data.get(self.node_lookup['county_nodeid']), list):
+            tile.data[self.node_lookup['county_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup['region_nodeid']), list):
+            tile.data[self.node_lookup['region_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup['area_nodeid']), list):
+            tile.data[self.node_lookup['area_nodeid']] = []
+        if not isinstance(tile.data.get(self.node_lookup['agency_nodeid']), list):
+            tile.data[self.node_lookup['agency_nodeid']] = []
+
+        return tile
+
+    def apply_management_area_attributes(self, resourceinstance: ResourceInstance, area: ManagementArea):
+        """Takes in a resource instance and a ManagementArea, and attaches the ManagementArea
+        and ManagementAgency concepts to the resource."""
+
+        tile = self.get_management_tile(resourceinstance)
 
         if TYPE_CHECKING and not tile.data:
             return
 
-        # set empty lists if the node value is None or nonexistent
-        if not isinstance(tile.data.get(n_lookup['region_nodeid']), list):
-            tile.data[n_lookup['region_nodeid']] = []
-        if not isinstance(tile.data.get(n_lookup['county_nodeid']), list):
-            tile.data[n_lookup['county_nodeid']] = []
-        if not isinstance(tile.data.get(n_lookup['area_nodeid']), list):
-            tile.data[n_lookup['area_nodeid']] = []
-        if not isinstance(tile.data.get(n_lookup['agency_nodeid']), list):
-            tile.data[n_lookup['agency_nodeid']] = []
-
         val = area.concept_value_id
-        add_to_main = True
-        # if management area has a category, check for where it should be added
-        if area.category is not None:
-            # add to region node in this case
-            if area.category.name == "FPAN Region":
-                add_to_main = False
-                tile.data[n_lookup['region_nodeid']].append(val)
-            # add to county node in this case
-            elif area.category.name == "County":
-                add_to_main = False
-                tile.data[n_lookup['county_nodeid']].append(val)
-        # for all other cases, add to the main Management Area node
-        if add_to_main is True:
-            tile.data[n_lookup['area_nodeid']].append(val)
+        tile.data[self.node_lookup['area_nodeid']].append(val)
+
         # add the agency if available
         if area.management_agency is not None:
-            tile.data[n_lookup['agency_nodeid']].append(area.management_agency.concept_value_id)
+            tile.data[self.node_lookup['agency_nodeid']].append(area.management_agency.concept_value_id)
 
         # finalize with some QA/QC
-        tile.data[n_lookup['region_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['region_nodeid']] if i in self.valid_management_area_vals]
+        tile.data[self.node_lookup['area_nodeid']] = list(set(
+            [i for i in tile.data[self.node_lookup['area_nodeid']] if i in self.valid_management_area_vals]
         ))
-        tile.data[n_lookup['county_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['county_nodeid']] if i in self.valid_management_area_vals]
-        ))
-        tile.data[n_lookup['area_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['area_nodeid']] if i in self.valid_management_area_vals]
-        ))
-        tile.data[n_lookup['agency_nodeid']] = list(set(
-            [i for i in tile.data[n_lookup['agency_nodeid']] if i in self.valid_management_agency_vals]
+        tile.data[self.node_lookup['agency_nodeid']] = list(set(
+            [i for i in tile.data[self.node_lookup['agency_nodeid']] if i in self.valid_management_agency_vals]
         ))
 
-        tile.save(index=index_tile)
+        tile.save(index=False)
+
+    def apply_fpan_region_and_county_attributes(self, resourceinstance: ResourceInstance):
+
+        tile = self.get_management_tile(resourceinstance)
+
+        if TYPE_CHECKING and not tile.data:
+            return
+
+        siteid = get_node_value(resourceinstance, "FMSF ID")
+        if not siteid:
+            logger.warning(f"missing FSMF site id on resource: {resourceinstance.pk}")
+            return
+
+        abbrev = siteid[:2].upper()
+        entry = self.county_lookup.get(abbrev)
+        if not entry:
+            logger.warning(f"no entry in county lookup for {abbrev}: {resourceinstance.pk}")
+            return
+
+        tile.data[self.node_lookup['county_nodeid']].append(entry['county_concept_value_id'])
+        tile.data[self.node_lookup['region_nodeid']].append(entry['region_concept_value_id'])
+
+        # finalize with some QA/QC
+        tile.data[self.node_lookup['county_nodeid']] = list(set([i for i in tile.data[self.node_lookup['county_nodeid']] if i in legal_value_ids]))
+        tile.data[self.node_lookup['region_nodeid']] = list(set([i for i in tile.data[self.node_lookup['region_nodeid']] if i in legal_value_ids]))
+
+        tile.save(index=False)
 
 def get_node_value(resource, node_name):
     """this just flattens the response from Resource().get_node_values()"""

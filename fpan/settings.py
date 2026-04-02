@@ -157,8 +157,8 @@ SPATIAL_JOIN_NODE_LOOKUP = {
         "nodegroupid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
         "county_nodeid": "ad51e461-715e-11ee-9e57-4df2569ff543",
         "region_nodeid": "ad51e460-715e-11ee-9e57-4df2569ff543",
-        "area_nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
-        "agency_nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
+        "area_nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
+        "agency_nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
     },
 }
 

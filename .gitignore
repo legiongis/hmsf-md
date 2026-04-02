@@ -5,6 +5,9 @@ fpan/logs
 
 # package content to ignore
 fpan/pkg/business_data/local
+fpan/pkg/graphs/resource_models/archive
+fpan/pkg/reference_data/concepts/archive
+fpan/pkg/reference_data/collections/archive
 
 # project content to ignore
 fpan/export_deliverables

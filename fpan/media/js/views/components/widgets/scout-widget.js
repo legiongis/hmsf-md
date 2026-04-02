@@ -19,11 +19,8 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
             
             // push the anonymous user to this list so admins can expose select sites to the public
             self.availableScouts.push({
-                'id': 'anonymous',
                 'username': 'anonymous',
                 'display_name': 'Public Access',
-                'site_interest_type': '',
-                'fpan_regions': '',
             });
 
             if (params.state != 'report') {
