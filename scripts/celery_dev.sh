@@ -1,1 +1,1 @@
-celery -A fpan worker --loglevel=DEBUG
+uv run celery -A fpan worker --loglevel=DEBUG
