@@ -13,6 +13,7 @@ from hms.views import (
     LoginView,
     activate,
     activate_page,
+    DownloadScoutReportPhotos,
 )
 
 urlpatterns = [
@@ -48,4 +49,10 @@ urlpatterns = [
     url(r"^auth/$", LoginView.as_view(), name="auth"),
     path("activate/", activate, name="activate"),
     path("activate/<str:uidb64>/<str:token>/", activate_page, name="activate_page"),
+    # download report photos
+    path(
+        "report/photos",
+        view=DownloadScoutReportPhotos.as_view(),
+        name="download-report-photos",
+    ),
 ]
