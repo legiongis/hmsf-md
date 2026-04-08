@@ -1,33 +1,33 @@
-/* Nifty Arches Overrides */
-.left-panel-overflow {
-    height: calc(100vh - 225px);
-    overflow-y: auto;
-}
-.card-component-panel {
-    overflow: scroll;
-}
-.search-toolbar {
-    height: 50px; 
-}
-.search-type-btn-panel {
-    height: 49px;
-}
-.search-type-btn {
-    height: 49px;
-}
-.card-form-preview-container {
-    overflow-y: auto;
-}
-.widget-input-label {
-    font-size: 1em;
-}
-.ep-graph-title-icon {
-    border: 0px solid #ddd;
-}
-.resource_search_widget_dropdown ul .select2-disabled div span span button {
-    width: 175px;
-}
+* Nifty Arches Overrides */
+left-panel-overflow {
+   height: calc(100vh - 225px);
+   overflow-y: auto;
 
-.main-panel {
-    height: calc(100vh - 50px);
-}
+card-component-panel {
+   overflow: scroll;
+
+search-toolbar {
+   height: 50px; 
+
+search-type-btn-panel {
+   height: 49px;
+
+search-type-btn {
+   height: 49px;
+
+card-form-preview-container {
+   overflow-y: auto;
+
+widget-input-label {
+   font-size: 1em;
+
+ep-graph-title-icon {
+   border: 0px solid #ddd;
+
+resource_search_widget_dropdown ul .select2-disabled div span span button {
+   width: 175px;
+
+
+main-panel {
+   height: calc(100vh - 50px);
+

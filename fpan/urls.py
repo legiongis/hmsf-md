@@ -9,7 +9,7 @@ from django.conf import settings
 
 from arches.app.views import search
 
-from fpan.views.api import MVT, DownloadScoutReportPhotos, ResourceIdLookup
+from fpan.views.api import MVT
 from fpan.views.user import FPANUserManagerView
 from fpan.views.resource import (
     FPANResourceListView,
@@ -49,7 +49,6 @@ urlpatterns = [
         MVT.as_view(),
         name="mvt",
     ),
-    url(r"api/lookup$", ResourceIdLookup.as_view(), name="resource_lookup"),
     url(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
     # the following are just pass through views so HMS can apply an additional permissions-based decorator
     url(r"^resource$", FPANResourceListView.as_view(), name="resource"),
@@ -125,12 +124,6 @@ urlpatterns = [
             search.get_dsl_from_search_string
         ),
         name="get_dsl",
-    ),
-    # download report photos
-    path(
-        "report/photos",
-        view=DownloadScoutReportPhotos.as_view(),
-        name="download-report-photos",
     ),
     # now include HMS urls
     url(r"^", include("hms.urls")),

@@ -2440,7 +2440,7 @@
                     "nodeid": "a6084bf2-d524-11e7-9dfb-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "style",
@@ -2462,7 +2462,7 @@
                     "nodeid": "a6084bf3-d524-11e7-9399-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "structural_system",
@@ -2484,7 +2484,7 @@
                     "nodeid": "a6084bf4-d524-11e7-a9cf-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "exterior_fabric",
@@ -2506,7 +2506,7 @@
                     "nodeid": "a6084bf5-d524-11e7-995a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "structure_use",
@@ -2528,7 +2528,7 @@
                     "nodeid": "a6084bf6-d524-11e7-9f1d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "architect",
@@ -2548,7 +2548,7 @@
                     "nodeid": "a6084bf7-d524-11e7-9d9f-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "national_register_eligibility",
@@ -2590,7 +2590,7 @@
                     "nodeid": "a751e2f4-d524-11e7-8102-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "shpo_evaluation",
@@ -2612,7 +2612,7 @@
                     "nodeid": "a7520a02-d524-11e7-90ee-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "national_register_list_date",
@@ -2634,7 +2634,7 @@
                     "nodeid": "a7520a05-d524-11e7-9105-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation_district_",
@@ -2656,7 +2656,7 @@
                     "nodeid": "a7520a08-d524-11e7-ba1b-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation",
@@ -2678,7 +2678,7 @@
                     "nodeid": "a7520a09-d524-11e7-af0c-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_number",
@@ -2698,7 +2698,7 @@
                     "nodeid": "a7520a0a-d524-11e7-be4b-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "fmsf_identification",
@@ -2718,7 +2718,7 @@
                     "nodeid": "a90dc3c1-d524-11e7-97f4-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "ownership",
@@ -2740,7 +2740,7 @@
                     "nodeid": "a90dead1-d524-11e7-935d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "assigned_to",
@@ -2760,7 +2760,7 @@
                     "nodeid": "a90dead4-d524-11e7-b4f3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "basic_site_information",
@@ -2950,7 +2950,7 @@
                     "nodeid": "c67216be-8cc2-11e7-883c-06ed184dc22c",
                     "ontologyclass": null,
                     "parentproperty": "",
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "geospatial_coordinates",
@@ -2993,7 +2993,7 @@
                     "nodeid": "efe6cb5e-dbab-11e7-a327-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "location",
@@ -3037,7 +3037,7 @@
                     "nodeid": "efe6cb6a-dbab-11e7-809e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "plot_method",
@@ -3059,7 +3059,7 @@
                     "nodeid": "efe6cb6c-dbab-11e7-a37a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 }
             ],
             "ontology_id": null,
@@ -3086,7 +3086,7 @@
                 "nodegroup_id": null,
                 "nodeid": "c67216be-8cc2-11e7-883c-06ed184dc22c",
                 "ontologyclass": null,
-                "sortorder": null
+                "sortorder": 0
             },
             "slug": "historic_structure",
             "subtitle": "Historic Structure resource model for FPAN-HMS (no ontology)",
