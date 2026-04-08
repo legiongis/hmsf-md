@@ -1146,7 +1146,7 @@
                     "nodeid": "210c6341-dbab-11e7-9832-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "location",
@@ -1190,7 +1190,7 @@
                     "nodeid": "210c634d-dbab-11e7-933c-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "plot_method",
@@ -1212,7 +1212,7 @@
                     "nodeid": "210c634f-dbab-11e7-9b68-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "management",
@@ -1340,7 +1340,7 @@
                     "nodeid": "73889291-d536-11e7-8e02-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": "",
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "photo",
@@ -1450,7 +1450,7 @@
                     "nodeid": "f253fbf2-d536-11e7-8045-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "cemetery_status",
@@ -1494,7 +1494,7 @@
                     "nodeid": "f253fbf4-d536-11e7-8908-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "fmsf_identification",
@@ -1514,7 +1514,7 @@
                     "nodeid": "f3cc1d01-d536-11e7-9257-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "assigned_to",
@@ -1534,7 +1534,7 @@
                     "nodeid": "f3cc4411-d536-11e7-98d3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "ownership",
@@ -1640,7 +1640,7 @@
                     "nodeid": "f64affb1-d536-11e7-af0d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "national_register_eligibility",
@@ -1682,7 +1682,7 @@
                     "nodeid": "f64affb7-d536-11e7-aec0-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "national_register_list_date",
@@ -1704,7 +1704,7 @@
                     "nodeid": "f64affba-d536-11e7-9f20-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation_district_",
@@ -1726,7 +1726,7 @@
                     "nodeid": "f64b26c1-d536-11e7-be85-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation",
@@ -1748,7 +1748,7 @@
                     "nodeid": "f64b26c2-d536-11e7-88ff-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_number",
@@ -1768,7 +1768,7 @@
                     "nodeid": "f64b26c3-d536-11e7-b836-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 }
             ],
             "ontology_id": null,
@@ -1795,7 +1795,7 @@
                 "nodegroup_id": null,
                 "nodeid": "73889291-d536-11e7-8e02-94659cf754d0",
                 "ontologyclass": null,
-                "sortorder": null
+                "sortorder": 0
             },
             "slug": "historic_cemetery",
             "subtitle": "Historic Cemetery resource model for FPAN-HMS (no ontology)",

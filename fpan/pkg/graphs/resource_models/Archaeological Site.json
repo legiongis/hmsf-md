@@ -1171,7 +1171,7 @@
                     "nodeid": "036462e2-d550-11e7-a492-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_culture",
@@ -1193,7 +1193,7 @@
                     "nodeid": "036462e3-d550-11e7-932a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_culture_assignment",
@@ -1213,7 +1213,7 @@
                     "nodeid": "036462e4-d550-11e7-93eb-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "human_remains",
@@ -1235,7 +1235,7 @@
                     "nodeid": "036462e5-d550-11e7-8942-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "site_type_assignment",
@@ -1255,7 +1255,7 @@
                     "nodeid": "036462e6-d550-11e7-884d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "geospatial_coordinates",
@@ -1298,7 +1298,7 @@
                     "nodeid": "3067ed10-dbaa-11e7-87be-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "location",
@@ -1342,7 +1342,7 @@
                     "nodeid": "3068142a-dbaa-11e7-9afc-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "plot_method",
@@ -1364,7 +1364,7 @@
                     "nodeid": "3068142c-dbaa-11e7-a50e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "management",
@@ -1404,7 +1404,7 @@
                     "nodeid": "4d1193b1-d535-11e7-919a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "ownership",
@@ -1446,7 +1446,7 @@
                     "nodeid": "4d11bac0-d535-11e7-a1b3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "basic_site_information",
@@ -1572,7 +1572,7 @@
                     "nodeid": "50061b93-d535-11e7-8d13-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "shpo_evaluation",
@@ -1594,7 +1594,7 @@
                     "nodeid": "50061b96-d535-11e7-b9a0-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "national_register_list_date",
@@ -1616,7 +1616,7 @@
                     "nodeid": "5006429e-d535-11e7-bbbc-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation_district_",
@@ -1638,7 +1638,7 @@
                     "nodeid": "500642a1-d535-11e7-812f-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_evaluation",
@@ -1660,7 +1660,7 @@
                     "nodeid": "500642a2-d535-11e7-9699-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "survey_number",
@@ -1680,7 +1680,7 @@
                     "nodeid": "500642a3-d535-11e7-9eec-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": null
+                    "sortorder": 0
                 },
                 {
                     "alias": "photo",
@@ -1832,7 +1832,7 @@
                     "nodeid": "f2127100-d534-11e7-b2c3-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": "",
-                    "sortorder": null
+                    "sortorder": 0
                 }
             ],
             "ontology_id": null,
@@ -1855,7 +1855,7 @@
                 "nodegroup_id": null,
                 "nodeid": "f2127100-d534-11e7-b2c3-94659cf754d0",
                 "ontologyclass": null,
-                "sortorder": null
+                "sortorder": 0
             },
             "slug": "archaeological_site",
             "subtitle": "Archaeological Site resource model for FPAN-HMS (no ontology)",
