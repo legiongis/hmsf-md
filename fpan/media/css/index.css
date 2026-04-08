@@ -1,780 +1,780 @@
-@font-face {
-  font-family: 'Helsing-Regular';
-  src: url("../fonts/Helsing.otf");
-}
-
-body, body.body-anonymous, body.body-admin, .profile-sections-admin {
-    font-family: 'Kreon',sans-serif;
-    background: url('../img/fpan/ricepaper.png');
-    font-size: 16px;
-    line-height: 1.65;
-}
-body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {
-    background: url('../img/fpan/ricepaper-hms.png');
-}
-body.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager, .profile-sections-landmanager {
-    background: url('../img/fpan/ricepaper-state.png');
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Ropa Sans',sans-serif !important;
-    line-height: 1.15;
-}
-
-h1, .card-component-panel h1 {
-  margin-top: 0;
-  font-size: 3.052em;
-}
-
-h2, .card-component-panel h2 {font-size: 2.441em;}
-
-h3, .card-component-panel h3 {font-size: 1.953em;}
-
-h4, .card-component-panel h4 {font-size: 1.563em;}
-
-h5, .card-component-panel h5 {font-size: 1.25em; font-weight: 400;}
-
-small, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !important;}
-
-.arches-menu-icon {
-    color: white;
-}
-
-a, li a, .search-candidate-title, .search-candidate-link, .btn-link, a.a-anonymous, li a.a-anonymous, .search-candidate-title-anonymous, .search-candidate-link-anonymous, .btn-link-anonymous, a.a-admin, li a.a-admin, .search-candidate-title-admin, .search-candidate-link-admin, .btn-link-admin {
-    color: #007fff;
-    text-decoration: none;
-}
-.a-scout, li .a-scout, body.body-hms .a-anonymous, .search-candidate-title-scout, .search-candidate-link-scout, .btn-link-scout {
-    color: #F26422;
-}
-.a-landmanager, li .a-landmanager, body.body-state .a-anonymous, .search-candidate-title-landmanager, .search-candidate-link-landmanager, .btn-link-landmanager {
-    color: #273675;
-}
-a:hover, li a:hover, .btn-link:hover, a.a-anonymous:hover, li a.a-anonymous:hover, .btn-link-anonymous:hover, a.a-admin:hover, li a.a-admin:hover, .btn-link-admin:hover {
-    color: #007fff;
-    text-decoration: underline;
-}
-a.a-scout:hover, li a.ascout:hover, .btn-link-scout:hover {
-    color: #F26422;
-}
-a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
-    color: #273675;
-}
-.body-scout .btn-success, .body-hms .btn-success {
-    background-color:#f26422;
-    border:none;
-}
-.body-landmanager .btn-success, .body-state .btn-success {
-    background-color:#273675;
-    border:none;
-}
-.body-scout .btn-success:hover, .body-hms .btn-success:hover, .body-landmanager .btn-success:hover, .body-state .btn-success:hover  {
-    background-color: #449d44;
-}
-#mainnav-container {
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-}
-
-#mainnav-container, #mainnav, #mainnav-menu>.active, .brand-title-anonymous, .sub-menu-anonymous ul, .brand-title-admin, .sub-menu ul   {
-    background: #431825;
-    color:white;
-}
-.brand-title-admin, .mainnav-container-admin, .mainnav-admin, .mainnav-menu-admin>.active, .mainnav-admin .menu-popover, .mainnav-admin .sub-menu ul, .brand-title-anonymous, .mainnav-container-anonymous, .mainnav-anonymous, .mainnav-menu-anonymous>.active, .mainnav-anonymous .menu-popover, .mainnav-anonymous .sub-menu ul  {
-    background: #431825 !important;
-}
-.brand-title-scout, .mainnav-container-scout, .mainnav-scout, .mainnav-menu-scout>.active, .mainnav-scout .menu-popover, .mainnav-scout .sub-menu ul  {
-    background: #5ec5b9 !important;
-}
-.brand-title-landmanager, .mainnav-container-landmanager, .mainnav-landmanager, .mainnav-menu-landmanager>.active, .mainnav-landmanager .menu-popover, .mainnav-landmanager .sub-menu ul  {
-    /* background: url('../img/fpan/ricepaper-state.png') !important; */
-    background: #273675 !important;
-}
-
-#mainnav .list-header {
-    font-family: 'Ropa Sans',sans-serif;
-    line-height: 1.15;
-    font-size: 1.25em;
-    color: white;
-}
-
-#mainnav-menu a {
-    color: white;
-}
-
-#mainnav-menu>li {
-    background-color:#431825;
-    box-shadow:none !important;
-}
-
-#mainnav-menu>li>a:hover, .link-submenu-item-admin a:hover, .link-submenu-item-anonymous a:hover {
-    background-color:#5D2134;
-    box-shadow:none !important;
-    text-decoration: none;
-}
-
-#mainnav-menu>li>a {
-    background-color:#431825;
-    box-shadow:none !important;
-    color: white;
-}
-
-.mainnav-menu-scout>li {
-    background-color:#5ec5b9 !important;
-}
-
-.mainnav-menu-scout>li>a {
-    background-color:#5ec5b9 !important;
-    color: white !important;
-}
-
-.mainnav-menu-scout>li>a:hover, .link-submenu-item-scout a:hover {
-    background-color:#F26422 !important;
-    color: white !important;
-    text-decoration: none;
-}
-
-.mainnav-menu-landmanager>li {
-    /* background: url('../img/fpan/ricepaper-state.png') !important; */
-    background: #273675 !important;
-}
-
-.mainnav-menu-landmanager>li>a {
-    /* background: url('../img/fpan/ricepaper-state.png') !important; */
-    background: #273675 !important;
-    color: white !important;
-}
-
-.mainnav-menu-landmanager>li>a:hover, .link-submenu-item-landmanager a:hover {
-    background:#273675 !important;
-    color: white !important;
-    text-decoration: none;
-}
-
-.mainnav-anonymous .popover-title, .mainnav-admin .popover-title {
-    background-color:#5D2134 !important;
-}
-.mainnav-scout .popover-title {
-    background-color:#F26422 !important;
-}
-.mainnav-landmanager .popover-title {
-    background:#273675 !important;
-}
-
-.mainnav-anonymous .single-content, .mainnav-admin .single-content {
-    background-color:#5D2134 !important;
-    font-family: 'Kreon',sans-serif;
-}
-.mainnav-scout .single-content {
-    background-color:#F26422 !important;
-    font-family: 'Kreon',sans-serif;
-}
-.mainnav-landmanager .single-content {
-    background:#273675 !important;
-    font-family: 'Kreon',sans-serif;
-}
-
-.mainnav-anonymous .hover, .mainnav-admin .hover  {
-    background-color:#5D2134;
-}
-.mainnav-scout .hover {
-    background-color:#F26422;
-}
-.mainnav-landmanager .hover {
-    background:#273675;
-}
-.menu-title {
-    font-family: 'Kreon',sans-serif;
-}
-
-.navbar-brand, .navbar-brand>img {
-    height: 49px;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.active-sub>a {
-    background-color:#5D2134 !important;
-}
-ul .collapse li {
-    height: 35px;
-}
-ul .collapse li:first-of-type {
-    margin-top: 0px;
-}
-ul .collapse li:last-of-type {
-    height: 45px;
-}
-
-.link-submenu {
-    font-family: 'Kreon',sans-serif;
-    color: white;
-}
-
-.navbar-header:before {
-    background-color: transparent;
-}
-
-/*--------------------------------------*/
-/* classes for the top Arches menu */
-
-/*
-.ep-toolbar {
-    background: #5D2134;
-    color: #E7E7E8;
-}
-
-
-
-.ep-graph-title-icon {
-    background: transparent;
-}
-/*--------------------------------------*/
-a.ep-tools {
-    color: #454545;
-}
-a.ep-tools:hover {
-    text-decoration: none;
-}
-.ep-graph-title-icon {
-    background: #fff;
-}
-
-.main-container {
-    min-height:calc(100vh-40px);
-    padding-top: 75px;
-}
-
-.auth-options {
-    margin-top: 17px;
-}
-
-div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
-    margin-right: 40px;
-}
-
-.one-page-header .navbar-nav>li> .fa-chevron-circle-down {
-    padding: 0px 0px 0px;
-    z-index: 100;
-    margin-top: 20px;
-}
-
-.navbar-nav>li>a>h3 {
-    color: white;
-    font-weight:500;
-    margin:0px;
-    font-size: 1.25em !important;
-}
-
-.navbar-default {
-    border: none;
-}
-
-.one-page-header .navbar-nav>li>a {
-    color: #333;
-}
-
-@media (min-width: 768px) {
-    .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
-        color: #eee;
-    }
-}
-
-@media (max-width: 1000px) {
-    .one-page-header .fa-chevron-circle-down {
-        padding-left: 12px;
-        margin-top: 14px;
-    }
-    .navbar-nav>li>a>h3 {
-        padding: 0px 15px;
-    }
-}
-
-
-@media (max-width: 1000px) {
-    ul .auth-options {
-        position: inherit;
-        float:left;
-        right: 3px;
-        list-style: none;
-        margin-top: 0px;
-        margin-right: -142px;
-    }
-}
-
-@media (min-width: 1000px) {
-    ul .auth-options {
-        position: inherit;
-        float:right;
-        right: 3px;
-        list-style: none;
-        margin-top: 40px;
-        margin-right: -142px;
-    }
-}
-
-.one-page-header .navbar-nav>li>a {
-    color: #333;
-}
-
-.login-panel {
-    width:350px;
-    margin-right:auto;
-    margin-left:auto;
-}
-
-#id_region_choices, #id-site-type-choices, .form-list-multiselect {
-    list-style: none;
-    padding-top: 10px;
-}
-
-.messages {
-    list-style: none;
-}
-
-.form-control {
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-}
-
-.select2-container {
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-}
-
-.select2-container-multi {
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-}
-
-.select2-choice {
-    border: solid 1px #CCC;
-}
-
-textarea.form-control {
-    height: 125px;
-    overflow-x: hidden;
-}
-
-input[type='text'] {
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-    border: solid 1px #CCC;
-}
-
-/* .copyright-section { */
-    /* background: url('../img/fpan/ricepaper.png'); */
-/* } */
-
-.copyright-section i.back-to-top {
-    top:-15px;
-    background: transparent;
-}
-
-.fpan-panel, .fpan-panel-anonymous, .fpan-panel-admin {
-    background: url('../img/fpan/bedge_muted.png');
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-    border-top: solid 8px #431825;
-}
-.fpan-panel-scout, .fpan-panel-hms {
-    background: url('../img/fpan/bedge_muted.png');
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-    border-top: solid 8px #F26422;
-}
-.fpan-panel-landmanager, .fpan-panel-state {
-    background: url('../img/fpan/bedge_muted.png');
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-    border-top: solid 8px #273675;
-}
-
-.profile-links {
-    border: 1px solid #431825;
-    background: rgba(255, 255, 255, 0.4);
-}
-.profile-links-scout {
-    border-color: #F26422;
-}
-.profile-links-heading-scout {
-    color: white;
-    background-color: #F26422;
-}
-.profile-links-landmanager {
-    border-color: #273675;
-}
-.profile-links-heading-landmanager {
-    background-color: #273675;
-    color: white;
-}
-.profile-links-admin {
-    border-color: #431825;
-}
-.profile-links-heading-admin {
-    background-color: #431825;
-    color: white;
-}
-
-.scout-panel {
-    border: 1px solid #F26422;
-    background-color: rgba(255, 255, 255, 0.4);
-}
-.scout-panel .panel-heading {
-    background-color: #F26422;
-}
-
-#login-failed-alert {
-    background-color: transparent;
-    border: none;
-}
-
-.state-logos-list {
-    display:inline-flex;
-    list-style-type: none;
-    padding-left: 0px !important;
-}
-
-.state-logos-list li {
-    margin: 0px 20px;
-}
-
-.state-logos-list li img {
-    height: 100px;
-}
-
-.footer {
-    text-align: center;
-}
-
-.title-v1 {
-    margin-bottom: 0px;
-}
-
-.custom-error-page h1 {
-    font-family: "Helsing-Regular", "Georgia", serif !important;
-    font-size: 3.052em;
-}
-.rr-splash-description {
-    padding-bottom: 20px;
-}
-.calendar.picker {
-    position: relative;
-}
-.fpan-related-report {
-  width: 100%;
-}
-.fpan-related-report .rp-section-title {
-  padding-left: 15px;
-}
-.fpan-related-report .rp-report-tile {
-  padding-left: 95px;
-}
-.fpan-related-report .rp-report-tile .dl-horizontal dt {
-  text-align: left;
-  width: 100%;
-}
-.fpan-related-report a.btn {
-  margin-left: 80px;
-  margin-top: 10px;
-}
-/* User profile page elements */
-.ep-toolbar-profile {
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    -ms-flex-align: center;
-    -webkit-align-items: center;
-    align-items: center;
-    width: 100%;
-    height: 50px;
-    background: #431825;
-    border-bottom: 0px;
-    z-index: 3000;
-    color: white;
-}
-.ep-toolbar-profile .ep-tools-login {
-    background: #431825;
-    border-bottom: 0px;
-    border-left: 1px solid #000;
-    color: white;
-}
-.ep-toolbar-profile .ep-tools-right {
-   border-right: none;
-   border-bottom: 1px solid #000;
-   border-left: 1px solid #000;
+font-face {
+ font-family: 'Helsing-Regular';
+ src: url("../fonts/Helsing.otf");
+
+
+ody, body.body-anonymous, body.body-admin, .profile-sections-admin {
+   font-family: 'Kreon',sans-serif;
+   background: url('../img/fpan/ricepaper.png');
+   font-size: 16px;
+   line-height: 1.65;
+
+ody.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {
+   background: url('../img/fpan/ricepaper-hms.png');
+
+ody.body-landmanager, body.body-state, body.body-state, .copyright-section-landmanager, .profile-sections-landmanager {
+   background: url('../img/fpan/ricepaper-state.png');
+
+
+1, h2, h3, h4, h5, h6 {
+   font-family: 'Ropa Sans',sans-serif !important;
+   line-height: 1.15;
+
+
+1, .card-component-panel h1 {
+ margin-top: 0;
+ font-size: 3.052em;
+
+
+2, .card-component-panel h2 {font-size: 2.441em;}
+
+3, .card-component-panel h3 {font-size: 1.953em;}
+
+4, .card-component-panel h4 {font-size: 1.563em;}
+
+5, .card-component-panel h5 {font-size: 1.25em; font-weight: 400;}
+
+mall, .text_small, .nano>.nano-content, .search-type-btn {font-size: 0.8em !important;}
+
+arches-menu-icon {
+   color: white;
+
+
+, li a, .search-candidate-title, .search-candidate-link, .btn-link, a.a-anonymous, li a.a-anonymous, .search-candidate-title-anonymous, .search-candidate-link-anonymous, .btn-link-anonymous, a.a-admin, li a.a-admin, .search-candidate-title-admin, .search-candidate-link-admin, .btn-link-admin {
+   color: #007fff;
+   text-decoration: none;
+
+a-scout, li .a-scout, body.body-hms .a-anonymous, .search-candidate-title-scout, .search-candidate-link-scout, .btn-link-scout {
+   color: #F26422;
+
+a-landmanager, li .a-landmanager, body.body-state .a-anonymous, .search-candidate-title-landmanager, .search-candidate-link-landmanager, .btn-link-landmanager {
+   color: #273675;
+
+:hover, li a:hover, .btn-link:hover, a.a-anonymous:hover, li a.a-anonymous:hover, .btn-link-anonymous:hover, a.a-admin:hover, li a.a-admin:hover, .btn-link-admin:hover {
+   color: #007fff;
+   text-decoration: underline;
+
+.a-scout:hover, li a.ascout:hover, .btn-link-scout:hover {
+   color: #F26422;
+
+.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
+   color: #273675;
+
+body-scout .btn-success, .body-hms .btn-success {
+   background-color:#f26422;
+   border:none;
+
+body-landmanager .btn-success, .body-state .btn-success {
+   background-color:#273675;
+   border:none;
+
+body-scout .btn-success:hover, .body-hms .btn-success:hover, .body-landmanager .btn-success:hover, .body-state .btn-success:hover  {
+   background-color: #449d44;
+
+mainnav-container {
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+
+
+mainnav-container, #mainnav, #mainnav-menu>.active, .brand-title-anonymous, .sub-menu-anonymous ul, .brand-title-admin, .sub-menu ul   {
    background: #431825;
-   color: #fff;
-}
-/* .ep-toolbar-profile-scout {
-    background: #5ec5b9;
-}
-.ep-toolbar-profile-scout .ep-tools-login-scout {
-    background: #5ec5b9;
-}
-.ep-toolbar-profile-scout .ep-tools-right-scout {
-    background: #5ec5b9;
-}
-.ep-toolbar-profile-landmanager {
-    background: #273675;
-}
-.ep-toolbar-profile-landmanager .ep-tools-login-landmanager {
-    background: #273675;
-}
-.ep-toolbar-profile-landmanager .ep-tools-right-landmanager {
-    background: #273675;
-} */
+   color:white;
 
-.profile-report-scout {
-  padding: 10px 10px 10px 0px;
-  background: url('../img/fpan/bedge_muted.png');
-  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-  border-top: solid 8px #F26422;
-}
-.profile-report-landmanager {
-  padding: 10px 10px 10px 0px;
-  background: url('../img/fpan/bedge_muted.png');
-  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-  border-top: solid 8px #273675;
-}
-.profile-list {
-    width: 100%;
-    padding: 20px 100px;
-    min-height: 170px;
-    border-bottom: 0px;
-}
-.profile-list .panel {
-  padding: 20px;
-}
-.profile-list .scout-panel {
-  padding: 0px;
-}
-.scout-panel .panel-title {
-  color: white;
-  font-size: 1em;
-  margin-top: -1px;
-}
-.profile-list h1 {
-  color: #555;
-  font-size: 2.441em;
-  font-weight: 400;
-}
-.profile-list h2 {
-  color: #444;
-  font-size: 28px;
-  position: relative;
-  margin-bottom: 15px;
-  padding-bottom: 20px;
-  text-transform: uppercase;
-}
-.profile-list h2:after {
-  bottom: 0;
-  left: 50%;
-  height: 1px;
-  width: 70px;
-  content: " ";
-  margin-left: -35px;
-  position: absolute;
-}
-.profile-list h2:after, i.icon-bg-u {
-    background: #4765a0;
-}
-.profile-list .btn-scout {
-  background-color: #F26422;
-  border-color: #F26422;
-}
-.profile-list .btn-landmanager {
-  background-color: #273675;
-  border-color: #273675;
-}
-.profile-label-shim {
-  color: #555;
-}
+brand-title-admin, .mainnav-container-admin, .mainnav-admin, .mainnav-menu-admin>.active, .mainnav-admin .menu-popover, .mainnav-admin .sub-menu ul, .brand-title-anonymous, .mainnav-container-anonymous, .mainnav-anonymous, .mainnav-menu-anonymous>.active, .mainnav-anonymous .menu-popover, .mainnav-anonymous .sub-menu ul  {
+   background: #431825 !important;
 
-/* applies to scout reports only */
-@media print {
-  :root {
-    --printed-font-size: 0.8rem;
-  }
+brand-title-scout, .mainnav-container-scout, .mainnav-scout, .mainnav-menu-scout>.active, .mainnav-scout .menu-popover, .mainnav-scout .sub-menu ul  {
+   background: #5ec5b9 !important;
 
-  /* we never want to print backgrounds -- override Chrome print dialog > Options > Background graphics = checked */ 
-  *,
-  .brand-title /* Chrome ignores this for the brand header, requiring more specificity */
-  {
-    background: none !important;
-    color: black !important;
-  }
-  
-  body {
-    font-size: var(--printed-font-size);
-  }
+brand-title-landmanager, .mainnav-container-landmanager, .mainnav-landmanager, .mainnav-menu-landmanager>.active, .mainnav-landmanager .menu-popover, .mainnav-landmanager .sub-menu ul  {
+   /* background: url('../img/fpan/ricepaper-state.png') !important; */
+   background: #273675 !important;
 
-  @page {
-    margin-inline: 0.75in;
-    margin-block: 0.5in;
-  }
-  
-  /* hide for printing */
-  #mainnav-container,
-  .carousel,
-  .ep-toolbar,
-  .toggle-container,
-  button#scroll-top,
-  footer {
-    display: none !important;
-  }
 
-  /* card sections containing single imgs (results when user selects one image for upload, then clicks "+ Add" button) */
-  .rp-card-section[id]:has(.rp-image-grid-item) {
-    page-break-inside: avoid;
-  }
-  
-  /* card sections containing multiple images (results when user selects multiple images for upload, then clicks "+ Add" button) */
-  .rp-card-section[id]:has(.rp-image-grid-item ~ .rp-image-grid-item) {
-    page-break-before: avoid;
-  }
+mainnav .list-header {
+   font-family: 'Ropa Sans',sans-serif;
+   line-height: 1.15;
+   font-size: 1.25em;
+   color: white;
 
-  /* add space between images with sibling image */
-  .rp-image-grid-item:not(:first-child) {
-    margin-top: calc(var(--printed-font-size) * 1);
-  }
-  
-  /* put site logo and brand text into a single row */
-  .navbar-header a {
-    display: grid;
-    grid-template-columns: 1fr 100fr;
-    gap: 0 calc(var(--printed-font-size) * 1);
 
-    .brand-title {
-      display: flex;
-      align-items: center;
-    }
-  }
+mainnav-menu a {
+   color: white;
 
-  /* align 'Scout Report - <date> - <user>' page title with following headers */
-  .report-toolbar-title {
-    margin-block: calc(var(--printed-font-size) * 1);
-    margin-inline: 0;
-  }
 
-  /* split the page/report title and 'Report Date' across the page */
-  .report-toolbar-preview.ep-form-toolbar {
-    display: flex;
-    justify-content: space-between;
-  }
+mainnav-menu>li {
+   background-color:#431825;
+   box-shadow:none !important;
 
-  /* increase margins of <hr> */
-  .rp-tile-separator {
-    margin-block: 1rem;
-  }
-  
-  /* <dt> = field labels */
-  dt,
-  .rp-tile-title {
-    font-weight: bold;
-  }
 
-  .rp-tile-title {
-    text-decoration: underline;
-    font-size: calc(var(--printed-font-size) * 1.15);
-  }
+mainnav-menu>li>a:hover, .link-submenu-item-admin a:hover, .link-submenu-item-anonymous a:hover {
+   background-color:#5D2134;
+   box-shadow:none !important;
+   text-decoration: none;
 
-  /* force field labels and values onto the same row */
-  dl {
-    display: grid;
-    /* make more room for field values, without causing labels to wrap, which would force the 2nd+ line of the following value to be set too far down */
-    grid-template-columns: 1fr 2fr;
 
-    /* match alignment of field labels to web view */
-    dt {
-      text-align: end;
-      grid-column: 1;
-    }
+mainnav-menu>li>a {
+   background-color:#431825;
+   box-shadow:none !important;
+   color: white;
 
-    /* when a dt has multiple dd's, ensure all dd's align right */
-    dd { grid-column: 2; }
 
-    /* add space between label:value lines */
-    dt, dd { margin-bottom: calc(var(--printed-font-size) * 0.8); }
-    
-    /* keep vertical gap bt rows consistent when the field value is paragraph text instead of text directly inside the <dd> */
-    p:first-child { margin-top: 0; }
-  }
+mainnav-menu-scout>li {
+   background-color:#5ec5b9 !important;
 
-  /* selects cards containing actual resource data, where the data is an image */
-  .rp-card-section[id]:has(img) {
-      width: 100%;
 
-      /* make alignment more visually pleasing in cards with images inside, since images are centered and possibly full-width -- decrease label and increase value col widths -- stops values (eg Overview, Unique Feature, <comment>, etc) from looking like there was a failed attempt at centering text */
-      dl { grid-template-columns: 1fr 8fr; }
-      dt { text-align: start; }
-      dd { margin-inline-start: 0; }
-  }
+mainnav-menu-scout>li>a {
+   background-color:#5ec5b9 !important;
+   color: white !important;
 
-  dd:has(img) {
-    margin: 0;
-    /* make img 100% width of dd that contains it */
-    grid-column: 1 / -1;
-    /* center the image */
-    text-align: center;
-    
-    /* hide the image files label, buying more vertical space to keep images as large as possible (up to half a page height) */
-    margin-top: calc(var(--printed-font-size) * 2.4 * -1);
-    background: white;
-    z-index: 100;
-      
-  }
 
-  dd img {
-    max-width: 100%;
-    max-height: 3.9in;
-  }
+mainnav-menu-scout>li>a:hover, .link-submenu-item-scout a:hover {
+   background-color:#F26422 !important;
+   color: white !important;
+   text-decoration: none;
 
-  /* keeping above in case we decide we want images in the future, but for now, hide all images */
-  .rp-card-section:has(img) { display: none; }
-}
 
-/*
-FIXES:
-    - "Hide Null Values" switch overlaps page content
-    - Screen width < 768px causes toolbars to overlap image carousel
+mainnav-menu-landmanager>li {
+   /* background: url('../img/fpan/ricepaper-state.png') !important; */
+   background: #273675 !important;
+
+
+mainnav-menu-landmanager>li>a {
+   /* background: url('../img/fpan/ricepaper-state.png') !important; */
+   background: #273675 !important;
+   color: white !important;
+
+
+mainnav-menu-landmanager>li>a:hover, .link-submenu-item-landmanager a:hover {
+   background:#273675 !important;
+   color: white !important;
+   text-decoration: none;
+
+
+mainnav-anonymous .popover-title, .mainnav-admin .popover-title {
+   background-color:#5D2134 !important;
+
+mainnav-scout .popover-title {
+   background-color:#F26422 !important;
+
+mainnav-landmanager .popover-title {
+   background:#273675 !important;
+
+
+mainnav-anonymous .single-content, .mainnav-admin .single-content {
+   background-color:#5D2134 !important;
+   font-family: 'Kreon',sans-serif;
+
+mainnav-scout .single-content {
+   background-color:#F26422 !important;
+   font-family: 'Kreon',sans-serif;
+
+mainnav-landmanager .single-content {
+   background:#273675 !important;
+   font-family: 'Kreon',sans-serif;
+
+
+mainnav-anonymous .hover, .mainnav-admin .hover  {
+   background-color:#5D2134;
+
+mainnav-scout .hover {
+   background-color:#F26422;
+
+mainnav-landmanager .hover {
+   background:#273675;
+
+menu-title {
+   font-family: 'Kreon',sans-serif;
+
+
+navbar-brand, .navbar-brand>img {
+   height: 49px;
+   margin-right: auto;
+   margin-left: auto;
+
+
+active-sub>a {
+   background-color:#5D2134 !important;
+
+l .collapse li {
+   height: 35px;
+
+l .collapse li:first-of-type {
+   margin-top: 0px;
+
+l .collapse li:last-of-type {
+   height: 45px;
+
+
+link-submenu {
+   font-family: 'Kreon',sans-serif;
+   color: white;
+
+
+navbar-header:before {
+   background-color: transparent;
+
+
+*--------------------------------------*/
+* classes for the top Arches menu */
+
+*
+ep-toolbar {
+   background: #5D2134;
+   color: #E7E7E8;
+
+
+
+
+ep-graph-title-icon {
+   background: transparent;
+
+*--------------------------------------*/
+.ep-tools {
+   color: #454545;
+
+.ep-tools:hover {
+   text-decoration: none;
+
+ep-graph-title-icon {
+   background: #fff;
+
+
+main-container {
+   min-height:calc(100vh-40px);
+   padding-top: 75px;
+
+
+auth-options {
+   margin-top: 17px;
+
+
+iv.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
+   margin-right: 40px;
+
+
+one-page-header .navbar-nav>li> .fa-chevron-circle-down {
+   padding: 0px 0px 0px;
+   z-index: 100;
+   margin-top: 20px;
+
+
+navbar-nav>li>a>h3 {
+   color: white;
+   font-weight:500;
+   margin:0px;
+   font-size: 1.25em !important;
+
+
+navbar-default {
+   border: none;
+
+
+one-page-header .navbar-nav>li>a {
+   color: #333;
+
+
+media (min-width: 768px) {
+   .one-page-header .navbar-nav>li> .fa-chevron-circle-down {
+       color: #eee;
+   }
+
+
+media (max-width: 1000px) {
+   .one-page-header .fa-chevron-circle-down {
+       padding-left: 12px;
+       margin-top: 14px;
+   }
+   .navbar-nav>li>a>h3 {
+       padding: 0px 15px;
+   }
+
+
+
+media (max-width: 1000px) {
+   ul .auth-options {
+       position: inherit;
+       float:left;
+       right: 3px;
+       list-style: none;
+       margin-top: 0px;
+       margin-right: -142px;
+   }
+
+
+media (min-width: 1000px) {
+   ul .auth-options {
+       position: inherit;
+       float:right;
+       right: 3px;
+       list-style: none;
+       margin-top: 40px;
+       margin-right: -142px;
+   }
+
+
+one-page-header .navbar-nav>li>a {
+   color: #333;
+
+
+login-panel {
+   width:350px;
+   margin-right:auto;
+   margin-left:auto;
+
+
+id_region_choices, #id-site-type-choices, .form-list-multiselect {
+   list-style: none;
+   padding-top: 10px;
+
+
+messages {
+   list-style: none;
+
+
+form-control {
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+
+
+select2-container {
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+
+
+select2-container-multi {
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+
+
+select2-choice {
+   border: solid 1px #CCC;
+
+
+extarea.form-control {
+   height: 125px;
+   overflow-x: hidden;
+
+
+nput[type='text'] {
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+   border: solid 1px #CCC;
+
+
+* .copyright-section { */
+   /* background: url('../img/fpan/ricepaper.png'); */
+* } */
+
+copyright-section i.back-to-top {
+   top:-15px;
+   background: transparent;
+
+
+fpan-panel, .fpan-panel-anonymous, .fpan-panel-admin {
+   background: url('../img/fpan/bedge_muted.png');
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+   border-top: solid 8px #431825;
+
+fpan-panel-scout, .fpan-panel-hms {
+   background: url('../img/fpan/bedge_muted.png');
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+   border-top: solid 8px #F26422;
+
+fpan-panel-landmanager, .fpan-panel-state {
+   background: url('../img/fpan/bedge_muted.png');
+   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+   border-top: solid 8px #273675;
+
+
+profile-links {
+   border: 1px solid #431825;
+   background: rgba(255, 255, 255, 0.4);
+
+profile-links-scout {
+   border-color: #F26422;
+
+profile-links-heading-scout {
+   color: white;
+   background-color: #F26422;
+
+profile-links-landmanager {
+   border-color: #273675;
+
+profile-links-heading-landmanager {
+   background-color: #273675;
+   color: white;
+
+profile-links-admin {
+   border-color: #431825;
+
+profile-links-heading-admin {
+   background-color: #431825;
+   color: white;
+
+
+scout-panel {
+   border: 1px solid #F26422;
+   background-color: rgba(255, 255, 255, 0.4);
+
+scout-panel .panel-heading {
+   background-color: #F26422;
+
+
+login-failed-alert {
+   background-color: transparent;
+   border: none;
+
+
+state-logos-list {
+   display:inline-flex;
+   list-style-type: none;
+   padding-left: 0px !important;
+
+
+state-logos-list li {
+   margin: 0px 20px;
+
+
+state-logos-list li img {
+   height: 100px;
+
+
+footer {
+   text-align: center;
+
+
+title-v1 {
+   margin-bottom: 0px;
+
+
+custom-error-page h1 {
+   font-family: "Helsing-Regular", "Georgia", serif !important;
+   font-size: 3.052em;
+
+rr-splash-description {
+   padding-bottom: 20px;
+
+calendar.picker {
+   position: relative;
+
+fpan-related-report {
+ width: 100%;
+
+fpan-related-report .rp-section-title {
+ padding-left: 15px;
+
+fpan-related-report .rp-report-tile {
+ padding-left: 95px;
+
+fpan-related-report .rp-report-tile .dl-horizontal dt {
+ text-align: left;
+ width: 100%;
+
+fpan-related-report a.btn {
+ margin-left: 80px;
+ margin-top: 10px;
+
+* User profile page elements */
+ep-toolbar-profile {
+   display: -ms-flexbox;
+   display: -webkit-flex;
+   display: flex;
+   -ms-flex-align: center;
+   -webkit-align-items: center;
+   align-items: center;
+   width: 100%;
+   height: 50px;
+   background: #431825;
+   border-bottom: 0px;
+   z-index: 3000;
+   color: white;
+
+ep-toolbar-profile .ep-tools-login {
+   background: #431825;
+   border-bottom: 0px;
+   border-left: 1px solid #000;
+   color: white;
+
+ep-toolbar-profile .ep-tools-right {
+  border-right: none;
+  border-bottom: 1px solid #000;
+  border-left: 1px solid #000;
+  background: #431825;
+  color: #fff;
+
+* .ep-toolbar-profile-scout {
+   background: #5ec5b9;
+
+ep-toolbar-profile-scout .ep-tools-login-scout {
+   background: #5ec5b9;
+
+ep-toolbar-profile-scout .ep-tools-right-scout {
+   background: #5ec5b9;
+
+ep-toolbar-profile-landmanager {
+   background: #273675;
+
+ep-toolbar-profile-landmanager .ep-tools-login-landmanager {
+   background: #273675;
+
+ep-toolbar-profile-landmanager .ep-tools-right-landmanager {
+   background: #273675;
  */
-.report-toolbar-preview.ep-form-toolbar {
-    display: flex;
-    flex-wrap: wrap; /* stack [scout report h4] and [report date, hide null vals switch] vertically when screen width isn't sufficient */
-    justify-content: space-between;
-    align-items: start;
-}
 
-.ep-form-toolbar-tools.mar-no {
-    margin-bottom: -3.5rem !important; /* trim bottom from hide null values switch component */
-}
+profile-report-scout {
+ padding: 10px 10px 10px 0px;
+ background: url('../img/fpan/bedge_muted.png');
+ box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+ border-top: solid 8px #F26422;
 
-/* ~768px screen width, left toolbar moves to top, pushing down top toolbar -- this keeps the latter from overlapping the page content */
-@media (max-width: 768px) {
-    .report-toolbar-preview.ep-form-toolbar {
-        margin-top: 4.5rem; /* move page content down */
-        height: fit-content; /* keep children from overlapping page content */
-    }
+profile-report-landmanager {
+ padding: 10px 10px 10px 0px;
+ background: url('../img/fpan/bedge_muted.png');
+ box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
+ border-top: solid 8px #273675;
 
-    .report-toolbar-title {
-        width: fit-content !important; /* allow sibling to get close before wrapping under self */
-        padding-bottom: 0 !important; /* this and margin-bottom remove excess space between self and sibling when they stack vertically */
-        margin-bottom: 0 !important;
-    }
+profile-list {
+   width: 100%;
+   padding: 20px 100px;
+   min-height: 170px;
+   border-bottom: 0px;
 
-    .ep-form-toolbar-tools.mar-no {
-        padding-left: 2rem; /* align report date and hide null vals switch with report-toolbar-title */
-    }
-}
+profile-list .panel {
+ padding: 20px;
 
-.btn-download-photos {
-    position: absolute;
-    right: 0;
-    z-index: 10;
-    margin: 1rem;
-    padding-left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0.1rem 0.1rem 0.6rem #00000066;
-}
+profile-list .scout-panel {
+ padding: 0px;
 
-.btn-download-photos__icon-wrapper {
-    background: #8d89e2;
-    padding-inline: 1.6rem;
-    padding-block: 1rem;
-    margin-right: 1.3rem;
-}
+scout-panel .panel-title {
+ color: white;
+ font-size: 1em;
+ margin-top: -1px;
+
+profile-list h1 {
+ color: #555;
+ font-size: 2.441em;
+ font-weight: 400;
+
+profile-list h2 {
+ color: #444;
+ font-size: 28px;
+ position: relative;
+ margin-bottom: 15px;
+ padding-bottom: 20px;
+ text-transform: uppercase;
+
+profile-list h2:after {
+ bottom: 0;
+ left: 50%;
+ height: 1px;
+ width: 70px;
+ content: " ";
+ margin-left: -35px;
+ position: absolute;
+
+profile-list h2:after, i.icon-bg-u {
+   background: #4765a0;
+
+profile-list .btn-scout {
+ background-color: #F26422;
+ border-color: #F26422;
+
+profile-list .btn-landmanager {
+ background-color: #273675;
+ border-color: #273675;
+
+profile-label-shim {
+ color: #555;
+
+
+* applies to scout reports only */
+media print {
+ :root {
+   --printed-font-size: 0.8rem;
+ }
+
+ /* we never want to print backgrounds -- override Chrome print dialog > Options > Background graphics = checked */ 
+ *,
+ .brand-title /* Chrome ignores this for the brand header, requiring more specificity */
+ {
+   background: none !important;
+   color: black !important;
+ }
+ 
+ body {
+   font-size: var(--printed-font-size);
+ }
+
+ @page {
+   margin-inline: 0.75in;
+   margin-block: 0.5in;
+ }
+ 
+ /* hide for printing */
+ #mainnav-container,
+ .carousel,
+ .ep-toolbar,
+ .toggle-container,
+ button#scroll-top,
+ footer {
+   display: none !important;
+ }
+
+ /* card sections containing single imgs (results when user selects one image for upload, then clicks "+ Add" button) */
+ .rp-card-section[id]:has(.rp-image-grid-item) {
+   page-break-inside: avoid;
+ }
+ 
+ /* card sections containing multiple images (results when user selects multiple images for upload, then clicks "+ Add" button) */
+ .rp-card-section[id]:has(.rp-image-grid-item ~ .rp-image-grid-item) {
+   page-break-before: avoid;
+ }
+
+ /* add space between images with sibling image */
+ .rp-image-grid-item:not(:first-child) {
+   margin-top: calc(var(--printed-font-size) * 1);
+ }
+ 
+ /* put site logo and brand text into a single row */
+ .navbar-header a {
+   display: grid;
+   grid-template-columns: 1fr 100fr;
+   gap: 0 calc(var(--printed-font-size) * 1);
+
+   .brand-title {
+     display: flex;
+     align-items: center;
+   }
+ }
+
+ /* align 'Scout Report - <date> - <user>' page title with following headers */
+ .report-toolbar-title {
+   margin-block: calc(var(--printed-font-size) * 1);
+   margin-inline: 0;
+ }
+
+ /* split the page/report title and 'Report Date' across the page */
+ .report-toolbar-preview.ep-form-toolbar {
+   display: flex;
+   justify-content: space-between;
+ }
+
+ /* increase margins of <hr> */
+ .rp-tile-separator {
+   margin-block: 1rem;
+ }
+ 
+ /* <dt> = field labels */
+ dt,
+ .rp-tile-title {
+   font-weight: bold;
+ }
+
+ .rp-tile-title {
+   text-decoration: underline;
+   font-size: calc(var(--printed-font-size) * 1.15);
+ }
+
+ /* force field labels and values onto the same row */
+ dl {
+   display: grid;
+   /* make more room for field values, without causing labels to wrap, which would force the 2nd+ line of the following value to be set too far down */
+   grid-template-columns: 1fr 2fr;
+
+   /* match alignment of field labels to web view */
+   dt {
+     text-align: end;
+     grid-column: 1;
+   }
+
+   /* when a dt has multiple dd's, ensure all dd's align right */
+   dd { grid-column: 2; }
+
+   /* add space between label:value lines */
+   dt, dd { margin-bottom: calc(var(--printed-font-size) * 0.8); }
+   
+   /* keep vertical gap bt rows consistent when the field value is paragraph text instead of text directly inside the <dd> */
+   p:first-child { margin-top: 0; }
+ }
+
+ /* selects cards containing actual resource data, where the data is an image */
+ .rp-card-section[id]:has(img) {
+     width: 100%;
+
+     /* make alignment more visually pleasing in cards with images inside, since images are centered and possibly full-width -- decrease label and increase value col widths -- stops values (eg Overview, Unique Feature, <comment>, etc) from looking like there was a failed attempt at centering text */
+     dl { grid-template-columns: 1fr 8fr; }
+     dt { text-align: start; }
+     dd { margin-inline-start: 0; }
+ }
+
+ dd:has(img) {
+   margin: 0;
+   /* make img 100% width of dd that contains it */
+   grid-column: 1 / -1;
+   /* center the image */
+   text-align: center;
+   
+   /* hide the image files label, buying more vertical space to keep images as large as possible (up to half a page height) */
+   margin-top: calc(var(--printed-font-size) * 2.4 * -1);
+   background: white;
+   z-index: 100;
+     
+ }
+
+ dd img {
+   max-width: 100%;
+   max-height: 3.9in;
+ }
+
+ /* keeping above in case we decide we want images in the future, but for now, hide all images */
+ .rp-card-section:has(img) { display: none; }
+
+
+*
+IXES:
+   - "Hide Null Values" switch overlaps page content
+   - Screen width < 768px causes toolbars to overlap image carousel
+*/
+report-toolbar-preview.ep-form-toolbar {
+   display: flex;
+   flex-wrap: wrap; /* stack [scout report h4] and [report date, hide null vals switch] vertically when screen width isn't sufficient */
+   justify-content: space-between;
+   align-items: start;
+
+
+ep-form-toolbar-tools.mar-no {
+   margin-bottom: -3.5rem !important; /* trim bottom from hide null values switch component */
+
+
+* ~768px screen width, left toolbar moves to top, pushing down top toolbar -- this keeps the latter from overlapping the page content */
+media (max-width: 768px) {
+   .report-toolbar-preview.ep-form-toolbar {
+       margin-top: 4.5rem; /* move page content down */
+       height: fit-content; /* keep children from overlapping page content */
+   }
+
+   .report-toolbar-title {
+       width: fit-content !important; /* allow sibling to get close before wrapping under self */
+       padding-bottom: 0 !important; /* this and margin-bottom remove excess space between self and sibling when they stack vertically */
+       margin-bottom: 0 !important;
+   }
+
+   .ep-form-toolbar-tools.mar-no {
+       padding-left: 2rem; /* align report date and hide null vals switch with report-toolbar-title */
+   }
+
+
+btn-download-photos {
+   position: absolute;
+   right: 0;
+   z-index: 10;
+   margin: 1rem;
+   padding-left: 0;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   box-shadow: 0.1rem 0.1rem 0.6rem #00000066;
+
+
+btn-download-photos__icon-wrapper {
+   background: #8d89e2;
+   padding-inline: 1.6rem;
+   padding-block: 1rem;
+   margin-right: 1.3rem;
+
