@@ -44,7 +44,8 @@ class FPANUserManagerView(UserManagerView):
             i["scout_reports"] = []
             site_lookup[i["resourceinstanceid"]] = i
 
-        siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
+        sr_graph = GraphModel.objects.get(name="Scout Report")
+        siteid_node = Node.objects.get(name="FMSF Site ID", graph=sr_graph)
         siteid_nodeid = str(siteid_node.pk)
         rep_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values(
             "data", "resourceinstance_id"
