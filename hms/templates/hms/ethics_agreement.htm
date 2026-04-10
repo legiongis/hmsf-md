@@ -1,8 +1,9 @@
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 <ol>
-    <li>I have read, comprehend, and affirm that I will abide by the code of ethics outlined by the Florida Anthropological Society: <a class="a-{{user_type}}" href="{% static 'img/fpan/FAS_Ethics.pdf' %}">FAS_Ethics.pdf</a>.</li>
+    <li>I have read, comprehend, and affirm that I will abide by the code of ethics outlined by the Florida Anthropological Society: <a class="a-{{user_type}}" href="{% webpack_static 'img/fpan/FAS_Ethics.pdf' %}">FAS_Ethics.pdf</a>.</li>
     <li>I agree to take on all risks associated with site stewardship and hold only myself accountable for my well-being and safety.</li>
     <li>I agree that I will not knowingly put myself in harm’s way to monitor a site for the HMS Florida program.</li>
     <li>I agree to follow any and all relevant laws pertaining to cultural sites, including those relevant to land access. I will not trespass on private property to monitor a site. I understand that, if site access is restricted OR if I am on non-public lands, I MUST have land owner/manager permission to access a site.</li>

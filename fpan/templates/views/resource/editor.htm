@@ -1,6 +1,7 @@
 {% extends "views/resource/resource-base.htm" %}
 {% load static %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block graph_header_title %}
 {% trans "Resource Editor" %}
@@ -139,7 +140,7 @@
 
                           <!-- Image -->
                           <div class="img-lg img-circle rr-splash-img-container">
-                              <img class="rr-splash-img" src="{% static "/img/inspection.png" %}" alt="Resource Editor">
+                              <img class="rr-splash-img" src="{% webpack_static "/img/inspection.png" %}" alt="Resource Editor">
                           </div>
 
                           <!-- Splash Title -->
@@ -162,7 +163,7 @@
 
                           <!-- Image -->
                           <div class="img-lg img-circle rr-splash-img-container">
-                              <img class="rr-splash-img" src="{% static "/img/inspection.png" %}" alt="Resource Editor">
+                              <img class="rr-splash-img" src="{% webpack_static "/img/inspection.png" %}" alt="Resource Editor">
                           </div>
 
                           <!-- Splash Title -->

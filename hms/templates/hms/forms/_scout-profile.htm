@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 <div class="row">
     <div class="col-xs-12 col-sm-10 col-sm-offset-1">
@@ -265,7 +266,7 @@
                     {% endif %}
                 </div>
                 <div class="col-sm-5">
-                    <img src="{% static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">
+                    <img src="{% webpack_static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">
                 </div>          
             </div>
 

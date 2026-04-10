@@ -33,10 +33,10 @@ STATIC_URL = "/static/"
 ROOT_URLCONF = "fpan.urls"
 WSGI_APPLICATION = "fpan.wsgi.application"
 
-STATICFILES_DIRS += (
+STATICFILES_DIRS = (
     os.path.join(APP_ROOT, "media", "build"),
     os.path.join(APP_ROOT, "media"),
-)
+) + STATICFILES_DIRS
 
 WEBPACK_LOADER = {
     "DEFAULT": {

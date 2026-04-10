@@ -3,6 +3,7 @@
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block content %}
 
@@ -12,12 +13,12 @@
                 <h1>Welcome to the HMS Florida Monitoring Database!</h1>
             </div>
             <div class="hidden-xs" style="display:flex; justify-content: end;">
-                <img class="" src="{% static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}" alt="Logo" style="height:150px;">
+                <img class="" src="{% webpack_static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}" alt="Logo" style="height:150px;">
             </div>
         </div>
         <div class="row hidden-sm hidden-md hidden-lg">
             <div class="col-xs-12" style="display:flex; justify-content: center;">
-                <img class="" src="{% static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}" alt="Logo" style="height:150px;">
+                <img class="" src="{% webpack_static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}" alt="Logo" style="height:150px;">
             </div>
         </div>
         <div class="row">
@@ -25,7 +26,7 @@
                 <div class="col-xs-12 fpan-panel-{{user_type}}" style="display:flex; flex-direction:column; align-items:center; padding: 30px 15px;">
                     <div style="border-bottom:1px solid grey; margin-bottom:30px; padding-bottom:20px; display:flex; flex-direction:column; align-items:center;">
                         <div>
-                            <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" height=100 alt="Data flow diagram">
+                            <img src="{% webpack_static 'img/fpan/HMSflorida_option3long.png' %}" height=100 alt="Data flow diagram">
                         </div>
                         <p>
                             Heritage Monitoring Scouts (HMS Florida) is a public engagement program focused on tracking changes
@@ -35,7 +36,7 @@
                     </div>
                     <div style="border-bottom:1px solid grey; margin-bottom:30px; padding-bottom:20px; display:flex; flex-direction:column; align-items:center;">
                         <div>
-                            <img src="{% static 'img/fpan/HMS_Florida_Course_Portal_Black.png' %}" height=130 alt="HMs Scout Portal logo">
+                            <img src="{% webpack_static 'img/fpan/HMS_Florida_Course_Portal_Black.png' %}" height=130 alt="HMs Scout Portal logo">
                         </div>
                         <p>
                             To access your portal account, training materials, and other Scout information, visit the HMS Scout Portal
@@ -47,7 +48,7 @@
                             HMS is a program created and administered by:
                         </p>
                         <div>
-                            <img src="{% static 'img/fpan/fpan-logo-feb23.png' %}" style="width: 100%;max-width: 300px;">
+                            <img src="{% webpack_static 'img/fpan/fpan-logo-feb23.png' %}" style="width: 100%;max-width: 300px;">
                         </div>
                         <p>
                             {% blocktrans %}
@@ -66,13 +67,13 @@
                     <div class="col-xs-12" style="display:flex;">
                         <div style="width:50%; display:flex; flex-direction:column; align-items:center;">
                             <a href="{% url 'auth' %}?t=scout">
-                                <img height=180 src="{% static 'img/fpan/hmsf-logo-feb23_sm.png' %}" alt="Scout login">
+                                <img height=180 src="{% webpack_static 'img/fpan/hmsf-logo-feb23_sm.png' %}" alt="Scout login">
                             </a>
                             <a href="{% url 'auth' %}?t=scout" class="a-scout" style="color:#2d8b80;font-size:14pt;">Scout Login</a>
                         </div>
                         <div style="width:50%; display:flex; flex-direction:column; align-items:center;">
                             <a href="{% url 'auth' %}?t=landmanager">
-                                <img height=180 src="{% static 'img/state/DHR transparent - NO url.png' %}" alt="Land manager login"><br>
+                                <img height=180 src="{% webpack_static 'img/state/DHR transparent - NO url.png' %}" alt="Land manager login"><br>
                             </a>
                             <a href="{% url 'auth' %}?t=landmanager" style="color:#273675;font-size:14pt;">Land Manager Login</a>
                         </div>

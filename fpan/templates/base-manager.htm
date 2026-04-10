@@ -2,13 +2,13 @@
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
-
+{% load webpack_static from webpack_loader %}
 
 {% block body %}
 
 <link href="https://fonts.googleapis.com/css?family=Ropa+Sans" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Kreon" rel="stylesheet">
-<link href="{% static 'css/index.css' %}" rel="stylesheet">
+<link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
 
     <div class="wrapper">
 

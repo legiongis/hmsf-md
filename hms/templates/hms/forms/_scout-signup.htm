@@ -1,5 +1,6 @@
 {% load static %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 <section id="scout-signup" class="scout-signup-section">
     <div class="fpan-panel-{{user_type}}" style="padding: 15px;">
@@ -7,7 +8,7 @@
             {% csrf_token %}
             <div class="row">
                 <div class="col-xs-12" style="text-align:center">
-                    <img style="width:300px; margin-bottom: 30px;" src="{% static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}"></img>
+                    <img style="width:300px; margin-bottom: 30px;" src="{% webpack_static 'img/fpan/HMS_Florida_Monitoring_Database _H_Black-500px.png' %}"></img>
                     <h2 style="margin-bottom: 30px;">Sign up to be a Heritage Monitoring Scout</h2>
                 </div>
             </div>
@@ -133,7 +134,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <img src="{% static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">
+                    <img src="{% webpack_static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">
                 </div>
             </div>
             <div class="row">

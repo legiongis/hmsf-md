@@ -1,5 +1,7 @@
 {% load static %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
+
 <section id="" class="profile-list">
     <div class="panel fpan-panel-{{user_type}}">
         <div class="row" >
@@ -12,10 +14,10 @@
                 {% if user_is_state or user_is_scout %}
                 <div style="margin-bottom:20px; text-align:center; border-bottom: solid 1px grey; padding-bottom: 15px;">
                     {% if user_is_state %}
-                    <img src="{% static 'img/state/DHR transparent - NO WWW.png' %}" alt="Logo" style="max-width:100%;max-height:140px;">
+                    <img src="{% webpack_static 'img/state/DHR transparent - NO WWW.png' %}" alt="Logo" style="max-width:100%;max-height:140px;">
                     {% endif %}
                     {% if user_is_scout %}
-                    <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" alt="Logo" style="max-width:100%;max-height:140px;">
+                    <img src="{% webpack_static 'img/fpan/HMSflorida_option3long.png' %}" alt="Logo" style="max-width:100%;max-height:140px;">
                     {% endif %}
                 </div>
                 {% endif %}
