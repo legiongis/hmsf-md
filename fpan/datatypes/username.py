@@ -25,12 +25,12 @@ details = {
 
 class UsernameDataType(DomainListDataType):
     def get_option_text(self, node, option_id):
-
         try:
-            return User.objects.get(pk=option_id).username
+            option = User.objects.get(pk=option_id).username
         except User.DoesNotExist:
             logger.warning(f"index error: user {option_id} not found")
-            return "<user not found>"
+            option = "<user not found>"
+        return {"id": option, "text": option}
 
     def transform_export_values(self, value, *args, **kwargs):  # pyright: ignore[reportIncompatibleMethodOverride]
 
