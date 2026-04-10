@@ -103,7 +103,10 @@ DEPRECATE_LEGACY_FIXTURE_LOAD_MSG = (
 # someone were to hit the shapefile export url somehow.
 RESOURCE_FORMATTERS["shp"] = ""
 
-DISABLE_PROVISIONAL_EDITING = True
+ENABLE_PROVISIONAL_EDITING = False
+# retained for backward compatibility, but will be removed eventually
+DISABLE_PROVISIONAL_EDITING = not ENABLE_PROVISIONAL_EDITING
+
 HIDE_EMPTY_NODES_IN_REPORT = True
 
 AUTH_PASSWORD_VALIDATORS = [
