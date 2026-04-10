@@ -68,16 +68,6 @@ class Command(BaseCommand):
             management.call_command("createcachetable")
             management.call_command("migrate")
 
-            # import system settings graph and any saved system settings data
-            settings_graph = Path(
-                settings.APP_ROOT,
-                "system_settings",
-                "Arches_System_Settings_Model.json",
-            )
-            management.call_command(
-                "packages", operation="import_graphs", source=str(settings_graph)
-            )
-
             settings_instance = Path(
                 settings.APP_ROOT, "system_settings", "System_Settings.json"
             )
