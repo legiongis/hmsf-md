@@ -1,7 +1,12 @@
+.elasticsearch
 .db_backups
 .services
 celerybeat-schedule*
 fpan/logs
+
+node_modules
+webpack
+staticfiles
 
 # package content to ignore
 fpan/pkg/business_data/local
