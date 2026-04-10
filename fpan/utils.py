@@ -182,7 +182,7 @@ class SpatialJoin:
             )
         )
 
-        tile.save(index=False, log=False)
+        tile.save(index=False, edit_log_entry=False)
 
     def apply_fpan_region_and_county_attributes(
         self, resourceinstance: ResourceInstance
@@ -233,7 +233,7 @@ class SpatialJoin:
             )
         )
 
-        tile.save(index=False, log=False)
+        tile.save(index=False, edit_log_entry=False)
 
 
 def get_node_value(resource, node_name):
