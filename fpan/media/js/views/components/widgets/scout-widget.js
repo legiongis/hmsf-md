@@ -1,4 +1,4 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','bindings/chosen'], function (ko, _, WidgetViewModel, $, fpan, chosen) {
+define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'bindings/chosen'], function (ko, _, WidgetViewModel, $, chosen) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -25,7 +25,7 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
 
             if (params.state != 'report') {
                 $.ajax({
-                    url: fpan.urls.scouts_dropdown,
+                    url: "/scouts/",
                     data: {
                         'resourceid': self.tile.resourceinstance_id
                     },

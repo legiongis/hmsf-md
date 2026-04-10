@@ -1,9 +1,9 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'widget-data',
+    'view-data',
     'plugins/knockout-select2'
-], function(ko, DomainWidgetViewModel, widgetData) {
+], function(ko, DomainWidgetViewModel, data) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -24,13 +24,13 @@ define([
             if (!params.node.configKeys) {
               params.node.configKeys = {};
             }
-            params.node.config.options = ko.observableArray(widgetData.dropdownLists.usernames)
+            params.node.config.options = ko.observableArray(data.dropdownLists.usernames)
 
             DomainWidgetViewModel.apply(this, [params]);
 
             var self = this;
             if (self.value() == null || self.value().length == 0) {
-              widgetData.dropdownLists.usernames.forEach( function (user) {
+              data.dropdownLists.usernames.forEach( function (user) {
                 if (user.text == params.user) {
                   self.value([user.id])
                 }
