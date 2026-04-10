@@ -1,4 +1,5 @@
 import os
+import json
 from django.utils.translation import gettext_lazy as _
 
 # when setting the imported variables explicitly, got
@@ -15,18 +16,33 @@ DEBUG = False
 HTTPS = False
 MODE = "PROD"
 
-APP_NAME = "HMS - FPAN"
+## Temporarily changing APP_NAME to "fpan" just for version 7.0 (and a few more)
+## because it needs to match this directory name. By 7.6 it can be changed
+## back to its intended value: "HMS - FPAN"
+APP_NAME = "fpan"
+
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 LOG_DIR = os.path.join(APP_ROOT, "logs")
 
 MEDIA_ROOT = os.path.join(APP_ROOT)
-STATIC_ROOT = os.path.join(APP_ROOT, "static")
+STATIC_ROOT = os.path.join(APP_ROOT, "staticfiles")
+
+STATIC_URL = "/static/"
 
 ROOT_URLCONF = "fpan.urls"
 WSGI_APPLICATION = "fpan.wsgi.application"
 
-STATICFILES_DIRS = (os.path.join(APP_ROOT, "media"),) + STATICFILES_DIRS
+STATICFILES_DIRS += (
+    os.path.join(APP_ROOT, "media", "build"),
+    os.path.join(APP_ROOT, "media"),
+)
+
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "STATS_FILE": os.path.join(APP_ROOT, "webpack/webpack-stats.json"),
+    },
+}
 
 ## new setting in 6.1  -AC 07/28/2022
 EXPORT_DATA_FIELDS_IN_CARD_ORDER = True
@@ -193,9 +209,20 @@ SPATIAL_COORDINATES_NODEGROUPS_IDS = [
 ]
 
 try:
+    from .package_settings import *
+except ImportError:
+    try:
+        from package_settings import *
+    except ImportError:
+        pass
+
+try:
     from .settings_local import *
 except ImportError:
-    pass
+    try:
+        from settings_local import *
+    except ImportError:
+        pass
 
 if MODE == "DEV":
     import sys
@@ -325,3 +352,17 @@ LANGUAGES = [
 ]
 # override this to permenantly display/hide the language switcher
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
+
+if __name__ == "__main__":
+    print(
+        json.dumps(
+            {
+                "ARCHES_NAMESPACE_FOR_DATA_EXPORT": ARCHES_NAMESPACE_FOR_DATA_EXPORT,
+                "STATIC_URL": STATIC_URL,
+                "ROOT_DIR": ROOT_DIR,
+                "APP_ROOT": APP_ROOT,
+                "WEBPACK_DEVELOPMENT_SERVER_PORT": WEBPACK_DEVELOPMENT_SERVER_PORT,
+            }
+        )
+    )
+    sys.stdout.flush()

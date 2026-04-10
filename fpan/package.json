@@ -1,10 +1,24 @@
 {
     "name": "fpan",
+    "version": "1.0.0",
+    "scripts": {
+        "build_production": "NODE_PATH=./media/node_modules NODE_OPTIONS=--max_old_space_size=8192 NODE_ENV=production ./media/node_modules/.bin/webpack --config webpack/webpack.config.prod.js",
+        "build_development": "NODE_PATH=./media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js",
+        "build_test": "NODE_PATH=./media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./media/node_modules/.bin/webpack --config webpack/webpack.config.dev.js --env test=true",
+        "start": "NODE_PATH=./media/node_modules NODE_OPTIONS=--max_old_space_size=8192 ./media/node_modules/.bin/webpack serve --config webpack/webpack.config.dev.js"
+    },
     "repository": {
-        "url": "git@github.com:legiongis/fpan.git",
+        "url": "git@github.com:legiongis/hmsf-md.git",
         "type": "git"
     },
+    "devDependencies": {
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/7.1.1"
+    },
     "dependencies": {
-        "arches": "git+https://github.com/legiongis/arches.git#dev/6.2.x-hms-cli"
+        "arches": "legiongis/arches#stable/7.1.1",
+        "datatables.net": "1.12.1",
+        "jquery-validation": "1.19.5",
+        "jquery-migrate": "3.4.0",
+        "jquery": "^3.6.1"
     }
 }
