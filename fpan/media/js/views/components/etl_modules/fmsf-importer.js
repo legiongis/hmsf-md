@@ -5,10 +5,11 @@ define([
     'uuid',
     'arches',
     'viewmodels/alert',
+    'templates/views/components/etl_modules/fmsf-importer.htm',
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, uuid, arches, AlertViewModel) {
+], function(_, ko, ImporterViewModel, uuid, arches, AlertViewModel, fmsfImporterTemplate) {
     return ko.components.register('fmsf-importer', {
         viewModel: function(params) {
             const self = this;
@@ -71,6 +72,6 @@ define([
                 }
             };
         },
-        template: { require: 'text!templates/views/components/etl_modules/fmsf-importer.htm' }
+        template: { require: fmsfImporterTemplate }
     });
 });

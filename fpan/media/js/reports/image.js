@@ -4,9 +4,10 @@ define([
     'knockout-mapping',
     'viewmodels/report',
     'arches',
+    'templates/views/report-templates/image.htm',
     'knockstrap',
     'bindings/chosen'
-], function(_, ko, koMapping, ReportViewModel, arches) {
+], function(_, ko, koMapping, ReportViewModel, arches, imageReportTemplate) {
     return ko.components.register('image-report', {
         viewModel: function(params) {
             var self = this;
@@ -115,7 +116,7 @@ define([
             }
         },
         template: {
-            require: 'text!report-templates/image'
+            require: imageReportTemplate
         }
     });
 });

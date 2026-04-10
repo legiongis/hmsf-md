@@ -2,8 +2,9 @@ define([
     'knockout',
     'viewmodels/domain-widget',
     'view-data',
+    'templates/views/components/widgets/select.htm',
     'plugins/knockout-select2'
-], function(ko, DomainWidgetViewModel, data) {
+], function(ko, DomainWidgetViewModel, data, selectWidgetTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -40,7 +41,7 @@ define([
             this.multiple = true;
         },
         template: {
-            require: 'text!widget-templates/select'
+            require: selectWidgetTemplate
         }
     });
 });

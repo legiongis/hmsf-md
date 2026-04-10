@@ -1,4 +1,11 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'bindings/chosen'], function (ko, _, WidgetViewModel, $, chosen) {
+define([
+    'knockout',
+    'underscore',
+    'viewmodels/widget',
+    'jquery',
+    'templates/views/components/widgets/scout-widget.htm',
+    'bindings/chosen'
+], function(ko, _, WidgetViewModel, $, scoutWidgetTemplate, chosen) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -39,6 +46,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'bindings/chose
                 });
             }
         },
-        template: { require: 'text!templates/views/components/widgets/scout-widget.htm' }
+        template: { require: scoutWidgetTemplate }
     });
 });

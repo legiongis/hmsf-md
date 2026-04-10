@@ -1,7 +1,8 @@
 define([
     'knockout',
     'views/components/search/base-filter',
-], function(ko, BaseFilter) {
+    'templates/views/components/search/scout-report-filter.htm'
+], function(ko, BaseFilter, scoutReportFilterTemplate) {
     var componentName = 'scout-report-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
@@ -24,6 +25,6 @@ define([
             },
 
         }),
-        template: { require: 'text!templates/views/components/search/scout-report-filter.htm' }
+        template: { require: scoutReportFilterTemplate }
     });
 });
