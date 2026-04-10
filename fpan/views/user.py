@@ -119,14 +119,8 @@ class FPANUserManagerView(UserManagerView):
             ## retain this user_details acquisition as it pulls upstream Arches information.
             ## make sure it is all passed to the context variable as below.
             user_details = self.get_user_details(request.user)
-            context["user_surveys"] = JSONSerializer().serialize(
-                user_details["user_surveys"], sort_keys=False
-            )
             context["identities"] = JSONSerializer().serialize(
                 user_details["identities"], sort_keys=False
-            )
-            context["resources"] = JSONSerializer().serialize(
-                user_details["resources"], sort_keys=False, exclude=["is_editable"]
             )
 
             ## new, additional call to local method to get more HMS info
@@ -176,13 +170,9 @@ class FPANUserManagerView(UserManagerView):
             # retain this user_details acquisition as it pulls upstream Arches information.
             # make sure it is all passed to the context variable as below.
             user_details = self.get_user_details(request.user)
-            context["user_surveys"] = JSONSerializer().serialize(
-                user_details["user_surveys"]
-            )
             context["identities"] = JSONSerializer().serialize(
                 user_details["identities"]
             )
-            context["resources"] = JSONSerializer().serialize(user_details["resources"])
 
             user_info = request.POST.copy()
             user_info["id"] = request.user.id
