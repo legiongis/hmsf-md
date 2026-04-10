@@ -21,9 +21,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-prod = [
-    "mod-wsgi==4.9.4",
-]
+
 
 [dependency-groups]
 dev = [
