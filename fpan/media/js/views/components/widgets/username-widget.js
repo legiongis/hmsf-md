@@ -20,22 +20,22 @@ define([
             params.configKeys = ['placeholder', 'defaultValue'];
 
             if (!params.node.config) {
-              params.node.config = {};
+                params.node.config = {};
             }
             if (!params.node.configKeys) {
-              params.node.configKeys = {};
+                params.node.configKeys = {};
             }
-            params.node.config.options = ko.observableArray(data.dropdownLists.usernames)
+            params.node.config.options = ko.observableArray(data.dropdownLists.usernames);
 
             DomainWidgetViewModel.apply(this, [params]);
 
             var self = this;
             if (self.value() == null || self.value().length == 0) {
-              data.dropdownLists.usernames.forEach( function (user) {
-                if (user.text == params.user) {
-                  self.value([user.id])
-                }
-              })
+                data.dropdownLists.usernames.forEach( function(user) {
+                    if (user.text == params.user) {
+                        self.value([user.id]);
+                    }
+                });
             }
 
             this.multiple = true;

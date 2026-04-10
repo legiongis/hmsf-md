@@ -76,24 +76,24 @@ define([
                 - the initial response will take a while to arrive (fetching
                     from S3 and zipping photos)
             */
-            self.isDownloadingPhotos = ko.observable(false)
+            self.isDownloadingPhotos = ko.observable(false);
 
-            self.downloadPhotos = function (baseUrl) {
+            self.downloadPhotos = function(baseUrl) {
                 self.isDownloadingPhotos(true);
                 var resourceid = self.report.get('resourceid');
                 var url = baseUrl + resourceid;
                 var response;
                 fetch(url)
-                    .then(function (resp) {
+                    .then(function(resp) {
                         if (!resp.ok) {
-                            err = new Error();
+                            const err = new Error();
                             err.isServerErr = true;
                             throw err;
                         }
                         response = resp;
                         return resp.blob();
                     })
-                    .then(function (blob) {
+                    .then(function(blob) {
                         var filename = response.headers.get('Content-Disposition')
                             .match(/filename="(.+)"/)[1]
                             || `report-photos-${resourceid}.zip`;
@@ -113,7 +113,7 @@ define([
                         alert(msg);
                     })
                     .finally(function() { self.isDownloadingPhotos(false); });
-            }
+            };
         },
         template: {
             require: imageReportTemplate

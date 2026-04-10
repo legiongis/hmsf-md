@@ -5,7 +5,7 @@ define([
     'jquery',
     'templates/views/components/widgets/scout-widget.htm',
     'bindings/chosen'
-], function(ko, _, WidgetViewModel, $, scoutWidgetTemplate, chosen) {
+], function(ko, _, WidgetViewModel, $, scoutWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget

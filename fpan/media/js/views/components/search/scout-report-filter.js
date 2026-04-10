@@ -14,7 +14,7 @@ define([
             enabled: ko.observable(false),
 
             updateQuery: function() {
-                this.enabled(!this.enabled())                
+                this.enabled(!this.enabled());
                 var queryObj = this.query();
                 if(this.enabled()){
                     queryObj[componentName] = 'enabled';

@@ -37,7 +37,7 @@ define([
                 const formData = new window.FormData();
                 formData.append('file', file, file.name);
                 const response = await self.submit('read_zip', formData);
-                console.log(self.loadId)
+
                 if (response.ok) {
                     const data = await response.json();
                     self.loading(false);
@@ -53,12 +53,12 @@ define([
 
             this.start = async function(){
                 self.loading(true);
-                self.formData.append("resourceType", self.resourceType())
-                self.formData.append("truncate", self.truncate())
-                self.formData.append("dryRun", self.dryRun())
-                self.formData.append("onlySiteIdList", self.onlySiteIdList())
-                self.formData.append("loadDescription", self.loadDescription())
-                self.formData.append("loadId", self.loadId)
+                self.formData.append("resourceType", self.resourceType());
+                self.formData.append("truncate", self.truncate());
+                self.formData.append("dryRun", self.dryRun());
+                self.formData.append("onlySiteIdList", self.onlySiteIdList());
+                self.formData.append("loadDescription", self.loadDescription());
+                self.formData.append("loadId", self.loadId);
                 const response = await self.submit('run_web_import');
                 self.loading(false);
                 params.activeTab("import");
