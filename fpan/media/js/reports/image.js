@@ -115,8 +115,6 @@ define([
                     .finally(function() { self.isDownloadingPhotos(false); });
             };
         },
-        template: {
-            require: imageReportTemplate
-        }
+        template: imageReportTemplate
     });
 });
