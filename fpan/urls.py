@@ -128,12 +128,20 @@ urlpatterns = [
     re_path(r"^", include("hms.urls")),
     # include site_theme urls
     re_path(r"^", include("site_theme.urls")),
-    # finally, include default Arches urls
-    re_path(r"^", include("arches.urls")),
     # django-docs urls
     re_path(r"^docs/", include("docs.urls")),
 ]
-if settings.SHOW_LANGUAGE_SWITCH is True:
-    urlpatterns = i18n_patterns(*urlpatterns)
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Ensure Arches core urls are superseded by project-level urls
+urlpatterns.append(path("", include("arches.urls")))
+
+# Adds URL pattern to serve media files during development
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Only handle i18n routing in active project. This will still handle the routes provided by Arches core and Arches applications,
+# but handling i18n routes in multiple places causes application errors.
+if settings.ROOT_URLCONF == __name__:
+    if settings.SHOW_LANGUAGE_SWITCH is True:
+        urlpatterns = i18n_patterns(*urlpatterns)
+
+    urlpatterns += [path("i18n/", include("django.conf.urls.i18n"))]
