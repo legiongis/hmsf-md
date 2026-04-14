@@ -45,7 +45,6 @@ define([
                     self.loadDetails(data);
                     self.loadId = data.result.loadid;
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log('error');
                     self.loading(false);
                 }
@@ -66,12 +65,11 @@ define([
                     const data = await response.json();
                     self.response(data);
                 } else {
-                    // eslint-disable-next-line no-console
                     console.log('error');
                     self.loading(false);
                 }
             };
         },
-        template: { require: managementAreaImporterTemplate }
+        template: managementAreaImporterTemplate
     });
 });

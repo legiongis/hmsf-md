@@ -72,6 +72,6 @@ define([
                 }
             };
         },
-        template: { require: fmsfImporterTemplate }
+        template: fmsfImporterTemplate
     });
 });

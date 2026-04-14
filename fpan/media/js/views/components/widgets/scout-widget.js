@@ -46,6 +46,6 @@ define([
                 });
             }
         },
-        template: { require: scoutWidgetTemplate }
+        template: scoutWidgetTemplate
     });
 });

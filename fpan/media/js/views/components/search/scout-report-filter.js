@@ -25,6 +25,6 @@ define([
             },
 
         }),
-        template: { require: scoutReportFilterTemplate }
+        template: scoutReportFilterTemplate
     });
 });

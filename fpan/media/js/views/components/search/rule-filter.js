@@ -19,6 +19,6 @@ define([
             },
 
         }),
-        template: { require: ruleFilterTemplate }
+        template: ruleFilterTemplate
     });
 });
