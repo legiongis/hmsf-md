@@ -4,7 +4,7 @@ import logging
 from django.contrib.auth.models import User
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render, redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 from arches.app.models.system_settings import settings
 from arches.app.models.models import Node, GraphModel

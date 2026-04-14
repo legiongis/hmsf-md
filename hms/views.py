@@ -22,7 +22,7 @@ from django.http import (
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.urls import reverse
 from django.views.generic import View
@@ -203,7 +203,7 @@ def activate(request):
     token = request.GET.get("token")
     if all([uidb64, token]):
         try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
+            uid = force_str(urlsafe_base64_decode(uidb64))
             logger.debug(f"activate user: {uid}")
             user = Scout.objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, Scout.DoesNotExist) as e:
