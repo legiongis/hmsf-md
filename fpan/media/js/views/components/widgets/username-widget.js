@@ -3,7 +3,7 @@ define([
     'viewmodels/domain-widget',
     'view-data',
     'templates/views/components/widgets/select.htm',
-    'plugins/knockout-select2'
+    'select-woo'
 ], function(ko, DomainWidgetViewModel, viewData, selectWidgetTemplate) {
     /**
      * registers a select-widget component for use in forms
