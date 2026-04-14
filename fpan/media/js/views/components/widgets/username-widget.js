@@ -4,7 +4,7 @@ define([
     'view-data',
     'templates/views/components/widgets/select.htm',
     'plugins/knockout-select2'
-], function(ko, DomainWidgetViewModel, data, selectWidgetTemplate) {
+], function(ko, DomainWidgetViewModel, viewData, selectWidgetTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -25,14 +25,15 @@ define([
             if (!params.node.configKeys) {
                 params.node.configKeys = {};
             }
-            params.node.config.options = ko.observableArray(data.dropdownLists.usernames);
+            params.node.config.options = ko.observableArray(viewData.usernameDropdownList);
 
             DomainWidgetViewModel.apply(this, [params]);
 
+            // auto-populate with signed in user if no value present.
             var self = this;
             if (self.value() == null || self.value().length == 0) {
-                data.dropdownLists.usernames.forEach( function(user) {
-                    if (user.text == params.user) {
+                viewData.usernameDropdownList.forEach( function(user) {
+                    if (user.text == viewData.currentUsername) {
                         self.value([user.id]);
                     }
                 });
@@ -40,8 +41,6 @@ define([
 
             this.multiple = true;
         },
-        template: {
-            require: selectWidgetTemplate
-        }
+        template: selectWidgetTemplate
     });
 });

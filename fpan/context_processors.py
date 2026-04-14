@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.contrib.auth.models import User
 
@@ -18,23 +20,28 @@ def debug(request):
     }
 
 
-def widget_data(request):
+def username_widget_data(request):
 
     # only collect this information for a few specific views
     widget_views = ["resource", "graph_designer", "report", "add-resource"]
 
-    data = {"lists": {}}
+    username_dropdown_list = []
+
     if any([True for i in widget_views if i in request.path.split("/")]):
-        usernames = [
-            {"id": str(i[0]), "selected": "false", "text": str(i[1])}
+        username_dropdown_list = [
+            {
+                "id": str(i[0]),
+                "selected": "false",
+                "text": str(i[1]),
+                "value": str(i[0]),
+            }
             for i in User.objects.all()
             .order_by("username")
             .values_list("pk", "username")
         ]
 
-        data["lists"]["usernames"] = usernames
-
-    return data
+    serialized_list = json.dumps(username_dropdown_list)
+    return {"username_dropdown_list": serialized_list}
 
 
 def management_area_importer_configs(request):
