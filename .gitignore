@@ -4,6 +4,12 @@
 celerybeat-schedule*
 fpan/logs
 
+*.egg-info
+.DS_STORE
+.tsconfig-paths.json
+.frontend-configuration-settings.json
+coverage/
+
 node_modules
 webpack
 staticfiles
@@ -18,7 +24,6 @@ fpan/pkg/reference_data/collections/archive
 fpan/export_deliverables
 fpan/fmsf-uploads
 fpan/management-area-uploads
-fpan/media/packages
 fpan/tileserver
 fpan/uploadedfiles
 fpan/settings_local.py
