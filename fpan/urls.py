@@ -1,10 +1,9 @@
 from django.conf.urls.i18n import i18n_patterns
-from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import user_passes_test
 from django.views.generic import RedirectView
 from django.views.generic.base import TemplateView
-from django.urls import path
+from django.urls import path, re_path, include
 from django.conf import settings
 
 from arches.app.views import search
@@ -36,89 +35,89 @@ def is_not_anonymous(user):
 
 urlpatterns = [
     # some site-level urls
-    url(r"^favicon\.ico$", favicon_view),
+    re_path(r"^favicon\.ico$", favicon_view),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
     path("grappelli/", include("grappelli.urls")),  # grappelli URLS
     # override existing Arches urls in a few different instances
-    url(
+    re_path(
         r"^mvt/(?P<nodeid>%s)/(?P<zoom>[0-9]+|\{z\})/(?P<x>[0-9]+|\{x\})/(?P<y>[0-9]+|\{y\}).pbf$"
         % uuid_regex,
         MVT.as_view(),
         name="mvt",
     ),
-    url(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
+    re_path(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
     # the following are just pass through views so HMS can apply an additional permissions-based decorator
-    url(r"^resource$", FPANResourceListView.as_view(), name="resource"),
-    url(
+    re_path(r"^resource$", FPANResourceListView.as_view(), name="resource"),
+    re_path(
         r"^resource/(?P<resourceid>%s)$" % uuid_regex,
         FPANResourceEditorView.as_view(),
         name="resource_editor",
     ),
-    url(
+    re_path(
         r"^resource/(?P<resourceid>%s)/history$" % uuid_regex,
         FPANResourceEditLogView.as_view(),
         name="resource_edit_log",
     ),
     # url(r"^resource/history$", FPANResourceEditLogView.as_view(), name="edit_history"),
-    url(
+    re_path(
         r"^resource/(?P<resourceid>%s)/data/(?P<formid>%s)$" % (uuid_regex, uuid_regex),
         FPANResourceData.as_view(),
         name="resource_data",
     ),
-    url(
+    re_path(
         r"^resource/(?P<resourceid>%s)/tiles$" % uuid_regex,
         FPANResourceTiles.as_view(),
         name="resource_tiles",
     ),
-    url(
+    re_path(
         r"^resource/(?P<resourceid>%s)/cards$" % uuid_regex,
         FPANResourceCards.as_view(),
         name="resource_cards",
     ),
-    url(
+    re_path(
         r"^report/(?P<resourceid>%s)$" % uuid_regex,
         FPANResourceReportView.as_view(),
         name="resource_report",
     ),
     # override Arches /search view to apply login_required
-    url(
+    re_path(
         r"^search$",
         user_passes_test(is_not_anonymous, login_url="/auth/")(
             search.SearchView.as_view()
         ),
         name="search_home",
     ),
-    url(
+    re_path(
         r"^search/terms$",
         user_passes_test(is_not_anonymous, login_url="/auth/")(search.search_terms),
         name="search_terms",
     ),
-    url(
+    re_path(
         r"^search/resources$",
         user_passes_test(is_not_anonymous, login_url="/auth/")(search.search_results),  # type: ignore (this is an upstream issue in arches)
         name="search_results",
     ),
-    url(
+    re_path(
         r"^search/time_wheel_config$",
         user_passes_test(is_not_anonymous, login_url="/auth/")(
             search.time_wheel_config
         ),
         name="time_wheel_config",
     ),
-    url(
+    re_path(
         r"^search/export_results$",
         user_passes_test(is_not_anonymous, login_url="/auth/")(search.export_results),
         name="export_results",
     ),
-    url(
+    re_path(
         r"^search/get_export_file$",
         user_passes_test(is_not_anonymous, login_url="/auth/")(search.get_export_file),  # type: ignore (this is an upstream issue in arches)
         name="get_export_file",
     ),
-    url(
+    re_path(
         r"^search/get_dsl$",
         user_passes_test(is_not_anonymous, login_url="/auth/")(
             search.get_dsl_from_search_string
@@ -126,13 +125,13 @@ urlpatterns = [
         name="get_dsl",
     ),
     # now include HMS urls
-    url(r"^", include("hms.urls")),
+    re_path(r"^", include("hms.urls")),
     # include site_theme urls
-    url(r"^", include("site_theme.urls")),
+    re_path(r"^", include("site_theme.urls")),
     # finally, include default Arches urls
-    url(r"^", include("arches.urls")),
+    re_path(r"^", include("arches.urls")),
     # django-docs urls
-    url(r"^docs/", include("docs.urls")),
+    re_path(r"^docs/", include("docs.urls")),
 ]
 if settings.SHOW_LANGUAGE_SWITCH is True:
     urlpatterns = i18n_patterns(*urlpatterns)

@@ -1,6 +1,5 @@
-from django.conf.urls import url
 from django.views.generic import RedirectView
-from django.urls import path
+from django.urls import path, re_path
 
 from hms.views import (
     index,
@@ -17,26 +16,28 @@ from hms.views import (
 )
 
 urlpatterns = [
-    url(r"^$", index, name="fpan_home"),
-    url(r"^index.htm", RedirectView.as_view(pattern_name="fpan_home", permanent=True)),
+    re_path(r"^$", index, name="fpan_home"),
+    re_path(
+        r"^index.htm", RedirectView.as_view(pattern_name="fpan_home", permanent=True)
+    ),
     path("about/", about, name="about"),
-    url(r"^user/scout-profile$", hms_home, name="scout_profile_manager"),
-    url(
+    re_path(r"^user/scout-profile$", hms_home, name="scout_profile_manager"),
+    re_path(
         r"^hms/home",
         RedirectView.as_view(pattern_name="scout_profile_manager", permanent=True),
     ),
-    url(
+    re_path(
         r"^state/home",
         RedirectView.as_view(pattern_name="user_profile_manager", permanent=True),
     ),
-    url(
+    re_path(
         r"^dashboard",
         RedirectView.as_view(pattern_name="user_profile_manager", permanent=True),
     ),
     # this url is meant to be sensible but not guessable
-    url(r"^scout/signup-850-595-0050", scout_signup, name="scout_signup"),
-    url(r"^scouts/$", scouts_dropdown, name="scouts_dropdown"),
-    url(r"^scout-list-download/$", scout_list_download, name="scout_list_download"),
+    re_path(r"^scout/signup-850-595-0050", scout_signup, name="scout_signup"),
+    re_path(r"^scouts/$", scouts_dropdown, name="scouts_dropdown"),
+    re_path(r"^scout-list-download/$", scout_list_download, name="scout_list_download"),
     path(
         "auth/state",
         login_patch,
@@ -46,7 +47,7 @@ urlpatterns = [
     path(
         "auth/scout", login_patch, {"login_type": "scout"}, name="scout_login_redirect"
     ),
-    url(r"^auth/$", LoginView.as_view(), name="auth"),
+    re_path(r"^auth/$", LoginView.as_view(), name="auth"),
     path("activate/", activate, name="activate"),
     path("activate/<str:uidb64>/<str:token>/", activate_page, name="activate_page"),
     # download report photos
