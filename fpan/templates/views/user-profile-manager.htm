@@ -343,348 +343,341 @@
 
 
 {% block main_content %}
-    <!-- Main Editor -->
-    <div id="">
 
-        <!-- Profile Summary -->
-        <div class="profile-summary-page">
-            <!-- Profile Sections -->
-            <div class="profile-sections-{{user_type}}">
+    <!-- Profile Summary -->
+    <div class="profile-summary-page" style="height:calc(100vh - 50px); overflow:scroll;">
+        <!-- Profile Sections -->
+        <div class="profile-sections-{{user_type}}">
 
-                {% include 'site_theme/profile_top_content.htm' %}
+            {% include 'site_theme/profile_top_content.htm' %}
 
-                <!-- My Account Info Panel -->
-                <section id="" class="profile-list">
-                    <div class="panel panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <!-- Section Title -->
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Profile Actions' %}
-                                </div>
-                                <div class="add-popover" data-bind='click: toggleChangePasswordForm'>
-                                    <a href="#" class="a-{{user_type}}">{% trans 'Change Password' %}</a>
-                                </div>
-                                <div class="password-success" data-bind="text:changePasswordSuccess"></div>
-                                <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
-                                    <div class="arrow" style="left: 50%;"></div>
-                                    {% include 'change_password.htm' %}
-                                </div>
-                                <div data-bind='click: toggleEditUserForm'>
-                                    <a href="#" class="a-{{user_type}}">{% trans 'Edit Basic Profile' %}</a>
-                                </div>
-                                {% if user_is_scout %}
-                                <p><a class="a-{{user_type}}" href="{% url 'scout_profile_manager' %}">{% trans 'Update Scout Profile' %}</a></p>
-                                {% endif %}
+            <!-- My Account Info Panel -->
+            <section id="" class="profile-list">
+                <div class="panel panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <!-- Section Title -->
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Profile Actions' %}
                             </div>
-                            <div class="col-sm-9">
-                                <!-- ko if: showEditUserForm() === false -->
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
-                                            <p class="profile-label-shim">{% trans 'User name' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.first_name }}</h4>
-                                            <p class="profile-label-shim">{% trans 'First Name' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.last_name }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Last Name' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Email' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Phone' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /ko -->
-
-                                <!-- ko if: showEditUserForm() === true -->
-                                <form id="profile-update-form" action="{% url 'user_profile_manager' %}" method="post">
-                                    {% csrf_token %}
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'HMS/Scout ID' %}</label>
-                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
-                                            </div>
-                                        </div>
-
-                                        <!-- Password -->
-                                        <div class="col-sm-5">
-                                            <p class="account-tips">
-                                                {% trans 'This is your account login, which cannot be changed.' %}
-                                            </p>
-                                        </div>
-
-                                        <div class="col-sm-2">
-                                            <div>
-                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit">{% trans 'Save' %}</button>
-                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr style="border-color: #eee;">
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
-                                                {% if form.first_name.errors %}
-                                                {% for error in form.first_name.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-5">
-                                        </div>
-                                    </div>
-
-                                    <!-- Account Last Name -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
-                                                {% if form.last_name.errors %}
-                                                {% for error in form.last_name.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Phone -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr style="border-color: #eee;">
-
-                                    <!-- Contact Email -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Contact Email' %}</label>
-                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
-                                                {% if form.email.errors %}
-                                                {% for error in form.email.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-5">
-                                        </div>
-                                    </div>
-                                </form>
-                                <!-- /ko -->
+                            <div class="add-popover" data-bind='click: toggleChangePasswordForm'>
+                                <a href="#" class="a-{{user_type}}">{% trans 'Change Password' %}</a>
                             </div>
+                            <div class="password-success" data-bind="text:changePasswordSuccess"></div>
+                            <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
+                                <div class="arrow" style="left: 50%;"></div>
+                                {% include 'change_password.htm' %}
+                            </div>
+                            <div data-bind='click: toggleEditUserForm'>
+                                <a href="#" class="a-{{user_type}}">{% trans 'Edit Basic Profile' %}</a>
+                            </div>
+                            {% if user_is_scout %}
+                            <p><a class="a-{{user_type}}" href="{% url 'scout_profile_manager' %}">{% trans 'Update Scout Profile' %}</a></p>
+                            {% endif %}
                         </div>
+                        <div class="col-sm-9">
+                            <!-- ko if: showEditUserForm() === false -->
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
+                                        <p class="profile-label-shim">{% trans 'User name' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.first_name }}</h4>
+                                        <p class="profile-label-shim">{% trans 'First Name' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.last_name }}</h4>
+                                        <p class="profile-label-shim">{% trans 'Last Name' %}</p>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
+                                        <p class="profile-label-shim">{% trans 'Email' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
+                                        <p class="profile-label-shim">{% trans 'Phone' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+
+                            <!-- ko if: showEditUserForm() === true -->
+                            <form id="profile-update-form" action="{% url 'user_profile_manager' %}" method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'HMS/Scout ID' %}</label>
+                                            <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                        </div>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="col-sm-5">
+                                        <p class="account-tips">
+                                            {% trans 'This is your account login, which cannot be changed.' %}
+                                        </p>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div>
+                                            <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit">{% trans 'Save' %}</button>
+                                            <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr style="border-color: #eee;">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'First name' %}</label>
+                                            <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
+                                            {% if form.first_name.errors %}
+                                            {% for error in form.first_name.errors %}
+                                                <div style="color:darkred">{{ error|escape }}</div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                    </div>
+                                </div>
+
+                                <!-- Account Last Name -->
+                                <div class="row">
+                                    <!-- Names -->
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'Last name' %}</label>
+                                            <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
+                                            {% if form.last_name.errors %}
+                                            {% for error in form.last_name.errors %}
+                                                <div style="color:darkred">{{ error|escape }}</div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="row">
+                                    <!-- Names -->
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
+                                            <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr style="border-color: #eee;">
+
+                                <!-- Contact Email -->
+                                <div class="row">
+                                    <!-- Names -->
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'Contact Email' %}</label>
+                                            <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
+                                            {% if form.email.errors %}
+                                            {% for error in form.email.errors %}
+                                                <div style="color:darkred">{{ error|escape }}</div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- /ko -->
+                        </div>
                     </div>
-                </section>
 
-                <!-- NEW SECTION FOR HMS INFO-->
-                <section id="permission-summary" class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Site assignment rules' %}
-                                </div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="relative" style="padding-top:5px;">
-                                    {{ rule_filter_html|safe }}
-                                </div>
+                </div>
+            </section>
+
+            <!-- NEW SECTION FOR HMS INFO-->
+            <section id="permission-summary" class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Site assignment rules' %}
                             </div>
                         </div>
-                        {% if site_access_rules.type != 'no_access' and site_access_rules.type != 'full_access' %}
-                        <div class="row relative">
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Archaeological sites you can monitor' %} ({{ accessible_sites|length }})
-                                </div>
+                        <div class="col-sm-9">
+                            <div class="relative" style="padding-top:5px;">
+                                {{ rule_filter_html|safe }}
                             </div>
-                            <div class="col-sm-9">
-                                <div class="relative" style="padding-top:5px;">
-                                    {% if accessible_sites|length == 0 %}
-                                    <p><em>No sites are accessible based on your access rules.</em></p>
-                                    {% else %}
-                                    <ul style="list-style:none; padding-left:0px;">
-                                    {% for site in accessible_sites %}
-                                        <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
-                                        {% if site.scout_report_ct > 0 %}
-                                        <ul style="list-style-type:'\21B3';">
-                                        {% for report in site.scout_reports %}
-                                            <li><a class="a-{{user_type}}" href="{{report.url}}">&nbsp;&nbsp;{{ report.displayname }}</a></li>
-                                        {% endfor %}
-                                        </ul>
-                                        {% endif %}
+                        </div>
+                    </div>
+                    {% if site_access_rules.type != 'no_access' and site_access_rules.type != 'full_access' %}
+                    <div class="row relative">
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Archaeological sites you can monitor' %} ({{ accessible_sites|length }})
+                            </div>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="relative" style="padding-top:5px;">
+                                {% if accessible_sites|length == 0 %}
+                                <p><em>No sites are accessible based on your access rules.</em></p>
+                                {% else %}
+                                <ul style="list-style:none; padding-left:0px;">
+                                {% for site in accessible_sites %}
+                                    <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
+                                    {% if site.scout_report_ct > 0 %}
+                                    <ul style="list-style-type:'\21B3';">
+                                    {% for report in site.scout_reports %}
+                                        <li><a class="a-{{user_type}}" href="{{report.url}}">&nbsp;&nbsp;{{ report.displayname }}</a></li>
                                     {% endfor %}
                                     </ul>
                                     {% endif %}
-                                </div>
+                                {% endfor %}
+                                </ul>
+                                {% endif %}
                             </div>
                         </div>
-                        {% endif %}
                     </div>
-                </section>
+                    {% endif %}
+                </div>
+            </section>
 
-                {% if user_type == "admin" %}
-                <section id="scout-list-section" class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Scout Summary' %}
-                                </div>
+            {% if user_type == "admin" %}
+            <section id="scout-list-section" class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Scout Summary' %}
                             </div>
-                            <div class="col-sm-9">
-                                <div class="relative" style="padding-top:5px;">
-                                    <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}" target="_blank">click to download full list</a></p>
-                                    <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px; background:url({% webpack_static 'img/fpan/ricepaper.png' %});">
-                                        {% for scout in scout_list %}
-                                        <li><strong>{{scout.username}}</strong> | <em>regions:</em>
-                                            {% for region in scout.fpan_regions %}
-                                                {{ region }}{% if not forloop.last %},{% endif %}
-                                            {% endfor %} | <em>interests:</em>
-                                            {% for interest in scout.site_interest_type %}
-                                                {{ interest }}{% if not forloop.last %},{% endif %}
-                                            {% endfor %}
-                                        </li>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="relative" style="padding-top:5px;">
+                                <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}" target="_blank">click to download full list</a></p>
+                                <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px;">
+                                    {% for scout in scout_list %}
+                                    <li><strong>{{scout.username}}</strong> | <em>regions:</em>
+                                        {% for region in scout.fpan_regions %}
+                                            {{ region }}{% if not forloop.last %},{% endif %}
+                                        {% endfor %} | <em>interests:</em>
+                                        {% for interest in scout.site_interest_type %}
+                                            {{ interest }}{% if not forloop.last %},{% endif %}
                                         {% endfor %}
-                                    </ul>
-                                </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                {% if plausible_embed_link %}
-                <section id="scout-list-section" class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <iframe plausible-embed src="{{plausible_embed_link}}&embed=true&theme=light" scrolling="no" frameborder="0" loading="lazy" style="width: 1px; min-width: 100%; height: 1600px;"></iframe>
-                            <div style="font-size: 14px; padding-bottom: 14px;">Stats powered by <a target="_blank" href="https://plausible.io">Plausible Analytics</a></div>
-                            <script async src="https://plausible.io/js/embed.host.js"></script>
+            {% if plausible_embed_link %}
+            <section id="scout-list-section" class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <iframe plausible-embed src="{{plausible_embed_link}}&embed=true&theme=light" scrolling="no" frameborder="0" loading="lazy" style="width: 1px; min-width: 100%; height: 1600px;"></iframe>
+                        <div style="font-size: 14px; padding-bottom: 14px;">Stats powered by <a target="_blank" href="https://plausible.io">Plausible Analytics</a></div>
+                        <script async src="https://plausible.io/js/embed.host.js"></script>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+            {% endif %}
+
+            <!-- Notification Settings -->
+            <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
+            {% comment %}
+            <section class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="profile-header">
+                        {% trans 'Notification Settings' %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-9 col-sm-offset-3 profile-notif-settings">
+                            <table class="notif-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Trigger' %}</th>
+                                        <th class="notif-type">{% trans 'Email Notification' %}</th>
+                                        <th class="notif-type">{% trans 'Web Notification' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- ko foreach: notifTypeObservables -->
+                                    <tr>
+                                        <td data-bind="text:name"></td>
+                                        <td>
+                                            <label class="control-label widget-input-label-notif">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="control-label widget-input-label-notif">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td>{% trans 'Exporting Search Results' %}</td>
+                                        <td>
+                                            <label class="control-label widget-input-label">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="control-label widget-input-label">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
+                                            </label>
+                                        </td>
+                                    </tr> -->
+                                    <!-- /ko -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </section>
-                {% endif %}
-                {% endif %}
-
-                <!-- Notification Settings -->
-                <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
-                {% comment %}
-                <section class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="profile-header">
-                            {% trans 'Notification Settings' %}
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-9 col-sm-offset-3 profile-notif-settings">
-                                <table class="notif-table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>{% trans 'Trigger' %}</th>
-                                            <th class="notif-type">{% trans 'Email Notification' %}</th>
-                                            <th class="notif-type">{% trans 'Web Notification' %}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- ko foreach: notifTypeObservables -->
-                                        <tr>
-                                            <td data-bind="text:name"></td>
-                                            <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
-                                            </td>
-                                        </tr>
-                                        <!-- <tr>
-                                            <td>{% trans 'Exporting Search Results' %}</td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                        </tr> -->
-                                        <!-- /ko -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                {% endcomment %}
-            </div>
+                </div>
+            </section>
+            {% endcomment %}
         </div>
-        <!-- END Profile Summary -->
-
     </div>
-    <!--END  Main Editor -->
+    <!-- END Profile Summary -->
 
 <!-- SCROLL TOP BUTTON -->
 <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
 {% endblock main_content %}
 {% block pre_require_js %}
 {{ block.super }}
-<script>{% autoescape off %}
-    define('profile-manager-data', [], function() {
-        return {
-            'error_count': {{form.errors|length}},
-            'identities': {{identities}},
-            'resources': {{resources}}
-        }
-    });
-{% endautoescape %}</script>
-
+<div 
+    id="profileManagerData"
+    style="display: none;"
+    profileManagerData='{
+        "error_count": {{form.errors|length}},
+        "two_factor_authentication_settings": {{two_factor_authentication_settings}},
+    }'
+></div>
 {% endblock pre_require_js %}

@@ -55,6 +55,7 @@ class FPANUserManagerView(UserManagerView):
         # add the report ids to that site object
         for rd in rep_datas:
             report_id = rd["resourceinstance_id"]
+            fmsfid = None
             try:
                 fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
             except (IndexError, KeyError, TypeError) as e:
@@ -63,7 +64,7 @@ class FPANUserManagerView(UserManagerView):
             except Exception as e:
                 logger.error(f"can't get fmsf id from {report_id}")
                 logger.error(e)
-            if fmsfid in site_lookup:
+            if fmsfid is not None and fmsfid in site_lookup:
                 site_lookup[fmsfid]["scout_report_ct"] += 1
                 res = Resource.objects.get(pk=report_id)
                 site_lookup[fmsfid]["scout_reports"].append(
@@ -134,6 +135,14 @@ class FPANUserManagerView(UserManagerView):
                 context["scout_list"] = sorted(
                     scouts_unsorted, key=lambda k: k["username"]
                 )
+
+            context["two_factor_authentication_settings"] = JSONSerializer().serialize(
+                {
+                    "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                    "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                    "user_has_enabled_two_factor_authentication": False,
+                }
+            )
 
             return render(request, "views/user-profile-manager.htm", context)
 
