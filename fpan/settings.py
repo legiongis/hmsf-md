@@ -1,5 +1,4 @@
 import os
-import json
 from django.utils.translation import gettext_lazy as _
 
 # when setting the imported variables explicitly, got
@@ -33,14 +32,11 @@ STATIC_URL = "/static/"
 ROOT_URLCONF = "fpan.urls"
 WSGI_APPLICATION = "fpan.wsgi.application"
 
-STATICFILES_DIRS = (
-    os.path.join(APP_ROOT, "media", "build"),
-    os.path.join(APP_ROOT, "media"),
-) + STATICFILES_DIRS
+STATICFILES_DIRS = build_staticfiles_dirs(app_root=APP_ROOT)
 
 WEBPACK_LOADER = {
     "DEFAULT": {
-        "STATS_FILE": os.path.join(APP_ROOT, "webpack/webpack-stats.json"),
+        "STATS_FILE": os.path.join(APP_ROOT, "..", "webpack/webpack-stats.json"),
     },
 }
 
@@ -58,16 +54,17 @@ DATATYPE_LOCATIONS.append("fpan.datatypes")
 FUNCTION_LOCATIONS.append("fpan.functions")
 ETL_MODULE_LOCATIONS.append("fpan.etl_modules")
 
-TEMPLATES[0]["DIRS"].append(os.path.join(APP_ROOT, "functions", "templates"))
-TEMPLATES[0]["DIRS"].append(os.path.join(APP_ROOT, "widgets", "templates"))
-TEMPLATES[0]["DIRS"].insert(0, os.path.join(APP_ROOT, "templates"))
+TEMPLATES = build_templates_config(
+    debug=DEBUG,
+    app_root=APP_ROOT,
+)
 TEMPLATES[0]["DIRS"].insert(
     0, os.path.join(os.path.dirname(APP_ROOT), "site_theme", "templates")
 )
 
 TEMPLATES[0]["OPTIONS"]["context_processors"].append("fpan.context_processors.debug")
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
-    "fpan.context_processors.widget_data"
+    "fpan.context_processors.username_widget_data"
 )
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
     "fpan.context_processors.management_area_importer_configs"
@@ -79,6 +76,9 @@ TEMPLATES[0]["OPTIONS"]["context_processors"].append("hms.context_processors.use
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
     "site_theme.context_processors.profile_content"
 )
+
+ROOT_HOSTCONF = "fpan.hosts"
+DEFAULT_HOST = "fpan"
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
@@ -100,6 +100,7 @@ INSTALLED_APPS += (
     "tinymce",  # used for WISIWYG editor in site_theme admin pages
     "docs",  # django-docs implementation: https://github.com/littlepea/django-docs/
 )
+# INSTALLED_APPS += ("arches.app",)
 
 PLAUSIBLE_SITE_DOMAIN = None
 PLAUSIBLE_EMBED_LINK = None
@@ -208,13 +209,6 @@ SPATIAL_COORDINATES_NODEGROUPS_IDS = [
     "efe6cb5e-dbab-11e7-a327-94659cf754d0",  # historic structure
 ]
 
-try:
-    from .package_settings import *
-except ImportError:
-    try:
-        from package_settings import *
-    except ImportError:
-        pass
 
 try:
     from .settings_local import *
@@ -333,9 +327,17 @@ MIDDLEWARE = [
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
+
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)
 
 # default language of the application
 # language code needs to be all lower case with the form:
@@ -353,16 +355,4 @@ LANGUAGES = [
 # override this to permenantly display/hide the language switcher
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 
-if __name__ == "__main__":
-    print(
-        json.dumps(
-            {
-                "ARCHES_NAMESPACE_FOR_DATA_EXPORT": ARCHES_NAMESPACE_FOR_DATA_EXPORT,
-                "STATIC_URL": STATIC_URL,
-                "ROOT_DIR": ROOT_DIR,
-                "APP_ROOT": APP_ROOT,
-                "WEBPACK_DEVELOPMENT_SERVER_PORT": WEBPACK_DEVELOPMENT_SERVER_PORT,
-            }
-        )
-    )
-    sys.stdout.flush()
+LOCALE_PATHS.insert(0, os.path.join(APP_ROOT, "locale"))
