@@ -1,5 +1,23 @@
+<!--
+ARCHES - a program developed to inventory and manage immovable cultural heritage.
+Copyright (C) 2013 J. Paul Getty Trust and World Monuments Fund
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
 {% extends "views/resource/resource-base.htm" %}
 {% load static %}
+{% load template_tags %}
 {% load i18n %}
 {% load webpack_static from webpack_loader %}
 
@@ -10,19 +28,19 @@
 {% block graph_title %}
 <!-- Page Title and Icon -->
 <div class="ep-tools-title">
-    <h1 class="page-header text-overflow ep-graph-title">
+    <h1 class="page-header text-overflow ep-graph-title flex">
         <i class="fa text-center icon-wrap bg-gray ep-graph-title-icon" data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'"></i>
-        <span data-bind="text: displayname"></span>
+        <span data-bind="text: displayname" style="margin: 0 10px;"></span>
     </h1>
 </div>
 {% endblock graph_title %}
 
 {% block main_content %}
 <div class="content-panel">
-    <div class="flex">
+    <div style="height: inherit;" class="flex">
         <div class="left-panel graph-designer" data-bind="resizableSidepanel:true">
             <div class="left-panel-inner-container">
-                <div class="jstree jstree-default" data-bind="visible: true" style="display: none;">
+                <div class="jstree jstree-default" data-bind="visible: true, css: {'jstree-rtl': activeLanguageDir() == 'rtl' }" style="display: none;">
                     <div class="header">
                         <div class="list-filter" data-bind="">
                             <input type="text" class="form-control" style="width: 100%;" placeholder="{% trans 'Find a card...' %}" data-bind="textInput: filter, event: {keypress: filterEnterKeyHandler}">
@@ -30,15 +48,16 @@
                             <!-- Clear Search -->
                             <span class="clear-node-search" data-bind="visible: filter().length > 0, click: function() { filter(''); }"><i class="fa fa-times-circle"></i></span>
                         </div>
-                        <div>
+                        <div class="tools">
                             <a class="tree-display-tool" data-bind="click: expandAll"><i class="ion-plus"></i>{% trans ' Expand' %}</a>
                             <a class="tree-display-tool" data-bind="click: collapseAll"><i class="ion-minus"></i>{% trans ' Collapse' %}</a>
+                            <a class="tree-display-tool" data-bind="click: toggleGrid"><i class="fa fa-ellipsis-v"></i>{% trans ' Grid' %}</a>
                         </div>
                     </div>
                     <div class="resource-editor-tree">
-                        <ul class="jstree-container-ul jstree-children" aria-expanded="true">
-                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded()}">
-                            <i class="jstree-icon jstree-ocl" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}"></i>
+                        <ul class="jstree-container-ul jstree-children jstree-striped" aria-expanded="true">
+                        <li role="treeitem" class="jstree-node" data-bind="css: {'jstree-open': rootExpanded, 'jstree-closed' : !rootExpanded(), 'hide-background': !showGrid()}">
+                            <i class="jstree-icon" role="presentation" data-bind="click: function(){rootExpanded(!rootExpanded())}, css: {'jstree-ocl': showGrid}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function () { selection('root'); }, css: {'jstree-clicked': selection() === 'root'}">
                                 <strong>
                                     <i data-bind="css: graphiconclass != (null || '') ? graphiconclass : 'fa fa-question'" role="presentation"></i>
@@ -65,8 +84,8 @@
                             <!-- /ko -->
                         </li>
                         <!--ko ifnot: issystemsettings -->
-                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
-                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId(), 'hide-background': !showGrid()}">
+                            <i class="jstree-icon" role="presentation" data-bind="css: {'jstree-ocl': showGrid}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showRelatedResourcesManager()}}, css: {'jstree-clicked': selection() === 'related-resources', 'disabled': resourceId() === ''}">
                                 <strong>
                                     <i class="fa fa-link" role="presentation"></i>
@@ -75,8 +94,8 @@
                             </a>
                         </li>
                         <!--/ko-->
-                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId()}">
-                            <i class="jstree-icon jstree-ocl" role="presentation"></i>
+                        <li role="treeitem" class="jstree-node jstree-open" data-bind="css: {'disabled': resourceId(), 'hide-background': !showGrid()}">
+                            <i class="jstree-icon" role="presentation" data-bind="css: {'jstree-ocl': showGrid}"></i>
                             <a class="jstree-anchor" href="#" tabindex="-1" data-bind="click: function(){if (resourceId()){showInstancePermissionsManager(self)}}, css: {'jstree-clicked': selection() === 'resource-permissions', 'disabled': resourceId() === '' || userIsCreator === false }">
                                 <strong>
                                     <i class="fa fa-lock" role="presentation"></i>
@@ -97,7 +116,7 @@
             <div>
                  <div data-bind="component: {
                     name: 'related-resources-manager',
-                    params: relatedResourcesManagerObj
+                    params: $data.relatedResourcesManagerObj
                 }"></div>
             </div>
             <!--/ko -->
@@ -113,13 +132,13 @@
                         userIsCreator: userIsCreator,
                         alert: alert,
                         permissionLabelLookup: {
-                            'view_resourceinstance':'{% trans 'Read' %}',
-                            'change_resourceinstance':'{% trans 'Update' %}',
-                            'no_access_to_resourceinstance':'{% trans 'No Access' %}',
-                            'delete_resourceinstance':'{% trans 'Delete' %}',
+                            'view_resourceinstance':{% quoted_trans _('Read') %},
+                            'change_resourceinstance':{% quoted_trans _('Update') %},
+                            'no_access_to_resourceinstance':{% quoted_trans _('No Access') %},
+                            'delete_resourceinstance':{% quoted_trans _('Delete') %},
                         },
-                        alertTitle: '{% trans 'You are about assign normal user access to this instance' %}',
-                        alertMessage: '{% trans 'Would you like to proceed?' %}'},
+                        alertTitle: {% quoted_trans _('You are about assign normal user access to this instance') %},
+                        alertMessage: {% quoted_trans _('Would you like to proceed?') %}},
                 }"></div>
             </div>
             <!--/ko -->
@@ -127,54 +146,30 @@
             <!--ko if: selection() === 'root' -->
                 <!--ko if: resourceId() -->
                 <div class='resource-report editor-report' data-bind='component: {
-                    name: reportLookup[report.get("template_id")()].componentname,
+                    name: "resource-report-abstract",
                     params: {
                         report: report,
-                        editorContext: true
+                        editorContext: true,
+                        cache: false
                     }
                 }'></div>
                 <!--/ko -->
                 <!--ko if: !resourceId() -->
-                  <!-- ko if: graphid === "14578901-bd5d-11e9-822a-94659cf754d0" -->
-                      <div id="rr-splash" class="rr-splash">
+                <div id="rr-splash" class="rr-splash">
 
-                          <!-- Image -->
-                          <div class="img-lg img-circle rr-splash-img-container">
-                              <img class="rr-splash-img" src="{% webpack_static "/img/inspection.png" %}" alt="Resource Editor">
-                          </div>
+                    <!-- Image -->
+                    <div class="img-lg img-circle rr-splash-img-container">
+                        <img class="rr-splash-img" src="{% webpack_static "img/inspection.png" %}" alt="Resource Editor">
+                    </div>
 
-                          <!-- Splash Title -->
-                          <div class="rr-splash-title">{% trans "Welcome to the HMS Florida Scout Report System!" %}</div>
+                    <!-- Splash Title -->
+                    <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
 
-                          <!-- Splash Instructions -->
-                          <div class="rr-splash-description">You are about to create a new Scout Report record or, as it is known in the Arches Database, a “New Resource”. </div>
-
-                          <div class="rr-splash-description">The tree structure on the left lists all six pages of the Scout Report you will log. You will click on each page to fill in the required information. Information marked with an *asterisk is required. Please click <span style="color:#3acaa1;">“+ Add”</span> after you have completed each page and you will see your new entry show up in the tree on the left.</div>
-
-                          <div class="rr-splash-description"><strong>Clicking <span style="color:#3acaa1;">“+ Add”</span> will only save the page you are currently editing, not the entire report, so you must click <span style="color:#3acaa1;">“+ Add”</span> at the end of every page to save.</strong></div>
-
-                          <div class="rr-splash-description">Steps 1 through 4 are required. If you are logging a report for an Archaeological Site or Historic Cemetery, you may skip Step 5. If you do not have photos from your monitoring visit, skip Step 6.</div>
-
-                          <div class="rr-splash-description">Have questions about a specific page? Click the <span style="color: #F26422">Help <i class="fa fa-question-circle"></i></span> feature at the top right of each page for more details and helpful information about each step and its questions.</div>
-                      </div>
-                  <!--/ko -->
-                  <!-- ko ifnot: graphid === "14578901-bd5d-11e9-822a-94659cf754d0" -->
-                      <div id="rr-splash" class="rr-splash">
-
-                          <!-- Image -->
-                          <div class="img-lg img-circle rr-splash-img-container">
-                              <img class="rr-splash-img" src="{% webpack_static "/img/inspection.png" %}" alt="Resource Editor">
-                          </div>
-
-                          <!-- Splash Title -->
-                          <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
-
-                          <!-- Splash Instructions -->
-                          <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
-                          <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
-                          <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
-                      </div>
-                  <!--/ko -->
+                    <!-- Splash Instructions -->
+                    <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
+                    <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
+                    <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
+                </div>
                 <!--/ko -->
             <!--/ko -->
 
@@ -294,36 +289,34 @@
 </div>
 {% endblock main_content %}
 
-{% block tabs %}{% endblock tabs %}
-
 {% block pre_require_js %}
 {{block.super}}
-    <script>
-        {% autoescape off %}define('resource-editor-data', [], function() {
-            return {
-                resourceid: '{{resourceid}}',
-                graphid: '{{graphid}}',
-                graphiconclass: '{{graphiconclass}}',
-                graphname: '{{graphname | escapejs}}',
-                displayname: '{{displayname | escapejs}}',
-                tiles: {{tiles}},
-                cards: {{cards}},
-                nodes: {{nodes}},
-                cardwidgets: {{cardwidgets}},
-                widgets: {{widgets_json}},
-                ontologyclass: '{{ontologyclass}}',
-                relationship_types: {{ relationship_types }},
-                datatypes: {{datatypes_json}},
-                appliedFunctions: {{applied_functions}},
-                cardComponents: {{card_components_json}},
-                nodegroups: {{nodegroups}},
-                userisreviewer:  JSON.parse('{{ user_is_reviewer }}'.toLowerCase()),
-                creator:  JSON.parse('{{ creator }}'.toLowerCase()),
-                useriscreator:  JSON.parse('{{ user_created_instance }}'.toLowerCase()),
-                templates: {{templates_json}},
-                graph: {{graph_json}},
-                issystemsettings: {{is_system_settings|yesno:"true,false"}}
-            };ƒ
-        });{% endautoescape %}
-    </script>
+<div 
+    id="resourceEditorData"
+    style="display: none;"
+    resourceEditorData='{
+        "resourceid": "{{resourceid}}",
+        "graphid": "{{graphid}}",
+        "graphiconclass": "{{graphiconclass}}",
+        "graphname": "{{graphname | escapejs}}",
+        "displayname": "{{displayname | escapejs}}",
+        "tiles": {{tiles}},
+        "cards": {{cards}},
+        "nodes": {{nodes}},
+        "cardwidgets": {{cardwidgets}},
+        "widgets": {{widgets_json}},
+        "ontologyclass": "{{ontologyclass}}",
+        "relationship_types": "{{ relationship_types }}",
+        "datatypes": {{datatypes_json}},
+        "appliedFunctions": {{applied_functions}},
+        "cardComponents": {{card_components_json}},
+        "nodegroups": {{nodegroups}},
+        "userisreviewer": "{{ user_is_reviewer }}",
+        "creator": {{ creator }},
+        "useriscreator": "{{ user_created_instance }}",
+        "templates": {{templates_json}},
+        "graph": {{graph_json}},
+        "issystemsettings": {{is_system_settings|yesno:"true,false"}}
+    }'
+></div>
 {% endblock pre_require_js %}
