@@ -155,21 +155,46 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
                 }'></div>
                 <!--/ko -->
                 <!--ko if: !resourceId() -->
-                <div id="rr-splash" class="rr-splash">
+                <!-- ko if: graphid === "14578901-bd5d-11e9-822a-94659cf754d0" -->
+                      <div id="rr-splash" class="rr-splash">
 
-                    <!-- Image -->
-                    <div class="img-lg img-circle rr-splash-img-container">
-                        <img class="rr-splash-img" src="{% webpack_static "img/inspection.png" %}" alt="Resource Editor">
-                    </div>
+                          <!-- Image -->
+                          <div class="img-lg img-circle rr-splash-img-container">
+                              <img class="rr-splash-img" src="{% webpack_static "/img/inspection.png" %}" alt="Resource Editor">
+                          </div>
 
-                    <!-- Splash Title -->
-                    <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
+                          <!-- Splash Title -->
+                          <div class="rr-splash-title">{% trans "Welcome to the HMS Florida Scout Report System!" %}</div>
 
-                    <!-- Splash Instructions -->
-                    <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
-                    <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
-                    <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
-                </div>
+                          <!-- Splash Instructions -->
+                          <div class="rr-splash-description">You are about to create a new Scout Report record or, as it is known in the Arches Database, a “New Resource”. </div>
+
+                          <div class="rr-splash-description">The tree structure on the left lists all six pages of the Scout Report you will log. You will click on each page to fill in the required information. Information marked with an *asterisk is required. Please click <span style="color:#3acaa1;">“+ Add”</span> after you have completed each page and you will see your new entry show up in the tree on the left.</div>
+
+                          <div class="rr-splash-description"><strong>Clicking <span style="color:#3acaa1;">“+ Add”</span> will only save the page you are currently editing, not the entire report, so you must click <span style="color:#3acaa1;">“+ Add”</span> at the end of every page to save.</strong></div>
+
+                          <div class="rr-splash-description">Steps 1 through 4 are required. If you are logging a report for an Archaeological Site or Historic Cemetery, you may skip Step 5. If you do not have photos from your monitoring visit, skip Step 6.</div>
+
+                          <div class="rr-splash-description">Have questions about a specific page? Click the <span style="color: #F26422">Help <i class="fa fa-question-circle"></i></span> feature at the top right of each page for more details and helpful information about each step and its questions.</div>
+                      </div>
+                  <!--/ko -->
+                  <!-- ko ifnot: graphid === "14578901-bd5d-11e9-822a-94659cf754d0" -->
+                      <div id="rr-splash" class="rr-splash">
+
+                          <!-- Image -->
+                          <div class="img-lg img-circle rr-splash-img-container">
+                              <img class="rr-splash-img" src="{% webpack_static "/img/inspection.png" %}" alt="Resource Editor">
+                          </div>
+
+                          <!-- Splash Title -->
+                          <div class="rr-splash-title">{% trans "Welcome to Arches' Resource Editor" %}</div>
+
+                          <!-- Splash Instructions -->
+                          <div class="rr-splash-description">{% trans "You are about to create a new resource record.  Select any data card from the list on the left and start entering information." %}</div>
+                          <div class="rr-splash-description">{% trans "Don't worry if you decide not to enter any data just yet." %}</div>
+                          <div class="rr-splash-description">{% trans "Arches will create your new resource record once you've saved a data entry card." %}</div>
+                      </div>
+                  <!--/ko -->
                 <!--/ko -->
             <!--/ko -->
 
