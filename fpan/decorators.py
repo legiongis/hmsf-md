@@ -22,10 +22,10 @@ def can_access_site_or_report(function):
         if resourceid is None:
             raise Http404
 
-        graph_name = ResourceInstance.objects.get(pk=resourceid).graph.name
+        graphid = str(ResourceInstance.objects.get(pk=resourceid).graph.pk)
         allowed = False
 
-        rule = get_rule_by_graph(request.user, graph_name=graph_name)
+        rule = get_rule_by_graph(request.user, graphid=graphid)
 
         if rule.type == "full_access":
             allowed = True

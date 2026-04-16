@@ -209,6 +209,13 @@ SPATIAL_COORDINATES_NODEGROUPS_IDS = [
     "efe6cb5e-dbab-11e7-a327-94659cf754d0",  # historic structure
 ]
 
+GRAPH_LOOKUP = {
+    "as": {"id": "f212980f-d534-11e7-8ca8-94659cf754d0", "name": "Archaeological Site"},
+    "hc": {"id": "73889292-d536-11e7-b3b3-94659cf754d0", "name": "Historic Cemetery"},
+    "hs": {"id": "c67216bf-8cc2-11e7-883c-06ed184dc22c", "name": "Historic Structure"},
+    "sr": {"id": "14578901-bd5d-11e9-822a-94659cf754d0", "name": "Scout Report"},
+}
+
 
 try:
     from .settings_local import *

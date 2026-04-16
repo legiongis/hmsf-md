@@ -178,10 +178,10 @@ class ScoutProfile(models.Model):
     def site_access_rules_formatted(self) -> SafeText:
         content = {}
         content["Archaeological Site"] = get_rule_by_graph(
-            self, graph_name="Archaeological Site"
+            self, graphid=settings.GRAPH_LOOKUP["as"]["id"]
         ).serialize()
         content["Scout Report"] = get_rule_by_graph(
-            self, graph_name="Scout Report"
+            self, graphid=settings.GRAPH_LOOKUP["sr"]["id"]
         ).serialize()
         return format_json_display(content)
 
@@ -189,7 +189,7 @@ class ScoutProfile(models.Model):
 
     def accessible_sites_formatted(self):
         res = get_user_allowed_resources_by_graph(
-            self, graph_name="Archaeological Site"
+            self, graphid=settings.GRAPH_LOOKUP["as"]["id"]
         )
         return format_json_display(res)
 
@@ -266,10 +266,10 @@ class LandManager(models.Model):
     def site_access_rules_formatted(self) -> SafeText:
         content = {}
         content["Archaeological Site"] = get_rule_by_graph(
-            self, graph_name="Archaeological Site"
+            self, graphid=settings.GRAPH_LOOKUP["as"]["id"]
         ).serialize()
         content["Scout Report"] = get_rule_by_graph(
-            self, graph_name="Scout Report"
+            self, graphid=settings.GRAPH_LOOKUP["sr"]["id"]
         ).serialize()
         return format_json_display(content)
 
@@ -277,7 +277,7 @@ class LandManager(models.Model):
 
     def accessible_sites_formatted(self):
         res = get_user_allowed_resources_by_graph(
-            self, graph_name="Archaeological Site"
+            self, graphid=settings.GRAPH_LOOKUP["as"]["id"]
         )
         return format_json_display(res)
 

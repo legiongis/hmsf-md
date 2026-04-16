@@ -35,8 +35,7 @@ class FPANUserManagerView(UserManagerView):
         start = time.time()
 
         # get rule for Archaeological Site resource model
-        graphid = str(GraphModel.objects.get(name="Archaeological Site").pk)
-        rule = get_rule_by_graph(user, graphid=graphid)
+        rule = get_rule_by_graph(user, graphid=settings.GRAPH_LOOKUP["as"]["id"])
         sites = RuleFilter().get_resources_from_rule(rule)
 
         site_lookup = {}

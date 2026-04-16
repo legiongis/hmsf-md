@@ -34,15 +34,11 @@ details = {
 
 
 class Rule(object):
-    def __init__(self, rule_type, **kwargs):
+    def __init__(self, rule_type: str, **kwargs):
 
         self.type = rule_type
         self.graph_id = kwargs.get("graph_id")
-        self.graph_name = kwargs.get("graph_name")
         self.config = {}
-
-        if not self.graph_id and self.graph_name:
-            self.graph_id = str(GraphModel.objects.get(name=self.graph_name).pk)
 
         if self.type in ["full_access", "no_access"]:
             self.config["graph_id"] = self.graph_id
@@ -303,7 +299,6 @@ class RuleFilter(BaseSearchFilter):
         results = query.search(index="resources")
 
         if ids_only is True:
-            ids = [i["_source"]["resourceinstanceid"] for i in results["hits"]["hits"]]
-            return ids
+            return [i["_source"]["resourceinstanceid"] for i in results["hits"]["hits"]]
 
         return [i["_source"] for i in results["hits"]["hits"]]
