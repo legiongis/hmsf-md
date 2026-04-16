@@ -143,13 +143,11 @@ class Rule(object):
 
 
 class RuleFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
         """
         This is the method that Arches calls, and ultimately all it does is
 
-          search_results_object["query"].add_query(some_new_es_dsl)
+          search_query_object["query"].add_query(some_new_es_dsl)
 
         Many other methods of this class are used as helpers for generating
         the new dsl content, which is stored in self.paramount.
@@ -164,7 +162,7 @@ class RuleFilter(BaseSearchFilter):
         self.existing_query = False
 
         ## manual test to see if any criteria have been added to the query yet
-        original_dsl = search_results_object["query"]._dsl
+        original_dsl = search_query_object["query"]._dsl
         try:
             if original_dsl["query"]["match_all"] == {}:
                 self.existing_query = True
@@ -172,10 +170,12 @@ class RuleFilter(BaseSearchFilter):
             pass
 
         if settings.LOG_LEVEL == "DEBUG":
-            with open(
-                os.path.join(settings.LOG_DIR, "dsl_before_fpan.json"), "w"
-            ) as output:
-                json.dump(original_dsl, output, indent=1)
+            with open(os.path.join(settings.LOG_DIR, "dsl_before_fpan.json"), "w") as o:
+                json.dump(
+                    json.loads(JSONSerializer().serialize(original_dsl)),
+                    o,
+                    indent=1,
+                )
 
         ## Should always be enabled. If not (like someone typed in a different URL) raise exception.
         querystring_params = self.request.GET.get(details["componentname"])
@@ -188,7 +188,7 @@ class RuleFilter(BaseSearchFilter):
         graphids_uuid = (
             GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
             .values_list("graphid", flat=True)
         )
         graphids = [str(i) for i in graphids_uuid]

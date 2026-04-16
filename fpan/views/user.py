@@ -79,7 +79,9 @@ class FPANUserManagerView(UserManagerView):
             v["scout_reports"].sort(key=lambda k: k["displayname"], reverse=True)
 
         # sort site list
-        site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
+        site_info = sorted(
+            site_lookup.values(), key=lambda k: k["displayname"][0]["value"]
+        )
 
         logger.debug(
             f"getting hms_details for {user.username}: {time.time() - start} seconds elapsed"
