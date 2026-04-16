@@ -20,13 +20,14 @@ define([
             params.configKeys = ['options','placeholder'];
             WidgetViewModel.apply(this, [params]);
 
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             var self = this;
             self.availableScouts = ko.observableArray();
             self.selectedScout = params.value;
             
             // push the anonymous user to this list so admins can expose select sites to the public
             self.availableScouts.push({
-                'username': 'anonymous',
+                'username': {"en": {"value":'anonymous', "direction": "ltr"}},
                 'display_name': 'Public Access',
             });
 

@@ -287,7 +287,7 @@ def scouts_dropdown(request):
             lookup = json.load(o)
         res = FMSFResource(resourceid)
         if res.siteid:
-            entry = lookup.get(res.siteid[:2])
+            entry = lookup.get(res.siteid["en"]["value"][:2])
             matched_scouts = ScoutProfile.objects.filter(
                 fpan_regions2__name__contains=entry["region"]
             ).distinct()
@@ -303,14 +303,16 @@ def scouts_dropdown(request):
         return_scouts.append(
             {
                 "id": scout.user.pk,
-                "username": scout.user.username,
+                "username": {"en": {"value": scout.user.username, "direction": "ltr"}},
                 "display_name": display_name,
                 "site_interest_type": scout.site_interest_type,
                 "fpan_regions": [region.name for region in scout.fpan_regions2.all()],
             }
         )
 
-    return JSONResponse(sorted(return_scouts, key=lambda k: k["username"]))
+    return JSONResponse(
+        sorted(return_scouts, key=lambda k: k["username"]["en"]["value"])
+    )
 
 
 @user_passes_test(lambda u: u.is_superuser)

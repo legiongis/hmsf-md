@@ -30,6 +30,7 @@ define([
             DomainWidgetViewModel.apply(this, [params]);
 
             // auto-populate with signed in user if no value present.
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             var self = this;
             if (self.value() == null || self.value().length == 0) {
                 viewData.usernameDropdownList.forEach( function(user) {
