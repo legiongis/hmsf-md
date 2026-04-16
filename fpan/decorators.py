@@ -7,7 +7,7 @@ from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 
 from fpan.search.components.rule_filter import RuleFilter
-from hms.permissions_backend import user_is_land_manager
+from hms.permissions_backend import user_is_land_manager, get_rule_by_graph
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ def can_access_site_or_report(function):
         graph_name = ResourceInstance.objects.get(pk=resourceid).graph.name
         allowed = False
 
-        rule = RuleFilter().get_rule_by_graph(request.user, graph_name=graph_name)
+        rule = get_rule_by_graph(request.user, graph_name=graph_name)
 
         if rule.type == "full_access":
             allowed = True

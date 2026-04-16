@@ -9,7 +9,7 @@ from hms.models import (
     ManagementAreaGroup,
     ManagementAreaCategory,
 )
-from fpan.search.components.rule_filter import RuleFilter
+from hms.permissions_backend import generate_site_access_html
 
 
 def debug(request):
@@ -61,4 +61,4 @@ def management_area_importer_configs(request):
 
 
 def rule_filter_html(request):
-    return {"rule_filter_html": RuleFilter().generate_html(request.user)}
+    return {"rule_filter_html": generate_site_access_html(request.user)}

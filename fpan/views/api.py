@@ -12,6 +12,7 @@ from arches.app.views.api import APIBase
 from arches.app.models.system_settings import settings
 
 from fpan.search.components.rule_filter import RuleFilter
+from hms.permissions_backend import get_rule_by_graph
 
 logger = logging.getLogger(__name__)
 
@@ -57,9 +58,7 @@ class MVT(APIBase):
                 "y": y,
             }
 
-            rule = RuleFilter().get_rule_by_graph(
-                request.user, graphid=str(node.graph.pk)
-            )
+            rule = get_rule_by_graph(request.user, graphid=str(node.graph.pk))
             full_access = False
             if rule.type == "no_access":
                 return self.EMPTY_TILE

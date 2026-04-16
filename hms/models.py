@@ -24,7 +24,10 @@ from arches.app.models.models import (
 )
 from arches.app.models.concept import Concept as ConceptProxy
 
-from fpan.search.components.rule_filter import RuleFilter
+from hms.permissions_backend import (
+    get_rule_by_graph,
+    get_user_allowed_resources_by_graph,
+)
 
 if TYPE_CHECKING:
     pass
@@ -174,20 +177,18 @@ class ScoutProfile(models.Model):
 
     def site_access_rules_formatted(self) -> SafeText:
         content = {}
-        content["Archaeological Site"] = (
-            RuleFilter()
-            .get_rule_by_graph(self, graph_name="Archaeological Site")
-            .serialize()
-        )
-        content["Scout Report"] = (
-            RuleFilter().get_rule_by_graph(self, graph_name="Scout Report").serialize()
-        )
+        content["Archaeological Site"] = get_rule_by_graph(
+            self, graph_name="Archaeological Site"
+        ).serialize()
+        content["Scout Report"] = get_rule_by_graph(
+            self, graph_name="Scout Report"
+        ).serialize()
         return format_json_display(content)
 
     site_access_rules_formatted.short_description = "Derived Access Rules"  # type: ignore
 
     def accessible_sites_formatted(self):
-        res = RuleFilter().get_user_allowed_resources_by_graph(
+        res = get_user_allowed_resources_by_graph(
             self, graph_name="Archaeological Site"
         )
         return format_json_display(res)
@@ -264,20 +265,18 @@ class LandManager(models.Model):
 
     def site_access_rules_formatted(self) -> SafeText:
         content = {}
-        content["Archaeological Site"] = (
-            RuleFilter()
-            .get_rule_by_graph(self, graph_name="Archaeological Site")
-            .serialize()
-        )
-        content["Scout Report"] = (
-            RuleFilter().get_rule_by_graph(self, graph_name="Scout Report").serialize()
-        )
+        content["Archaeological Site"] = get_rule_by_graph(
+            self, graph_name="Archaeological Site"
+        ).serialize()
+        content["Scout Report"] = get_rule_by_graph(
+            self, graph_name="Scout Report"
+        ).serialize()
         return format_json_display(content)
 
     site_access_rules_formatted.short_description = "Derived Access Rules"  # type: ignore
 
     def accessible_sites_formatted(self):
-        res = RuleFilter().get_user_allowed_resources_by_graph(
+        res = get_user_allowed_resources_by_graph(
             self, graph_name="Archaeological Site"
         )
         return format_json_display(res)

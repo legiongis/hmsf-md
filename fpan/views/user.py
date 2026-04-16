@@ -22,6 +22,7 @@ from fpan.search.components.rule_filter import RuleFilter
 from hms.permissions_backend import (
     user_is_land_manager,
     user_is_scout,
+    get_rule_by_graph,
 )
 from hms.views import scouts_dropdown
 
@@ -35,7 +36,7 @@ class FPANUserManagerView(UserManagerView):
 
         # get rule for Archaeological Site resource model
         graphid = str(GraphModel.objects.get(name="Archaeological Site").pk)
-        rule = RuleFilter().get_rule_by_graph(user, graphid=graphid)
+        rule = get_rule_by_graph(user, graphid=graphid)
         sites = RuleFilter().get_resources_from_rule(rule)
 
         site_lookup = {}
@@ -159,7 +160,7 @@ class FPANUserManagerView(UserManagerView):
                 request.user
             ):
                 userids = json.loads(request.POST.get("userids", "[]"))
-                data = {u.id: u.username for u in User.objects.filter(id__in=userids)}
+                data = {u.pk: u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
 
         if (
