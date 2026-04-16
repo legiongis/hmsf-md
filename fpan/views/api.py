@@ -57,9 +57,8 @@ class MVT(APIBase):
                 "y": y,
             }
 
-            graphid = str(node.graph_id)
-            rule = RuleFilter().compile_rules(
-                request.user, graphids=[graphid], single=True
+            rule = RuleFilter().get_rule_by_graph(
+                request.user, graphid=str(node.graph.pk)
             )
             full_access = False
             if rule.type == "no_access":

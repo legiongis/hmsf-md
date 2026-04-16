@@ -1,8 +1,9 @@
 import os
 import json
 import logging
+import time
 from typing import TYPE_CHECKING
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -15,6 +16,8 @@ from arches.app.search.elasticsearch_dsl_builder import (
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel, Node
+from arches.app.models.resource import Resource
+from arches.app.models.tile import Tile
 
 from hms.permissions_backend import (
     user_is_scout,
@@ -33,8 +36,59 @@ details = {
     "componentpath": "views/components/search/rule-filter",
     "componentname": "rule-filter",
     "sortorder": "0",
-    "enabled": True,
+    "config": {},
 }
+
+
+def report_rule_from_arch_rule(arch_rule):
+    """
+    Utility function that returns a resourceid filter that contains all
+    resourceids for Scout Reports attached to Archaeological Sites
+    that fit the specified archaeological site filter.
+    """
+    start = time.time()
+    if arch_rule.type == "full_access":
+        return Rule("full_access", graph_name="Scout Report")
+    elif arch_rule.type == "no_access":
+        arch_ids = []
+    else:
+        ## get ids only for the sites this user has access to
+        arch_ids = RuleFilter().get_resources_from_rule(arch_rule, ids_only=True)
+
+    ## now add all ids for all Historic Cemeteries and Historic Structures
+    cem_graph = GraphModel.objects.get(name="Historic Cemetery")
+    cem_ids = list(
+        Resource.objects.filter(graph=cem_graph).values_list("pk", flat=True)
+    )
+    struct_graph = GraphModel.objects.get(name="Historic Structure")
+    struct_ids = list(
+        Resource.objects.filter(graph=struct_graph).values_list("pk", flat=True)
+    )
+
+    resids = [str(i) for i in arch_ids + cem_ids + struct_ids]
+
+    report_graph = GraphModel.objects.get(name="Scout Report")
+    siteid_node = Node.objects.get(name="FMSF Site ID", graph=report_graph)
+    siteid_nodeid = str(siteid_node.pk)
+    rep_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values(
+        "data", "resourceinstance_id"
+    )
+    reportids = []
+    for rd in rep_datas:
+        try:
+            fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
+            if fmsfid in resids:
+                reportids.append(str(rd["resourceinstance_id"]))
+        except (IndexError, KeyError, TypeError) as e:
+            logger.warning(f"can't get fmsf id from {rd['resourceinstance_id']}")
+            logger.warning(e)
+        except Exception as e:
+            logger.error(f"can't get fmsf id from {rd['resourceinstance_id']}")
+            logger.error(e)
+
+    report_rule = Rule("resourceid_filter", resourceids=reportids)
+    logger.debug(f"report_rule_from_arch_rule: {time.time() - start}")
+    return report_rule
 
 
 class Rule(object):
@@ -160,84 +214,158 @@ class RuleFilter(BaseSearchFilter):
 
         ## now create a user-determined rule for each graph in the request.
         ## collected rules are created with the rule generators above.
-        collected_rules = self.compile_rules(self.request.user, graphids=graphids)
+        collected_rules = [
+            self.get_rule_by_graph(self.request.user, graphid=i) for i in graphids
+        ]
 
         ## iterate rules, applying them to self.paramount thereby generating
         ## a composite query.
         for rule in collected_rules:
             self.apply_rule(rule)
 
-        search_results_object["query"].add_query(self.paramount)
+        search_query_object["query"].add_query(self.paramount)
 
         if settings.LOG_LEVEL == "DEBUG":
-            with open(
-                os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w"
-            ) as output:
-                json.dump(search_results_object["query"]._dsl, output, indent=1)
+            with open(os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w") as o:
+                json.dump(
+                    json.loads(
+                        JSONSerializer().serialize(search_query_object["query"]._dsl)
+                    ),
+                    o,
+                    indent=1,
+                )
 
-    def compile_rules(self, user, graphids=[], single=False):
-        """
-        Pass in a user and a list of graphids to generate filters for each graph
-        based on user characteristics. If a single graphid is passed in, then
-        you can add single=True to return a single rule, instead of a list
-        containing only one rule.
+    def get_rule_by_graph(self, user, graphid=None, graph_name=None) -> Rule:
 
-        Potentially, user-defined settings could be pulled in here to extrapolate
-        this logic to the front-end.
-        """
-
-        compiled_rules = []
-        for graphid in graphids:
+        if not graph_name:
             graph_name = GraphModel.objects.get(graphid=graphid).name
 
-            if user.is_superuser:
-                rule = Rule("full_access", graph_name=graph_name)
+        if user.is_superuser:
+            rule = Rule("full_access", graph_name=graph_name)
 
-            elif user_is_land_manager(user):
-                rule = user.landmanager.get_graph_rule(graph_name)
+        elif user_is_land_manager(user):
+            if graph_name == "Archaeological Site":
+                if user.site_access_mode == "FULL":
+                    rule = Rule("full_access", graph_name=graph_name)
 
-            elif user_is_scout(user):
-                rule = user.scout.scoutprofile.get_graph_rule(graph_name)
+                elif user.site_access_mode == "AREA":
+                    ## this was supposed to be a proper geo rule as below, but
+                    ## that doesn't allow for arbitrary assignment of nearby
+                    ## management areas that don't spatially intersect.
+                    # multipolygon = user.landmanager.areas_as_multipolygon
+                    # rules["Archaeological Site"] = Rule(
+                    #   graph_name="Archaeological Site"
+                    #   geometry=multipolygon,
+                    # )
 
-            elif user.username == "anonymous":
-                ## manual handling of public users here
-                if graph_name == "Archaeological Site":
+                    ## instead, apply attribute rule based on the names of
+                    ## of associated areas.
+                    value = ["<no area set>"]
+                    if len(user.all_areas) > 0:
+                        value = [f"{i.name} ({i.pk})" for i in user.all_areas]
                     rule = Rule(
                         "attribute_filter",
-                        graph_name=graph_name,
-                        node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
-                        value=[user.username],
+                        graph_name="Archaeological Site",
+                        node_id=settings.SPATIAL_JOIN_NODE_LOOKUP[
+                            "Archaeological Site"
+                        ]["area_nodeid"],
+                        value=value,
                     )
 
-                elif graph_name == "Scout Report":
-                    from hms.models import report_rule_from_arch_rule
+                elif user.site_access_mode == "AGENCY":
+                    value = ["<no agency set>"]
+                    if user.management_agency:
+                        value = [user.management_agency.name]
 
-                    arch_rule = Rule(
+                    rule = Rule(
+                        "attribute_filter",
+                        graph_name="Archaeological Site",
+                        node_id=settings.SPATIAL_JOIN_NODE_LOOKUP[
+                            "Archaeological Site"
+                        ]["agency_nodeid"],
+                        value=value,
+                    )
+                elif user.site_access_mode == "NONE":
+                    rule = Rule("no_access", graph_name=graph_name)
+                else:
+                    rule = Rule("no_access", graph_name=graph_name)
+
+            elif graph_name == "Scout Report":
+                arch_rule = self.get_rule_by_graph(
+                    user, graph_name="Archaeological Site"
+                )
+                rule = report_rule_from_arch_rule(arch_rule)
+
+            else:
+                rule = Rule("full_access", graph_name=graph_name)
+
+        elif user_is_scout(user):
+            if graph_name == "Archaeological Site":
+                if user.scout.scoutprofile.site_access_mode == "FULL":
+                    rule = Rule("full_access", graph_name=graph_name)
+                else:
+                    rule = Rule(
                         "attribute_filter",
                         graph_name="Archaeological Site",
                         node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
-                        value=[user.username],
+                        value=[user.username, "anonymous"],
                     )
-                    rule = report_rule_from_arch_rule(arch_rule)
 
-                else:
-                    rule = Rule("full_access", graph_name=graph_name)
+            elif graph_name == "Scout Report":
+                ## This is identical to the analogous section of LandManager.get_graph_rule()
+                arch_rule = self.get_rule_by_graph(
+                    user, graph_name="Archaeological Site"
+                )
+                rule = report_rule_from_arch_rule(arch_rule)
 
             else:
-                # this will catch old land managers before their profiles
-                # have been created.
-                logger.debug(f"compile_rules: user {user.username} is adrift.")
-                if graph_name in ["Archaeological Site", "Scout Report"]:
-                    rule = Rule("no_access", graph_name=graph_name)
-                else:
-                    rule = Rule("full_access", graph_name=graph_name)
+                rule = Rule("full_access", graph_name=graph_name)
 
-            compiled_rules.append(rule)
+            return rule
 
-        if len(compiled_rules) == 1 and single is True:
-            return compiled_rules[0]
+        elif user.username == "anonymous":
+            ## manual handling of public users here
+            if graph_name == "Archaeological Site":
+                rule = Rule(
+                    "attribute_filter",
+                    graph_name=graph_name,
+                    node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
+                    value=[user.username],
+                )
+
+            elif graph_name == "Scout Report":
+                arch_rule = Rule(
+                    "attribute_filter",
+                    graph_name="Archaeological Site",
+                    node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
+                    value=[user.username],
+                )
+                rule = report_rule_from_arch_rule(arch_rule)
+
+            else:
+                rule = Rule("full_access", graph_name=graph_name)
+
         else:
-            return compiled_rules
+            # this will catch old land managers before their profiles
+            # have been created.
+            logger.debug(f"get_rule_by_graph: user {user.username} is adrift.")
+            if graph_name in ["Archaeological Site", "Scout Report"]:
+                rule = Rule("no_access", graph_name=graph_name)
+            else:
+                rule = Rule("full_access", graph_name=graph_name)
+
+        return rule
+
+    def get_user_allowed_resources_by_graph(self, user, graphid=None, graph_name=None):
+
+        if not graph_name:
+            graph_name = GraphModel.objects.get(graphid=graphid).name
+
+        rule = self.get_rule_by_graph(user, graph_name=graph_name)
+        if rule.type in ["full_access", "no_access"]:
+            return []
+        id_list = RuleFilter().get_resources_from_rule(rule)
+        return id_list
 
     def apply_rule(self, rule):
 
@@ -374,7 +502,6 @@ class RuleFilter(BaseSearchFilter):
 
         ## ultimately, this should be dynamically driven directly by the rules this filter finds.
         ## for now though, there is a lot of hard-coded HMS logic
-        # rules = self.compile_rules(user)
 
         FULL_ACCESS_HTML = "<p>Your account has full access to <strong>all</strong> archaeological sites.</p>"
         NO_ACCESS_HTML = (
