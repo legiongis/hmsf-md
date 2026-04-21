@@ -1,6 +1,7 @@
-import os
 import json
 import logging
+from pathlib import Path
+
 from typing import TYPE_CHECKING
 from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
@@ -31,6 +32,16 @@ details = {
     "sortorder": "0",
     "config": {},
 }
+
+
+def save_dsl(dsl_object, file_name):
+    out_dsl = json.loads(JSONSerializer().serialize(dsl_object))
+    ## remove some non-standard query keys to allow easy copy/paste
+    ## into an Elasticsearch client
+    out_dsl.pop("source_includes", None)
+    out_dsl.pop("source_excludes", None)
+    with open(Path(settings.LOG_DIR, file_name), "w") as o:
+        json.dump(out_dsl, o, indent=1)
 
 
 class Rule(object):
@@ -72,6 +83,9 @@ class Rule(object):
         else:
             raise (Exception(f"Invalid rule type: {self.type}"))
 
+    def __repr__(self):
+        return f"{self.type} | {self.config}"
+
     def serialize(self):
 
         return {
@@ -99,6 +113,7 @@ class RuleFilter(BaseSearchFilter):
         self.paramount = Bool()
         self.existing_query = False
 
+        ## PROBABLY REMOVE THIS AS ARCHES HAS A DIFFERENT DEFAULT STRUCTURE NOW
         ## manual test to see if any criteria have been added to the query yet
         original_dsl = search_query_object["query"]._dsl
         try:
@@ -107,16 +122,28 @@ class RuleFilter(BaseSearchFilter):
         except KeyError:
             pass
 
+        ## NEW APPROACH:
+        ## collect all existing filters BESIDES the default graph_id filter
+        existing_filters = []
+        for f in search_query_object["query"].dsl["query"]["bool"]["filter"]:
+            if "graph_id" not in f.get("terms", {}):
+                existing_filters.append(f)
+
+        print(
+            json.dumps(
+                search_query_object["query"].dsl["query"]["bool"]["filter"], indent=1
+            )
+        )
+        print(json.dumps(existing_filters, indent=1))
+
         if settings.LOG_LEVEL == "DEBUG":
-            with open(os.path.join(settings.LOG_DIR, "dsl_before_fpan.json"), "w") as o:
-                json.dump(
-                    json.loads(JSONSerializer().serialize(original_dsl)),
-                    o,
-                    indent=1,
-                )
+            save_dsl(
+                search_query_object["query"]._dsl,
+                f"{self.componentname}_dsl__before.json",
+            )
 
         ## Should always be enabled. If not (like someone typed in a different URL) raise exception.
-        querystring_params = self.request.GET.get(details["componentname"])
+        querystring_params = self.request.GET.get(self.componentname)
         if querystring_params != "enabled":
             raise (
                 Exception("Error: Site filter is registered but not shown as enabled.")
@@ -158,22 +185,55 @@ class RuleFilter(BaseSearchFilter):
             get_rule_by_graph(self.request.user, graphid=i) for i in graphids
         ]
 
+        should_list = []
+        must_not_list = []
+
+        full_allow_graphids = []
+        no_allow_graphids = []
+
+        ## NEW APPROACH: Iterate rules and generate dsl and add it to the filter
+        ## should or must_not list. No longer using hardly any of the other methods
+        ## on this class!
+
         ## iterate rules, applying them to self.paramount thereby generating
         ## a composite query.
         for rule in collected_rules:
-            self.apply_rule(rule)
+            print("applying rule:", rule)
+            if rule.type == "full_access":
+                full_allow_graphids.append(rule.config["graph_id"])
+            elif rule.type == "no_access":
+                no_allow_graphids.append(rule.config["graph_id"])
+            elif rule.type == "resourceid_filter":
+                should_list.append(
+                    self.get_resourceid_filter_clause(rule.config["resourceids"])._dsl
+                )
+            elif rule.type == "attribute_filter":
+                should_list.append(self.get_attribute_filter_clause(rule.config)._dsl)
+            # self.apply_rule(rule)
 
-        search_query_object["query"].add_query(self.paramount)
+        if len(full_allow_graphids) > 0:
+            should_list.append({"terms": {"graph_id": full_allow_graphids}})
+        if len(no_allow_graphids) > 0:
+            must_not_list.append({"terms": {"graph_id": no_allow_graphids}})
+
+        new_bool_filter = {
+            "bool": {
+                "should": should_list,
+                "must_not": must_not_list,
+            }
+        }
+
+        existing_filters.append(new_bool_filter)
+
+        search_query_object["query"].dsl["query"]["bool"]["filter"] = existing_filters
+
+        # search_query_object["query"].add_query(self.paramount)
 
         if settings.LOG_LEVEL == "DEBUG":
-            with open(os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w") as o:
-                json.dump(
-                    json.loads(
-                        JSONSerializer().serialize(search_query_object["query"]._dsl)
-                    ),
-                    o,
-                    indent=1,
-                )
+            save_dsl(
+                search_query_object["query"]._dsl,
+                f"{self.componentname}_dsl__after.json",
+            )
 
     def apply_rule(self, rule):
 
@@ -213,6 +273,17 @@ class RuleFilter(BaseSearchFilter):
 
         self.paramount.must_not(terms)
 
+    def get_attribute_filter_clause(self, rule_config):
+        attribute_bool = Bool()
+        terms = Terms(field="strings.nodegroup_id", terms=[rule_config["nodegroup_id"]])
+        attribute_bool.filter(terms)
+        for value in rule_config["value"]:
+            match = Match(field="strings.string", query=value, type="phrase")
+            attribute_bool.should(match)
+
+        nested = Nested(path="strings", query=attribute_bool)
+        return nested
+
     def add_attribute_filter_clause(self, rule_config):
 
         attribute_bool = Bool()
@@ -228,6 +299,13 @@ class RuleFilter(BaseSearchFilter):
             self.paramount.should(nested)
         else:
             self.paramount.must(nested)
+
+    def get_resourceid_filter_clause(self, resourceids):
+
+        resid_bool = Bool()
+        terms = Terms(field="resourceinstanceid", terms=resourceids)
+        resid_bool.should(terms)
+        return resid_bool
 
     def add_resourceid_filter_clause(self, resourceids):
         """incomplete at this time, but would pull a list of resource ids
