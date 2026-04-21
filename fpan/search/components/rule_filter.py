@@ -347,6 +347,15 @@ class RuleFilter(BaseSearchFilter):
         else:
             logger.warning(f"error constructing geoshape from geojson: {geojson_geom}")
 
+    def view_data(self):
+        from hms.permissions_backend import generate_site_access_html
+
+        html_content = "No access"
+        if self.request and self.request.user:
+            html_content = generate_site_access_html(self.request.user)
+
+        return {"rule_filter_html": html_content}
+
     def get_resources_from_rule(self, rule, ids_only=False):
         """
         Returns a list of resources for single graph_filter rule. This

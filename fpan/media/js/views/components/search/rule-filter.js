@@ -1,23 +1,24 @@
 define([
     'knockout',
+    'arches',
     'views/components/search/base-filter',
     'templates/views/components/search/rule-filter.htm'
-], function(ko, BaseFilter, ruleFilterTemplate) {
+], function(ko, arches, BaseFilter, ruleFilterTemplate) {
     var componentName = 'rule-filter';
     return ko.components.register(componentName, {
         viewModel: BaseFilter.extend({
-            initialize: function(options) {
+            initialize: async function(options) {
                 options.name = 'Rule Filter';
                 BaseFilter.prototype.initialize.call(this, options);
-                this.restoreState();
+                const response = await fetch(arches.urls.api_search_component_data + componentName);
+                if (response.ok) {
+                    const data = await response.json();
+                    this.rule_filter_html(data.rule_filter_html);
+                } else {
+                    this.rule_filter_html('Failed to fetch rule-filter summary');
+                }
             },
-
-            restoreState: function() {
-                var queryObj = this.query();
-                queryObj[componentName] = 'enabled';
-                this.query(queryObj);
-            },
-
+            rule_filter_html: ko.observable(),
         }),
         template: ruleFilterTemplate
     });
