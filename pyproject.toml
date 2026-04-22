@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Arches implementation for the Heritage Monitoring Scouts program by the Florida Public Archaeology Network."
 readme = "README.md"
 license = {text = "GNU AGPL3"}
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 
 dependencies = [
     "pygments==2.15.0",
