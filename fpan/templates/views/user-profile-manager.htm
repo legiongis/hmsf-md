@@ -547,7 +547,7 @@
                                 {% else %}
                                 <ul style="list-style:none; padding-left:0px;">
                                 {% for site in accessible_sites %}
-                                    <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
+                                    <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname.0.value }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
                                     {% if site.scout_report_ct > 0 %}
                                     <ul style="list-style-type:'\21B3';">
                                     {% for report in site.scout_reports %}
@@ -579,7 +579,7 @@
                                 <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}" target="_blank">click to download full list</a></p>
                                 <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px; background:url({% webpack_static 'img/fpan/ricepaper.png' %});">
                                     {% for scout in scout_list %}
-                                    <li><strong>{{scout.username}}</strong> | <em>regions:</em>
+                                    <li><strong>{{scout.username.en.value}}</strong> | <em>regions:</em>
                                         {% for region in scout.fpan_regions %}
                                             {{ region }}{% if not forloop.last %},{% endif %}
                                         {% endfor %} | <em>interests:</em>

@@ -135,7 +135,7 @@ class FPANUserManagerView(UserManagerView):
             if request.user.is_superuser:
                 scouts_unsorted = json.loads(scouts_dropdown(request).content)
                 context["scout_list"] = sorted(
-                    scouts_unsorted, key=lambda k: k["username"]
+                    scouts_unsorted, key=lambda k: k["username"]["en"]["value"]
                 )
 
             context["two_factor_authentication_settings"] = JSONSerializer().serialize(
