@@ -28,10 +28,10 @@ def get_archaeological_site_rule(user) -> Rule:
         rule = Rule("full_access", graph_id=arch_graphid)
 
     elif user_is_land_manager(user):
-        if user.site_access_mode == "FULL":
+        if user.landmanager.site_access_mode == "FULL":
             rule = Rule("full_access", graph_id=arch_graphid)
 
-        elif user.site_access_mode == "AREA":
+        elif user.landmanager.site_access_mode == "AREA":
             ## this was supposed to be a proper geo rule as below, but
             ## that doesn't allow for arbitrary assignment of nearby
             ## management areas that don't spatially intersect.
@@ -44,8 +44,8 @@ def get_archaeological_site_rule(user) -> Rule:
             ## instead, apply attribute rule based on the names of
             ## of associated areas.
             value = ["<no area set>"]
-            if len(user.all_areas) > 0:
-                value = [f"{i.name} ({i.pk})" for i in user.all_areas]
+            if len(user.landmanager.all_areas) > 0:
+                value = [f"{i.name} ({i.pk})" for i in user.landmanager.all_areas]
             rule = Rule(
                 "attribute_filter",
                 graph_id=arch_graphid,
@@ -55,10 +55,10 @@ def get_archaeological_site_rule(user) -> Rule:
                 value=value,
             )
 
-        elif user.site_access_mode == "AGENCY":
+        elif user.landmanager.site_access_mode == "AGENCY":
             value = ["<no agency set>"]
-            if user.management_agency:
-                value = [user.management_agency.name]
+            if user.landmanager.management_agency:
+                value = [user.landmanager.management_agency.name]
 
             rule = Rule(
                 "attribute_filter",
