@@ -22,6 +22,7 @@ from django.http import (
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.urls import reverse
@@ -31,7 +32,9 @@ from arches.app.views.api import APIBase
 from arches.app.utils.response import JSONResponse
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.views.user import UserManagerView
 
+from fpan.decorators import user_is_scout_decorator
 from hms.fmsf import FMSFResource
 from hms.forms import ScoutForm, ScoutProfileForm
 from hms.models import Scout, ScoutProfile
@@ -68,10 +71,43 @@ def about(request):
     )
 
 
-@user_passes_test(user_is_scout)
-def hms_home(request):
+@method_decorator(user_is_scout_decorator, name="dispatch")
+class ScoutProfileView(UserManagerView):
+    def get(self, request):
 
-    if request.method == "POST":
+        context = self.get_context_data()
+
+        title = "User Home"
+        if request.user.is_superuser:
+            title = "Admin: " + request.user.username
+        elif user_is_land_manager(request.user):
+            title = "Land Manager: " + request.user.username
+        elif user_is_scout(request.user):
+            title = "Scout: " + request.user.username
+
+        context["nav"]["icon"] = "fa fa-user"
+        context["nav"]["title"] = title
+
+        context["scout_profile"] = None
+        context["page"] = "scout-profile"
+        context["help"] = {
+            "title": "Profile Editing",
+            "template": "profile-manager-help",
+        }
+
+        try:
+            context["scout_profile"] = ScoutProfileForm(
+                instance=request.user.scout.scoutprofile
+            )
+        except Scout.DoesNotExist:
+            pass
+        return render(
+            request,
+            "scout-profile.htm",
+            context,
+        )
+
+    def post(self, request):
         scout_profile_form = ScoutProfileForm(
             request.POST, instance=request.user.scout.scoutprofile
         )
@@ -83,25 +119,29 @@ def hms_home(request):
             return redirect(reverse("user_profile_manager"))
         else:
             messages.add_message(request, messages.ERROR, "Form was invalid.")
+            context = self.get_context_data()
+            title = "User Home"
+            if request.user.is_superuser:
+                title = "Admin: " + request.user.username
+            elif user_is_land_manager(request.user):
+                title = "Land Manager: " + request.user.username
+            elif user_is_scout(request.user):
+                title = "Scout: " + request.user.username
+
+            context["nav"]["icon"] = "fa fa-user"
+            context["nav"]["title"] = title
+
+            context["scout_profile"] = scout_profile_form
+            context["page"] = "scout-profile"
+            context["help"] = {
+                "title": "Profile Editing",
+                "template": "profile-manager-help",
+            }
             return render(
                 request,
-                "home-hms.htm",
-                {"scout_profile": scout_profile_form, "page": "home-hms"},
+                "scout-profile.htm",
+                context,
             )
-
-    else:
-        scout_profile_form = None
-        try:
-            scout_profile_form = ScoutProfileForm(
-                instance=request.user.scout.scoutprofile
-            )
-        except Scout.DoesNotExist:
-            pass
-        return render(
-            request,
-            "home-hms.htm",
-            {"scout_profile": scout_profile_form, "page": "home-hms"},
-        )
 
 
 def server_error(request, template_name="500.html"):

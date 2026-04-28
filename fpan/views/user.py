@@ -120,12 +120,12 @@ class FPANUserManagerView(UserManagerView):
             }
             context["validation_help"] = validation.password_validators_help_texts()
 
-            ## retain this user_details acquisition as it pulls upstream Arches information.
-            ## make sure it is all passed to the context variable as below.
-            user_details = self.get_user_details(request.user)
-            context["identities"] = JSONSerializer().serialize(
-                user_details["identities"], sort_keys=False
-            )
+            ## COMMENT OUT THIS get_user_details() it takes a very long time
+            ## to complete and doesn't seem necessary??
+            # user_details = self.get_user_details(request.user)
+            # context["identities"] = JSONSerializer().serialize(
+            #     user_details["identities"], sort_keys=False
+            # )
 
             ## new, additional call to local method to get more HMS info
             hms_details = self.get_hms_details(request.user)
@@ -219,4 +219,4 @@ class FPANUserManagerView(UserManagerView):
                     scouts_unsorted, key=lambda k: k["username"]
                 )
 
-            return render(request, "views/user-profile-manager.htm", context)
+            return redirect(reverse("user_profile_manager"))

@@ -84,6 +84,10 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
 }
 
 /* set all style for all sidebar text */
+.sidenav-brand {
+    border-bottom: none;
+}
+
 .sidenav,
 .sidenav a,
 .sidenav .list-header {
@@ -161,8 +165,9 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     background: var(--admin-primary-nav-color) !important;
 }
 
-/* scout sidebar, use the same colors as admin*/
+/* scout sidebar */
 
+.sidenav-scout li.active-sub a,
 .sidenav-scout .menu-title:hover,
 .sidenav-menu-scout a:hover,
 .sidenav-menu-landmanager li.active-sub > a,
@@ -180,7 +185,7 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     background: var(--scout-primary-nav-color) !important;
 }
 
-/* landmanager sidebar, use the same colors as admin*/
+/* landmanager sidebar*/
 
 .sidenav-landmanager .menu-title:hover,
 .sidenav-menu-landmanager a:hover,
@@ -342,6 +347,12 @@ div.collapse.navbar-collapse.navbar-ex1-collapse > div > ul {
 .messages {
     list-style: none;
 }
+.messages .error {
+    color: red;
+}
+.messages .info {
+    color: #007fff;
+}
 
 .form-control {
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
@@ -447,6 +458,10 @@ input[type='text'] {
     margin-bottom: 0px;
 }
 
+
+.errorlist {
+    color:red;
+}
 .custom-error-page h1 {
     font-family: "Helsing-Regular", "Georgia", serif !important;
     font-size: 3.052em;
@@ -492,15 +507,18 @@ input[type='text'] {
 .ep-toolbar-profile .ep-tools-login {
     background: var(--admin-primary-nav-color);
     border-bottom: 0px;
-    border-left: 1px solid #000;
+    /* border-left: 1px solid #000; */
     color: white;
 }
 .ep-toolbar-profile .ep-tools-right {
    border-right: none;
-   border-bottom: 1px solid #000;
-   border-left: 1px solid #000;
+   /* border-bottom: 1px solid #000;
+   border-left: 1px solid #000; */
    background: var(--admin-primary-nav-color);
    color: #fff;
+}
+.ep-tools-login-scout, .ep-tools-login-admin, .ep-tools-login-anonymous, .ep-tools-login-landmanager {
+    border-color: white;
 }
 .ep-toolbar-profile-scout {
     background: var(--scout-primary-nav-color);
@@ -538,6 +556,12 @@ input[type='text'] {
     padding: 20px 100px;
     min-height: 170px;
     border-bottom: 0px;
+}
+
+@media (max-width: 768px) {
+    .profile-list {
+        padding: 0;
+    }
 }
 .profile-list .panel {
   padding: 20px;

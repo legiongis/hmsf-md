@@ -8,12 +8,12 @@
             {% csrf_token %}
 
             <div class="form-group">
-                <label for="{{ scout_profile.street_address.id_for_label"
+                <label for="{{ scout_profile.street_address.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.street_address.label }}
                 </label>
-                <div class="col-sm-8">           
+                <div class="col-sm-8">
                     {{ scout_profile.street_address }}
                 </div>
                 
@@ -21,17 +21,12 @@
                     {% if scout_profile.street_address.help_text %}
                         <small style="display: none">{{ scout_profile.street_address.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.street_address.errors %}
-                        {% for error in scout_profile.street_address.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.street_address.errors }}
                 </div>
             </div>  
 
             <div class="form-group">
-                <label for="{{ scout_profile.city.id_for_label"
+                <label for="{{ scout_profile.city.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.city.label }}
@@ -43,17 +38,12 @@
                     {% if scout_profile.city.help_text %}
                         <small style="display: none">{{ scout_profile.city.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.city.errors %}
-                        {% for error in scout_profile.city.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.city.errors }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ scout_profile.state.id_for_label"
+                <label for="{{ scout_profile.state.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.state.label }}
@@ -65,17 +55,12 @@
                     {% if scout_profile.state.help_text %}
                         <small style="display: none">{{ scout_profile.state.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.state.errors %}
-                        {% for error in scout_profile.state.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.state.errors }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ scout_profile.zip_code.id_for_label"
+                <label for="{{ scout_profile.zip_code.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.zip_code.label }}
@@ -87,17 +72,12 @@
                     {% if scout_profile.zip_code.help_text %}
                         <small style="display: none">{{ scout_profile.zip_code.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.zip_code.errors %}
-                        {% for error in scout_profile.zip_code.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.zip_code.errors }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ scout_profile.phone.id_for_label"
+                <label for="{{ scout_profile.phone.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.phone.label }}
@@ -109,17 +89,12 @@
                     {% if scout_profile.phone.help_text %}
                         <small style="display: none">{{ scout_profile.phone.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.phone.errors %}
-                        {% for error in scout_profile.phone.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.phone.errors }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ scout_profile.background.id_for_label"
+                <label for="{{ scout_profile.background.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.background.label }}
@@ -131,17 +106,12 @@
                     {% if scout_profile.background.help_text %}
                         <small style="display: none">{{ scout_profile.background.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.background.errors %}
-                        {% for error in scout_profile.background.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.background.errors }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ scout_profile.relevant_experience.id_for_label"
+                <label for="{{ scout_profile.relevant_experience.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.relevant_experience.label }}
@@ -153,17 +123,12 @@
                     {% if scout_profile.relevant_experience.help_text %}
                         <small style="display: none">{{ scout_profile.relevant_experience.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.relevant_experience.errors %}
-                        {% for error in scout_profile.relevant_experience.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.relevant_experience.errors }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ scout_profile.interest_reason.id_for_label"
+                <label for="{{ scout_profile.interest_reason.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {{ scout_profile.interest_reason.label }}
@@ -175,17 +140,12 @@
                     {% if scout_profile.interest_reason.help_text %}
                         <small style="display: none">{{ scout_profile.interest_reason.help_text }}</small>
                     {% endif %}
-
-                    {% if scout_profile.interest_reason.errors %}
-                        {% for error in scout_profile.interest_reason.errors %}
-                            <span style="color:red" > {{ error }} </span>
-                        {% endfor %}
-                    {% endif %}
+                    {{ scout_profile.interest_reason.errors }}
                 </div>
             </div>
             
             <div class="form-group">
-                <label for="{{ scout_profile.site_interest_type.id_for_label"
+                <label for="{{ scout_profile.site_interest_type.id_for_label }}"
                        class="col-sm-3 control-label"
                        style="color: #555">
                     {% trans "What types of sites are you most interested in?" %}
@@ -249,21 +209,19 @@
 
                     </ul>
                     <div hidden>{{ scout_profile.site_interest_type }}</div>
-                </div>            
+                    {{ scout_profile.site_interest_type.errors }}
+                </div>
             </div>
 
             <div class="form-group">
-                <label for="{{ scout_profile.fpan_regions2.id_for_label"
+                <label for="{{ scout_profile.fpan_regions2.id_for_label }}"
                        class="col-sm-12"
                        style="color: #555">
                     {% trans "Which region(s) are you interested in monitoring sites in?" %}
                 </label>
                 <div class="col-sm-6">
                     {{ scout_profile.fpan_regions2 }}
-                    {% if scout_form.fpan_regions2.errors %}
-                        {% for error in scout_form.fpan_regions2.errors %}<span style="color:red" > {{ error }} </span>{% endfor %}
-                        <br>
-                    {% endif %}
+                    {{ scout_profile.fpan_regions2.errors }}
                 </div>
                 <div class="col-sm-5">
                     <img src="{% webpack_static 'img/fpan/FPAN_Regions.png' %}" alt="FPAN Regions" class="img-responsive">

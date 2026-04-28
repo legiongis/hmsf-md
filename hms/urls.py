@@ -4,12 +4,12 @@ from django.urls import path, re_path
 from hms.views import (
     index,
     about,
-    hms_home,
     scout_signup,
     scouts_dropdown,
     scout_list_download,
     login_patch,
     LoginView,
+    ScoutProfileView,
     activate,
     activate_page,
     DownloadScoutReportPhotos,
@@ -21,7 +21,11 @@ urlpatterns = [
         r"^index.htm", RedirectView.as_view(pattern_name="fpan_home", permanent=True)
     ),
     path("about/", about, name="about"),
-    re_path(r"^user/scout-profile$", hms_home, name="scout_profile_manager"),
+    re_path(
+        r"^user/scout-profile$",
+        ScoutProfileView.as_view(),
+        name="scout_profile_manager",
+    ),
     re_path(
         r"^hms/home",
         RedirectView.as_view(pattern_name="scout_profile_manager", permanent=True),

@@ -7,9 +7,26 @@ from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
 
 from fpan.search.components.rule_filter import RuleFilter
-from hms.permissions_backend import user_is_land_manager, get_rule_by_graph
+from hms.permissions_backend import (
+    user_is_land_manager,
+    user_is_scout,
+    get_rule_by_graph,
+)
 
 logger = logging.getLogger(__name__)
+
+
+def user_is_scout_decorator(view_func):
+
+    @functools.wraps(view_func)
+    def wrapper_view(*args, **kwargs):
+        print(args)
+        if user_is_scout(args[0].user):
+            return view_func(*args, **kwargs)
+        else:
+            raise Http404
+
+    return wrapper_view
 
 
 def can_access_site_or_report(function):
