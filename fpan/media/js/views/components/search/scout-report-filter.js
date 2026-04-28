@@ -9,11 +9,13 @@ define([
             initialize: function(options) {
                 options.name = 'Scout Report Filter';
                 BaseFilter.prototype.initialize.call(this, options);
+                this.searchFilterVms[componentName](this);
             },
 
             enabled: ko.observable(false),
 
             updateQuery: function() {
+                console.log("updating query");
                 this.enabled(!this.enabled());
                 var queryObj = this.query();
                 if(this.enabled()){

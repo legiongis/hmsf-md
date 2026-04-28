@@ -1,12 +1,15 @@
 import logging
 from typing import TYPE_CHECKING
 
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Query
+from django.conf import settings
+
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.models.models import Node
 from arches.app.models.tile import Tile
+
+from .rule_filter import save_dsl
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +28,7 @@ details = {
 
 
 class ScoutReportFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
         """
         This is the method that Arches calls, and ultimately all it does is
 
@@ -40,38 +41,45 @@ class ScoutReportFilter(BaseSearchFilter):
             return
 
         if self.request.GET.get(details["componentname"]) == "enabled":
+            if settings.LOG_LEVEL == "DEBUG":
+                save_dsl(
+                    search_query_object["query"]._dsl,
+                    f"{self.componentname}_dsl__before.json",
+                )
+
             # get original results here, and iterate them to get the ids to look for
             # in Scout Reports
-            search_results_object["query"].limit = 10000
-            results = search_results_object["query"].search(index=RESOURCES_INDEX)
-            resids = set(
-                [i["_source"]["resourceinstanceid"] for i in results["hits"]["hits"]]
-            )
+            search_query_object["query"].limit = 10000
+            results = search_query_object["query"].search(index=RESOURCES_INDEX)
+            resids = [
+                i["_source"]["resourceinstanceid"] for i in results["hits"]["hits"]
+            ]
 
             # now look through all Scout Report tiles to return ids of the ones that reference
             # the sites from the query.
             site_node = Node.objects.get(
-                name="FMSF Site ID", graph__name="Scout Report"
+                name="FMSF Site ID", graph_id=settings.GRAPH_LOOKUP["sr"]["id"]
             )
-            report_tiles = Tile.objects.filter(
-                resourceinstance__graph__name="Scout Report",
+            report_siteid_tiles = Tile.objects.filter(
+                resourceinstance__graph_id=settings.GRAPH_LOOKUP["sr"]["id"],
                 nodegroup=site_node.nodegroup,
-            )
-            reportids = []
-            for t in report_tiles:
-                if t.data:
-                    if len(t.data[str(site_node.pk)]) > 0:
-                        if t.data[str(site_node.pk)][0]["resourceId"] in resids:
-                            reportids.append(str(t.resourceinstance.pk))
+                data__has_key=str(site_node.pk),
+            ).values_list("resourceinstance_id", "data")
 
-            # create new query using ids for the scout reports
-            se = SearchEngineFactory().create()
-            query = Query(se, limit=10000)
+            reportids_set = set()
+            for t in report_siteid_tiles:
+                if t[1][str(site_node.pk)][0]["resourceId"] in resids:
+                    reportids_set.add(str(t[0]))
 
             new_bool = Bool()
-            terms = Terms(field="resourceinstanceid", terms=reportids)
+            terms = Terms(field="resourceinstanceid", terms=list(reportids_set))
             new_bool.must(terms)
-            query.add_query(new_bool)
 
             # replace original query object with new query
-            search_results_object["query"] = query
+            search_query_object["query"].add_query(new_bool)
+
+            if settings.LOG_LEVEL == "DEBUG":
+                save_dsl(
+                    search_query_object["query"]._dsl,
+                    f"{self.componentname}_dsl__after.json",
+                )
