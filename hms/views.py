@@ -429,7 +429,9 @@ def zipped_photos(reportid: str) -> Tuple[str, BytesIO]:
     # and use those PKs to get the node data as in:
     # `tile.data.get(str(comment_node.pk))`
 
-    photo_node = Node.objects.get(name="Photo", graph__name="Scout Report")
+    photo_node = Node.objects.get(
+        name="Photo", graph_id=settings.GRAPH_LOOKUP["sr"]["id"]
+    )
     resource_photo_tiles = Tile.objects.filter(
         nodegroup=photo_node.nodegroup,
         resourceinstance=report,
@@ -454,8 +456,9 @@ def zipped_photos(reportid: str) -> Tuple[str, BytesIO]:
     zip_buf.seek(0)
 
     fmsf_site_id = ""
+
     fmsf_site_id_node = Node.objects.get(
-        name="FMSF Site ID", graph__name="Scout Report"
+        name="FMSF Site ID", graph_id=settings.GRAPH_LOOKUP["sr"]["id"]
     )
     fmsf_site_id_tiles = Tile.objects.filter(
         nodegroup=fmsf_site_id_node.nodegroup, resourceinstance=report
