@@ -1,3 +1,13 @@
+:root {
+    --admin-primary-nav-color: #30111b;
+    --admin-active-nav-color: #5D2134;
+    --scout-primary-nav-color: #46a297;
+    --scout-active-nav-color: #c45d2e;
+    --landmanager-primary-nav-color: #273675;
+    --landmanager-active-nav-color: #0051a2;
+}
+
+
 @font-face {
   font-family: 'Helsing-Regular';
   src: url("../fonts/Helsing.otf");
@@ -8,6 +18,7 @@ body, body.body-anonymous, body.body-admin, .profile-sections-admin {
     background: url('../img/fpan/ricepaper.png');
     font-size: 16px;
     line-height: 1.65;
+    letter-spacing: .5px;
 }
 body.body-scout, body.body-hms, body.body-hms, .copyright-section-scout, .profile-sections-scout {
     background: url('../img/fpan/ricepaper-hms.png');
@@ -71,155 +82,156 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
 .body-scout .btn-success:hover, .body-hms .btn-success:hover, .body-landmanager .btn-success:hover, .body-state .btn-success:hover  {
     background-color: #449d44;
 }
-#mainnav-container {
-    box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-}
 
-#mainnav-container, #mainnav, #mainnav-menu>.active, .brand-title-anonymous, .sub-menu-anonymous ul, .brand-title-admin, .sub-menu ul   {
-    background: #431825;
-    color:white;
-}
-.brand-title-admin, .mainnav-container-admin, .mainnav-admin, .mainnav-menu-admin>.active, .mainnav-admin .menu-popover, .mainnav-admin .sub-menu ul, .brand-title-anonymous, .mainnav-container-anonymous, .mainnav-anonymous, .mainnav-menu-anonymous>.active, .mainnav-anonymous .menu-popover, .mainnav-anonymous .sub-menu ul  {
-    background: #431825 !important;
-}
-.brand-title-scout, .mainnav-container-scout, .mainnav-scout, .mainnav-menu-scout>.active, .mainnav-scout .menu-popover, .mainnav-scout .sub-menu ul  {
-    background: #5ec5b9 !important;
-}
-.brand-title-landmanager, .mainnav-container-landmanager, .mainnav-landmanager, .mainnav-menu-landmanager>.active, .mainnav-landmanager .menu-popover, .mainnav-landmanager .sub-menu ul  {
-    /* background: url('../img/fpan/ricepaper-state.png') !important; */
-    background: #273675 !important;
-}
-
-#mainnav .list-header {
-    font-family: 'Ropa Sans',sans-serif;
-    line-height: 1.15;
-    font-size: 1.25em;
+/* set all style for all sidebar text */
+.sidenav,
+.sidenav a,
+.sidenav .list-header {
     color: white;
+    font-weight: 400 !important;
 }
 
-#mainnav-menu a {
-    color: white;
-}
-
-#mainnav-menu>li {
-    background-color:#431825;
-    box-shadow:none !important;
-}
-
-#mainnav-menu>li>a:hover, .link-submenu-item-admin a:hover, .link-submenu-item-anonymous a:hover {
-    background-color:#5D2134;
-    box-shadow:none !important;
+.sidenav-menu a:hover,
+.link-submenu-item a:hover {
+    box-shadow: none !important;
     text-decoration: none;
 }
 
-#mainnav-menu>li>a {
-    background-color:#431825;
-    box-shadow:none !important;
-    color: white;
-}
-
-.mainnav-menu-scout>li {
-    background-color:#5ec5b9 !important;
-}
-
-.mainnav-menu-scout>li>a {
-    background-color:#5ec5b9 !important;
-    color: white !important;
-}
-
-.mainnav-menu-scout>li>a:hover, .link-submenu-item-scout a:hover {
-    background-color:#F26422 !important;
-    color: white !important;
-    text-decoration: none;
-}
-
-.mainnav-menu-landmanager>li {
-    /* background: url('../img/fpan/ricepaper-state.png') !important; */
-    background: #273675 !important;
-}
-
-.mainnav-menu-landmanager>li>a {
-    /* background: url('../img/fpan/ricepaper-state.png') !important; */
-    background: #273675 !important;
-    color: white !important;
-}
-
-.mainnav-menu-landmanager>li>a:hover, .link-submenu-item-landmanager a:hover {
-    background:#273675 !important;
-    color: white !important;
-    text-decoration: none;
-}
-
-.mainnav-anonymous .popover-title, .mainnav-admin .popover-title {
-    background-color:#5D2134 !important;
-}
-.mainnav-scout .popover-title {
-    background-color:#F26422 !important;
-}
-.mainnav-landmanager .popover-title {
-    background:#273675 !important;
-}
-
-.mainnav-anonymous .single-content, .mainnav-admin .single-content {
-    background-color:#5D2134 !important;
-    font-family: 'Kreon',sans-serif;
-}
-.mainnav-scout .single-content {
-    background-color:#F26422 !important;
-    font-family: 'Kreon',sans-serif;
-}
-.mainnav-landmanager .single-content {
-    background:#273675 !important;
-    font-family: 'Kreon',sans-serif;
-}
-
-.mainnav-anonymous .hover, .mainnav-admin .hover  {
-    background-color:#5D2134;
-}
-.mainnav-scout .hover {
-    background-color:#F26422;
-}
-.mainnav-landmanager .hover {
-    background:#273675;
-}
-.menu-title {
-    font-family: 'Kreon',sans-serif;
-}
-
-.navbar-brand, .navbar-brand>img {
-    height: 49px;
-    margin-right: auto;
-    margin-left: auto;
-}
-
-.active-sub>a {
-    background-color:#5D2134 !important;
-}
-ul .collapse li {
-    height: 35px;
-}
-ul .collapse li:first-of-type {
-    margin-top: 0px;
-}
-ul .collapse li:last-of-type {
+.sidenav-sm .sidenav-menu li:hover .menu-title {
     height: 45px;
+    margin: -33px 30px;
 }
 
-.link-submenu {
-    font-family: 'Kreon',sans-serif;
-    color: white;
+.sidenav-sm .sidenav-menu .menu-title:hover {
+    background-color: var(--scout-active-nav-color);
 }
 
-.navbar-header:before {
-    background-color: transparent;
+.sidenav-sm .sidenav-menu li:hover > ul {
+    margin: -45px 50px;
 }
 
+.sidenav-sm .sidenav-menu li:hover > ul > li {
+    height: unset;
+}
+
+.sidenav-sm .sidenav-menu a {
+    height: unset;
+}
+
+.sidenav-sm .sidenav-menu li:not(.list-divider-dark) {
+    height: unset;
+}
+
+/* set conditional background for sidebar elements */
+
+/* admin sidebar */
+.sidenav-admin .menu-title:hover,
+.sidenav-menu-admin a:hover,
+.sidenav-menu-landmanager li.active-sub > a,
+.link-submenu-item-admin a:hover {
+    background-color:var(--admin-active-nav-color) !important;
+}
+
+.sidenav-admin,
+.sidenav-admin li,
+.sidenav-admin a,
+.sidenav-admin ul,
+.sidenav-menu-admin,
+.sidenav-menu-admin li:hover,
+.sidenav-menu-admin li:hover .menu-title {
+    background: var(--admin-primary-nav-color) !important;
+}
+
+/* anonymous sidebar, use the same colors as admin*/
+
+.sidenav-anonymous .menu-title:hover,
+.sidenav-menu-anonymous a:hover,
+.sidenav-menu-landmanager li.active-sub > a,
+.link-submenu-item-anonymous a:hover {
+    background-color:var(--admin-active-nav-color) !important;
+}
+
+.sidenav-anonymous,
+.sidenav-anonymous li,
+.sidenav-anonymous a,
+.sidenav-anonymous ul,
+.sidenav-menu-anonymous,
+.sidenav-menu-anonymous li:hover,
+.sidenav-menu-anonymous li:hover .menu-title {
+    background: var(--admin-primary-nav-color) !important;
+}
+
+/* scout sidebar, use the same colors as admin*/
+
+.sidenav-scout .menu-title:hover,
+.sidenav-menu-scout a:hover,
+.sidenav-menu-landmanager li.active-sub > a,
+.link-submenu-item-scout a:hover {
+    background-color:var(--scout-active-nav-color) !important;
+}
+
+.sidenav-scout,
+.sidenav-scout li,
+.sidenav-scout a,
+.sidenav-scout ul,
+.sidenav-menu-scout,
+.sidenav-menu-scout li:hover,
+.sidenav-menu-scout li:hover .menu-title {
+    background: var(--scout-primary-nav-color) !important;
+}
+
+/* landmanager sidebar, use the same colors as admin*/
+
+.sidenav-landmanager .menu-title:hover,
+.sidenav-menu-landmanager a:hover,
+.sidenav-menu-landmanager li.active-sub > a,
+.link-submenu-item-landmanager a:hover {
+    background-color:var(--landmanager-active-nav-color) !important;
+}
+
+.sidenav-landmanager,
+.sidenav-landmanager li,
+.sidenav-landmanager a,
+.sidenav-landmanager ul,
+.sidenav-menu-landmanager,
+.sidenav-menu-landmanager li:hover,
+.sidenav-menu-landmanager li:hover .menu-title {
+    background: var(--landmanager-primary-nav-color) !important;
+}
+
+.admin-bg-primary {
+    background-color: var(--admin-primary-nav-color) !important;
+}
+.admin-bg-active {
+    background-color: var(--admin-active-nav-color) !important;
+}
+.admin-bg-hover:hover {
+    background-color: var(--admin-active-nav-color) !important;
+}
+.scout-bg-primary {
+    background-color: var(--scout-primary-nav-color) !important;
+}
+.scout-bg-active {
+    background-color: var(--scout-active-nav-color) !important;
+}
+.scout-bg-hover:hover {
+    background-color: var(--scout-active-nav-color) !important;
+}
+.landmanager-bg-primary {
+    background-color: var(--landmanager-primary-nav-color) !important;
+}
+.landmanager-bg-hover:hover {
+    background-color: var(--landmanager-active-nav-color) !important;
+}
+.landmanager-bg-active {
+    background-color: var(--landmanager-active-nav-color) !important;
+}
 /*--------------------------------------*/
 /* classes for the top Arches menu */
 
 /*
 .ep-toolbar {
-    background: #5D2134;
+    background: var(--admin-active-nav-color);
     color: #E7E7E8;
 }
 
@@ -369,51 +381,43 @@ input[type='text'] {
 .fpan-panel, .fpan-panel-anonymous, .fpan-panel-admin {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-    border-top: solid 8px #431825;
+    border-top: solid 8px var(--admin-primary-nav-color);
 }
 .fpan-panel-scout, .fpan-panel-hms {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-    border-top: solid 8px #F26422;
+    border-top: solid 8px var(--scout-primary-nav-color);
 }
 .fpan-panel-landmanager, .fpan-panel-state {
     background: url('../img/fpan/bedge_muted.png');
     box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.3);
-    border-top: solid 8px #273675;
+    border-top: solid 8px var(--landmanager-primary-nav-color);
 }
 
 .profile-links {
-    border: 1px solid #431825;
+    border: 1px solid var(--admin-primary-nav-color);
     background: rgba(255, 255, 255, 0.4);
 }
 .profile-links-scout {
-    border-color: #F26422;
+    border-color: var(--scout-primary-nav-color);
 }
 .profile-links-heading-scout {
     color: white;
-    background-color: #F26422;
+    background-color: var(--scout-primary-nav-color);
 }
 .profile-links-landmanager {
-    border-color: #273675;
+    border-color: var(--landmanager-primary-nav-color);
 }
 .profile-links-heading-landmanager {
-    background-color: #273675;
+    background-color: var(--landmanager-primary-nav-color);
     color: white;
 }
 .profile-links-admin {
-    border-color: #431825;
+    border-color: var(--admin-primary-nav-color);
 }
 .profile-links-heading-admin {
-    background-color: #431825;
+    background-color: var(--admin-primary-nav-color);
     color: white;
-}
-
-.scout-panel {
-    border: 1px solid #F26422;
-    background-color: rgba(255, 255, 255, 0.4);
-}
-.scout-panel .panel-heading {
-    background-color: #F26422;
 }
 
 #login-failed-alert {
@@ -480,13 +484,13 @@ input[type='text'] {
     align-items: center;
     width: 100%;
     height: 50px;
-    background: #431825;
+    background: var(--admin-primary-nav-color);
     border-bottom: 0px;
     z-index: 3000;
     color: white;
 }
 .ep-toolbar-profile .ep-tools-login {
-    background: #431825;
+    background: var(--admin-primary-nav-color);
     border-bottom: 0px;
     border-left: 1px solid #000;
     color: white;
@@ -495,27 +499,27 @@ input[type='text'] {
    border-right: none;
    border-bottom: 1px solid #000;
    border-left: 1px solid #000;
-   background: #431825;
+   background: var(--admin-primary-nav-color);
    color: #fff;
 }
-/* .ep-toolbar-profile-scout {
-    background: #5ec5b9;
+.ep-toolbar-profile-scout {
+    background: var(--scout-primary-nav-color);
 }
 .ep-toolbar-profile-scout .ep-tools-login-scout {
-    background: #5ec5b9;
+    background: var(--scout-primary-nav-color);
 }
 .ep-toolbar-profile-scout .ep-tools-right-scout {
-    background: #5ec5b9;
+    background: var(--scout-primary-nav-color);
 }
 .ep-toolbar-profile-landmanager {
-    background: #273675;
+    background: var(--landmanager-primary-nav-color);
 }
 .ep-toolbar-profile-landmanager .ep-tools-login-landmanager {
-    background: #273675;
+    background: var(--landmanager-primary-nav-color);
 }
 .ep-toolbar-profile-landmanager .ep-tools-right-landmanager {
-    background: #273675;
-} */
+    background: var(--landmanager-primary-nav-color);
+}
 
 .profile-report-scout {
   padding: 10px 10px 10px 0px;

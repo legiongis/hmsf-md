@@ -2,8 +2,13 @@
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block body %}
+
+<link href="https://fonts.googleapis.com/css?family=Ropa+Sans" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Kreon" rel="stylesheet">
+<link href="{% webpack_static 'css/index.css' %}" rel="stylesheet">
 
     <!-- ko if: alert() -->
     <div data-bind="visible: alert().active" style="display: none;" class="relative">
@@ -33,7 +38,7 @@
     <div id="container" class="base-manager-grid effect aside-left aside-bright navbar-fixed sidenav-sm"
         data-bind="css: {'mainnav-in': tabsActive() && showTabs(), 'sidenav-sm': !navExpanded(), 'sidenav-lg': navExpanded()}">
 
-        <nav class="sidenav" role="navigation" id="arches-navigation">
+        <nav class="sidenav sidenav-{{user_type}}" role="navigation" id="arches-navigation">
             {% block navheader %}
             <a href="#" class="sidenav-brand" data-bind="onEnterkeyClick, onSpaceClick, click: function () { navExpanded(!navExpanded()) },
                 attr: {
@@ -42,17 +47,17 @@
                     'aria-expanded': navExpanded().toString()
                 }
             ">
-                <img src="{{ STATIC_URL }}img/arches_logo_light.png" class="brand-icon" alt="">
+                <img src="{% webpack_static 'img/fpan/fpan_sun.png' %}" class="brand-icon" alt="">
                 <div class="brand-title">
                     <h1 class="brand-text" style="margin-top: 15px;">{{ app_name }}</h1>
                 </div>
             </a>
             {% endblock navheader %}
             {% block mainnav %}
-            <div class="mainnav-container">
-                <div class="sidenav-menu">
+            <div class="mainnav-container mainnav-container-{{user_type}}">
+                <div class="sidenav-menu sidenav-menu-{{user_type}}">
                     {% block navbar %}
-                    <ul class="list-group" data-bind="attr: {'aria-label': $root.translations.mainMenu}">
+                    <ul class="list-group mainnav-menu-{{user_type}}" data-bind="attr: {'aria-label': $root.translations.mainMenu}">
         
                         <!-- Home. -->
                         <li>
@@ -78,11 +83,11 @@
                                     </span>
                                 </a>
                                 <ul class="collapse" data-bind="css:{'in': navExpanded()}" aria-labelledby="system-settings-link-label">
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'config' %}"
                                             data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
                                     </li>
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}"
                                             data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}'), clickBubble: false">{% trans "System Settings Graph" %}</a>
                                     </li>
@@ -108,7 +113,7 @@
                                     class="active-sub" 
                                 {% endif %}
                             >
-                                <a href="{% url 'resource' %}" aria-labelledby="new-resource-link-label">
+                                <a href="#" aria-labelledby="new-resource-link-label">
                                     <i class="fa fa-building-o"></i>
                                     <span class="menu-title">
                                         <strong id="new-resource-link-label">{% trans "Add New Resource" %}</strong>
@@ -116,7 +121,7 @@
                                 </a>
                                 <ul class="collapse" data-bind="css:{'in': navExpanded()}" aria-labelledby="new-resource-link-label">
                                     <!-- ko foreach: createableResources -->
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a 
                                             class="link-submenu" 
                                             data-bind="
@@ -148,11 +153,11 @@
                                     </span>
                                 </a>
                                 <ul class="collapse" data-bind="css:{'in': navExpanded()}" aria-labelledby="designer-link-label">
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'graph' '' %}"
                                             data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
                                     </li>
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'graph' '' %}#branches"
                                             data-bind="click: navigate.bind(this, '{% url 'graph' '' %}#branches')">{% trans "Branches" %}</a>
                                     </li>
@@ -170,16 +175,16 @@
                                     </span>
                                 </a>
                                 <ul class="collapse"  data-bind="css:{'in': navExpanded()}" aria-labelledby="map-layer-manager-link-label">
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu" href="{% url 'map_layer_manager' %}"
                                             data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
                                     </li>
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu"
                                             href="{% url 'map_layer_manager' %}#basemaps"
                                             data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#basemaps')">{% trans "Basemaps" %}</a>
                                     </li>
-                                    <li class="link-submenu-item">
+                                    <li class="link-submenu-item-{{user_type}}">
                                         <a class="link-submenu"
                                             href="{% url 'map_layer_manager' %}#overlays"
                                             data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#overlays')">{% trans "Overlays" %}</a>
@@ -511,7 +516,7 @@
                     <a href="javascript:void(0);" id="ep-close-notifs-button" role="button" aria-label="{% trans 'Close Notifications' %}"
                         class="ep-notifs-toggle ep-notifs-close ep-tools ep-tools-right" data-bind="click: closeNotifs"
                     >
-                        <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Close" %}">
+                        <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans 'Close' %}">
                             <i class="fa fa-times-circle fa-lg"></i>
                         </div>
                     </a>
