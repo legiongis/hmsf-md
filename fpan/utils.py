@@ -21,7 +21,12 @@ legal_value_ids = [str(i) for i in Value.objects.all().values_list("pk", flat=Tr
 class SpatialJoin:
     def __init__(self, graph_name: str):
 
-        self.node_lookup = settings.SPATIAL_JOIN_NODE_LOOKUP[graph_name]
+        self.node_lookup = {}
+        for graph in settings.GRAPH_LOOKUP.values():
+            if graph["name"] == graph_name:
+                self.node_lookup = graph["spatial_node_lookup"]
+        if not self.node_lookup:
+            raise Exception(f"Invalid graph name provided to SpatialJoin: {graph_name}")
 
         self.valid_management_area_vals = [
             i.concept_value_id for i in ManagementArea.objects.all()
@@ -182,7 +187,10 @@ class SpatialJoin:
             )
         )
 
-        tile.save(index=False, edit_log_entry=False)
+        tile.save(
+            index=False,
+            #   edit_log_entry=False
+        )
 
     def apply_fpan_region_and_county_attributes(
         self, resourceinstance: ResourceInstance
@@ -198,7 +206,7 @@ class SpatialJoin:
             logger.warning(f"missing FSMF site id on resource: {resourceinstance.pk}")
             return
 
-        abbrev = siteid[:2].upper()
+        abbrev = siteid["en"]["value"][:2].upper()
         entry = self.county_lookup.get(abbrev)
         if not entry:
             logger.warning(
@@ -233,7 +241,10 @@ class SpatialJoin:
             )
         )
 
-        tile.save(index=False, edit_log_entry=False)
+        tile.save(
+            index=False,
+            # edit_log_entry=False
+        )
 
 
 def get_node_value(resource, node_name):

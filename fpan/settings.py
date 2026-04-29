@@ -178,31 +178,6 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID = "4d11bac0-d535-11e7-a1b3-94659cf754d0"
 
-## Full config with node ids used in spatial join.
-SPATIAL_JOIN_NODE_LOOKUP = {
-    "Archaeological Site": {
-        "nodegroupid": "4259ff42-715c-11ee-9e57-4df2569ff543",
-        "county_nodeid": "64f9a4da-715c-11ee-9e57-4df2569ff543",
-        "region_nodeid": "4d1dc620-715c-11ee-9e57-4df2569ff543",
-        "area_nodeid": "877fefaa-715c-11ee-9e57-4df2569ff543",
-        "agency_nodeid": "58908172-715d-11ee-9e57-4df2569ff543",
-    },
-    "Historic Cemetery": {
-        "nodegroupid": "48821219-715e-11ee-9e57-4df2569ff543",
-        "county_nodeid": "4882121d-715e-11ee-9e57-4df2569ff543",
-        "region_nodeid": "4882121c-715e-11ee-9e57-4df2569ff543",
-        "area_nodeid": "4882121e-715e-11ee-9e57-4df2569ff543",
-        "agency_nodeid": "4882121b-715e-11ee-9e57-4df2569ff543",
-    },
-    "Historic Structure": {
-        "nodegroupid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
-        "county_nodeid": "ad51e461-715e-11ee-9e57-4df2569ff543",
-        "region_nodeid": "ad51e460-715e-11ee-9e57-4df2569ff543",
-        "area_nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
-        "agency_nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
-    },
-}
-
 SPATIAL_COORDINATES_NODEGROUPS_IDS = [
     "3067ed10-dbaa-11e7-87be-94659cf754d0",  # archaeological site
     "210c6341-dbab-11e7-9832-94659cf754d0",  # historic cemetery
@@ -210,9 +185,39 @@ SPATIAL_COORDINATES_NODEGROUPS_IDS = [
 ]
 
 GRAPH_LOOKUP = {
-    "as": {"id": "f212980f-d534-11e7-8ca8-94659cf754d0", "name": "Archaeological Site"},
-    "hc": {"id": "73889292-d536-11e7-b3b3-94659cf754d0", "name": "Historic Cemetery"},
-    "hs": {"id": "c67216bf-8cc2-11e7-883c-06ed184dc22c", "name": "Historic Structure"},
+    "as": {
+        "id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+        "name": "Archaeological Site",
+        "spatial_node_lookup": {
+            "nodegroupid": "4259ff42-715c-11ee-9e57-4df2569ff543",
+            "county_nodeid": "64f9a4da-715c-11ee-9e57-4df2569ff543",
+            "region_nodeid": "4d1dc620-715c-11ee-9e57-4df2569ff543",
+            "area_nodeid": "877fefaa-715c-11ee-9e57-4df2569ff543",
+            "agency_nodeid": "58908172-715d-11ee-9e57-4df2569ff543",
+        },
+    },
+    "hc": {
+        "id": "73889292-d536-11e7-b3b3-94659cf754d0",
+        "name": "Historic Cemetery",
+        "spatial_node_lookup": {
+            "nodegroupid": "48821219-715e-11ee-9e57-4df2569ff543",
+            "county_nodeid": "4882121d-715e-11ee-9e57-4df2569ff543",
+            "region_nodeid": "4882121c-715e-11ee-9e57-4df2569ff543",
+            "area_nodeid": "4882121e-715e-11ee-9e57-4df2569ff543",
+            "agency_nodeid": "4882121b-715e-11ee-9e57-4df2569ff543",
+        },
+    },
+    "hs": {
+        "id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+        "name": "Historic Structure",
+        "spatial_node_lookup": {
+            "nodegroupid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+            "county_nodeid": "ad51e461-715e-11ee-9e57-4df2569ff543",
+            "region_nodeid": "ad51e460-715e-11ee-9e57-4df2569ff543",
+            "area_nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
+            "agency_nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
+        },
+    },
     "sr": {"id": "14578901-bd5d-11e9-822a-94659cf754d0", "name": "Scout Report"},
 }
 

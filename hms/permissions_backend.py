@@ -49,7 +49,7 @@ def get_archaeological_site_rule(user) -> Rule:
             rule = Rule(
                 "attribute_filter",
                 graph_id=arch_graphid,
-                node_id=settings.SPATIAL_JOIN_NODE_LOOKUP["Archaeological Site"][
+                node_id=settings.GRAPH_LOOKUP["as"]["spatial_node_lookup"][
                     "area_nodeid"
                 ],
                 value=value,
@@ -63,7 +63,7 @@ def get_archaeological_site_rule(user) -> Rule:
             rule = Rule(
                 "attribute_filter",
                 graph_id=arch_graphid,
-                node_id=settings.SPATIAL_JOIN_NODE_LOOKUP["Archaeological Site"][
+                node_id=settings.GRAPH_LOOKUP["as"]["spatial_node_lookup"][
                     "agency_nodeid"
                 ],
                 value=value,
