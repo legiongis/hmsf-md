@@ -262,7 +262,7 @@ class FMSFImporter(BaseImportModule):
             except IndexError:
                 logger.warning(f"orphan resource: {resource.pk} has no FMSF ID")
                 continue
-            self.resource_lookup[siteid] = resource
+            self.resource_lookup[siteid["en"]["value"]] = resource
 
     def delete_from_default_storage(self, directory):
         dirs, files = default_storage.listdir(directory)
@@ -711,8 +711,9 @@ class FMSFImporter(BaseImportModule):
                             loadid,
                             nodegroup_depth,
                             source_description,
-                            passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            passes_validation,
+                            operation
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'insert')""",
                         tile,
                     )
 
@@ -817,7 +818,10 @@ class FMSFImporter(BaseImportModule):
         try:
             self.update_status_and_load_details("indexing")
             index_resources_by_transaction(
-                self.loadid, quiet=True, use_multiprocessing=False
+                self.loadid,
+                quiet=True,
+                use_multiprocessing=False,
+                recalculate_descriptors=True,
             )
             with connection.cursor() as cursor:
                 cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
@@ -825,7 +829,7 @@ class FMSFImporter(BaseImportModule):
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
                     (
-                        "completed",
+                        "indexed",
                         datetime.now(),
                         True,
                         True,
@@ -957,7 +961,7 @@ class FMSFImporter(BaseImportModule):
         # READ FEATURES FROM THE INPUT SHAPEFILE
         self.read_features_from_shapefile()
         if len(self.new_features) == 0:
-            return self.abort_load(status="completed")
+            return self.abort_load(status="indexed")
 
         # RUN FILTERS ON THE STRUCTURES, IF NECESSARY
         if self.resource_type == "Historic Structure":
@@ -1122,6 +1126,8 @@ class FMSFResource:
                 source_value = self.feature.get(fieldset[0]["field"])
                 if source_value is not None:
                     source_value = str(source_value)
+                else:
+                    continue
                 value = datatype_instance.transform_value_for_tile(
                     source_value, **node_config
                 )
