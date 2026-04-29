@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 define([
     'underscore',
     'knockout',
@@ -30,6 +31,10 @@ define([
             this.templates = ko.observableArray();
             this.selectedTemplate = ko.observable();
             this.loadStatus = ko.observable('ready');
+
+            this.validated = ko.observable();
+            this.validationError = ko.observableArray();
+            this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
 
             this.addFile = async function(file){
                 self.loading(true);
