@@ -327,7 +327,7 @@ def scouts_dropdown(request):
             lookup = json.load(o)
         res = FMSFResource(resourceid)
         if res.siteid:
-            entry = lookup.get(res.siteid["en"]["value"][:2])
+            entry = lookup.get(res.siteid[:2])
             matched_scouts = ScoutProfile.objects.filter(
                 fpan_regions2__name__contains=entry["region"]
             ).distinct()

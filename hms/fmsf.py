@@ -25,5 +25,5 @@ class FMSFResource:
         siteid = None
         for t in tiles:
             if t.data and str(node.pk) in t.data:
-                siteid = t.data[str(node.pk)]
+                siteid = t.data[str(node.pk)]["en"]["value"]
         return siteid
