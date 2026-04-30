@@ -251,6 +251,10 @@ class FMSFImporter(BaseImportModule):
         self.field_map = field_maps[resource_type]
 
     def _set_resource_lookup(self):
+
+        self.reporter.stage = "creating resource lookup"
+        self.update_status_and_load_details("running")
+
         resources = Resource.objects.filter(graph=self.graph)
         for resource in resources:
             try:
@@ -499,7 +503,8 @@ class FMSFImporter(BaseImportModule):
 
     def apply_historical_structures_filter(self, only_extra_ids=False):
 
-        self.update_status_and_load_details("filtering")
+        self.reporter.stage = "filtering"
+        self.update_status_and_load_details("validated")
 
         def _feature_is_lighthouse(feature):
             vals = [feature.get(f"STRUCUSE{i}") for i in [1, 2, 3]]
@@ -601,6 +606,8 @@ class FMSFImporter(BaseImportModule):
 
     def read_features_from_shapefile(self):
 
+        self.reporter.stage = "reading shapefile features"
+        self.update_status_and_load_details("running")
         ds = DataSource(self.resource_shp)
         lyr = ds[0]
 
@@ -621,7 +628,8 @@ class FMSFImporter(BaseImportModule):
 
     def generate_load_data(self, truncate=None):
 
-        self.update_status_and_load_details("generating")
+        self.reporter.stage = "generating load data"
+        self.update_status_and_load_details("validated")
 
         logger.debug("reading csv")
         self._read_resource_csv()
@@ -689,7 +697,8 @@ class FMSFImporter(BaseImportModule):
 
     def write_data_to_load_staging(self):
 
-        self.update_status_and_load_details("staging")
+        self.reporter.stage = "staging data to load"
+        self.update_status_and_load_details("validated")
 
         logger.debug("writing data to load_staging table")
         try:
@@ -729,7 +738,8 @@ class FMSFImporter(BaseImportModule):
 
     def write_tiles_from_load_staging(self):
 
-        self.update_status_and_load_details("writing")
+        self.reporter.stage = "writing tiles from staging"
+        self.update_status_and_load_details("validated")
 
         logger.debug("writing tiles from load_staging")
         try:
@@ -752,7 +762,7 @@ class FMSFImporter(BaseImportModule):
                     cursor.execute(
                         """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, %s) WHERE loadid = %s""",
                         (
-                            "loaded",
+                            "completed",
                             datetime.now(),
                             self.reporter.get_load_details(),
                             self.loadid,
@@ -789,7 +799,8 @@ class FMSFImporter(BaseImportModule):
 
     def run_spatial_join(self):
 
-        self.update_status_and_load_details("joining management areas")
+        self.reporter.stage = "joining management areas"
+        self.update_status_and_load_details("validated")
 
         logger.debug("running spatial join on resources")
         resids = [i.resourceid for i in self.fmsf_resources]
@@ -812,13 +823,15 @@ class FMSFImporter(BaseImportModule):
     def finalize_indexing(self):
 
         try:
-            self.update_status_and_load_details("indexing")
+            self.reporter.stage = "indexing resources"
+            self.update_status_and_load_details("completed")
             index_resources_by_transaction(
                 self.loadid,
                 quiet=True,
                 use_multiprocessing=False,
                 recalculate_descriptors=True,
             )
+            self.reporter.stage = "completed"
             with connection.cursor() as cursor:
                 cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
@@ -1002,7 +1015,6 @@ class FMSFImporter(BaseImportModule):
         Sets the load_event status as specified and updates the load_details
         object from the current state of self.reporter
         """
-
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, load_details) = (%s, %s) WHERE loadid = %s""",

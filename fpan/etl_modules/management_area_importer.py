@@ -239,7 +239,8 @@ class ManagementAreaImporter(BaseImportModule):
 
     def read_features_from_shapefile(self):
 
-        self.update_status_and_load_details("creating areas")
+        self.reporter.stage = "creating management areas"
+        self.update_status_and_load_details("validated")
         ds = DataSource(self.file_path)
         lyr = ds[0]
         name_field = [i for i in lyr.fields if i.lower() == "name"][0]
@@ -286,11 +287,13 @@ class ManagementAreaImporter(BaseImportModule):
 
     def apply_spatial_join(self):
 
-        self.update_status_and_load_details("running spatial join")
+        self.reporter.stage = "running spatial join"
+        self.update_status_and_load_details("validated")
 
         all_resids = []
         for area in self.areas:
-            self.update_status_and_load_details(f"processing {area.name}")
+            self.reporter.stage = f"processing {area.name}"
+            self.update_status_and_load_details("validated")
             resids = area.get_intersecting_resource_ids()
             resourceinstances = ResourceInstance.objects.filter(pk__in=resids).exclude(
                 graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
@@ -308,12 +311,13 @@ class ManagementAreaImporter(BaseImportModule):
     def finalize_load(self):
 
         try:
-            self.update_status_and_load_details("finalizing load")
+            self.reporter.stage = "completed"
+            self.update_status_and_load_details("indexed")
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
                     (
-                        "completed",
+                        "indexed",
                         datetime.now(),
                         True,
                         True,

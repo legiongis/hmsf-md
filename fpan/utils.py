@@ -262,12 +262,21 @@ def get_node_value(resource, node_name):
 
 
 class ETLOperationResult:
-    def __init__(self, operation, loadid=None, success=True, message="", data={}):
+    def __init__(
+        self,
+        operation,
+        loadid=None,
+        success=True,
+        message="",
+        stage="initializing",
+        data={},
+    ):
         self.operation = operation
         self.loadid = loadid
         self.start_time = time.time()
         self.success = success
         self.message = message
+        self.stage = stage
         self.data = data
         self.seconds = 0
 
@@ -297,12 +306,14 @@ class ETLOperationResult:
         """
         details = dict(self.data)
         details["Message"] = self.message
+        details["Stage"] = self.stage
         return json.dumps(details)
 
     def serialize(self):
 
         details = dict(self.data)
         details["Message"] = self.message
+        details["Stage"] = self.stage
 
         return {
             "operation": self.operation,
