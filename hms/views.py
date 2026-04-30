@@ -325,7 +325,7 @@ def scouts_dropdown(request):
     if resourceid:
         with open(Path(settings.APP_ROOT, "data", "county_lookup.json"), "r") as o:
             lookup = json.load(o)
-        res = FMSFResource(resourceid)
+        res = FMSFResource.from_arches(resourceid)
         if res.siteid:
             entry = lookup.get(res.siteid[:2])
             matched_scouts = ScoutProfile.objects.filter(
