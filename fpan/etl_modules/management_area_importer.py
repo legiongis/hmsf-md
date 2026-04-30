@@ -9,7 +9,6 @@ from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from django.contrib.gis.gdal import DataSource  # type: ignore
 from django.db import connection, transaction
 from django.core.files.storage import default_storage
-from django.conf import settings
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
@@ -19,6 +18,7 @@ from arches.app.models.models import (
     ResourceInstance,
 )
 from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_using_singleprocessing
 
 from hms.models import (
@@ -54,7 +54,7 @@ details = {
 class ManagementAreaImporter(BaseImportModule):
     # ETLResult object that will be assigned at the beginning of run_sequence()
     reporter: ETLOperationResult
-    loadid: str
+    loadid: str | None = None
 
     def __init__(self, request=None):
 
@@ -111,7 +111,10 @@ class ManagementAreaImporter(BaseImportModule):
         return self.nodegroup_lookup[graph_name]
 
     def get_uploaded_files_location(self):
-        self.file_dir = Path(settings.APP_ROOT, "management-area-uploads", self.loadid)
+        if self.loadid:
+            self.file_dir = Path(
+                settings.APP_ROOT, "management-area-uploads", self.loadid
+            )
         return self.file_dir
 
     def delete_from_default_storage(self, directory):
@@ -289,16 +292,18 @@ class ManagementAreaImporter(BaseImportModule):
         for area in self.areas:
             self.update_status_and_load_details(f"processing {area.name}")
             resids = area.get_intersecting_resource_ids()
-            resourceinstances = ResourceInstance.objects.filter(pk__in=resids)
+            resourceinstances = ResourceInstance.objects.filter(pk__in=resids).exclude(
+                graph_id=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID
+            )
             for res in resourceinstances:
                 if res.graph and res.graph.name:
                     joiner = SpatialJoin(res.graph.name)
-                    joiner.update_resource(res)
+                    joiner.update_resource(res, index=False)
                 else:
                     logger.warning(f"no graph on this resource instance: {res.pk}")
             all_resids += resids
         resources = Resource.objects.filter(pk__in=all_resids)
-        index_resources_using_singleprocessing(resources)
+        index_resources_using_singleprocessing(resources, quiet=True)
 
     def finalize_load(self):
 
