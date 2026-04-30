@@ -1,6 +1,80 @@
 {% extends "views/components/etl_modules/base-import.htm" %}
 {% load i18n %}
 
+{% block loading_status %}
+<div class="bulk-load-status">
+    <h4 class="summary-header">
+        <span data-bind="text: $root.translations.loadingData"></span>
+    </h4>
+    <div>
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadingStatus + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="
+            text:
+                selectedLoadEvent().status == 'indexed' ? $root.translations.completed
+                : selectedLoadEvent().status == 'completed' ? $root.translations.indexing
+                : selectedLoadEvent().status == 'validated' ? $root.translations.running
+                : selectedLoadEvent().status == 'running' ? $root.translations.validating
+                : selectedLoadEvent().status == 'reversing' ? $root.translations.unloading
+                : selectedLoadEvent().status == 'unloaded' ? $root.translations.unloaded
+                : selectedLoadEvent().status == 'cancelled' ? $root.translations.cancelled
+                : $root.translations.failed
+        "></span>  
+    </div>
+    <div style="padding-top: 10px;">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadingStarted + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_start_time)"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent().load_end_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadingEnded + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().load_end_time)"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent().load_end_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.loadDuration + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().load_end_time, selectedLoadEvent().load_start_time)"></span>    
+    </div>
+    <div style="padding-top: 10px;" data-bind="if: selectedLoadEvent().indexed_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingEnded + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: formatTime(selectedLoadEvent().indexed_time)"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent().indexed_time">
+        <span class="etl-loading-metadata-key" data-bind="text: $root.translations.indexingDuration + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: timeDifference(selectedLoadEvent().indexed_time, selectedLoadEvent().load_end_time)"></span>    
+    </div>
+    <div data-bind="if: selectedLoadEvent().load_details">
+        <h4 class="summary-header">{% trans "Load Details" %}</h4>
+        <!-- ko foreach: {data: Object.keys(selectedLoadEvent().load_details)} -->
+            <span class="etl-loading-metadata-key" data-bind="text: $data + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: $parent.selectedLoadEvent().load_details[$data]"></span><br>
+        <!-- /ko -->   
+    </div>
+</div>
+
+<!-- ko if: loadDetails.number_of_import -->
+<div class="bulk-load-status" style="padding: 5px 0">
+    <h4 class="summary-header">
+        <span data-bind="text: $root.translations.importedData"></span>
+        <span>
+            <a class="etl-status-link" target="_blank"
+                data-bind="text: '('+$root.translations.viewInEditLog+')', attr: { href: editHistoryUrl }">
+            </a>
+        </span>
+    </h4>
+    <div>
+        <!-- ko foreach: loadDetails.number_of_import -->
+        <span class="etl-loading-metadata-key" data-bind="text: $data.name + ' ' + $root.translations.instances + ':'"></span>
+        <span class="etl-loading-metadata-value" data-bind="text: $data.total"></span>
+        <!-- ko foreach: $data.tiles -->
+        <div style="padding-left: 20px;">
+            <span class="etl-loading-metadata-key" data-bind="text: $data.tile + ':'"></span>
+            <span class="etl-loading-metadata-value" data-bind="text: $data.count"></span>
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+    </div>
+</div>
+<!-- /ko -->
+{% endblock loading_status %}
+
 {% block task_details %}
 <!-- ko ifnot: loading() -->
     <div class="fmsf-etl" style="display:flex; flex-direction:column; height:calc(100vh - 100px);">
