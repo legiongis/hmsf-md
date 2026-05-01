@@ -29,8 +29,7 @@ details = {
     "type": "popup",
     "componentpath": "views/components/search/rule-filter",
     "componentname": "rule-filter",
-    "sortorder": "0",
-    "config": {},
+    "config": {"layoutType": "popup"},
 }
 
 

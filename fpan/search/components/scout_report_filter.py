@@ -22,8 +22,7 @@ details = {
     "type": "popup",
     "componentpath": "views/components/search/scout-report-filter",
     "componentname": "scout-report-filter",
-    "sortorder": "100",
-    "enabled": True,
+    "config": {"layoutType": "popup"},
 }
 
 
