@@ -68,8 +68,11 @@ class ScoutReportFilter(BaseSearchFilter):
 
             reportids_set = set()
             for t in report_siteid_tiles:
-                if t[1][str(site_node.pk)][0]["resourceId"] in resids:
-                    reportids_set.add(str(t[0]))
+                try:
+                    if t[1][str(site_node.pk)][0]["resourceId"] in resids:
+                        reportids_set.add(str(t[0]))
+                except IndexError:
+                    pass
 
             new_bool = Bool()
             terms = Terms(field="resourceinstanceid", terms=list(reportids_set))
