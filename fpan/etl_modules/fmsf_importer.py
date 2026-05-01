@@ -37,8 +37,8 @@ logger = logging.getLogger(__name__)
 
 details = {
     "etlmoduleid": "3b19a76a-0b09-450e-bee1-bbaccb0960bb",
-    "name": "FMSF Data Importer",
-    "description": "Loads resource data from a JSON source",
+    "name": "FMSF Data",
+    "description": "Loads resources from Florida Master Site File exports",
     "etl_type": "import",
     "component": "views/components/etl_modules/fmsf-importer",
     "componentname": "fmsf-importer",

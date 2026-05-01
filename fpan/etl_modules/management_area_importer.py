@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 details = {
     "etlmoduleid": "3aaaa76a-0b09-450e-bee1-bbaccb0960bb",
-    "name": "Management Area Importer",
+    "name": "Management Areas",
     "description": "Loads management area objects from a shapefile",
     "etl_type": "import",
     "component": "views/components/etl_modules/management-area-importer",
