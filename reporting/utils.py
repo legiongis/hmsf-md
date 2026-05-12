@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from arches.app.models.resource import Resource
 
 from fpan.utils import get_node_value
+from hms.fmsf import FMSFResource
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,7 @@ def get_past_week_report_counts(use_date=None):
         count_dict[past_date] = {"ct": 0, "reports": []}
         past_date = past_date + datetime.timedelta(days=1)
 
-    all_reports = Resource.objects.filter(graph__name="Scout Report")
+    all_reports = Resource.objects.filter(graph_id=settings.GRAPH_LOOKUP["sr"]["id"])
 
     start = datetime.datetime.now()
 
@@ -46,8 +47,8 @@ def get_past_week_report_counts(use_date=None):
         if not related_site or not isinstance(related_site, dict):
             continue
         site_uuid = related_site["resourceId"]
-        site_res = Resource.objects.get(resourceinstanceid=site_uuid)
-        fmsfid = get_node_value(site_res, "FMSF ID")
+        site_res = FMSFResource.from_arches(resourceid=site_uuid)
+        fmsfid = site_res.siteid
 
         report_date = report.createdtime.date()
         if report_date is None:
@@ -69,7 +70,7 @@ def get_past_week_report_counts(use_date=None):
 
     for k, v in count_dict.items():
         for report in v["reports"]:
-            report["new_site"] = not report["fmsfid"] in sites_with_reports_already
+            report["new_site"] = report["fmsfid"] not in sites_with_reports_already
 
     logger.info(
         f"report count generation completed | {datetime.datetime.now() - start} seconds"
