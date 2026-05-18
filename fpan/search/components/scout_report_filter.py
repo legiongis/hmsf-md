@@ -3,7 +3,8 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 
-from arches.app.search.elasticsearch_dsl_builder import Bool, Terms
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Query
 from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.models.models import Node
@@ -46,16 +47,19 @@ class ScoutReportFilter(BaseSearchFilter):
                     f"{self.componentname}_dsl__before.json",
                 )
 
-            # get original results here, and iterate them to get the ids to look for
-            # in Scout Reports
-            search_query_object["query"].limit = 10000
-            results = search_query_object["query"].search(index=RESOURCES_INDEX)
+            # get original results here by making and running a duplicate search, then
+            # iterate the results to get the ids of resources for which reports will be returned
+            se = SearchEngineFactory().create()
+            dupe_original = Query(se)
+            dupe_original.add_query(search_query_object["query"]._dsl["query"])
+            dupe_original.limit = 10000
+            results = dupe_original.search(index=RESOURCES_INDEX)
             resids = [
                 i["_source"]["resourceinstanceid"] for i in results["hits"]["hits"]
             ]
 
             # now look through all Scout Report tiles to return ids of the ones that reference
-            # the sites from the query.
+            # the resource ids returned from the original query
             site_node = Node.objects.get(
                 name="FMSF Site ID", graph_id=settings.GRAPH_LOOKUP["sr"]["id"]
             )
@@ -70,14 +74,17 @@ class ScoutReportFilter(BaseSearchFilter):
                 try:
                     if t[1][str(site_node.pk)][0]["resourceId"] in resids:
                         reportids_set.add(str(t[0]))
-                except IndexError:
-                    pass
+                except IndexError as e:
+                    logger.warning(e)
 
             new_bool = Bool()
             terms = Terms(field="resourceinstanceid", terms=list(reportids_set))
             new_bool.must(terms)
 
-            # replace original query object with new query
+            ## replace original query object with new query that only looks for certain scout report ids
+            # 1. remove default filter in case there is one (if there is a resource type filter applied)
+            search_query_object["query"].dsl["query"]["bool"]["filter"] = []
+            # 2 add the new terms to the query
             search_query_object["query"].add_query(new_bool)
 
             if settings.LOG_LEVEL == "DEBUG":

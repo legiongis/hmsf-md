@@ -14,8 +14,14 @@ define([
 
             enabled: ko.observable(false),
 
+            refreshQuery: function() {
+                var queryObj = this.query();
+                delete queryObj[componentName];
+                queryObj[componentName] = 'enabled';
+                this.query(queryObj);
+            },
+
             updateQuery: function() {
-                console.log("updating query");
                 this.enabled(!this.enabled());
                 var queryObj = this.query();
                 if(this.enabled()){
