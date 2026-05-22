@@ -149,11 +149,7 @@
                     <div>
                         <label>
                             <strong>Management Area Category (required):</strong>
-                            <select style="line-height:unset;" step="1" data-bind="value: maCategory">
-                                <option value="---">---</option>
-                                {% for i in ma_category_opts %}
-                                <option value="{{ i.id }}">{{ i.name }}</option>
-                                {% endfor %}
+                            <select style="line-height:unset;" step="1" data-bind="value: maCategory, options: maCategoryOptions, optionsText: 'name'">
                             </select>
                         </label>
                         <p>The category determines how the incoming areas will be sorted on the backend, but it does not affect how permissions are handled for access to sites within the areas. To assign areas to a new category, you must first create the category and then return to this page.</p>
@@ -164,11 +160,7 @@
                     <div>
                         <label>
                             <strong>Management Area Group (optional):</strong>
-                            <select style="line-height:unset;" step="1" data-bind="value: maGroup">
-                                <option value="---">---</option>
-                                {% for i in ma_group_opts %}
-                                <option value="{{ i.id }}">{{ i.name }}</option>
-                                {% endfor %}
+                            <select style="line-height:unset;" step="1" data-bind="value: maGroup, options: maGroupOptions, optionsText: 'name'">
                             </select>
                         </label>
                         <p>Management Areas can be aggregated into groups, allowing for a broader range of permissions filters. For example, a user may get access to all archaeological sites on a single Management Area, or all sites on all Management Areas within a Management Area Group. To assign incoming areas to a group that does not exist, you must first create the group and then return to this page.</p>
@@ -179,11 +171,7 @@
                     <div>
                         <label>
                             <strong>Management Agency (optional):</strong>
-                            <select style="line-height:unset;" step="1" data-bind="value: maAgency">
-                                <option value="---">---</option>
-                                {% for i in ma_agency_opts %}
-                                <option value="{{ i.code }}">{{ i.name }}</option>
-                                {% endfor %}
+                            <select style="line-height:unset;" step="1" data-bind="value: maAgency, options: maAgencyOptions, optionsText: 'name'">
                             </select>
                         </label>
                         <p>Some users will have their access to archaeological sites determined by their agency affiliation, which gets matched to the Management Agency attached to each group. Set the agency for the incoming Management Areas here if needed. To assign incoming Management Areas to a group that does not exist, you must first create the group and then return to this page.</p>
@@ -194,11 +182,7 @@
                     <div>
                         <label>
                             <strong>Management Area Level (recommended):</strong>
-                            <select style="line-height:unset;" step="1" data-bind="value: maLevel">
-                                <option value="---">---</option>
-                                {% for i in ma_level_opts %}
-                                <option value="{{ i.0 }}">{{ i.1 }}</option>
-                                {% endfor %}
+                            <select style="line-height:unset;" step="1" data-bind="value: maLevel, options: maLevelOptions, optionsText: 'name'">
                             </select>
                         </label>
                         <p>Management Area Level is a placeholder attribute that we may need to use in the future. It is best to assign a level to the incoming areas, if one of the provided levels fits.</p>

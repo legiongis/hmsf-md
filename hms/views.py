@@ -17,6 +17,7 @@ from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseNotFound,
+    HttpResponseForbidden,
     FileResponse,
 )
 from django.shortcuts import render, redirect
@@ -37,7 +38,14 @@ from arches.app.views.user import UserManagerView
 from fpan.decorators import user_is_scout_decorator
 from hms.fmsf import FMSFResource
 from hms.forms import ScoutForm, ScoutProfileForm
-from hms.models import Scout, ScoutProfile
+from hms.models import (
+    Scout,
+    ScoutProfile,
+    ManagementAreaGroup,
+    ManagementArea,
+    ManagementAgency,
+    ManagementAreaCategory,
+)
 from hms.permissions_backend import user_is_land_manager, user_is_scout
 from hms.utils import account_activation_token, create_scout_from_valid_form
 
@@ -391,6 +399,34 @@ def scout_list_download(request):
         writer.writerow(translate_row)
 
     return response
+
+
+class ManagementAreaDropdowns(View):
+    def get(self, request):
+        if not request.user or not request.user.is_authenticated:
+            return HttpResponseForbidden
+
+        g = ManagementAreaGroup.objects.all().order_by("name").values("id", "name")
+        c = ManagementAreaCategory.objects.all().order_by("name").values("id", "name")
+        a = [
+            {"id": i["code"], "name": i["name"]}
+            for i in ManagementAgency.objects.all()
+            .order_by("name")
+            .values("code", "name")
+        ]
+        lvl = [
+            {"id": i[0], "name": i[0]}
+            for i in list(ManagementArea._meta.get_field("management_level").choices)
+        ]
+
+        return JSONResponse(
+            {
+                "ma_group_opts": g,
+                "ma_category_opts": c,
+                "ma_agency_opts": a,
+                "ma_level_opts": lvl,
+            }
+        )
 
 
 ## TODO: Does this really need to inherit from APIBase?

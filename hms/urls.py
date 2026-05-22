@@ -13,6 +13,7 @@ from hms.views import (
     activate,
     activate_page,
     DownloadScoutReportPhotos,
+    ManagementAreaDropdowns,
 )
 
 urlpatterns = [
@@ -59,5 +60,10 @@ urlpatterns = [
         "report/photos",
         view=DownloadScoutReportPhotos.as_view(),
         name="download-report-photos",
+    ),
+    path(
+        "select-lists/management-area-data",
+        view=ManagementAreaDropdowns.as_view(),
+        name="management-area-assdfa",
     ),
 ]

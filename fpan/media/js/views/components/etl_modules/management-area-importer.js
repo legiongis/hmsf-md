@@ -20,10 +20,16 @@ define([
             this.loading = params.loading || ko.observable();
             this.data2 = ko.observable(false);
 
+            const blankOption = {"name": "---", "id": "---"};
             this.maGroup = ko.observable("");
+            this.maGroupOptions = ko.observableArray([blankOption]);
             this.maCategory = ko.observable("");
+            this.maCategoryOptions = ko.observableArray([blankOption]);
             this.maAgency = ko.observable("");
+            this.maAgencyOptions = ko.observableArray([blankOption]);
             this.maLevel = ko.observable("");
+            this.maLevelOptions = ko.observableArray([blankOption]);
+
             this.loadDescription = ko.observable("");
 
             this.moduleId = params.etlmoduleid;
@@ -55,12 +61,24 @@ define([
                 }
             };
 
+
+
+            fetch("/select-lists/management-area-data")
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    data.ma_agency_opts.forEach(i => self.maAgencyOptions.push(i));
+                    data.ma_category_opts.forEach(i => self.maCategoryOptions.push(i));
+                    data.ma_group_opts.forEach(i => self.maGroupOptions.push(i));
+                    data.ma_level_opts.forEach(i => self.maLevelOptions.push(i));
+                });
+
             this.start = async function(){
                 self.loading(true);
-                self.formData.append("maGroup", self.maGroup());
-                self.formData.append("maCategory", self.maCategory());
-                self.formData.append("maAgency", self.maAgency());
-                self.formData.append("maLevel", self.maLevel());
+                self.formData.append("maGroup", self.maGroup().id);
+                self.formData.append("maCategory", self.maCategory().id);
+                self.formData.append("maAgency", self.maAgency().id);
+                self.formData.append("maLevel", self.maLevel().id);
                 self.formData.append("loadDescription", self.loadDescription());
                 self.formData.append("loadId", self.loadId);
                 const response = await self.submit('run_web_import');

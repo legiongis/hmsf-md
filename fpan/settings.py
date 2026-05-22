@@ -66,12 +66,6 @@ TEMPLATES[0]["OPTIONS"]["context_processors"].append("fpan.context_processors.de
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
     "fpan.context_processors.username_widget_data"
 )
-TEMPLATES[0]["OPTIONS"]["context_processors"].append(
-    "fpan.context_processors.management_area_importer_configs"
-)
-TEMPLATES[0]["OPTIONS"]["context_processors"].append(
-    "fpan.context_processors.rule_filter_html"
-)
 TEMPLATES[0]["OPTIONS"]["context_processors"].append("hms.context_processors.user_type")
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
     "site_theme.context_processors.profile_content"
