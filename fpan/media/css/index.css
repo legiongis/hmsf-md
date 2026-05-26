@@ -94,6 +94,10 @@ a.a-landmanager:hover, li a.landmanager:hover, .btn-link-landmanager:hover {
     font-weight: 400 !important;
 }
 
+.sidenav-menu a {
+    padding: 12px 18px;
+}
+
 .sidenav-menu a:hover,
 .link-submenu-item a:hover {
     box-shadow: none !important;

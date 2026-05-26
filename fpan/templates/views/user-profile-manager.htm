@@ -32,7 +32,6 @@
             {% endif %}
         {% endif %}
 
-
         {% block graph_title %}
         <!-- Page Title and Icon -->
         <div class="ep-tools-title">
@@ -42,6 +41,16 @@
             </h1>
         </div>
         {% endblock graph_title %}
+
+        {% if nav.search %}
+        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right ep-tools-login-{{user_type}}" style="border:none;" aria-label="{% trans 'Visit the Search page' %}"
+            data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+            <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Search" %}">
+                <i class="ion-home"></i>
+
+            </div>
+        </a>
+        {% endif %}
 
         <!-- Login -->
         {% if nav.login %}
@@ -58,9 +67,9 @@
                 </div>
             </a>
             {% else %}
-            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
+            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}" title="log out of the database">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Logout">
-                <h5 class="hidden-xs">{% trans "Logout" %}</h5>
+                    <i class="ion-log-out"></i>
                 </div>
             </a>
             {% endif %}

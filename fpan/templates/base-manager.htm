@@ -47,7 +47,8 @@
                     'aria-expanded': navExpanded().toString()
                 }
             ">
-                <img src="{% webpack_static 'img/fpan/fpan_sun.png' %}" class="brand-icon" alt="">
+                <!-- <img src="{% webpack_static 'img/fpan/fpan_sun.png' %}" class="brand-icon" alt=""> -->
+                <i class="ti-layout-sidebar-left brand-icon" style="height:14px; width:14px;"></i>
                 <div class="brand-title">
                     <h1 class="brand-text" style="margin-top: 15px;">{{ app_name }}</h1>
                 </div>
@@ -62,9 +63,10 @@
                         <!-- Home. -->
                         <li>
                             <a href="{% url 'home' %}" aria-labelledby="index-link-label" data-bind="click:function () { navigate('{% url 'home' %}') }">
-                                <i class="ti-home"></i>
+                                <!-- <i class="ti-home"></i> -->
+                                <img src="{% webpack_static 'img/fpan/Preserver Icon.png' %}" style="height:14px; width:14px;">
                                 <span class="menu-title">
-                                    <strong id="index-link-label">{% trans "Home" %}</strong>
+                                    <strong id="index-link-label">{% trans "Landing Page" %}</strong>
                                 </span>
                             </a>
                         </li>
@@ -73,6 +75,18 @@
                         <div id="tools-header-label" class="list-header">{% trans "Tools" %}</div>
 
                         <ul aria-labelledby="tools-header-label">
+
+                            <!-- Search -->
+                            <li {% if "views/search" in main_script %} class="active-sub" {% endif %}>
+                                <a href="{% url 'search_home' %}" aria-labelledby="search-link-label"
+                                    data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+                                    <i class="ti-home"></i>
+                                    <span class="menu-title">
+                                        <strong id="search-link-label">{% trans "Home Page" %}</strong>
+                                    </span>
+                                </a>
+                            </li>
+
                             <!-- System Settings list item -->
                             {% if request.user|has_group:"System Administrator" %}
                             <li {% if "views/resource" in main_script and is_system_settings is True %} class="active-sub" {% endif %} data-bind="click: navigate.bind(this, '{% url 'config' %}')">
@@ -94,17 +108,6 @@
                                 </ul>
                             </li>
                             {% endif %}
-
-                            <!-- Search -->
-                            <li {% if "views/search" in main_script %} class="active-sub" {% endif %}>
-                                <a href="{% url 'search_home' %}" aria-labelledby="search-link-label"
-                                    data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                                    <i class="fa fa-search"></i>
-                                    <span class="menu-title">
-                                        <strong id="search-link-label">{% trans "Search" %}</strong>
-                                    </span>
-                                </a>
-                            </li>
 
                             <!-- New Resource -->
                             {% if user_can_edit %}
@@ -406,7 +409,7 @@
                             <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right" aria-label="{% trans 'Visit the Search page' %}"
                                 data-bind="click:function () { navigate('{% url 'search_home' %}') }">
                                 <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Search" %}">
-                                    <i class="ion-search"></i>
+                                    <i class="ion-home"></i>
 
                                 </div>
                             </a>
