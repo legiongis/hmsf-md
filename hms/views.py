@@ -8,7 +8,7 @@ from typing import Tuple
 
 from django.core.mail import EmailMultiAlternatives
 from django.contrib import messages
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import (
@@ -253,7 +253,7 @@ def activate(request):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             logger.debug(f"activate user: {uid}")
-            user = Scout.objects.get(pk=uid)
+            user = get_user_model().objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, Scout.DoesNotExist) as e:
             logger.debug(f"error during account activation: {e}")
             return redirect("/auth/?t=scout")
@@ -264,8 +264,7 @@ def activate(request):
             user.is_active = True
             user.save()
             logger.debug(f"user set to active: {user}")
-            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            return redirect(reverse("user_profile_manager"))
+            return redirect("/auth/?t=scout")
 
     return redirect("/auth/?t=scout")
 
