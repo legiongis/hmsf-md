@@ -10,7 +10,7 @@ from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.models.models import Node
 from arches.app.models.tile import Tile
 
-from .rule_filter import save_dsl
+from fpan.search.components.rule_filter import save_dsl
 
 logger = logging.getLogger(__name__)
 
