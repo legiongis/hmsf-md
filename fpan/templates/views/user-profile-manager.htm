@@ -80,14 +80,14 @@
 {% block main_content %}
 
     <!-- Profile Summary -->
-    <div class="profile-summary-page" style="height:calc(100vh - 50px); overflow:scroll;">
+    <div id="profile-container" class="profile-summary-page" style="height:calc(100vh - 50px); overflow:scroll;">
         <!-- Profile Sections -->
         <div class="profile-sections-{{user_type}}">
 
             {% include 'site_theme/profile_top_content.htm' %}
 
             <!-- My Account Info Panel -->
-            <section id="" class="profile-list">
+            <section class="profile-list">
                 <div class="panel panel fpan-panel-{{user_type}}">
                     <div class="row relative">
                         <!-- Section Title -->
@@ -404,9 +404,16 @@
 
 <!-- SCROLL TOP BUTTON -->
 <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+<script>
+    // this is needed to properly set the page scroll on load
+    document.addEventListener("DOMContentLoaded", function(event) { 
+        document.getElementById("profile-container").scrollTo(0,0);
+    });
+</script>
 {% endblock main_content %}
 {% block pre_require_js %}
 {{ block.super }}
+
 <div 
     id="profileManagerData"
     style="display: none;"
