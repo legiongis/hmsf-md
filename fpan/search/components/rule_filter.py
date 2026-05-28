@@ -128,13 +128,6 @@ class RuleFilter(BaseSearchFilter):
             if "graph_id" not in f.get("terms", {}):
                 existing_filters.append(f)
 
-        print(
-            json.dumps(
-                search_query_object["query"].dsl["query"]["bool"]["filter"], indent=1
-            )
-        )
-        print(json.dumps(existing_filters, indent=1))
-
         if settings.LOG_LEVEL == "DEBUG":
             save_dsl(
                 search_query_object["query"]._dsl,
@@ -208,7 +201,6 @@ class RuleFilter(BaseSearchFilter):
                 )
             elif rule.type == "attribute_filter":
                 should_list.append(self.get_attribute_filter_clause(rule.config)._dsl)
-            # self.apply_rule(rule)
 
         if len(full_allow_graphids) > 0:
             should_list.append({"terms": {"graph_id": full_allow_graphids}})
@@ -226,13 +218,29 @@ class RuleFilter(BaseSearchFilter):
 
         search_query_object["query"].dsl["query"]["bool"]["filter"] = existing_filters
 
-        # search_query_object["query"].add_query(self.paramount)
-
         if settings.LOG_LEVEL == "DEBUG":
             save_dsl(
                 search_query_object["query"]._dsl,
                 f"{self.componentname}_dsl__after.json",
             )
+
+    def get_resourceid_filter_clause(self, resourceids):
+
+        resid_bool = Bool()
+        terms = Terms(field="resourceinstanceid", terms=resourceids)
+        resid_bool.should(terms)
+        return resid_bool
+
+    def get_attribute_filter_clause(self, rule_config):
+
+        attribute_bool = Bool()
+        terms = Terms(field="strings.nodegroup_id", terms=[rule_config["nodegroup_id"]])
+        attribute_bool.filter(terms)
+        for value in rule_config["value"]:
+            match = Match(field="strings.string", query=value, type="phrase")
+            attribute_bool.should(match)
+
+        return Nested(path="strings", query=attribute_bool)
 
     def apply_rule(self, rule):
 
@@ -272,47 +280,18 @@ class RuleFilter(BaseSearchFilter):
 
         self.paramount.must_not(terms)
 
-    def get_attribute_filter_clause(self, rule_config):
-        attribute_bool = Bool()
-        terms = Terms(field="strings.nodegroup_id", terms=[rule_config["nodegroup_id"]])
-        attribute_bool.filter(terms)
-        for value in rule_config["value"]:
-            match = Match(field="strings.string", query=value, type="phrase")
-            attribute_bool.should(match)
-
-        nested = Nested(path="strings", query=attribute_bool)
-        return nested
-
     def add_attribute_filter_clause(self, rule_config):
 
-        attribute_bool = Bool()
-        terms = Terms(field="strings.nodegroup_id", terms=[rule_config["nodegroup_id"]])
-        attribute_bool.filter(terms)
-        for value in rule_config["value"]:
-            match = Match(field="strings.string", query=value, type="phrase")
-            attribute_bool.should(match)
-
-        nested = Nested(path="strings", query=attribute_bool)
+        nested = self.get_attribute_filter_clause(rule_config)
 
         if self.existing_query:
             self.paramount.should(nested)
         else:
             self.paramount.must(nested)
 
-    def get_resourceid_filter_clause(self, resourceids):
-
-        resid_bool = Bool()
-        terms = Terms(field="resourceinstanceid", terms=resourceids)
-        resid_bool.should(terms)
-        return resid_bool
-
     def add_resourceid_filter_clause(self, resourceids):
-        """incomplete at this time, but would pull a list of resource ids
-        from somewhere and put it in the query."""
 
-        resid_bool = Bool()
-        terms = Terms(field="resourceinstanceid", terms=resourceids)
-        resid_bool.should(terms)
+        resid_bool = self.get_resourceid_filter_clause(resourceids)
 
         if self.existing_query:
             self.paramount.should(resid_bool)

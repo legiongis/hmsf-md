@@ -120,13 +120,6 @@ class FPANUserManagerView(UserManagerView):
             }
             context["validation_help"] = validation.password_validators_help_texts()
 
-            ## COMMENT OUT THIS get_user_details() it takes a very long time
-            ## to complete and doesn't seem necessary??
-            # user_details = self.get_user_details(request.user)
-            # context["identities"] = JSONSerializer().serialize(
-            #     user_details["identities"], sort_keys=False
-            # )
-
             ## new, additional call to local method to get more HMS info
             hms_details = self.get_hms_details(request.user)
             context["site_access_rules"] = hms_details["site_access_rules"]

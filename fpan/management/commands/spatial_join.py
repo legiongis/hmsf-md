@@ -97,11 +97,12 @@ class Command(BaseCommand):
         print(f"completed. elapsed time: {datetime.now() - start}")
 
     def run_join_by_graph(self, graph_name):
-        resources = ResourceInstance.objects.filter(graph__name=graph_name)
+        graph = Graph.objects.get(name=graph_name)
+        resources = ResourceInstance.objects.filter(graph=graph)
         joiner = SpatialJoin(graph_name)
         total = resources.count()
         for n, res in enumerate(resources, start=1):
             print(f"{n}/{total}: {str(res.pk)} ({res.graph.name})")
             joiner.update_resource(res, index=False)
         graph = Graph.objects.get(name=graph_name)
-        index_resources_by_type([graph.pk])
+        index_resources_by_type([str(graph.pk)])
