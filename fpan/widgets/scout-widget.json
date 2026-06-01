@@ -2,7 +2,7 @@
     "widgetid":"0c298980-cbd9-11e7-b225-94659cf754d0",
     "name": "scout-widget",
     "component": "views/components/widgets/scout-widget",
-    "defaultconfig": {},
+    "defaultconfig": {"placeholder": "Select a scout", "defaultValue": ""},
     "helptext": null,
     "datatype": "string"
 }
