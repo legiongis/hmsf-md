@@ -26,10 +26,12 @@ details = {
     "icon": "fa fa-key",
     "modulename": "rule_filter.py",
     "classname": "RuleFilter",
-    "type": "popup",
+    "type": "rule-filter-type",
     "componentpath": "views/components/search/rule-filter",
     "componentname": "rule-filter",
     "config": {"layoutType": "popup"},
+    "layoutSortorder": 12,
+    "enabled": True,
 }
 
 

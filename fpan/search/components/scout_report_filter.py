@@ -20,10 +20,12 @@ details = {
     "icon": "fa fa-binoculars",
     "modulename": "scout_report_filter.py",
     "classname": "ScoutReportFilter",
-    "type": "popup",
+    "type": "scout-report-filter-type",
     "componentpath": "views/components/search/scout-report-filter",
     "componentname": "scout-report-filter",
     "config": {"layoutType": "popup"},
+    "layoutSortorder": 13,
+    "enabled": True,
 }
 
 
