@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core import management
 from django.core.management.base import BaseCommand
 
-from arches.app.models.models import MapLayer
+from arches.app.models.models import MapLayer, Plugin
 from hms.models import ManagementArea, ManagementAgency
 from hms.utils import TestUtils
 
@@ -100,7 +100,7 @@ class Command(BaseCommand):
         management.call_command("loaddata", "slr6-layer")
         management.call_command("loaddata", "slr10-layer")
 
-        print("\033[96m-- Register SEARCH FILTERS --\033[0m")
+        print("\033[96m-- Register CUSTOM SEARCH FILTERS --\033[0m")
 
         management.call_command(
             "extension",
@@ -114,6 +114,23 @@ class Command(BaseCommand):
             "search-filter",
             source="fpan/search/components/scout_report_filter.py",
         )
+
+        print("\033[96m-- Unregister PROVISIONAL SEARCH FILTERS --\033[0m")
+
+        management.call_command(
+            "extension",
+            "unregister",
+            "search-filter",
+            name="Provisional Filter",
+        )
+
+        print("\033[96m-- Enable ETL MANAGER --\033[0m")
+
+        etl_manager = Plugin.objects.get(componentname="etl-manager")
+        if etl_manager.config:
+            etl_manager.config["show"] = True
+            etl_manager.save()
+        print("config:", etl_manager.config)
 
         print("\033[96m-- Load MANAGEMENT AGENCIES --\033[0m")
         management.call_command("loaddata", "management-agencies")
