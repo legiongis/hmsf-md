@@ -13,11 +13,19 @@
                     "description": null,
                     "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
                     "helpenabled": true,
-                    "helptext": "<p><big>The FMSF Site ID is the Florida Master Site File (FMSF) number that is assigned to an archaeological site when it is recorded at the State. It consists of two letters and five numbers. The letters represent the code for the Florida county the site is located in. The numbers represent the site number within that county. For example, CI00001 represents the first recorded site in Citrus county. SJ00456 represents the 456th site recorded in St. Johns county.</big></p>\n\n<h3><em>You must have the FMSF site number to submit a scout report. If you do not know the FMSF Site ID for the site you visited, please email us at </em><a href=\"mailto:hmsflorida@fpan.us\">hmsflorida@fpan.us</a><em>.</em></h3>\n",
-                    "helptitle": "FMSF Site ID Help",
-                    "instructions": "Please fill in the FMSF Site number for the site that you visited.  Once you complete this page, please click \"Add\" and move on to Step 2.",
-                    "is_editable": true,
-                    "name": "Step 1: FMSF Site ID",
+                    "helptext": {
+                        "en": "<p><big>The FMSF Site ID is the Florida Master Site File (FMSF) number that is assigned to an archaeological site when it is recorded at the State. It consists of two letters and five numbers. The letters represent the code for the Florida county the site is located in. The numbers represent the site number within that county. For example, CI00001 represents the first recorded site in Citrus county. SJ00456 represents the 456th site recorded in St. Johns county.</big></p>\n\n<h3><em>You must have the FMSF site number to submit a scout report. If you do not know the FMSF Site ID for the site you visited, please email us at </em><a href=\"mailto:hmsflorida@fpan.us\">hmsflorida@fpan.us</a><em>.</em></h3>\n"
+                    },
+                    "helptitle": {
+                        "en": "FMSF Site ID Help"
+                    },
+                    "instructions": {
+                        "en": "Please fill in the FMSF Site number for the site that you visited.  Once you complete this page, please click \"Add\" and move on to Step 2."
+                    },
+                    "is_editable": false,
+                    "name": {
+                        "en": "Step 1: FMSF Site ID"
+                    },
                     "nodegroup_id": "a103e68f-bf7f-11e9-aa39-94659cf754d0",
                     "sortorder": 0,
                     "visible": true
@@ -32,11 +40,19 @@
                     "description": "",
                     "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
                     "helpenabled": true,
-                    "helptext": "<p><big>This section allows you to attach additional information that you gathered during your visit to a Historic Structure.&nbsp;See below for helpful information about each section:</big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>Current Use: </big></strong><big>Please fill in any information you have on the current use of the building. Does the building now house a museum or business? Is it used for storage? Is it preserved as part of a historic park? Is it abandoned? </big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Environmental Mitigation Factors At Site:</strong> Please fill in any environmental mitigation factors you observed during your visit. Environmental mitigation factors include stabilization strategies. These may either be successful or failed attempts such as rip-rap, fencing, sea walls or drainage trenches, etc. </big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Current Address:</strong> The current address of the structure.</big></p>\n",
-                    "helptitle": "Additional Information for Structures Help",
-                    "instructions": "If you are submitting a scout report for a historic structure, please fill in the information below. Once you complete this page, please click \"Add\" and move to Step 6 to submit photos from your monitoring visit.",
-                    "is_editable": true,
-                    "name": "Step 5: (STRUCTURES ONLY) Additional Information  for Structures",
+                    "helptext": {
+                        "en": "<p><big>This section allows you to attach additional information that you gathered during your visit to a Historic Structure.&nbsp;See below for helpful information about each section:</big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>Current Use: </big></strong><big>Please fill in any information you have on the current use of the building. Does the building now house a museum or business? Is it used for storage? Is it preserved as part of a historic park? Is it abandoned? </big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Environmental Mitigation Factors At Site:</strong> Please fill in any environmental mitigation factors you observed during your visit. Environmental mitigation factors include stabilization strategies. These may either be successful or failed attempts such as rip-rap, fencing, sea walls or drainage trenches, etc. </big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Current Address:</strong> The current address of the structure.</big></p>\n"
+                    },
+                    "helptitle": {
+                        "en": "Additional Information for Structures Help"
+                    },
+                    "instructions": {
+                        "en": "If you are submitting a scout report for a historic structure, please fill in the information below. Once you complete this page, please click \"Add\" and move to Step 6 to submit photos from your monitoring visit."
+                    },
+                    "is_editable": false,
+                    "name": {
+                        "en": "Step 5: (STRUCTURES ONLY) Additional Information  for Structures"
+                    },
                     "nodegroup_id": "a4261c41-bd5d-11e9-baa9-94659cf754d0",
                     "sortorder": 4,
                     "visible": true
@@ -58,11 +74,19 @@
                     "description": "",
                     "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
                     "helpenabled": true,
-                    "helptext": "<p><big>This section records any site condition information you gathered while visiting a site. See below for helpful information about each section:</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Overall Site Condition:</strong>&nbsp;Select the condition that best describes your site from the three options listed below.&nbsp;Consider the overall site as you make your assessment. One area may be more threatened than the rest of the site, but you are making a general assessment of how the site appears to you based on your training and the references provided.</big></p>\n\n<p><big><em>Good = Stable:</em> The site should be considered good to stable if it falls anywhere in the range of the images below. Sites that are in good to stable condition are structurally stable and do not show any obvious deterioration, nor do they appear to be in danger of predictable deterioration.</big></p>\n\n<p><big><em>Fair = Declining:</em> The site should be considered fair to declining if it falls anywhere in the range of the images below. Sites that are in fair to declining condition exhibit discernible decline, their wholeness or physical integrity is threatened by normal wear.</big></p>\n\n<p><big><em>Poor = Unstable:</em> The site should be considered poor to unstable if it falls anywhere in the range of the images below. Sites that are in poor to unstable condition exhibit palpable, accelerating decline. Their physical integrity is being compromised quickly.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Threats Observed:</strong>&nbsp;Select from the list of threats provided based on your observations that day. In addition to what you observe that day, it&#39;s also fair to look for previous successful or failing stabilization strategies, such as rip-rap or fencing. They may give you clues as to threats occurring at the site over time. Please add any additional threats you observed or comments you may have in the text box.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Visible Artifacts:</strong>&nbsp;Please record any artifacts you encountered on your site visit here. Artifacts are items made and used by people and are often visible on the ground surface or eroding from a&nbsp;site. Add any artifacts you observed that are not explicitly listed&nbsp;in the text box.</big></p>\n\n<p><big>***While out at the site &ndash; <em>Please do not move or remove any artifacts from any site, always leave them in place.</em> Document the artifact by photographing it with a scale in the picture (can be a coin, pen, etc.)&nbsp;and leave it in situ (in place), where it was found.</big></p>\n\n<p><big>****If you encounter unexpected finds such as human remains, immediately halt any activities that might further affect the remains. Immediately notify a FPAN staff member, who will protect the remains from further disturbance and contact the State Archaeologist or local medical examiner to comply with the provisions as outlined in Florida Statutes, Ch. 872.05, Florida&rsquo;s Unmarked Human Remains Law, and when appropriate, Rule 1A-44, F.A.C., until an appropriate course of action is determined.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Site Impact Comments:</strong>&nbsp;Please add here&nbsp;any additional comments or observations you have about the site impacts you witnessed on your visit.&nbsp;This will help staff and future scouts better understand what you observed during your monitoring visit and how you arrived at your assessment.</big></p>\n\n<p>&nbsp;</p>\n\n<h3><em>For more information on this section and to see photo examples of the site condition options and artifacts, please see the HMS Florida Site Assessment Instructions pdf.</em></h3>\n",
-                    "helptitle": "Scout Visit Condition Assessment Help",
-                    "instructions": "Please fill in the information you gathered about the site on your visit. Once you complete this page, please click \"Add\" and move on to Step 4.",
-                    "is_editable": true,
-                    "name": "Step 3: Scout Visit Condition Assessment",
+                    "helptext": {
+                        "en": "<p><big>This section records any site condition information you gathered while visiting a site. See below for helpful information about each section:</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Overall Site Condition:</strong>&nbsp;Select the condition that best describes your site from the three options listed below.&nbsp;Consider the overall site as you make your assessment. One area may be more threatened than the rest of the site, but you are making a general assessment of how the site appears to you based on your training and the references provided.</big></p>\n\n<p><big><em>Good = Stable:</em> The site should be considered good to stable if it falls anywhere in the range of the images below. Sites that are in good to stable condition are structurally stable and do not show any obvious deterioration, nor do they appear to be in danger of predictable deterioration.</big></p>\n\n<p><big><em>Fair = Declining:</em> The site should be considered fair to declining if it falls anywhere in the range of the images below. Sites that are in fair to declining condition exhibit discernible decline, their wholeness or physical integrity is threatened by normal wear.</big></p>\n\n<p><big><em>Poor = Unstable:</em> The site should be considered poor to unstable if it falls anywhere in the range of the images below. Sites that are in poor to unstable condition exhibit palpable, accelerating decline. Their physical integrity is being compromised quickly.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Threats Observed:</strong>&nbsp;Select from the list of threats provided based on your observations that day. In addition to what you observe that day, it&#39;s also fair to look for previous successful or failing stabilization strategies, such as rip-rap or fencing. They may give you clues as to threats occurring at the site over time. Please add any additional threats you observed or comments you may have in the text box.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Visible Artifacts:</strong>&nbsp;Please record any artifacts you encountered on your site visit here. Artifacts are items made and used by people and are often visible on the ground surface or eroding from a&nbsp;site. Add any artifacts you observed that are not explicitly listed&nbsp;in the text box.</big></p>\n\n<p><big>***While out at the site &ndash; <em>Please do not move or remove any artifacts from any site, always leave them in place.</em> Document the artifact by photographing it with a scale in the picture (can be a coin, pen, etc.)&nbsp;and leave it in situ (in place), where it was found.</big></p>\n\n<p><big>****If you encounter unexpected finds such as human remains, immediately halt any activities that might further affect the remains. Immediately notify a FPAN staff member, who will protect the remains from further disturbance and contact the State Archaeologist or local medical examiner to comply with the provisions as outlined in Florida Statutes, Ch. 872.05, Florida&rsquo;s Unmarked Human Remains Law, and when appropriate, Rule 1A-44, F.A.C., until an appropriate course of action is determined.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Site Impact Comments:</strong>&nbsp;Please add here&nbsp;any additional comments or observations you have about the site impacts you witnessed on your visit.&nbsp;This will help staff and future scouts better understand what you observed during your monitoring visit and how you arrived at your assessment.</big></p>\n\n<p>&nbsp;</p>\n\n<h3><em>For more information on this section and to see photo examples of the site condition options and artifacts, please see the HMS Florida Site Assessment Instructions pdf.</em></h3>\n"
+                    },
+                    "helptitle": {
+                        "en": "Scout Visit Condition Assessment Help"
+                    },
+                    "instructions": {
+                        "en": "Please fill in the information you gathered about the site on your visit. Once you complete this page, please click \"Add\" and move on to Step 4."
+                    },
+                    "is_editable": false,
+                    "name": {
+                        "en": "Step 3: Scout Visit Condition Assessment"
+                    },
                     "nodegroup_id": "a55d15a2-bd5d-11e9-a21e-94659cf754d0",
                     "sortorder": 2,
                     "visible": true
@@ -84,11 +108,19 @@
                     "description": "",
                     "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
                     "helpenabled": true,
-                    "helptext": "<p><big>This section records your evaluation of the site based on&nbsp;the observations you made during your visit.&nbsp;See below for helpful information about each section:</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Priority:</strong>&nbsp;Select the priority that best describes your site from the three options listed below. This question will help to determine the frequency of future visits.</big></p>\n\n<p><big><em>High:</em>&nbsp;High priority sites are in immediate danger or may be in danger of changing based on a specific threat (you may notice that continued recreational activity is impacting the site, etc.).</big></p>\n\n<p><big><em>Medium:</em> Many of the sites you visit will fall into this category. These sites have a moderate risk of impact and should be monitored annually or after storm events</big></p>\n\n<p><big><em>Low:</em> Low priority sites are at minimal risk and should be monitored after storm events or every five years.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Recommendations:</strong>&nbsp;This area allows you to offer your recommendation for the site. Remember to base your recommendations on observations that you made in the field. Feel free to add as much detail from your visit as you&rsquo;d like, particularly anything that you would like the next scout who visits the site to know. Recommendation options include:<br />\n&bull; Repeat visit<br />\n&bull; Defense<br />\n&bull; FMSF update<br />\n&bull; Other observations</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Final Evaluation Notes:</strong>&nbsp;This area allows you to capture any additional information you would like to provide about the site and your visit.</big></p>\n\n<p>&nbsp;</p>\n\n<h3><em>For more information on this section, please see the HMS Florida Site Assessment Instructions pdf.</em></h3>\n",
-                    "helptitle": "Scout Visit Evaluation Help",
-                    "instructions": "Please fill in your evaluation of the site and any summary comments you have.  Once you complete this page, please click \"Add\". If you  are submitting a scout report for a Structure, move on to Step 5. If you are submitting a scout report for an archaeological site or cemetery and have photos from your visit, skip to Step 6. ",
-                    "is_editable": true,
-                    "name": "Step 4: Scout Visit Evaluation",
+                    "helptext": {
+                        "en": "<p><big>This section records your evaluation of the site based on&nbsp;the observations you made during your visit.&nbsp;See below for helpful information about each section:</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Priority:</strong>&nbsp;Select the priority that best describes your site from the three options listed below. This question will help to determine the frequency of future visits.</big></p>\n\n<p><big><em>High:</em>&nbsp;High priority sites are in immediate danger or may be in danger of changing based on a specific threat (you may notice that continued recreational activity is impacting the site, etc.).</big></p>\n\n<p><big><em>Medium:</em> Many of the sites you visit will fall into this category. These sites have a moderate risk of impact and should be monitored annually or after storm events</big></p>\n\n<p><big><em>Low:</em> Low priority sites are at minimal risk and should be monitored after storm events or every five years.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Recommendations:</strong>&nbsp;This area allows you to offer your recommendation for the site. Remember to base your recommendations on observations that you made in the field. Feel free to add as much detail from your visit as you&rsquo;d like, particularly anything that you would like the next scout who visits the site to know. Recommendation options include:<br />\n&bull; Repeat visit<br />\n&bull; Defense<br />\n&bull; FMSF update<br />\n&bull; Other observations</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Final Evaluation Notes:</strong>&nbsp;This area allows you to capture any additional information you would like to provide about the site and your visit.</big></p>\n\n<p>&nbsp;</p>\n\n<h3><em>For more information on this section, please see the HMS Florida Site Assessment Instructions pdf.</em></h3>\n"
+                    },
+                    "helptitle": {
+                        "en": "Scout Visit Evaluation Help"
+                    },
+                    "instructions": {
+                        "en": "Please fill in your evaluation of the site and any summary comments you have.  Once you complete this page, please click \"Add\". If you  are submitting a scout report for a Structure, move on to Step 5. If you are submitting a scout report for an archaeological site or cemetery and have photos from your visit, skip to Step 6. "
+                    },
+                    "is_editable": false,
+                    "name": {
+                        "en": "Step 4: Scout Visit Evaluation"
+                    },
                     "nodegroup_id": "a69c4c62-bd5d-11e9-8c0d-94659cf754d0",
                     "sortorder": 3,
                     "visible": true
@@ -107,14 +139,24 @@
                         }
                     ],
                     "cssclass": null,
-                    "description": "Represents a single node in a graph",
+                    "description": {
+                        "en": "Represents a single node in a graph"
+                    },
                     "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
                     "helpenabled": true,
-                    "helptext": "<p><big>This page records all the general information about your&nbsp;monitoring visit. Help for each section is listed below: </big></p>\n\n<p><big><strong>Scout ID(s):</strong> Please place the Scout IDs for all participating Scouts here.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Additional Participant Information: </strong>Please place Land Manager/Park staff and/or participant&rsquo;s names who don&rsquo;t have Scout IDs here if applicable.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Type of Visit:</strong> Please fill in if this is your first&nbsp;visit and first Scout Report for this site (Initial) or if you have visited this site multiple times and filled out Scout Reports (Follow-up). If you are monitoring a site you visit often, you can monitor it each time you go. Make sure you fill out a new monitoring form each and every time, even if there is no change noted at the site between visits. This allows us to confirm that the site is stable.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Time of Day:</strong> Note if your monitoring visit occurred in the Morning, Afternoon, or Evening. This information helps determine&nbsp;if water levels in your images are based on the tides or storm events. </big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Date:</strong> The date of your visit to the site. This information helps us keep track of all the different Scout visits and creates a timeline of events for each site.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Location Verification:</strong>&nbsp;This is one of the most important steps of the whole process. If we are not sure where a site is located, we are not able to track change over time or help land managers protect the site. Select one of the following location options</big></p>\n\n<p><big><em>Location verified:</em>&nbsp;Choose this option if you found the site and are confident you are in the correct location based on the information you were provided.</big></p>\n\n<p><big><em>Site found, but in different location:</em>&nbsp;Choose this option if the site was not where you expected it to be based on the information you were provided, but you are confident you have located the site</big></p>\n\n<p><big><em>Site could not be found:</em>&nbsp;Choose this option if you were not able to locate the site with the information provided to you. If you choose this option, you will not be able to fill in any site-specific information in the following steps</big></p>\n\n<p><big>Please use the text box to fill in any notes or comments you have about the location of the site or observations you made while locating the site.&nbsp;</big></p>\n\n<p>&nbsp;</p>\n\n<p><em>For more information on this section, please see the HMS Florida Site Assessment Instructions pdf.</em></p>\n",
-                    "helptitle": "Visit Arrival Information Help",
-                    "instructions": "Please fill in your monitoring visit arrival information below. Once you complete this page, please click \"Add\" and move on to Step 3.",
-                    "is_editable": true,
-                    "name": "Step 2: Visit Arrival Information",
+                    "helptext": {
+                        "en": "<p><big>This page records all the general information about your&nbsp;monitoring visit. Help for each section is listed below: </big></p>\n\n<p><big><strong>Scout ID(s):</strong> Please place the Scout IDs for all participating Scouts here.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Additional Participant Information: </strong>Please place Land Manager/Park staff and/or participant&rsquo;s names who don&rsquo;t have Scout IDs here if applicable.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Type of Visit:</strong> Please fill in if this is your first&nbsp;visit and first Scout Report for this site (Initial) or if you have visited this site multiple times and filled out Scout Reports (Follow-up). If you are monitoring a site you visit often, you can monitor it each time you go. Make sure you fill out a new monitoring form each and every time, even if there is no change noted at the site between visits. This allows us to confirm that the site is stable.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Time of Day:</strong> Note if your monitoring visit occurred in the Morning, Afternoon, or Evening. This information helps determine&nbsp;if water levels in your images are based on the tides or storm events. </big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Date:</strong> The date of your visit to the site. This information helps us keep track of all the different Scout visits and creates a timeline of events for each site.</big></p>\n\n<p>&nbsp;</p>\n\n<p><big><strong>Location Verification:</strong>&nbsp;This is one of the most important steps of the whole process. If we are not sure where a site is located, we are not able to track change over time or help land managers protect the site. Select one of the following location options</big></p>\n\n<p><big><em>Location verified:</em>&nbsp;Choose this option if you found the site and are confident you are in the correct location based on the information you were provided.</big></p>\n\n<p><big><em>Site found, but in different location:</em>&nbsp;Choose this option if the site was not where you expected it to be based on the information you were provided, but you are confident you have located the site</big></p>\n\n<p><big><em>Site could not be found:</em>&nbsp;Choose this option if you were not able to locate the site with the information provided to you. If you choose this option, you will not be able to fill in any site-specific information in the following steps</big></p>\n\n<p><big>Please use the text box to fill in any notes or comments you have about the location of the site or observations you made while locating the site.&nbsp;</big></p>\n\n<p>&nbsp;</p>\n\n<p><em>For more information on this section, please see the HMS Florida Site Assessment Instructions pdf.</em></p>\n"
+                    },
+                    "helptitle": {
+                        "en": "Visit Arrival Information Help"
+                    },
+                    "instructions": {
+                        "en": "Please fill in your monitoring visit arrival information below. Once you complete this page, please click \"Add\" and move on to Step 3."
+                    },
+                    "is_editable": false,
+                    "name": {
+                        "en": "Step 2: Visit Arrival Information"
+                    },
                     "nodegroup_id": "a72bbb22-bd5d-11e9-b9ba-94659cf754d0",
                     "sortorder": 1,
                     "visible": true
@@ -136,11 +178,19 @@
                     "description": "",
                     "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
                     "helpenabled": true,
-                    "helptext": "<p><big>Please attach all the photos you would like to submit for your site visit here. </big></p>\n\n<p>&nbsp;</p>\n\n<p>***<big><strong>If you are attaching photos with unique descriptions or of different Photo Types:</strong>&nbsp;Please follow all of the steps below for <em><strong>each</strong>&nbsp;</em>photo submission. To attach a new photo or batch of photos, click on the &quot;+&quot; sign that is next to the &quot;Step 6: Photo Submission&quot; heading in the Scout Report tree to the left. This will open a new blank window for you to submit your next photo. Please remember to click &quot;Add&quot; after attaching and filling in the description for&nbsp;<em><strong>each</strong></em> photo or batch of photos&nbsp;to finalize your submissions. You will notice that each individual submission will show up as a new dropdown page below the&nbsp;&quot;Step 6: Photo Submission&quot; heading in the Scout Report tree to the left. These new pages are named for the Photo Type you chose.</big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>To Submit a Photo:&nbsp;</big></strong><big>You must first decide if you are&nbsp;attaching each photo with its own description or if you are attaching a batch of photos all with the same description. It is more helpful if each photo has its own Photo Type and description.</big></p>\n\n<p><strong><big>Select the Photo Type:</big></strong></p>\n\n<p><big><em>Overview</em>: These photos are of large areas of the site to show context. They give a general sense of the site, show large features, or are taken from the&nbsp;cardinal directions.</big></p>\n\n<p><big><em>Close-up</em>: These photos are detail photos of&nbsp;artifacts, damage, or small features like gopher tortoise or looter holes.</big></p>\n\n<p><big><em>Unique Feature</em>: Select this Photo Type if you take a photo of something that is unique or that you are unsure of what it is or how the damage was caused.</big></p>\n\n<p><big><em>Character-defining Feature (Historic Structures only)</em>: These photos show parts of the structure that aid in defining&nbsp;the architectural style or period which best describes the structure.&nbsp;Character defining&nbsp;aspects of a&nbsp;historic building&nbsp;include its materials,&nbsp;features, craftsmanship, decorative details, interior spaces, and&nbsp;features, as well as its site and environment.</big></p>\n\n<p><big><em>Facade (Historic Structures only)</em>: These photos are of the facade or&nbsp;face of a building, especially the principal front that looks onto a street or open space. </big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>Attach Images:&nbsp;</big></strong><big>After selecting the photo type, click the purple&nbsp;&quot;Select Files&quot; button to navigate to your images on your computer. In your computer&#39;s file explorer, select the image(s) that you would like to attach and click &quot;Open&quot;. A thumbnail of the image(s) will now appear.&nbsp;</big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>Comments:</big></strong><big>&nbsp;After attaching images,&nbsp;write out a description of the photo(s). Please describe what the image is showing, is it of damage to the site&nbsp;or the threats you observed such as erosion, wave action, or visitor traffic? Is the image showing an interesting artifact you encountered? Or is the photo just an overall view of the site for scale?&nbsp;Helpful information also includes the direction the photo was taken from, if you used any landmarks to take the photo, and if the image is a close-up view&nbsp;if there is an overall photo that compliments it. After attaching an individual photo or batch of photos, please click &quot;Add&quot; to finalize the photo submission.</big></p>\n\n<p>&nbsp;</p>\n\n<p><em>For more information on this section and to see examples of the Photo Types listed above, please see the HMS Florida Site Assessment Instructions pdf.</em></p>\n",
-                    "helptitle": "Photo Submission Help",
-                    "instructions": "Please submit any photos you have for your monitoring visit here. You can submit photos in a batch with a single description if the photos are all the same Photo Type. Submit each picture individually if each photo has a unique description or your photos are of multiple Photo Types. Please click \"Select Files\" to attach a photo. After each photo (if submitting individually) or batch of photos (if submitting together) is attached, please click \"Add\" to finalize your photo submissions.",
-                    "is_editable": true,
-                    "name": "Step 6: Photo Submission",
+                    "helptext": {
+                        "en": "<p><big>Please attach all the photos you would like to submit for your site visit here. </big></p>\n\n<p>&nbsp;</p>\n\n<p>***<big><strong>If you are attaching photos with unique descriptions or of different Photo Types:</strong>&nbsp;Please follow all of the steps below for <em><strong>each</strong>&nbsp;</em>photo submission. To attach a new photo or batch of photos, click on the &quot;+&quot; sign that is next to the &quot;Step 6: Photo Submission&quot; heading in the Scout Report tree to the left. This will open a new blank window for you to submit your next photo. Please remember to click &quot;Add&quot; after attaching and filling in the description for&nbsp;<em><strong>each</strong></em> photo or batch of photos&nbsp;to finalize your submissions. You will notice that each individual submission will show up as a new dropdown page below the&nbsp;&quot;Step 6: Photo Submission&quot; heading in the Scout Report tree to the left. These new pages are named for the Photo Type you chose.</big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>To Submit a Photo:&nbsp;</big></strong><big>You must first decide if you are&nbsp;attaching each photo with its own description or if you are attaching a batch of photos all with the same description. It is more helpful if each photo has its own Photo Type and description.</big></p>\n\n<p><strong><big>Select the Photo Type:</big></strong></p>\n\n<p><big><em>Overview</em>: These photos are of large areas of the site to show context. They give a general sense of the site, show large features, or are taken from the&nbsp;cardinal directions.</big></p>\n\n<p><big><em>Close-up</em>: These photos are detail photos of&nbsp;artifacts, damage, or small features like gopher tortoise or looter holes.</big></p>\n\n<p><big><em>Unique Feature</em>: Select this Photo Type if you take a photo of something that is unique or that you are unsure of what it is or how the damage was caused.</big></p>\n\n<p><big><em>Character-defining Feature (Historic Structures only)</em>: These photos show parts of the structure that aid in defining&nbsp;the architectural style or period which best describes the structure.&nbsp;Character defining&nbsp;aspects of a&nbsp;historic building&nbsp;include its materials,&nbsp;features, craftsmanship, decorative details, interior spaces, and&nbsp;features, as well as its site and environment.</big></p>\n\n<p><big><em>Facade (Historic Structures only)</em>: These photos are of the facade or&nbsp;face of a building, especially the principal front that looks onto a street or open space. </big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>Attach Images:&nbsp;</big></strong><big>After selecting the photo type, click the purple&nbsp;&quot;Select Files&quot; button to navigate to your images on your computer. In your computer&#39;s file explorer, select the image(s) that you would like to attach and click &quot;Open&quot;. A thumbnail of the image(s) will now appear.&nbsp;</big></p>\n\n<p>&nbsp;</p>\n\n<p><strong><big>Comments:</big></strong><big>&nbsp;After attaching images,&nbsp;write out a description of the photo(s). Please describe what the image is showing, is it of damage to the site&nbsp;or the threats you observed such as erosion, wave action, or visitor traffic? Is the image showing an interesting artifact you encountered? Or is the photo just an overall view of the site for scale?&nbsp;Helpful information also includes the direction the photo was taken from, if you used any landmarks to take the photo, and if the image is a close-up view&nbsp;if there is an overall photo that compliments it. After attaching an individual photo or batch of photos, please click &quot;Add&quot; to finalize the photo submission.</big></p>\n\n<p>&nbsp;</p>\n\n<p><em>For more information on this section and to see examples of the Photo Types listed above, please see the HMS Florida Site Assessment Instructions pdf.</em></p>\n"
+                    },
+                    "helptitle": {
+                        "en": "Photo Submission Help"
+                    },
+                    "instructions": {
+                        "en": "Please submit any photos you have for your monitoring visit here. You can submit photos in a batch with a single description if the photos are all the same Photo Type. Submit each picture individually if each photo has a unique description or your photos are of multiple Photo Types. Please click \"Select Files\" to attach a photo. After each photo (if submitting individually) or batch of photos (if submitting together) is attached, please click \"Add\" to finalize your photo submissions."
+                    },
+                    "is_editable": false,
+                    "name": {
+                        "en": "Step 6: Photo Submission"
+                    },
                     "nodegroup_id": "a7c11d50-bd5d-11e9-9317-94659cf754d0",
                     "sortorder": 5,
                     "visible": true
@@ -153,7 +203,9 @@
                         "label": "Scout ID(s)"
                     },
                     "id": "619ad721-d468-11eb-99aa-0abff18d581c",
-                    "label": "Scout ID(s)",
+                    "label": {
+                        "en": "Scout ID(s)"
+                    },
                     "node_id": "25487304-d468-11eb-99aa-0abff18d581c",
                     "sortorder": 0,
                     "visible": true,
@@ -162,15 +214,27 @@
                 {
                     "card_id": "a4261c43-bd5d-11e9-bd21-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Current Address",
                         "maxLength": null,
-                        "placeholder": "Enter text",
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a4261c47-bd5d-11e9-af1e-94659cf754d0",
-                    "label": "Current Address",
+                    "label": {
+                        "en": "Current Address"
+                    },
                     "node_id": "a4261c46-bd5d-11e9-a822-94659cf754d0",
                     "sortorder": 2,
                     "visible": true,
@@ -179,15 +243,27 @@
                 {
                     "card_id": "a4261c43-bd5d-11e9-bd21-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Environmental Mitigation Factors At Site",
                         "maxLength": null,
-                        "placeholder": "Enter text",
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a4261c48-bd5d-11e9-a7b1-94659cf754d0",
-                    "label": "Environmental Mitigation Factors At Site",
+                    "label": {
+                        "en": "Environmental Mitigation Factors At Site"
+                    },
                     "node_id": "a4261c45-bd5d-11e9-a135-94659cf754d0",
                     "sortorder": 1,
                     "visible": true,
@@ -196,15 +272,27 @@
                 {
                     "card_id": "a4261c43-bd5d-11e9-bd21-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Current Use",
                         "maxLength": null,
-                        "placeholder": "Enter text",
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a4261c49-bd5d-11e9-8598-94659cf754d0",
-                    "label": "Current Use",
+                    "label": {
+                        "en": "Current Use"
+                    },
                     "node_id": "a4261c44-bd5d-11e9-ac1d-94659cf754d0",
                     "sortorder": 0,
                     "visible": true,
@@ -213,15 +301,27 @@
                 {
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "",
                         "maxLength": null,
-                        "placeholder": "Enter text",
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a55d15ab-bd5d-11e9-93a7-94659cf754d0",
-                    "label": "",
+                    "label": {
+                        "en": ""
+                    },
                     "node_id": "a55d15a8-bd5d-11e9-bfd0-94659cf754d0",
                     "sortorder": 2,
                     "visible": true,
@@ -230,15 +330,27 @@
                 {
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "",
                         "maxLength": "250",
-                        "placeholder": "describe other visible artifacts here",
+                        "placeholder": {
+                            "en": "describe other visible artifacts here"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a55d15ac-bd5d-11e9-883f-94659cf754d0",
-                    "label": "",
+                    "label": {
+                        "en": ""
+                    },
                     "node_id": "a55d15aa-bd5d-11e9-ab7f-94659cf754d0",
                     "sortorder": 5,
                     "visible": true,
@@ -248,6 +360,9 @@
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
                         "defaultValue": null,
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Overall Site Condition",
                         "options": [
                             {
@@ -283,11 +398,15 @@
                                 "text": "N/A = Site not found"
                             }
                         ],
-                        "placeholder": "Select an option",
+                        "placeholder": {
+                            "en": "Select an option"
+                        },
                         "url": "/concepts/dropdown?conceptid=5c648046-7268-4c2b-b714-6729ec57d5c8"
                     },
                     "id": "a55d15ad-bd5d-11e9-99c3-94659cf754d0",
-                    "label": "Overall Site Condition",
+                    "label": {
+                        "en": "Overall Site Condition"
+                    },
                     "node_id": "a55d15a5-bd5d-11e9-8167-94659cf754d0",
                     "sortorder": 0,
                     "visible": true,
@@ -297,6 +416,9 @@
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
                         "defaultValue": null,
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Negative Impacts to Site (check all that apply; Please mark only negative effects you witness during your visit)",
                         "options": [
                             {
@@ -388,11 +510,15 @@
                                 "text": "Other (describe below)"
                             }
                         ],
-                        "placeholder": "Select an option",
+                        "placeholder": {
+                            "en": "Select an option"
+                        },
                         "url": "/concepts/dropdown?conceptid=251413e3-8475-4317-ac55-8442b4723264"
                     },
                     "id": "a55d15ae-bd5d-11e9-a548-94659cf754d0",
-                    "label": "Negative Impacts to Site (check all that apply; Please mark only negative effects you witness during your visit)",
+                    "label": {
+                        "en": "Negative Impacts to Site (check all that apply; Please mark only negative effects you witness during your visit)"
+                    },
                     "node_id": "a55d15a7-bd5d-11e9-8572-94659cf754d0",
                     "sortorder": 1,
                     "visible": true,
@@ -402,6 +528,9 @@
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
                         "defaultValue": null,
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Visible Artifacts (check all that apply)",
                         "options": [
                             {
@@ -509,11 +638,15 @@
                                 "text": "Other (describe below)"
                             }
                         ],
-                        "placeholder": "Select an option",
+                        "placeholder": {
+                            "en": "Select an option"
+                        },
                         "url": "/concepts/dropdown?conceptid=7f4f8676-3b83-4275-8a9e-4d419e2ddfcf"
                     },
                     "id": "a55d15af-bd5d-11e9-889e-94659cf754d0",
-                    "label": "Visible Artifacts (check all that apply)",
+                    "label": {
+                        "en": "Visible Artifacts (check all that apply)"
+                    },
                     "node_id": "a55d15a6-bd5d-11e9-8850-94659cf754d0",
                     "sortorder": 4,
                     "visible": true,
@@ -522,13 +655,26 @@
                 {
                     "card_id": "a55d15a4-bd5d-11e9-9c90-94659cf754d0",
                     "config": {
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": null
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Condition Assessment Explanation and Impact Comments",
                         "maxLength": null,
-                        "placeholder": "Enter text",
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
                         "width": "100%"
                     },
                     "id": "a55d15b0-bd5d-11e9-9517-94659cf754d0",
-                    "label": "Condition Assessment Explanation and Impact Comments",
+                    "label": {
+                        "en": "Condition Assessment Explanation and Impact Comments"
+                    },
                     "node_id": "a55d15a9-bd5d-11e9-9e9c-94659cf754d0",
                     "sortorder": 3,
                     "visible": true,
@@ -538,6 +684,9 @@
                     "card_id": "a69c4c64-bd5d-11e9-8b6b-94659cf754d0",
                     "config": {
                         "defaultValue": null,
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Site Priority",
                         "options": [
                             {
@@ -565,11 +714,15 @@
                                 "text": "Low"
                             }
                         ],
-                        "placeholder": "Select an option",
+                        "placeholder": {
+                            "en": "Select an option"
+                        },
                         "url": "/concepts/dropdown?conceptid=34d5bf40-f2cc-42e3-ac93-f33f693c447b"
                     },
                     "id": "a69c4c68-bd5d-11e9-ab84-94659cf754d0",
-                    "label": "Site Priority",
+                    "label": {
+                        "en": "Site Priority"
+                    },
                     "node_id": "a69c4c67-bd5d-11e9-974f-94659cf754d0",
                     "sortorder": 0,
                     "visible": true,
@@ -578,15 +731,27 @@
                 {
                     "card_id": "a69c4c64-bd5d-11e9-8b6b-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Site Priority Explanation and any Additional Notes",
                         "maxLength": null,
-                        "placeholder": "enter text",
+                        "placeholder": {
+                            "en": "enter text"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a69c4c69-bd5d-11e9-acd6-94659cf754d0",
-                    "label": "Site Priority Explanation and any Additional Notes",
+                    "label": {
+                        "en": "Site Priority Explanation and any Additional Notes"
+                    },
                     "node_id": "a69c4c66-bd5d-11e9-835e-94659cf754d0",
                     "sortorder": 2,
                     "visible": true,
@@ -596,6 +761,9 @@
                     "card_id": "a69c4c64-bd5d-11e9-8b6b-94659cf754d0",
                     "config": {
                         "defaultValue": "",
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Recommendations",
                         "options": [
                             {
@@ -631,10 +799,14 @@
                                 "text": "Repeat visit"
                             }
                         ],
-                        "placeholder": "Select an option"
+                        "placeholder": {
+                            "en": "Select an option"
+                        }
                     },
                     "id": "a69c4c6a-bd5d-11e9-a9ae-94659cf754d0",
-                    "label": "Recommendations",
+                    "label": {
+                        "en": "Recommendations"
+                    },
                     "node_id": "a69c4c65-bd5d-11e9-bc2b-94659cf754d0",
                     "sortorder": 1,
                     "visible": true,
@@ -643,15 +815,27 @@
                 {
                     "card_id": "a72bbb24-bd5d-11e9-b9ce-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "",
                         "maxLength": "250",
-                        "placeholder": "please add extra notes on the location verification here",
+                        "placeholder": {
+                            "en": "please add extra notes on the location verification here"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a72bbb2b-bd5d-11e9-85da-94659cf754d0",
-                    "label": "",
+                    "label": {
+                        "en": ""
+                    },
                     "node_id": "a72bbb26-bd5d-11e9-ad1d-94659cf754d0",
                     "sortorder": 6,
                     "visible": true,
@@ -661,6 +845,9 @@
                     "card_id": "a72bbb24-bd5d-11e9-b9ce-94659cf754d0",
                     "config": {
                         "defaultValue": null,
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Time of Day",
                         "options": [
                             {
@@ -688,11 +875,15 @@
                                 "text": "Evening"
                             }
                         ],
-                        "placeholder": "Select an option",
+                        "placeholder": {
+                            "en": "Select an option"
+                        },
                         "url": "/concepts/dropdown?conceptid=41a3e333-cacb-4dd9-a13d-a42c3eeac72b"
                     },
                     "id": "a72bbb2c-bd5d-11e9-a171-94659cf754d0",
-                    "label": "Time of Day",
+                    "label": {
+                        "en": "Time of Day"
+                    },
                     "node_id": "a72bbb2a-bd5d-11e9-8993-94659cf754d0",
                     "sortorder": 3,
                     "visible": true,
@@ -702,6 +893,9 @@
                     "card_id": "a72bbb24-bd5d-11e9-b9ce-94659cf754d0",
                     "config": {
                         "defaultValue": null,
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Type of Visit",
                         "options": [
                             {
@@ -721,11 +915,15 @@
                                 "text": "Follow-up"
                             }
                         ],
-                        "placeholder": "Select an option",
+                        "placeholder": {
+                            "en": "Select an option"
+                        },
                         "url": "/concepts/dropdown?conceptid=31e4eef3-9018-46d2-9c81-951f488c642e"
                     },
                     "id": "a72bbb2d-bd5d-11e9-81b9-94659cf754d0",
-                    "label": "Type of Visit",
+                    "label": {
+                        "en": "Type of Visit"
+                    },
                     "node_id": "a72bbb28-bd5d-11e9-821e-94659cf754d0",
                     "sortorder": 2,
                     "visible": false,
@@ -735,6 +933,9 @@
                     "card_id": "a72bbb24-bd5d-11e9-b9ce-94659cf754d0",
                     "config": {
                         "defaultValue": null,
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Location Verification",
                         "options": [
                             {
@@ -762,11 +963,15 @@
                                 "text": "Site found but in different location"
                             }
                         ],
-                        "placeholder": "Select an option",
+                        "placeholder": {
+                            "en": "Select an option"
+                        },
                         "url": "/concepts/dropdown?conceptid=b26f6d6a-c44a-4054-8d09-1d4f7e3c9759"
                     },
                     "id": "a72bbb2e-bd5d-11e9-bcc7-94659cf754d0",
-                    "label": "Location Verification",
+                    "label": {
+                        "en": "Location Verification"
+                    },
                     "node_id": "a72bbb29-bd5d-11e9-a7dc-94659cf754d0",
                     "sortorder": 5,
                     "visible": true,
@@ -775,15 +980,27 @@
                 {
                     "card_id": "a72bbb24-bd5d-11e9-b9ce-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Additional Participant Information",
                         "maxLength": null,
-                        "placeholder": "add Land Manager/Park staff and/or participant\u2019s names who don\u2019t have Scout IDs here",
+                        "placeholder": {
+                            "en": "add Land Manager/Park staff and/or participant\u2019s names who don\u2019t have Scout IDs here"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a72bbb2f-bd5d-11e9-b036-94659cf754d0",
-                    "label": "Additional Participant Information",
+                    "label": {
+                        "en": "Additional Participant Information"
+                    },
                     "node_id": "a72bbb27-bd5d-11e9-9b8f-94659cf754d0",
                     "sortorder": 1,
                     "visible": true,
@@ -801,7 +1018,9 @@
                         "viewMode": "days"
                     },
                     "id": "a72bbb30-bd5d-11e9-b399-94659cf754d0",
-                    "label": "Date",
+                    "label": {
+                        "en": "Date"
+                    },
                     "node_id": "a72bbb25-bd5d-11e9-a026-94659cf754d0",
                     "sortorder": 4,
                     "visible": true,
@@ -811,12 +1030,19 @@
                     "card_id": "a7c11d52-bd5d-11e9-8eae-94659cf754d0",
                     "config": {
                         "defaultValue": "",
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Photo Type",
                         "options": [],
-                        "placeholder": "Select an option"
+                        "placeholder": {
+                            "en": "Select an option"
+                        }
                     },
                     "id": "a7c11d55-bd5d-11e9-804f-94659cf754d0",
-                    "label": "Photo Type",
+                    "label": {
+                        "en": "Photo Type"
+                    },
                     "node_id": "a7c11d54-bd5d-11e9-a39a-94659cf754d0",
                     "sortorder": 0,
                     "visible": true,
@@ -826,12 +1052,15 @@
                     "card_id": "a7c11d52-bd5d-11e9-8eae-94659cf754d0",
                     "config": {
                         "acceptedFiles": "",
+                        "defaultValue": [],
                         "label": "Image File(s)",
                         "maxFilesize": "20",
                         "rerender": true
                     },
                     "id": "a7c11d56-bd5d-11e9-8aa0-94659cf754d0",
-                    "label": "Image File(s)",
+                    "label": {
+                        "en": "Image File(s)"
+                    },
                     "node_id": "a7c11d50-bd5d-11e9-9317-94659cf754d0",
                     "sortorder": 1,
                     "visible": true,
@@ -840,15 +1069,27 @@
                 {
                     "card_id": "a7c11d52-bd5d-11e9-8eae-94659cf754d0",
                     "config": {
-                        "defaultValue": "",
+                        "defaultValue": {
+                            "en": {
+                                "direction": "ltr",
+                                "value": ""
+                            }
+                        },
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "Comments",
                         "maxLength": null,
-                        "placeholder": "Enter text",
+                        "placeholder": {
+                            "en": "Enter text"
+                        },
                         "uneditable": false,
                         "width": "100%"
                     },
                     "id": "a7c11d57-bd5d-11e9-90d9-94659cf754d0",
-                    "label": "Comments",
+                    "label": {
+                        "en": "Comments"
+                    },
                     "node_id": "a7c11d53-bd5d-11e9-86bb-94659cf754d0",
                     "sortorder": 2,
                     "visible": true,
@@ -857,13 +1098,20 @@
                 {
                     "card_id": "a103e691-bf7f-11e9-a1e5-94659cf754d0",
                     "config": {
+                        "i18n_properties": [
+                            "placeholder"
+                        ],
                         "label": "FMSF Site ID",
-                        "placeholder": ""
+                        "placeholder": {
+                            "en": ""
+                        }
                     },
                     "id": "e50199f1-bf7f-11e9-9fbe-94659cf754d0",
-                    "label": "FMSF Site ID",
+                    "label": {
+                        "en": "FMSF Site ID"
+                    },
                     "node_id": "a103e68f-bf7f-11e9-aa39-94659cf754d0",
-                    "sortorder": null,
+                    "sortorder": 0,
                     "visible": true,
                     "widget_id": "31f3728c-7613-11e7-a139-784f435179ea"
                 }
@@ -876,7 +1124,9 @@
             },
             "deploymentdate": null,
             "deploymentfile": null,
-            "description": "",
+            "description": {
+                "en": ""
+            },
             "edges": [
                 {
                     "description": null,
@@ -1148,11 +1398,12 @@
             ],
             "graphid": "14578901-bd5d-11e9-822a-94659cf754d0",
             "iconclass": "fa fa-binoculars",
-            "is_editable": true,
-            "isactive": true,
+            "is_editable": false,
             "isresource": true,
             "jsonldcontext": null,
-            "name": "Scout Report",
+            "name": {
+                "en": "Scout Report"
+            },
             "nodegroups": [
                 {
                     "cardinality": "1",
@@ -1194,7 +1445,7 @@
             "nodes": [
                 {
                     "alias": "scout_report",
-                    "config": null,
+                    "config": {},
                     "datatype": "semantic",
                     "description": "",
                     "exportable": false,
@@ -1210,7 +1461,8 @@
                     "nodeid": "14578900-bd5d-11e9-bac9-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": "",
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_id_s_",
@@ -5488,7 +5740,8 @@
                     "nodeid": "25487304-d468-11eb-99aa-0abff18d581c",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "fmsf_site_id",
@@ -5497,17 +5750,20 @@
                             {
                                 "graphid": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
                                 "inverseOntologyProperty": "",
-                                "ontologyProperty": ""
+                                "ontologyProperty": "",
+                                "useOntologyRelationship": true
                             },
                             {
                                 "graphid": "73889292-d536-11e7-b3b3-94659cf754d0",
                                 "inverseOntologyProperty": "",
-                                "ontologyProperty": ""
+                                "ontologyProperty": "",
+                                "useOntologyRelationship": true
                             },
                             {
                                 "graphid": "f212980f-d534-11e7-8ca8-94659cf754d0",
                                 "inverseOntologyProperty": "",
-                                "ontologyProperty": ""
+                                "ontologyProperty": "",
+                                "useOntologyRelationship": true
                             }
                         ],
                         "searchDsl": "",
@@ -5528,11 +5784,12 @@
                     "nodeid": "a103e68f-bf7f-11e9-aa39-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "extra_info_for_structures",
-                    "config": null,
+                    "config": {},
                     "datatype": "semantic",
                     "description": "",
                     "exportable": false,
@@ -5548,11 +5805,12 @@
                     "nodeid": "a4261c41-bd5d-11e9-baa9-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 4
+                    "sortorder": 4,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "current_use",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": true,
@@ -5568,11 +5826,12 @@
                     "nodeid": "a4261c44-bd5d-11e9-ac1d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "environmental_mitigation_factors_at_site",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": true,
@@ -5588,11 +5847,12 @@
                     "nodeid": "a4261c45-bd5d-11e9-a135-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "current_address",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "",
                     "exportable": true,
@@ -5608,11 +5868,12 @@
                     "nodeid": "a4261c46-bd5d-11e9-a822-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_condition_assessment",
-                    "config": null,
+                    "config": {},
                     "datatype": "semantic",
                     "description": "",
                     "exportable": false,
@@ -5628,7 +5889,8 @@
                     "nodeid": "a55d15a2-bd5d-11e9-a21e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 2
+                    "sortorder": 2,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_overall_condition",
@@ -5650,7 +5912,8 @@
                     "nodeid": "a55d15a5-bd5d-11e9-8167-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "visible_artifacts",
@@ -5672,7 +5935,8 @@
                     "nodeid": "a55d15a6-bd5d-11e9-8850-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_threats_observed",
@@ -5694,11 +5958,12 @@
                     "nodeid": "a55d15a7-bd5d-11e9-8572-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_threats_note",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": true,
@@ -5714,11 +5979,12 @@
                     "nodeid": "a55d15a8-bd5d-11e9-bfd0-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "site_impact_comments",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": true,
@@ -5734,11 +6000,12 @@
                     "nodeid": "a55d15a9-bd5d-11e9-9e9c-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "other_visible_artifacts",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": true,
@@ -5754,11 +6021,12 @@
                     "nodeid": "a55d15aa-bd5d-11e9-ab7f-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_evaluation",
-                    "config": null,
+                    "config": {},
                     "datatype": "semantic",
                     "description": "",
                     "exportable": false,
@@ -5774,7 +6042,8 @@
                     "nodeid": "a69c4c62-bd5d-11e9-8c0d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 3
+                    "sortorder": 3,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_recommendations",
@@ -5796,11 +6065,12 @@
                     "nodeid": "a69c4c65-bd5d-11e9-bc2b-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_evaluation_notes",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "",
                     "exportable": true,
@@ -5816,7 +6086,8 @@
                     "nodeid": "a69c4c66-bd5d-11e9-835e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_priority_evaluation",
@@ -5838,11 +6109,12 @@
                     "nodeid": "a69c4c67-bd5d-11e9-974f-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "visit_arrival_information",
-                    "config": null,
+                    "config": {},
                     "datatype": "semantic",
                     "description": "Represents a single node in a graph",
                     "exportable": false,
@@ -5858,7 +6130,8 @@
                     "nodeid": "a72bbb22-bd5d-11e9-b9ba-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 1
+                    "sortorder": 1,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_date",
@@ -5880,11 +6153,12 @@
                     "nodeid": "a72bbb25-bd5d-11e9-a026-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_location_notes",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": true,
@@ -5900,11 +6174,12 @@
                     "nodeid": "a72bbb26-bd5d-11e9-ad1d-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "additional_participant_information",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": true,
@@ -5920,7 +6195,8 @@
                     "nodeid": "a72bbb27-bd5d-11e9-9b8f-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_type",
@@ -5942,7 +6218,8 @@
                     "nodeid": "a72bbb28-bd5d-11e9-821e-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_location_verification",
@@ -5964,7 +6241,8 @@
                     "nodeid": "a72bbb29-bd5d-11e9-a7dc-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "scout_visit_time_of_day",
@@ -5986,12 +6264,14 @@
                     "nodeid": "a72bbb2a-bd5d-11e9-8993-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "photo",
                     "config": {
                         "activateMax": false,
+                        "imagesOnly": false,
                         "maxFileSize": null,
                         "maxFiles": 10
                     },
@@ -6010,11 +6290,12 @@
                     "nodeid": "a7c11d50-bd5d-11e9-9317-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "comments",
-                    "config": null,
+                    "config": {},
                     "datatype": "string",
                     "description": "Represents a single node in a graph",
                     "exportable": false,
@@ -6030,7 +6311,8 @@
                     "nodeid": "a7c11d53-bd5d-11e9-86bb-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 },
                 {
                     "alias": "photo_type",
@@ -6052,15 +6334,22 @@
                     "nodeid": "a7c11d54-bd5d-11e9-a39a-94659cf754d0",
                     "ontologyclass": null,
                     "parentproperty": null,
-                    "sortorder": 0
+                    "sortorder": 0,
+                    "sourcebranchpublication_id": null
                 }
             ],
             "ontology_id": null,
+            "publication": {
+                "graph_id": "14578901-bd5d-11e9-822a-94659cf754d0",
+                "notes": null,
+                "publicationid": "a84c5d0a-45a2-11f1-aa64-ddb7c643f6a2",
+                "published_time": "2026-05-01T16:13:53.579"
+            },
             "relatable_resource_model_ids": [],
             "resource_2_resource_constraints": [],
             "root": {
                 "alias": "scout_report",
-                "config": null,
+                "config": {},
                 "datatype": "semantic",
                 "description": "",
                 "exportable": false,
@@ -6075,18 +6364,21 @@
                 "nodegroup_id": null,
                 "nodeid": "14578900-bd5d-11e9-bac9-94659cf754d0",
                 "ontologyclass": null,
-                "sortorder": 0
+                "sortorder": 0,
+                "sourcebranchpublication_id": null
             },
             "slug": "scout_report",
-            "subtitle": "Scout Report resource model for FPAN-HMS (no ontology)",
+            "subtitle": {
+                "en": "Scout Report resource model for FPAN-HMS (no ontology)"
+            },
             "template_id": "50000000-0000-0000-0000-000000000003",
             "version": ""
         }
     ],
     "metadata": {
-        "db": "PostgreSQL 12.22 (Ubuntu 12.22-0ubuntu0.20.04.4) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 9.4.0-1ubuntu1~20.04.2) 9.4.0, 64-bit",
-        "git hash": "fatal: detected dubious ownership in repository at '/opt/hms/arches'",
+        "db": "PostgreSQL 14.22 (Debian 14.22-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+        "git hash": "7b607c122 2026-05-18 18:30:54 +0000",
         "os": "Linux",
-        "os version": "6.14.3-x86_64-linode168"
+        "os version": "7.0.3-x86_64-linode172"
     }
 }

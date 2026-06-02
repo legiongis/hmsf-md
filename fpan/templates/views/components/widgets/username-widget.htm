@@ -16,8 +16,8 @@
                 value: selectedOption,
                 options: availableOptions,
                 optionsCaption: 'Select a username',
-                optionsText: 'username',
-                optionsValue: 'username',
+                optionsText: 'username.id',
+                optionsValue: 'username.id',
                 valueAllowUnset: true">
             </select>
         </div>
@@ -32,14 +32,14 @@
     {% trans "Placeholder" %}
 </div>
 <div class="col-xs-12 crud-widget-container">
-    <input type="text" placeholder="{% trans "Placeholder" %}" id="" class="form-control input-md widget-input" data-bind="textInput: placeholder">
+    <input type="text" placeholder="{% trans 'Placeholder' %}" id="" class="form-control input-md widget-input" data-bind="textInput: placeholder">
 </div>
 
 <div class="control-label">
     {% trans "Default Value" %}
 </div>
 <div class="col-xs-12 crud-widget-container">
-    <input type="text" placeholder="{% trans "set to {username} for auto-population" %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
+    <input type="text" placeholder="{% trans 'set to {username} for auto-population' %}" id="" class="form-control input-md widget-input" data-bind="textInput: defaultValue">
 </div>
 
 {% endblock config_form %}

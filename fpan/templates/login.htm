@@ -1,5 +1,6 @@
 {% extends "base-fpan.htm" %}
 {% load static %}
+{% load webpack_static from webpack_loader %}
 {% load i18n %}
 
 {% block page_title %}
@@ -19,10 +20,10 @@
         <div class="cls-content">
             <div class="cls-content-sm login-panel panel-body fpan-panel-{{login_type}}">
                 {% if login_type == "scout" %}
-                <img src="{% static 'img/fpan/HMSflorida_option3long.png' %}" style="width:100%">
+                <img src="{% webpack_static 'img/fpan/HMSflorida_option3long.png' %}" style="width:100%">
                 <h3 class="login-panel-header">{% trans "Sign in to your HMS account with your <strong>Scout ID</strong> and <strong>password</strong>." %}</h3>
                 {% elif login_type == "landmanager" %}
-                <img src="{% static 'img/state/dhr logo.png' %}" style="width:100%">
+                <img src="{% webpack_static 'img/state/dhr logo.png' %}" style="width:100%">
                 <h3 class="login-panel-header">{% trans "Sign in to record site condition assessments with your <strong>Land Manager ID</strong> and <strong>password</strong>." %}</h3>
                 {% endif %}
                 <p><em>{% trans "Both ID and password are case-sensitive." %}</em></p>
@@ -91,13 +92,13 @@
     <div class="copyright-section copyright-section-{{ login_type }}" style="text-align: center;">
         <ul class="state-logos-list">
             <li>
-                <img src="{% static 'img/state/FL-DEP-LOGO-color.png' %}" class="state-logo-img">
+                <img src="{% webpack_static 'img/state/FL-DEP-LOGO-color.png' %}" class="state-logo-img">
             </li>
             <li>
-                <img src="{% static 'img/state/fl_forest_service logo sm.png' %}" class="state-logo-img">
+                <img src="{% webpack_static 'img/state/fl_forest_service logo sm.png' %}" class="state-logo-img">
             </li>
             <li>
-                <img src="{% static 'img/state/fwc logo sm.png' %}" class="state-logo-img">
+                <img src="{% webpack_static 'img/state/fwc logo sm.png' %}" class="state-logo-img">
             </li>
         </ul>
     </div>

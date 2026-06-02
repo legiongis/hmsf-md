@@ -4,10 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hmsf-md"
-version = "0.1.0"
+version = "2.0.0"
 description = "Arches implementation for the Heritage Monitoring Scouts program by the Florida Public Archaeology Network."
 readme = "README.md"
-requires-python = ">=3.8,<3.9"
+license = {text = "GNU AGPL3"}
+requires-python = ">=3.10,<3.13"
 
 dependencies = [
     "pygments==2.15.0",
@@ -16,14 +17,12 @@ dependencies = [
     "django-storages==1.13",
     "boto3==1.24",
     "setuptools<=80.9.0",
-    "arches",
+    "arches~=7.6",
     "arches_extensions",
 ]
 
 [project.optional-dependencies]
-prod = [
-    "mod-wsgi==4.9.4",
-]
+
 
 [dependency-groups]
 dev = [
@@ -32,6 +31,12 @@ dev = [
     "sphinx==7.1.2",
     "myst-parser==2.0.0",
     "sphinx-material==0.0.36",
+    "livereload",
+    "sst",
+    "coverage",
+    "django-silk==5.1.0",
+    "pre-commit==3.8.0",
+    "black==24.4.2",
 ]
 
 [tool.setuptools]

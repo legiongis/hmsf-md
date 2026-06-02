@@ -1,5 +1,5 @@
-from django.conf.urls import include, url
+from django.urls import re_path, include
 
 urlpatterns = [
-    url(r"^tinymce/", include("tinymce.urls")),
+    re_path(r"^tinymce/", include("tinymce.urls")),
 ]

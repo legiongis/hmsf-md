@@ -4,7 +4,7 @@ import logging
 from django.contrib.auth.models import User
 import django.contrib.auth.password_validation as validation
 from django.shortcuts import render, redirect
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.urls import reverse
 from arches.app.models.system_settings import settings
 from arches.app.models.models import Node, GraphModel
@@ -22,6 +22,7 @@ from fpan.search.components.rule_filter import RuleFilter
 from hms.permissions_backend import (
     user_is_land_manager,
     user_is_scout,
+    get_rule_by_graph,
 )
 from hms.views import scouts_dropdown
 
@@ -34,8 +35,7 @@ class FPANUserManagerView(UserManagerView):
         start = time.time()
 
         # get rule for Archaeological Site resource model
-        graphid = str(GraphModel.objects.get(name="Archaeological Site").pk)
-        rule = RuleFilter().compile_rules(user, graphids=[graphid], single=True)
+        rule = get_rule_by_graph(user, graphid=settings.GRAPH_LOOKUP["as"]["id"])
         sites = RuleFilter().get_resources_from_rule(rule)
 
         site_lookup = {}
@@ -44,7 +44,8 @@ class FPANUserManagerView(UserManagerView):
             i["scout_reports"] = []
             site_lookup[i["resourceinstanceid"]] = i
 
-        siteid_node = Node.objects.get(name="FMSF Site ID", graph__name="Scout Report")
+        sr_graph = GraphModel.objects.get(name="Scout Report")
+        siteid_node = Node.objects.get(name="FMSF Site ID", graph=sr_graph)
         siteid_nodeid = str(siteid_node.pk)
         rep_datas = Tile.objects.filter(nodegroup=siteid_node.nodegroup).values(
             "data", "resourceinstance_id"
@@ -54,6 +55,7 @@ class FPANUserManagerView(UserManagerView):
         # add the report ids to that site object
         for rd in rep_datas:
             report_id = rd["resourceinstance_id"]
+            fmsfid = None
             try:
                 fmsfid = rd["data"][siteid_nodeid][0]["resourceId"]
             except (IndexError, KeyError, TypeError) as e:
@@ -62,7 +64,7 @@ class FPANUserManagerView(UserManagerView):
             except Exception as e:
                 logger.error(f"can't get fmsf id from {report_id}")
                 logger.error(e)
-            if fmsfid in site_lookup:
+            if fmsfid is not None and fmsfid in site_lookup:
                 site_lookup[fmsfid]["scout_report_ct"] += 1
                 res = Resource.objects.get(pk=report_id)
                 site_lookup[fmsfid]["scout_reports"].append(
@@ -77,7 +79,9 @@ class FPANUserManagerView(UserManagerView):
             v["scout_reports"].sort(key=lambda k: k["displayname"], reverse=True)
 
         # sort site list
-        site_info = sorted(site_lookup.values(), key=lambda k: k["displayname"])
+        site_info = sorted(
+            site_lookup.values(), key=lambda k: k["displayname"][0]["value"]
+        )
 
         logger.debug(
             f"getting hms_details for {user.username}: {time.time() - start} seconds elapsed"
@@ -116,19 +120,6 @@ class FPANUserManagerView(UserManagerView):
             }
             context["validation_help"] = validation.password_validators_help_texts()
 
-            ## retain this user_details acquisition as it pulls upstream Arches information.
-            ## make sure it is all passed to the context variable as below.
-            user_details = self.get_user_details(request.user)
-            context["user_surveys"] = JSONSerializer().serialize(
-                user_details["user_surveys"], sort_keys=False
-            )
-            context["identities"] = JSONSerializer().serialize(
-                user_details["identities"], sort_keys=False
-            )
-            context["resources"] = JSONSerializer().serialize(
-                user_details["resources"], sort_keys=False, exclude=["is_editable"]
-            )
-
             ## new, additional call to local method to get more HMS info
             hms_details = self.get_hms_details(request.user)
             context["site_access_rules"] = hms_details["site_access_rules"]
@@ -137,8 +128,16 @@ class FPANUserManagerView(UserManagerView):
             if request.user.is_superuser:
                 scouts_unsorted = json.loads(scouts_dropdown(request).content)
                 context["scout_list"] = sorted(
-                    scouts_unsorted, key=lambda k: k["username"]
+                    scouts_unsorted, key=lambda k: k["username"]["en"]["value"]
                 )
+
+            context["two_factor_authentication_settings"] = JSONSerializer().serialize(
+                {
+                    "ENABLE_TWO_FACTOR_AUTHENTICATION": settings.ENABLE_TWO_FACTOR_AUTHENTICATION,
+                    "FORCE_TWO_FACTOR_AUTHENTICATION": settings.FORCE_TWO_FACTOR_AUTHENTICATION,
+                    "user_has_enabled_two_factor_authentication": False,
+                }
+            )
 
             return render(request, "views/user-profile-manager.htm", context)
 
@@ -153,7 +152,7 @@ class FPANUserManagerView(UserManagerView):
                 request.user
             ):
                 userids = json.loads(request.POST.get("userids", "[]"))
-                data = {u.id: u.username for u in User.objects.filter(id__in=userids)}
+                data = {u.pk: u.username for u in User.objects.filter(id__in=userids)}
                 return JSONResponse(data)
 
         if (
@@ -176,13 +175,9 @@ class FPANUserManagerView(UserManagerView):
             # retain this user_details acquisition as it pulls upstream Arches information.
             # make sure it is all passed to the context variable as below.
             user_details = self.get_user_details(request.user)
-            context["user_surveys"] = JSONSerializer().serialize(
-                user_details["user_surveys"]
-            )
             context["identities"] = JSONSerializer().serialize(
                 user_details["identities"]
             )
-            context["resources"] = JSONSerializer().serialize(user_details["resources"])
 
             user_info = request.POST.copy()
             user_info["id"] = request.user.id
@@ -217,4 +212,4 @@ class FPANUserManagerView(UserManagerView):
                     scouts_unsorted, key=lambda k: k["username"]
                 )
 
-            return render(request, "views/user-profile-manager.htm", context)
+            return redirect(reverse("user_profile_manager"))

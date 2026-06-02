@@ -1,17 +1,14 @@
 import gc
 import os
 import csv
-import copy
 import time
 import uuid
 import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import Union
 
 from django.contrib.gis.gdal.datasource import DataSource
-from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.db.models import Union as UnionGeoms
 from django.db import connection
 from django.db.utils import IntegrityError, ProgrammingError
@@ -28,11 +25,10 @@ from arches.app.models.models import (
     ETLModule,
     ResourceInstance,
 )
-from arches.app.models.tile import Tile
 from arches.app.models.resource import Resource
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.index_database import index_resources_by_transaction
 
+from hms.fmsf import FMSFResource
 from hms.models import ManagementArea
 from fpan.tasks import run_fmsf_import_as_task
 from fpan.utils import ETLOperationResult, SpatialJoin
@@ -41,8 +37,8 @@ logger = logging.getLogger(__name__)
 
 details = {
     "etlmoduleid": "3b19a76a-0b09-450e-bee1-bbaccb0960bb",
-    "name": "FMSF Data Importer",
-    "description": "Loads resource data from a JSON source",
+    "name": "FMSF Data",
+    "description": "Loads resources from Florida Master Site File exports",
     "etl_type": "import",
     "component": "views/components/etl_modules/fmsf-importer",
     "componentname": "fmsf-importer",
@@ -255,6 +251,10 @@ class FMSFImporter(BaseImportModule):
         self.field_map = field_maps[resource_type]
 
     def _set_resource_lookup(self):
+
+        self.reporter.stage = "creating resource lookup"
+        self.update_status_and_load_details("running")
+
         resources = Resource.objects.filter(graph=self.graph)
         for resource in resources:
             try:
@@ -262,7 +262,7 @@ class FMSFImporter(BaseImportModule):
             except IndexError:
                 logger.warning(f"orphan resource: {resource.pk} has no FMSF ID")
                 continue
-            self.resource_lookup[siteid] = resource
+            self.resource_lookup[siteid["en"]["value"]] = resource
 
     def delete_from_default_storage(self, directory):
         dirs, files = default_storage.listdir(directory)
@@ -503,7 +503,8 @@ class FMSFImporter(BaseImportModule):
 
     def apply_historical_structures_filter(self, only_extra_ids=False):
 
-        self.update_status_and_load_details("filtering")
+        self.reporter.stage = "filtering"
+        self.update_status_and_load_details("validated")
 
         def _feature_is_lighthouse(feature):
             vals = [feature.get(f"STRUCUSE{i}") for i in [1, 2, 3]]
@@ -605,6 +606,8 @@ class FMSFImporter(BaseImportModule):
 
     def read_features_from_shapefile(self):
 
+        self.reporter.stage = "reading shapefile features"
+        self.update_status_and_load_details("running")
         ds = DataSource(self.resource_shp)
         lyr = ds[0]
 
@@ -625,7 +628,8 @@ class FMSFImporter(BaseImportModule):
 
     def generate_load_data(self, truncate=None):
 
-        self.update_status_and_load_details("generating")
+        self.reporter.stage = "generating load data"
+        self.update_status_and_load_details("validated")
 
         logger.debug("reading csv")
         self._read_resource_csv()
@@ -693,7 +697,8 @@ class FMSFImporter(BaseImportModule):
 
     def write_data_to_load_staging(self):
 
-        self.update_status_and_load_details("staging")
+        self.reporter.stage = "staging data to load"
+        self.update_status_and_load_details("validated")
 
         logger.debug("writing data to load_staging table")
         try:
@@ -711,8 +716,9 @@ class FMSFImporter(BaseImportModule):
                             loadid,
                             nodegroup_depth,
                             source_description,
-                            passes_validation
-                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                            passes_validation,
+                            operation
+                        ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'insert')""",
                         tile,
                     )
 
@@ -732,7 +738,8 @@ class FMSFImporter(BaseImportModule):
 
     def write_tiles_from_load_staging(self):
 
-        self.update_status_and_load_details("writing")
+        self.reporter.stage = "writing tiles from staging"
+        self.update_status_and_load_details("validated")
 
         logger.debug("writing tiles from load_staging")
         try:
@@ -755,7 +762,7 @@ class FMSFImporter(BaseImportModule):
                     cursor.execute(
                         """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, %s) WHERE loadid = %s""",
                         (
-                            "loaded",
+                            "completed",
                             datetime.now(),
                             self.reporter.get_load_details(),
                             self.loadid,
@@ -792,7 +799,8 @@ class FMSFImporter(BaseImportModule):
 
     def run_spatial_join(self):
 
-        self.update_status_and_load_details("joining management areas")
+        self.reporter.stage = "joining management areas"
+        self.update_status_and_load_details("validated")
 
         logger.debug("running spatial join on resources")
         resids = [i.resourceid for i in self.fmsf_resources]
@@ -815,17 +823,22 @@ class FMSFImporter(BaseImportModule):
     def finalize_indexing(self):
 
         try:
-            self.update_status_and_load_details("indexing")
+            self.reporter.stage = "indexing resources"
+            self.update_status_and_load_details("completed")
             index_resources_by_transaction(
-                self.loadid, quiet=True, use_multiprocessing=False
+                self.loadid,
+                quiet=True,
+                use_multiprocessing=False,
+                recalculate_descriptors=True,
             )
+            self.reporter.stage = "completed"
             with connection.cursor() as cursor:
                 cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
                 cursor.execute(
                     """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
                     (
-                        "completed",
+                        "indexed",
                         datetime.now(),
                         True,
                         True,
@@ -957,7 +970,7 @@ class FMSFImporter(BaseImportModule):
         # READ FEATURES FROM THE INPUT SHAPEFILE
         self.read_features_from_shapefile()
         if len(self.new_features) == 0:
-            return self.abort_load(status="completed")
+            return self.abort_load(status="indexed")
 
         # RUN FILTERS ON THE STRUCTURES, IF NECESSARY
         if self.resource_type == "Historic Structure":
@@ -1002,7 +1015,6 @@ class FMSFImporter(BaseImportModule):
         Sets the load_event status as specified and updates the load_details
         object from the current state of self.reporter
         """
-
         with connection.cursor() as cursor:
             cursor.execute(
                 """UPDATE load_event SET (status, load_details) = (%s, %s) WHERE loadid = %s""",
@@ -1064,158 +1076,3 @@ class FMSFImporter(BaseImportModule):
             nodegroup = NodeGroup.objects.get(pk=nodegroupid)
             self.nodegroup_lookup[nodegroupid] = nodegroup
         return nodegroup
-
-
-class FMSFResource:
-    siteid: str
-    resource: Union[Resource, None]
-    resourceid: str
-    feature: Feature
-    parent_tile_lookup: dict
-
-    def __init__(self, siteid: str):
-
-        self.siteid = siteid
-        self.parent_tile_lookup = {}
-
-    @staticmethod
-    def from_shp_feature(feature: Feature) -> "FMSFResource":
-
-        siteid = feature.get("SITEID")
-        if not siteid:
-            raise Exception("bad shapefile feature: missing or empty SITEID field")
-        res = FMSFResource(siteid)
-        res.feature = feature
-        return res
-
-    def generate_tiles(self, importer: FMSFImporter):
-
-        dict_by_nodegroup = {}
-        for node_name, fieldset in importer.field_map.items():
-            node = importer.get_node(node_name)
-            node_config = node.config if node.config else {}
-            datatype_instance = importer.datatype_factory.get_instance(node.datatype)
-            if node.nodegroup is None:
-                continue
-            nodegroupid = str(node.nodegroup.pk)
-            if node.datatype in ["concept-list", "concept"]:
-                values = []
-                source_values = []
-                for field in fieldset:
-                    value = None
-                    if field["source"] == "shp":
-                        value = self.feature.get(field["field"])
-                    elif field["source"] == "csv":
-                        value = importer.get_value_from_csv(self.siteid, field["field"])
-                    if value is not None:
-                        source_values.append(value)
-                        labelid = importer.lookup_labelid_from_label(value, node)
-                        if labelid is not None:
-                            values.append(labelid)
-                if len(values) > 1 and node.datatype == "concept":
-                    raise Exception(f"concept node can't fit multiple values: {values}")
-                source_value = ",".join(values)
-                value = datatype_instance.transform_value_for_tile(
-                    source_value, **node_config
-                )
-            elif node.datatype in ["date"]:
-                source_value = self.feature.get(fieldset[0]["field"])
-                if source_value is not None:
-                    source_value = str(source_value)
-                value = datatype_instance.transform_value_for_tile(
-                    source_value, **node_config
-                )
-            else:
-                if fieldset[0]["field"] == "geom":
-                    geom = self.feature.geom
-                    with connection.cursor() as cursor:
-                        cursor.execute(
-                            f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));"
-                        )
-                        result = cursor.fetchone()
-                        if not result:
-                            logger.warning("Error sanitizing geometry for tile.")
-                            continue
-                        geojson = result[0]
-                    source_value = geojson
-                else:
-                    source_value = self.feature.get(fieldset[0]["field"])
-                value = datatype_instance.transform_value_for_tile(
-                    source_value, **node_config
-                )
-            valid = True
-            error_message = ""
-            node_obj = {
-                str(node.nodeid): {
-                    "value": value,
-                    "valid": valid,
-                    "source": source_value,
-                    "notes": error_message,
-                    "datatype": node.datatype,
-                }
-            }
-            dict_by_nodegroup[nodegroupid] = dict_by_nodegroup.get(nodegroupid, []) + [
-                node_obj
-            ]
-
-        tiles = []
-        for nid in dict_by_nodegroup:
-            ng = importer.get_nodegroup(nid)
-            if ng.parentnodegroup is not None:
-                parentnodegroup_id = str(ng.parentnodegroup.pk)
-                pt = self.parent_tile_lookup.get(parentnodegroup_id)
-
-                # if this is the first time the parent tile has been encountered for
-                # this resource, create it and add a blank tile for it.
-                if pt is None:
-                    pt = Tile().get_blank_tile(nid, resourceid=self.resourceid)
-                    pt.tileid = uuid.uuid4()
-                    self.parent_tile_lookup[parentnodegroup_id] = pt
-                    tiles.append(
-                        (
-                            parentnodegroup_id,
-                            self.siteid,  # legacyid
-                            self.resourceid,  # resourceid
-                            pt.tileid,
-                            None,
-                            None,
-                            importer.loadid,
-                            0,
-                            importer.resource_csv.name,
-                            True,
-                        )
-                    )
-
-                # now set the appropriate values for the business data tile
-                parenttileid = pt.tileid
-                nodegroup_depth = 1
-            else:
-                parenttileid = None
-                nodegroup_depth = 0
-
-            tile_data = copy.deepcopy(importer.get_blank_tile(nid))
-            passes_validation = True
-            for node in dict_by_nodegroup[nid]:
-                for key in node:
-                    tile_data[key] = node[key]
-                    if node[key]["valid"] is False:
-                        passes_validation = False
-
-            tileid = uuid.uuid4()
-            tile_value_json = JSONSerializer().serialize(tile_data)
-
-            row = (
-                nid,
-                self.siteid,  # legacyid
-                self.resourceid,  # resourceid
-                tileid,
-                parenttileid,
-                tile_value_json,
-                importer.loadid,
-                nodegroup_depth,
-                importer.resource_csv.name,
-                passes_validation,
-            )
-            tiles.append(row)
-
-        return tiles

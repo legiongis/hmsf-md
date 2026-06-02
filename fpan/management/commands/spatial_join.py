@@ -59,14 +59,16 @@ class Command(BaseCommand):
         elif options["backfill"]:
             # find all empty FPAN Region nodes and use only these resources
             resids = []
-            for k, v in settings.SPATIAL_JOIN_NODE_LOOKUP.items():
-                print(k)
-                all_tiles = Tile.objects.filter(nodegroup_id=v["nodegroupid"])
+            for graph in settings.GRAPH_LOOKUP.values():
+                print(graph["name"])
+                all_tiles = Tile.objects.filter(
+                    nodegroup_id=graph["spatial_node_lookup"]["nodegroupid"]
+                )
                 res_with_nodegroup = all_tiles.values_list(
                     "resourceinstance_id", flat=True
                 )
                 res_without_nodegroup = ResourceInstance.objects.filter(
-                    graph__name=k
+                    graph_id=graph["id"]
                 ).exclude(pk__in=res_with_nodegroup)
                 resids_missing_region = list(
                     res_without_nodegroup.values_list("pk", flat=True)
@@ -74,7 +76,9 @@ class Command(BaseCommand):
                 for tile in all_tiles:
                     if tile.data:
                         ## use the FPAN Region as a way to test whether this has been filled.
-                        region_val = tile.data.get(v["region_nodeid"])
+                        region_val = tile.data.get(
+                            graph["spatial_node_lookup"]["region_nodeid"]
+                        )
                         if region_val in (None, ""):
                             resids_missing_region.append(tile.resourceinstance.pk)
                 print(f"resources to join: {len(resids_missing_region)}")
@@ -93,11 +97,12 @@ class Command(BaseCommand):
         print(f"completed. elapsed time: {datetime.now() - start}")
 
     def run_join_by_graph(self, graph_name):
-        resources = ResourceInstance.objects.filter(graph__name=graph_name)
+        graph = Graph.objects.get(name=graph_name)
+        resources = ResourceInstance.objects.filter(graph=graph)
         joiner = SpatialJoin(graph_name)
         total = resources.count()
         for n, res in enumerate(resources, start=1):
             print(f"{n}/{total}: {str(res.pk)} ({res.graph.name})")
             joiner.update_resource(res, index=False)
         graph = Graph.objects.get(name=graph_name)
-        index_resources_by_type([graph.pk])
+        index_resources_by_type([str(graph.pk)])

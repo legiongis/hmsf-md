@@ -15,18 +15,30 @@ DEBUG = False
 HTTPS = False
 MODE = "PROD"
 
-APP_NAME = "HMS - FPAN"
+## Temporarily changing APP_NAME to "fpan" just for version 7.0 (and a few more)
+## because it needs to match this directory name. By 7.6 it can be changed
+## back to its intended value: "HMS - FPAN"
+APP_NAME = "fpan"
+
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 LOG_DIR = os.path.join(APP_ROOT, "logs")
 
 MEDIA_ROOT = os.path.join(APP_ROOT)
-STATIC_ROOT = os.path.join(APP_ROOT, "static")
+STATIC_ROOT = os.path.join(APP_ROOT, "staticfiles")
+
+STATIC_URL = "/static/"
 
 ROOT_URLCONF = "fpan.urls"
 WSGI_APPLICATION = "fpan.wsgi.application"
 
-STATICFILES_DIRS = (os.path.join(APP_ROOT, "media"),) + STATICFILES_DIRS
+STATICFILES_DIRS = build_staticfiles_dirs(app_root=APP_ROOT)
+
+WEBPACK_LOADER = {
+    "DEFAULT": {
+        "STATS_FILE": os.path.join(APP_ROOT, "..", "webpack/webpack-stats.json"),
+    },
+}
 
 ## new setting in 6.1  -AC 07/28/2022
 EXPORT_DATA_FIELDS_IN_CARD_ORDER = True
@@ -42,27 +54,25 @@ DATATYPE_LOCATIONS.append("fpan.datatypes")
 FUNCTION_LOCATIONS.append("fpan.functions")
 ETL_MODULE_LOCATIONS.append("fpan.etl_modules")
 
-TEMPLATES[0]["DIRS"].append(os.path.join(APP_ROOT, "functions", "templates"))
-TEMPLATES[0]["DIRS"].append(os.path.join(APP_ROOT, "widgets", "templates"))
-TEMPLATES[0]["DIRS"].insert(0, os.path.join(APP_ROOT, "templates"))
+TEMPLATES = build_templates_config(
+    debug=DEBUG,
+    app_root=APP_ROOT,
+)
 TEMPLATES[0]["DIRS"].insert(
     0, os.path.join(os.path.dirname(APP_ROOT), "site_theme", "templates")
 )
 
 TEMPLATES[0]["OPTIONS"]["context_processors"].append("fpan.context_processors.debug")
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
-    "fpan.context_processors.widget_data"
-)
-TEMPLATES[0]["OPTIONS"]["context_processors"].append(
-    "fpan.context_processors.management_area_importer_configs"
-)
-TEMPLATES[0]["OPTIONS"]["context_processors"].append(
-    "fpan.context_processors.rule_filter_html"
+    "fpan.context_processors.username_widget_data"
 )
 TEMPLATES[0]["OPTIONS"]["context_processors"].append("hms.context_processors.user_type")
 TEMPLATES[0]["OPTIONS"]["context_processors"].append(
     "site_theme.context_processors.profile_content"
 )
+
+ROOT_HOSTCONF = "fpan.hosts"
+DEFAULT_HOST = "fpan"
 
 SEARCH_COMPONENT_LOCATIONS += ["fpan.search.components"]
 
@@ -84,6 +94,7 @@ INSTALLED_APPS += (
     "tinymce",  # used for WISIWYG editor in site_theme admin pages
     "docs",  # django-docs implementation: https://github.com/littlepea/django-docs/
 )
+# INSTALLED_APPS += ("arches.app",)
 
 PLAUSIBLE_SITE_DOMAIN = None
 PLAUSIBLE_EMBED_LINK = None
@@ -103,7 +114,10 @@ DEPRECATE_LEGACY_FIXTURE_LOAD_MSG = (
 # someone were to hit the shapefile export url somehow.
 RESOURCE_FORMATTERS["shp"] = ""
 
-DISABLE_PROVISIONAL_EDITING = True
+ENABLE_PROVISIONAL_EDITING = False
+# retained for backward compatibility, but will be removed eventually
+DISABLE_PROVISIONAL_EDITING = not ENABLE_PROVISIONAL_EDITING
+
 HIDE_EMPTY_NODES_IN_REPORT = True
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -158,41 +172,57 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID = "4d11bac0-d535-11e7-a1b3-94659cf754d0"
 
-## Full config with node ids used in spatial join.
-SPATIAL_JOIN_NODE_LOOKUP = {
-    "Archaeological Site": {
-        "nodegroupid": "4259ff42-715c-11ee-9e57-4df2569ff543",
-        "county_nodeid": "64f9a4da-715c-11ee-9e57-4df2569ff543",
-        "region_nodeid": "4d1dc620-715c-11ee-9e57-4df2569ff543",
-        "area_nodeid": "877fefaa-715c-11ee-9e57-4df2569ff543",
-        "agency_nodeid": "58908172-715d-11ee-9e57-4df2569ff543",
-    },
-    "Historic Cemetery": {
-        "nodegroupid": "48821219-715e-11ee-9e57-4df2569ff543",
-        "county_nodeid": "4882121d-715e-11ee-9e57-4df2569ff543",
-        "region_nodeid": "4882121c-715e-11ee-9e57-4df2569ff543",
-        "area_nodeid": "4882121e-715e-11ee-9e57-4df2569ff543",
-        "agency_nodeid": "4882121b-715e-11ee-9e57-4df2569ff543",
-    },
-    "Historic Structure": {
-        "nodegroupid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
-        "county_nodeid": "ad51e461-715e-11ee-9e57-4df2569ff543",
-        "region_nodeid": "ad51e460-715e-11ee-9e57-4df2569ff543",
-        "area_nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
-        "agency_nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
-    },
-}
-
 SPATIAL_COORDINATES_NODEGROUPS_IDS = [
     "3067ed10-dbaa-11e7-87be-94659cf754d0",  # archaeological site
     "210c6341-dbab-11e7-9832-94659cf754d0",  # historic cemetery
     "efe6cb5e-dbab-11e7-a327-94659cf754d0",  # historic structure
 ]
 
+GRAPH_LOOKUP = {
+    "as": {
+        "id": "f212980f-d534-11e7-8ca8-94659cf754d0",
+        "name": "Archaeological Site",
+        "spatial_node_lookup": {
+            "nodegroupid": "4259ff42-715c-11ee-9e57-4df2569ff543",
+            "county_nodeid": "64f9a4da-715c-11ee-9e57-4df2569ff543",
+            "region_nodeid": "4d1dc620-715c-11ee-9e57-4df2569ff543",
+            "area_nodeid": "877fefaa-715c-11ee-9e57-4df2569ff543",
+            "agency_nodeid": "58908172-715d-11ee-9e57-4df2569ff543",
+        },
+    },
+    "hc": {
+        "id": "73889292-d536-11e7-b3b3-94659cf754d0",
+        "name": "Historic Cemetery",
+        "spatial_node_lookup": {
+            "nodegroupid": "48821219-715e-11ee-9e57-4df2569ff543",
+            "county_nodeid": "4882121d-715e-11ee-9e57-4df2569ff543",
+            "region_nodeid": "4882121c-715e-11ee-9e57-4df2569ff543",
+            "area_nodeid": "4882121e-715e-11ee-9e57-4df2569ff543",
+            "agency_nodeid": "4882121b-715e-11ee-9e57-4df2569ff543",
+        },
+    },
+    "hs": {
+        "id": "c67216bf-8cc2-11e7-883c-06ed184dc22c",
+        "name": "Historic Structure",
+        "spatial_node_lookup": {
+            "nodegroupid": "ad51e45d-715e-11ee-9e57-4df2569ff543",
+            "county_nodeid": "ad51e461-715e-11ee-9e57-4df2569ff543",
+            "region_nodeid": "ad51e460-715e-11ee-9e57-4df2569ff543",
+            "area_nodeid": "ad51e462-715e-11ee-9e57-4df2569ff543",
+            "agency_nodeid": "ad51e45f-715e-11ee-9e57-4df2569ff543",
+        },
+    },
+    "sr": {"id": "14578901-bd5d-11e9-822a-94659cf754d0", "name": "Scout Report"},
+}
+
+
 try:
     from .settings_local import *
 except ImportError:
-    pass
+    try:
+        from settings_local import *
+    except ImportError:
+        pass
 
 if MODE == "DEV":
     import sys
@@ -303,9 +333,17 @@ MIDDLEWARE = [
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    # "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "arches.app.utils.middleware.SetAnonymousUser",
 ]
+
+MIDDLEWARE.insert(  # this must resolve to first MIDDLEWARE entry
+    0, "django_hosts.middleware.HostsRequestMiddleware"
+)
+
+MIDDLEWARE.append(  # this must resolve last MIDDLEWARE entry
+    "django_hosts.middleware.HostsResponseMiddleware"
+)
 
 # default language of the application
 # language code needs to be all lower case with the form:
@@ -322,3 +360,5 @@ LANGUAGES = [
 ]
 # override this to permenantly display/hide the language switcher
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
+
+LOCALE_PATHS.insert(0, os.path.join(APP_ROOT, "locale"))

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 define([
     'underscore',
     'knockout',
@@ -5,10 +6,11 @@ define([
     'uuid',
     'arches',
     'viewmodels/alert',
+    'templates/views/components/etl_modules/fmsf-importer.htm',
     'dropzone',
     'bindings/select2-query',
     'bindings/dropzone',
-], function(_, ko, ImporterViewModel, uuid, arches, AlertViewModel) {
+], function(_, ko, ImporterViewModel, uuid, arches, AlertViewModel, fmsfImporterTemplate) {
     return ko.components.register('fmsf-importer', {
         viewModel: function(params) {
             const self = this;
@@ -30,13 +32,17 @@ define([
             this.selectedTemplate = ko.observable();
             this.loadStatus = ko.observable('ready');
 
+            this.validated = ko.observable();
+            this.validationError = ko.observableArray();
+            this.selectedLoadEvent = params.selectedLoadEvent || ko.observable();
+
             this.addFile = async function(file){
                 self.loading(true);
                 self.fileInfo({name: file.name, size: file.size});
                 const formData = new window.FormData();
                 formData.append('file', file, file.name);
                 const response = await self.submit('read_zip', formData);
-                console.log(self.loadId)
+
                 if (response.ok) {
                     const data = await response.json();
                     self.loading(false);
@@ -52,12 +58,12 @@ define([
 
             this.start = async function(){
                 self.loading(true);
-                self.formData.append("resourceType", self.resourceType())
-                self.formData.append("truncate", self.truncate())
-                self.formData.append("dryRun", self.dryRun())
-                self.formData.append("onlySiteIdList", self.onlySiteIdList())
-                self.formData.append("loadDescription", self.loadDescription())
-                self.formData.append("loadId", self.loadId)
+                self.formData.append("resourceType", self.resourceType());
+                self.formData.append("truncate", self.truncate());
+                self.formData.append("dryRun", self.dryRun());
+                self.formData.append("onlySiteIdList", self.onlySiteIdList());
+                self.formData.append("loadDescription", self.loadDescription());
+                self.formData.append("loadId", self.loadId);
                 const response = await self.submit('run_web_import');
                 self.loading(false);
                 params.activeTab("import");
@@ -71,6 +77,6 @@ define([
                 }
             };
         },
-        template: { require: 'text!templates/views/components/etl_modules/fmsf-importer.htm' }
+        template: fmsfImporterTemplate
     });
 });

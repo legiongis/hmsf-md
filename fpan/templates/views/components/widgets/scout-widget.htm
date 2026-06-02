@@ -19,6 +19,11 @@
 
 {% endblock form %}
 
+{% block display_value %}
+<span data-bind="text: displayValue().en.value || $root.translations.none,
+    class: nodeCssClasses"></span>
+{% endblock display_value %}
+
 {% block config_form %}
 
 <div class="control-label">
@@ -33,6 +38,6 @@
 {% block report %}
 <dt data-bind="text: label"></dt>
 <dd>
-  <div style='margin-bottom:2px' data-bind="text: value"></div>
+  <div style='margin-bottom:2px' data-bind="text: value.en.value"></div>
 </dd>
 {% endblock report %}

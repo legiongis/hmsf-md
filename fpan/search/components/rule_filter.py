@@ -1,8 +1,9 @@
-import os
 import json
 import logging
+from pathlib import Path
+
 from typing import TYPE_CHECKING
-from arches.app.utils.betterJSONSerializer import JSONDeserializer
+from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 from arches.app.search.search_engine_factory import SearchEngineFactory
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
@@ -16,10 +17,6 @@ from arches.app.search.components.base import BaseSearchFilter
 from arches.app.models.system_settings import settings
 from arches.app.models.models import GraphModel, Node
 
-from hms.permissions_backend import (
-    user_is_scout,
-    user_is_land_manager,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -29,24 +26,31 @@ details = {
     "icon": "fa fa-key",
     "modulename": "rule_filter.py",
     "classname": "RuleFilter",
-    "type": "popup",
+    "type": "rule-filter-type",
     "componentpath": "views/components/search/rule-filter",
     "componentname": "rule-filter",
-    "sortorder": "0",
+    "config": {"layoutType": "popup"},
+    "layoutSortorder": 12,
     "enabled": True,
 }
 
 
+def save_dsl(dsl_object, file_name):
+    out_dsl = json.loads(JSONSerializer().serialize(dsl_object))
+    ## remove some non-standard query keys to allow easy copy/paste
+    ## into an Elasticsearch client
+    out_dsl.pop("source_includes", None)
+    out_dsl.pop("source_excludes", None)
+    with open(Path(settings.LOG_DIR, file_name), "w") as o:
+        json.dump(out_dsl, o, indent=1)
+
+
 class Rule(object):
-    def __init__(self, rule_type, **kwargs):
+    def __init__(self, rule_type: str, **kwargs):
 
         self.type = rule_type
         self.graph_id = kwargs.get("graph_id")
-        self.graph_name = kwargs.get("graph_name")
         self.config = {}
-
-        if not self.graph_id and self.graph_name:
-            self.graph_id = str(GraphModel.objects.get(name=self.graph_name).pk)
 
         if self.type in ["full_access", "no_access"]:
             self.config["graph_id"] = self.graph_id
@@ -80,6 +84,9 @@ class Rule(object):
         else:
             raise (Exception(f"Invalid rule type: {self.type}"))
 
+    def __repr__(self):
+        return f"{self.type} | {self.config}"
+
     def serialize(self):
 
         return {
@@ -89,13 +96,11 @@ class Rule(object):
 
 
 class RuleFilter(BaseSearchFilter):
-    def append_dsl(
-        self, search_results_object, permitted_nodegroups, include_provisional
-    ):
+    def append_dsl(self, search_query_object, **kwargs):
         """
         This is the method that Arches calls, and ultimately all it does is
 
-          search_results_object["query"].add_query(some_new_es_dsl)
+          search_query_object["query"].add_query(some_new_es_dsl)
 
         Many other methods of this class are used as helpers for generating
         the new dsl content, which is stored in self.paramount.
@@ -109,22 +114,30 @@ class RuleFilter(BaseSearchFilter):
         self.paramount = Bool()
         self.existing_query = False
 
+        ## PROBABLY REMOVE THIS AS ARCHES HAS A DIFFERENT DEFAULT STRUCTURE NOW
         ## manual test to see if any criteria have been added to the query yet
-        original_dsl = search_results_object["query"]._dsl
+        original_dsl = search_query_object["query"]._dsl
         try:
             if original_dsl["query"]["match_all"] == {}:
                 self.existing_query = True
         except KeyError:
             pass
 
+        ## NEW APPROACH:
+        ## collect all existing filters BESIDES the default graph_id filter
+        existing_filters = []
+        for f in search_query_object["query"].dsl["query"]["bool"]["filter"]:
+            if "graph_id" not in f.get("terms", {}):
+                existing_filters.append(f)
+
         if settings.LOG_LEVEL == "DEBUG":
-            with open(
-                os.path.join(settings.LOG_DIR, "dsl_before_fpan.json"), "w"
-            ) as output:
-                json.dump(original_dsl, output, indent=1)
+            save_dsl(
+                search_query_object["query"]._dsl,
+                f"{self.componentname}_dsl__before.json",
+            )
 
         ## Should always be enabled. If not (like someone typed in a different URL) raise exception.
-        querystring_params = self.request.GET.get(details["componentname"])
+        querystring_params = self.request.GET.get(self.componentname)
         if querystring_params != "enabled":
             raise (
                 Exception("Error: Site filter is registered but not shown as enabled.")
@@ -134,7 +147,7 @@ class RuleFilter(BaseSearchFilter):
         graphids_uuid = (
             GraphModel.objects.exclude(pk=settings.SYSTEM_SETTINGS_RESOURCE_MODEL_ID)
             .exclude(isresource=False)
-            .exclude(isactive=False)
+            .exclude(publication=None)
             .values_list("graphid", flat=True)
         )
         graphids = [str(i) for i in graphids_uuid]
@@ -160,84 +173,76 @@ class RuleFilter(BaseSearchFilter):
 
         ## now create a user-determined rule for each graph in the request.
         ## collected rules are created with the rule generators above.
-        collected_rules = self.compile_rules(self.request.user, graphids=graphids)
+        from hms.permissions_backend import get_rule_by_graph
+
+        collected_rules = [
+            get_rule_by_graph(self.request.user, graphid=i) for i in graphids
+        ]
+
+        should_list = []
+        must_not_list = []
+
+        full_allow_graphids = []
+        no_allow_graphids = []
+
+        ## NEW APPROACH: Iterate rules and generate dsl and add it to the filter
+        ## should or must_not list. No longer using hardly any of the other methods
+        ## on this class!
 
         ## iterate rules, applying them to self.paramount thereby generating
         ## a composite query.
         for rule in collected_rules:
-            self.apply_rule(rule)
+            print("applying rule:", rule)
+            if rule.type == "full_access":
+                full_allow_graphids.append(rule.config["graph_id"])
+            elif rule.type == "no_access":
+                no_allow_graphids.append(rule.config["graph_id"])
+            elif rule.type == "resourceid_filter":
+                should_list.append(
+                    self.get_resourceid_filter_clause(rule.config["resourceids"])._dsl
+                )
+            elif rule.type == "attribute_filter":
+                should_list.append(self.get_attribute_filter_clause(rule.config)._dsl)
 
-        search_results_object["query"].add_query(self.paramount)
+        if len(full_allow_graphids) > 0:
+            should_list.append({"terms": {"graph_id": full_allow_graphids}})
+        if len(no_allow_graphids) > 0:
+            must_not_list.append({"terms": {"graph_id": no_allow_graphids}})
+
+        new_bool_filter = {
+            "bool": {
+                "should": should_list,
+                "must_not": must_not_list,
+            }
+        }
+
+        existing_filters.append(new_bool_filter)
+
+        search_query_object["query"].dsl["query"]["bool"]["filter"] = existing_filters
 
         if settings.LOG_LEVEL == "DEBUG":
-            with open(
-                os.path.join(settings.LOG_DIR, "dsl_after_fpan.json"), "w"
-            ) as output:
-                json.dump(search_results_object["query"]._dsl, output, indent=1)
+            save_dsl(
+                search_query_object["query"]._dsl,
+                f"{self.componentname}_dsl__after.json",
+            )
 
-    def compile_rules(self, user, graphids=[], single=False):
-        """
-        Pass in a user and a list of graphids to generate filters for each graph
-        based on user characteristics. If a single graphid is passed in, then
-        you can add single=True to return a single rule, instead of a list
-        containing only one rule.
+    def get_resourceid_filter_clause(self, resourceids):
 
-        Potentially, user-defined settings could be pulled in here to extrapolate
-        this logic to the front-end.
-        """
+        resid_bool = Bool()
+        terms = Terms(field="resourceinstanceid", terms=resourceids)
+        resid_bool.should(terms)
+        return resid_bool
 
-        compiled_rules = []
-        for graphid in graphids:
-            graph_name = GraphModel.objects.get(graphid=graphid).name
+    def get_attribute_filter_clause(self, rule_config):
 
-            if user.is_superuser:
-                rule = Rule("full_access", graph_name=graph_name)
+        attribute_bool = Bool()
+        terms = Terms(field="strings.nodegroup_id", terms=[rule_config["nodegroup_id"]])
+        attribute_bool.filter(terms)
+        for value in rule_config["value"]:
+            match = Match(field="strings.string", query=value, type="phrase")
+            attribute_bool.should(match)
 
-            elif user_is_land_manager(user):
-                rule = user.landmanager.get_graph_rule(graph_name)
-
-            elif user_is_scout(user):
-                rule = user.scout.scoutprofile.get_graph_rule(graph_name)
-
-            elif user.username == "anonymous":
-                ## manual handling of public users here
-                if graph_name == "Archaeological Site":
-                    rule = Rule(
-                        "attribute_filter",
-                        graph_name=graph_name,
-                        node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
-                        value=[user.username],
-                    )
-
-                elif graph_name == "Scout Report":
-                    from hms.models import report_rule_from_arch_rule
-
-                    arch_rule = Rule(
-                        "attribute_filter",
-                        graph_name="Archaeological Site",
-                        node_id=settings.ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID,
-                        value=[user.username],
-                    )
-                    rule = report_rule_from_arch_rule(arch_rule)
-
-                else:
-                    rule = Rule("full_access", graph_name=graph_name)
-
-            else:
-                # this will catch old land managers before their profiles
-                # have been created.
-                logger.debug(f"compile_rules: user {user.username} is adrift.")
-                if graph_name in ["Archaeological Site", "Scout Report"]:
-                    rule = Rule("no_access", graph_name=graph_name)
-                else:
-                    rule = Rule("full_access", graph_name=graph_name)
-
-            compiled_rules.append(rule)
-
-        if len(compiled_rules) == 1 and single is True:
-            return compiled_rules[0]
-        else:
-            return compiled_rules
+        return Nested(path="strings", query=attribute_bool)
 
     def apply_rule(self, rule):
 
@@ -279,14 +284,7 @@ class RuleFilter(BaseSearchFilter):
 
     def add_attribute_filter_clause(self, rule_config):
 
-        attribute_bool = Bool()
-        terms = Terms(field="strings.nodegroup_id", terms=[rule_config["nodegroup_id"]])
-        attribute_bool.filter(terms)
-        for value in rule_config["value"]:
-            match = Match(field="strings.string", query=value, type="phrase")
-            attribute_bool.should(match)
-
-        nested = Nested(path="strings", query=attribute_bool)
+        nested = self.get_attribute_filter_clause(rule_config)
 
         if self.existing_query:
             self.paramount.should(nested)
@@ -294,12 +292,8 @@ class RuleFilter(BaseSearchFilter):
             self.paramount.must(nested)
 
     def add_resourceid_filter_clause(self, resourceids):
-        """incomplete at this time, but would pull a list of resource ids
-        from somewhere and put it in the query."""
 
-        resid_bool = Bool()
-        terms = Terms(field="resourceinstanceid", terms=resourceids)
-        resid_bool.should(terms)
+        resid_bool = self.get_resourceid_filter_clause(resourceids)
 
         if self.existing_query:
             self.paramount.should(resid_bool)
@@ -333,6 +327,15 @@ class RuleFilter(BaseSearchFilter):
         else:
             logger.warning(f"error constructing geoshape from geojson: {geojson_geom}")
 
+    def view_data(self):
+        from hms.permissions_backend import generate_site_access_html
+
+        html_content = "No access"
+        if self.request and self.request.user:
+            html_content = generate_site_access_html(self.request.user)
+
+        return {"rule_filter_html": html_content}
+
     def get_resources_from_rule(self, rule, ids_only=False):
         """
         Returns a list of resources for single graph_filter rule. This
@@ -363,54 +366,6 @@ class RuleFilter(BaseSearchFilter):
         results = query.search(index="resources")
 
         if ids_only is True:
-            ids = [i["_source"]["resourceinstanceid"] for i in results["hits"]["hits"]]
-            return ids
+            return [i["_source"]["resourceinstanceid"] for i in results["hits"]["hits"]]
 
         return [i["_source"] for i in results["hits"]["hits"]]
-
-    def generate_html(self, user):
-        """This function should be called by a context_processor to dynamically generate HTML
-        content that is used in the rule filter component template. It can be altered as needed."""
-
-        ## ultimately, this should be dynamically driven directly by the rules this filter finds.
-        ## for now though, there is a lot of hard-coded HMS logic
-        # rules = self.compile_rules(user)
-
-        FULL_ACCESS_HTML = "<p>Your account has full access to <strong>all</strong> archaeological sites.</p>"
-        NO_ACCESS_HTML = (
-            "<p>Your account does not have access to any archaeological sites.</p>"
-        )
-
-        if user.is_superuser:
-            return FULL_ACCESS_HTML
-        if user.username == "anonymous":
-            return NO_ACCESS_HTML
-
-        if user_is_scout(user):
-            if user.scout.scoutprofile.site_access_mode == "FULL":
-                return FULL_ACCESS_HTML
-            elif user.scout.scoutprofile.site_access_mode == "USERNAME=ASSIGNEDTO":
-                return "<p>You have access to any archaeological sites to which you have been individually assigned.</p>"
-            else:
-                return NO_ACCESS_HTML
-
-        if user_is_land_manager(user):
-            if user.landmanager.site_access_mode == "FULL":
-                html = FULL_ACCESS_HTML
-            elif user.landmanager.site_access_mode == "AREA":
-                html = "<p>You can access any archaeological sites that are located in the following Management Areas:</p>"
-                if len(user.landmanager.all_areas) == 0:
-                    html += "<p><em>No Management Areas have been added to your Land Manager profile.</em></p>"
-                else:
-                    html += "<ul style='list-style:none; padding-left:0px; font-weight:bold;'>"
-                    for group in user.landmanager.grouped_areas.all():
-                        html += f"<li>{group.name} (grouped area)</li>"
-                    for area in user.landmanager.individual_areas.all():
-                        html += f"<li>{area.name}</li>"
-                    html += "</ul>"
-            elif user.landmanager.site_access_mode == "AGENCY":
-                html = f"<p>You can access any archaeological sites that are managed by your agency: <strong>{user.landmanager.management_agency}</strong></p>"
-            else:
-                html = NO_ACCESS_HTML
-
-            return html

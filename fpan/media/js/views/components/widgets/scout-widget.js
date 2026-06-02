@@ -1,4 +1,11 @@
-define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','bindings/chosen'], function (ko, _, WidgetViewModel, $, fpan, chosen) {
+define([
+    'knockout',
+    'underscore',
+    'viewmodels/widget',
+    'jquery',
+    'templates/views/components/widgets/scout-widget.htm',
+    'bindings/chosen'
+], function(ko, _, WidgetViewModel, $, scoutWidgetTemplate) {
     /**
     * registers a text-widget component for use in forms
     * @function external:"ko.components".text-widget
@@ -13,19 +20,20 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
             params.configKeys = ['options','placeholder'];
             WidgetViewModel.apply(this, [params]);
 
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             var self = this;
             self.availableScouts = ko.observableArray();
             self.selectedScout = params.value;
             
             // push the anonymous user to this list so admins can expose select sites to the public
             self.availableScouts.push({
-                'username': 'anonymous',
+                'username': {"en": {"value":'anonymous', "direction": "ltr"}},
                 'display_name': 'Public Access',
             });
 
             if (params.state != 'report') {
                 $.ajax({
-                    url: fpan.urls.scouts_dropdown,
+                    url: "/scouts/",
                     data: {
                         'resourceid': self.tile.resourceinstance_id
                     },
@@ -39,6 +47,6 @@ define(['knockout', 'underscore', 'viewmodels/widget', 'jquery', 'fpan','binding
                 });
             }
         },
-        template: { require: 'text!templates/views/components/widgets/scout-widget.htm' }
+        template: scoutWidgetTemplate
     });
 });

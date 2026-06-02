@@ -1,8 +1,9 @@
 #! /usr/bin/bash
 
-docker create --name postgis15 \
+docker create --name postgis15_3 \
         -p 5432:5432 \
         -e POSTGRES_PASSWORD=postgres \
         -e POSTGRES_HOST_AUTH_METHOD=trust \
+        --shm-size 1g \
         postgis/postgis:15-3.5-alpine
 

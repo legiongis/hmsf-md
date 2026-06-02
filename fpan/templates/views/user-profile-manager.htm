@@ -2,210 +2,12 @@
 {% load static %}
 {% load template_tags %}
 {% load i18n %}
+{% load webpack_static from webpack_loader %}
 
 {% block title %}
 {{ block.super }}
 {% trans "Account Settings" %}
 {% endblock title %}
-
-{% block navheader %}
-<header id="navbar">
-
-    <div id="navbar-container" class="boxed" style="background-color: inherit; padding-right: 0px">
-        <div class="navbar-header">
-            <a href="#" class="navbar-brand" data-bind="click: function () { navExpanded(!navExpanded()) }">
-                <img src="{{ STATIC_URL }}img/fpan/fpan_sun.png" alt="FPAN logo" class="brand-icon">
-                <div class="brand-title brand-title-{{user_type}}">
-                    <span class="brand-text">{{ app_name }}</span>
-                </div>
-            </a>
-        </div>
-    </div>
-
-</header>
-{% endblock navheader %}
-
-
-{% block mainnav %}
-    <nav id="mainnav-container" class="mainnav-container-{{user_type}}">
-        <div id="mainnav" class="mainnav-{{user_type}}">
-            {% block navbar %}
-            <div id="mainnav-menu-wrap">
-                <div class="nano">
-                    <div class="nano-content" tabindex="0">
-                        <ul id="mainnav-menu" class="list-group mainnav-menu-{{user_type}}">
-
-                            <!-- Tools -->
-                            <li class="list-header">{% trans "Tools" %}</li>
-
-                            <!-- System Settings list item -->
-                            {% if request.user|has_group:"System Administrator" %}
-                            <li{% if "views/resource" in main_script and is_system_settings is True %} class="active-sub"{% endif %}>
-                                <a href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}') ">
-                                    <i class="ti-alarm-clock"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Manage System Settings" %}</strong>
-                                    </span>
-                                </a>
-                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu" href="{% url 'config' %}" data-bind="click: navigate.bind(this, '{% url 'config' %}')">{% trans "System Settings" %}</a>
-                                    </li>
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu" href="{% url 'graph' system_settings_graphid %}" data-bind="click: navigate.bind(this, '{% url 'graph_designer' system_settings_graphid %}')">{% trans "System Settings Graph" %}</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            {% endif %}
-
-                            <li{% if "views/search" in main_script %} class="active-sub"{% endif %}>
-                                <a href="{% url 'search_home' %}" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-                                    <i class="fa fa-search"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Search" %}</strong>
-                                    </span>
-                                </a>
-                            </li>
-
-                            <!--Menu list item-->
-                            {% if request.user|can_edit_resource_instance %}
-                            <li{% if "views/resource" in main_script and is_system_settings is False %} class="active-sub"{% endif %}>
-                                <a href="{% url 'resource' %}" data-bind="click: navigate.bind(this, '{% url 'resource' %}') ">
-                                    <i class="fa fa-building-o"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Add New Resource" %}</strong>
-                                    </span>
-                                </a>
-                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                    <!-- ko foreach: createableResources -->
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu" href="#" data-bind="click: disable_instance_creation ? null: $parent.navigate.bind(this, '{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid)),
-                                            css: { 'arches-menu-item-disabled': disable_instance_creation },
-                                            attr: {
-                                                href: disable_instance_creation ? '#' : ('{% url 'add_resource' 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' %}'.replace('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', graphid))
-                                            }">
-                                            <i class="fa arches-menu-icon" data-bind="css: iconclass || 'fa fa-question'"></i> <span data-bind="text:name"></span></a>
-                                    </li>
-                                    <!-- /ko -->
-                                </ul>
-                            </li>
-                            {% endif %}
-
-                            <!--Menu list item-->
-                            {% if request.user|has_group:"Graph Editor" %}
-                            <li{% if "views/graph" in main_script %} class="active-sub"{% endif %}>
-                                <a href="#" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}') ">
-                                    <i class="fa fa-bookmark"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Arches Designer" %}</strong>
-                                    </span>
-                                </a>
-                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu"  href="{% url 'graph' '' %}" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}')">{% trans "Resource Models" %}</a>
-                                    </li>
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu" href="{% url 'graph' '' %}#branches" data-bind="click: navigate.bind(this, '{% url 'graph' '' %}#branches')">{% trans "Branches" %}</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            {% endif %}
-
-                            <!--Menu list item-->
-                            {% if request.user|has_group:"Application Administrator" %}
-                            <li{% if "views/map-layer-manager" in main_script %} class="active-sub"{% endif %}>
-                                <a href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}') ">
-                                    <i class="fa fa-server"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Map Layer Manager" %}</strong>
-                                    </span>
-                                </a>
-                                <ul class="collapse in pop-in arches" data-bind="css:{'expanded-nav': navExpanded()}">
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu" href="{% url 'map_layer_manager' %}" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}')">{% trans "Resource Layers" %}</a>
-                                    </li>
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu" href="{% url 'map_layer_manager' %}#basemaps" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#basemaps')">{% trans "Basemaps" %}</a>
-                                    </li>
-                                    <li class="link-submenu-item-{{user_type}}">
-                                        <a class="link-submenu" href="{% url 'map_layer_manager' %}#overlays" data-bind="click: navigate.bind(this, '{% url 'map_layer_manager' %}#overlays')">{% trans "Overlays" %}</a>
-                                    </li>
-                                </ul>
-                            </li>
-
-                            <li{% if "views/mobile-survey-manager" in main_script %} class="active-sub"{% endif %}>
-                                <a href="{% url 'collector_manager' %}" data-bind="click: navigate.bind(this, '{% url 'collector_manager' %}') ">
-                                    <i class="fa fa-globe"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Arches Collector Manager" %}</strong>
-                                    </span>
-                                </a>
-                            </li>
-                            {% endif %}
-
-
-                            <!-- Recently Added -->
-                            {% if request.user|can_edit_resource_instance %}
-                            <li{% if 'edit-history' in main_script %} class="active-sub"{% endif %}>
-                                <a href="{% url 'edit_history' %}" data-bind="click: navigate.bind(this, '{% url 'edit_history' %}') ">
-                                    <i class="ti-ticket"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Recent Edits" %}</strong>
-                                    </span>
-                                </a>
-                            </li>
-                            {% endif %}
-
-                            <!-- Profile Manager -->
-                            {% if user.is_authenticated and request.user.username != 'anonymous' %}
-                            <!--
-                            <li{% if "user-profile-manager" in main_script %} class="active-sub"{% endif %}>
-                                <a href="{% url 'user_profile_manager' %}" data-bind="click: navigate.bind(this, '{% url 'user_profile_manager' %}') ">
-                                    <i class="fa fa-user"></i>
-                                    <span class="menu-title">
-                                        <strong>{% trans "Profile Manager" %}</strong>
-                                    </span>
-                                </a>
-                            </li>
-                            -->
-                            {% endif %}
-
-                            <li class="list-divider-dark"></li>
-
-                            {% if request.user|has_group:"RDM Administrator" %}
-                            <!--Menu list item-->
-                            <li{% if main_script == "rdm" %} class="active-sub"{% endif %}>
-                                <a href="{% url 'rdm' '' %}" data-bind="click: navigate.bind(this, '{% url 'rdm' '' %}') ">
-                                    <i class="fa fa-align-left"></i>
-                                    <span class="menu-title">
-                                        {% trans "Reference Data Manager" %}
-                                    </span>
-                                </a>
-                            </li>
-                            {% endif %}
-
-                            {% for p in plugins %}
-                            <li{% if main_script == "views/plugin" and plugin.pluginid == p.pluginid  %} class="active-sub"{% endif %}>
-                                {% if p.slug is not None %}
-                                <a href="{% url 'plugins' p.slug %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.slug %}') ">
-                                {% else %}
-                                <a href="{% url 'plugins' p.pluginid %}" data-bind="click: navigate.bind(this, '{% url 'plugins' p.pluginid %}') ">
-                                {% endif %}
-                                    <i class="{{p.icon}}"></i>
-                                    <span class="menu-title">
-                                        {{p.name}}
-                                    </span>
-                                </a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            {% endblock navbar %}
-        </div>
-    </nav>
-{% endblock mainnav %}
 
 {% block header %}
     <div class="ep-toolbar-profile ep-toolbar-profile-{{user_type}}">
@@ -230,7 +32,6 @@
             {% endif %}
         {% endif %}
 
-
         {% block graph_title %}
         <!-- Page Title and Icon -->
         <div class="ep-tools-title">
@@ -240,6 +41,16 @@
             </h1>
         </div>
         {% endblock graph_title %}
+
+        {% if nav.search %}
+        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-right ep-tools-login-{{user_type}}" style="border:none;" aria-label="{% trans 'Visit the Search page' %}"
+            data-bind="click:function () { navigate('{% url 'search_home' %}') }">
+            <div data-placement="bottom" data-toggle="tooltip" data-original-title="{% trans "Search" %}">
+                <i class="ion-home"></i>
+
+            </div>
+        </a>
+        {% endif %}
 
         <!-- Login -->
         {% if nav.login %}
@@ -256,444 +67,359 @@
                 </div>
             </a>
             {% else %}
-            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
+            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}" title="log out of the database">
                 <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Logout">
-                <h5 class="hidden-xs">{% trans "Logout" %}</h5>
+                    <i class="ion-log-out"></i>
                 </div>
             </a>
             {% endif %}
         {% endif %}
-
-        <!-- Search Bar -->
-        {% if nav.search %}
-        <a href="{% url 'search_home' %}" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}" data-bind="click:function () { navigate('{% url 'search_home' %}') }">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Search" %}'>
-              <h5 class="hidden-xs">Explore the Database</h5>
-            </div>
-        </a>
-        {% endif %}
-
-        <!-- Prov edit history-->
-        {% if user_is_reviewer == False and user|can_edit_resource_instance %}
-        <a href="{% url 'search_home' %}" class="ep-edits-toggle ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click:function () { getProvisionalHistory(); }">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "My Recent Edits" %}'>
-              <i class="ion-clock"></i>
-            </div>
-        </a>
-        {% endif %}
-
-        {% if nav.res_edit and user|can_edit_resource_instance %}
-        <a href="{% url 'resource_editor' resourceid %}" class="ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click:function () { navigate('{% url 'resource_editor' resourceid %}') }">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Edit" %}'>
-              <i class="ion-edit"></i>
-            </div>
-        </a>
-        {% endif %}
-
-        {% if nav.print %}
-        <a href="" class="ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click: function() { window.print() }">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Print" %}'>
-              <i class="ion-printer"></i>
-            </div>
-        </a>
-        {% endif %}
-
-        {% if nav.help %}
-        <a href="javascript:void(0)" class="ep-help-toggle ep-tools ep-tools-right ep-tools-right-{{user_type}}" data-bind="click: function(){ getHelp('{{ nav.help.template }}'); helpOpen(true) }">
-            <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Help" %}'>
-              <i class="ion-help"></i>
-            </div>
-        </a>
-        {% endif %}
-    </div>
-
-    <!-- Help Panel -->
-    <div id="ep-edits-panel" class="ep-edits" style="display:none;">
-        <div class="ep-edits-header" style="padding-right:0px">
-            <div class="ep-edits-title">
-                <span>{% trans 'My Edit History' %}</span>
-            </div>
-            <a href="javascript:void(0);" class="ep-edits-toggle ep-edits-close ep-tools ep-tools-right ep-tools-right-{{user_type}}" style="border:none;">
-                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close" %}'>
-                  <i class="fa fa-times-circle fa-lg"></i>
-                </div>
-            </a>
-        </div>
-        <div class="ep-edits-body provisional-edit-history" style="float:left" data-bind="css: {'loading-mask': helploading()}">
-            <div class="ep-edits-content">
-                {% include 'views/provisional-history-list.htm' %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Help Panel -->
-    <div id="ep-help-panel" class="ep-help" style="display: none" data-bind="slide: helpOpen, duration: 400, direction: {direction: 'right'}, easing: 'slide'">
-        <div class="ep-help-header" style="padding-right:0px">
-            <div class="ep-help-title">
-                <span>{% trans nav.help.title %}</span>
-            </div>
-            <a href="javascript:void(0);" class="ep-help-toggle ep-help-close ep-tools ep-tools-right ep-tools-right-{{user_type}}" style="border:none" data-bind="click: function(){helpOpen(false)}">
-                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title='{% trans "Close Help" %}'>
-                  <i class="fa fa-times-circle fa-lg"></i>
-                </div>
-            </a>
-        </div>
-
-        <!-- help content loaded from contextually referenced template -->
-        <div class="ep-help-body" data-bind="css: {'loading-mask': helploading()}">
-            <!-- content gets inserted into this div -->
-            <div class="ep-help-content"></div>
-            <hr>
-            <h5>{% trans "for more documentation, visit" %} <a href="https://arches.readthedocs.io/" target="_blank">arches.readthedocs.io <i class="fa fa-external-link-square" aria-hidden="true"></i></a></h5>
-        </div>
     </div>
 {% endblock header %}
 
-
 {% block main_content %}
-    <!-- Main Editor -->
-    <div id="">
 
-        <!-- Profile Summary -->
-        <div class="profile-summary-page">
-            <!-- Profile Sections -->
-            <div class="profile-sections-{{user_type}}">
+    <!-- Profile Summary -->
+    <div id="profile-container" class="profile-summary-page" style="height:calc(100vh - 50px); overflow:scroll;">
+        <!-- Profile Sections -->
+        <div class="profile-sections-{{user_type}}">
 
-                {% include 'site_theme/profile_top_content.htm' %}
+            {% include 'site_theme/profile_top_content.htm' %}
 
-                <!-- My Account Info Panel -->
-                <section id="" class="profile-list">
-                    <div class="panel panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <!-- Section Title -->
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Profile Actions' %}
-                                </div>
-                                <div class="add-popover" data-bind='click: toggleChangePasswordForm'>
-                                    <a href="#" class="a-{{user_type}}">{% trans 'Change Password' %}</a>
-                                </div>
-                                <div class="password-success" data-bind="text:changePasswordSuccess"></div>
-                                <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
-                                    <div class="arrow" style="left: 50%;"></div>
-                                    {% include 'change_password.htm' %}
-                                </div>
-                                <div data-bind='click: toggleEditUserForm'>
-                                    <a href="#" class="a-{{user_type}}">{% trans 'Edit Basic Profile' %}</a>
-                                </div>
-                                {% if user_is_scout %}
-                                <p><a class="a-{{user_type}}" href="{% url 'scout_profile_manager' %}">{% trans 'Update Scout Profile' %}</a></p>
-                                {% endif %}
+            <!-- My Account Info Panel -->
+            <section class="profile-list">
+                <div class="panel panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <!-- Section Title -->
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Profile Actions' %}
                             </div>
-                            <div class="col-sm-9">
-                                <!-- ko if: showEditUserForm() === false -->
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
-                                            <p class="profile-label-shim">{% trans 'User name' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.first_name }}</h4>
-                                            <p class="profile-label-shim">{% trans 'First Name' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.last_name }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Last Name' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Email' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="relative">
-                                            <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
-                                            <p class="profile-label-shim">{% trans 'Phone' %}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- /ko -->
-
-                                <!-- ko if: showEditUserForm() === true -->
-                                <form id="profile-update-form" action="{% url 'user_profile_manager' %}" method="post">
-                                    {% csrf_token %}
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'HMS/Scout ID' %}</label>
-                                                <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
-                                            </div>
-                                        </div>
-
-                                        <!-- Password -->
-                                        <div class="col-sm-5">
-                                            <p class="account-tips">
-                                                {% trans 'This is your account login, which cannot be changed.' %}
-                                            </p>
-                                        </div>
-
-                                        <div class="col-sm-2">
-                                            <div>
-                                                <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit">{% trans 'Save' %}</button>
-                                                <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr style="border-color: #eee;">
-                                    <div class="row">
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'First name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
-                                                {% if form.first_name.errors %}
-                                                {% for error in form.first_name.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-5">
-                                        </div>
-                                    </div>
-
-                                    <!-- Account Last Name -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Last name' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
-                                                {% if form.last_name.errors %}
-                                                {% for error in form.last_name.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Phone -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
-                                                <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <hr style="border-color: #eee;">
-
-                                    <!-- Contact Email -->
-                                    <div class="row">
-                                        <!-- Names -->
-                                        <div class="col-sm-5">
-                                            <div class="form-group">
-                                                <label class="control-label account-label">{% trans 'Contact Email' %}</label>
-                                                <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
-                                                {% if form.email.errors %}
-                                                {% for error in form.email.errors %}
-                                                    <div style="color:darkred">{{ error|escape }}</div>
-                                                {% endfor %}
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-5">
-                                        </div>
-                                    </div>
-                                </form>
-                                <!-- /ko -->
+                            <div class="add-popover" data-bind='click: toggleChangePasswordForm'>
+                                <a href="#" class="a-{{user_type}}">{% trans 'Change Password' %}</a>
                             </div>
+                            <div class="password-success" data-bind="text:changePasswordSuccess"></div>
+                            <div class="change-password-form bottom fade in popover" data-bind='visible: showChangePasswordForm()'>
+                                <div class="arrow" style="left: 50%;"></div>
+                                {% include 'change_password.htm' %}
+                            </div>
+                            <div data-bind='click: toggleEditUserForm'>
+                                <a href="#" class="a-{{user_type}}">{% trans 'Edit Basic Profile' %}</a>
+                            </div>
+                            {% if user_is_scout %}
+                            <p><a class="a-{{user_type}}" href="{% url 'scout_profile_manager' %}">{% trans 'Update Scout Profile' %}</a></p>
+                            {% endif %}
                         </div>
+                        <div class="col-sm-9">
+                            <!-- ko if: showEditUserForm() === false -->
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.username }}</h4>
+                                        <p class="profile-label-shim">{% trans 'User name' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.first_name }}</h4>
+                                        <p class="profile-label-shim">{% trans 'First Name' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.last_name }}</h4>
+                                        <p class="profile-label-shim">{% trans 'Last Name' %}</p>
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.email }}</h4>
+                                        <p class="profile-label-shim">{% trans 'Email' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="relative">
+                                        <h4 class="text-main" style="font-weight: 500;">{{ user.userprofile.phone }}</h4>
+                                        <p class="profile-label-shim">{% trans 'Phone' %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+
+                            <!-- ko if: showEditUserForm() === true -->
+                            <form id="profile-update-form" action="{% url 'user_profile_manager' %}" method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'HMS/Scout ID' %}</label>
+                                            <input disabled type="text" class="form-control input-lg account-input" placeholder="Fist name" name="username" value="{{ user.username }}">
+                                        </div>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="col-sm-5">
+                                        <p class="account-tips">
+                                            {% trans 'This is your account login, which cannot be changed.' %}
+                                        </p>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <div>
+                                            <button class="btn btn-primary btn-active-purple btn-profile mar-btm" type="submit">{% trans 'Save' %}</button>
+                                            <button class="btn btn-danger btn-active-dark btn-profile mar-btm" data-bind='click: toggleEditUserForm'>{% trans 'Cancel' %}</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr style="border-color: #eee;">
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'First name' %}</label>
+                                            <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'First name' %}" name="first_name" value="{{ user.first_name }}">
+                                            {% if form.first_name.errors %}
+                                            {% for error in form.first_name.errors %}
+                                                <div style="color:darkred">{{ error|escape }}</div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                    </div>
+                                </div>
+
+                                <!-- Account Last Name -->
+                                <div class="row">
+                                    <!-- Names -->
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'Last name' %}</label>
+                                            <input type="text" class="form-control input-lg account-input" placeholder="{% trans 'Last name' %}" name="last_name" value="{{ user.last_name }}">
+                                            {% if form.last_name.errors %}
+                                            {% for error in form.last_name.errors %}
+                                                <div style="color:darkred">{{ error|escape }}</div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Phone -->
+                                <div class="row">
+                                    <!-- Names -->
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'Phone Number (optional)' %}</label>
+                                            <input type="text" class="form-control input-lg account-input" placeholder="e.g. +1 415 555-1234" name="phone" value="{{ user.userprofile.phone }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr style="border-color: #eee;">
+
+                                <!-- Contact Email -->
+                                <div class="row">
+                                    <!-- Names -->
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <label class="control-label account-label">{% trans 'Contact Email' %}</label>
+                                            <input type="email" class="form-control input-lg account-input" placeholder="jsmith@company.com" name="email" value="{{ user.email }}">
+                                            {% if form.email.errors %}
+                                            {% for error in form.email.errors %}
+                                                <div style="color:darkred">{{ error|escape }}</div>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- /ko -->
+                        </div>
                     </div>
-                </section>
 
-                <!-- NEW SECTION FOR HMS INFO-->
-                <section id="permission-summary" class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Site assignment rules' %}
-                                </div>
-                            </div>
-                            <div class="col-sm-9">
-                                <div class="relative" style="padding-top:5px;">
-                                    {{ rule_filter_html|safe }}
-                                </div>
+                </div>
+            </section>
+
+            <!-- NEW SECTION FOR HMS INFO-->
+            <section id="permission-summary" class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Site assignment rules' %}
                             </div>
                         </div>
-                        {% if site_access_rules.type != 'no_access' and site_access_rules.type != 'full_access' %}
-                        <div class="row relative">
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Archaeological sites you can monitor' %} ({{ accessible_sites|length }})
-                                </div>
+                        <div class="col-sm-9">
+                            <div class="relative" style="padding-top:5px;">
+                                {{ rule_filter_html|safe }}
                             </div>
-                            <div class="col-sm-9">
-                                <div class="relative" style="padding-top:5px;">
-                                    {% if accessible_sites|length == 0 %}
-                                    <p><em>No sites are accessible based on your access rules.</em></p>
-                                    {% else %}
-                                    <ul style="list-style:none; padding-left:0px;">
-                                    {% for site in accessible_sites %}
-                                        <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
-                                        {% if site.scout_report_ct > 0 %}
-                                        <ul style="list-style-type:'\21B3';">
-                                        {% for report in site.scout_reports %}
-                                            <li><a class="a-{{user_type}}" href="{{report.url}}">&nbsp;&nbsp;{{ report.displayname }}</a></li>
-                                        {% endfor %}
-                                        </ul>
-                                        {% endif %}
+                        </div>
+                    </div>
+                    {% if site_access_rules.type != 'no_access' and site_access_rules.type != 'full_access' %}
+                    <div class="row relative">
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Archaeological sites you can monitor' %} ({{ accessible_sites|length }})
+                            </div>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="relative" style="padding-top:5px;">
+                                {% if accessible_sites|length == 0 %}
+                                <p><em>No sites are accessible based on your access rules.</em></p>
+                                {% else %}
+                                <ul style="list-style:none; padding-left:0px;">
+                                {% for site in accessible_sites %}
+                                    <li><a class="a-{{user_type}}" href="/report/{{ site.resourceinstanceid }}"> {{ site.displayname.0.value }} </a><em> - {{ site.scout_report_ct }} reports</em></li>
+                                    {% if site.scout_report_ct > 0 %}
+                                    <ul style="list-style-type:'\21B3';">
+                                    {% for report in site.scout_reports %}
+                                        <li><a class="a-{{user_type}}" href="{{report.url}}">&nbsp;&nbsp;{{ report.displayname }}</a></li>
                                     {% endfor %}
                                     </ul>
                                     {% endif %}
-                                </div>
+                                {% endfor %}
+                                </ul>
+                                {% endif %}
                             </div>
                         </div>
-                        {% endif %}
                     </div>
-                </section>
+                    {% endif %}
+                </div>
+            </section>
 
-                {% if user_type == "admin" %}
-                <section id="scout-list-section" class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <div class="col-sm-3">
-                                <div class="profile-header">
-                                    {% trans 'Scout Summary' %}
-                                </div>
+            {% if user_type == "admin" %}
+            <section id="scout-list-section" class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <div class="col-sm-3">
+                            <div class="profile-header">
+                                {% trans 'Scout Summary' %}
                             </div>
-                            <div class="col-sm-9">
-                                <div class="relative" style="padding-top:5px;">
-                                    <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}" target="_blank">click to download full list</a></p>
-                                    <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px; background:url({% static 'img/fpan/ricepaper.png' %});">
-                                        {% for scout in scout_list %}
-                                        <li><strong>{{scout.username}}</strong> | <em>regions:</em>
-                                            {% for region in scout.fpan_regions %}
-                                                {{ region }}{% if not forloop.last %},{% endif %}
-                                            {% endfor %} | <em>interests:</em>
-                                            {% for interest in scout.site_interest_type %}
-                                                {{ interest }}{% if not forloop.last %},{% endif %}
-                                            {% endfor %}
-                                        </li>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="relative" style="padding-top:5px;">
+                                <p>Number of Scouts: {{ scout_list|length }} &nbsp;&rarr;&nbsp; <a class="a-{{user_type}}" href="{% url 'scout_list_download' %}" target="_blank">click to download full list</a></p>
+                                <ul class="fpan-panel-{{user_type}}" style="max-height:200px;overflow-y:auto; padding:5px; background:url({% webpack_static 'img/fpan/ricepaper.png' %});">
+                                    {% for scout in scout_list %}
+                                    <li><strong>{{scout.username.en.value}}</strong> | <em>regions:</em>
+                                        {% for region in scout.fpan_regions %}
+                                            {{ region }}{% if not forloop.last %},{% endif %}
+                                        {% endfor %} | <em>interests:</em>
+                                        {% for interest in scout.site_interest_type %}
+                                            {{ interest }}{% if not forloop.last %},{% endif %}
                                         {% endfor %}
-                                    </ul>
-                                </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                {% if plausible_embed_link %}
-                <section id="scout-list-section" class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="row relative">
-                            <iframe plausible-embed src="{{plausible_embed_link}}&embed=true&theme=light" scrolling="no" frameborder="0" loading="lazy" style="width: 1px; min-width: 100%; height: 1600px;"></iframe>
-                            <div style="font-size: 14px; padding-bottom: 14px;">Stats powered by <a target="_blank" href="https://plausible.io">Plausible Analytics</a></div>
-                            <script async src="https://plausible.io/js/embed.host.js"></script>
+            {% if plausible_embed_link %}
+            <section id="scout-list-section" class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="row relative">
+                        <iframe plausible-embed src="{{plausible_embed_link}}&embed=true&theme=light" scrolling="no" frameborder="0" loading="lazy" style="width: 1px; min-width: 100%; height: 1600px;"></iframe>
+                        <div style="font-size: 14px; padding-bottom: 14px;">Stats powered by <a target="_blank" href="https://plausible.io">Plausible Analytics</a></div>
+                        <script async src="https://plausible.io/js/embed.host.js"></script>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+            {% endif %}
+
+            <!-- Notification Settings -->
+            <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
+            {% comment %}
+            <section class="profile-list">
+                <div class="panel fpan-panel-{{user_type}}">
+                    <div class="profile-header">
+                        {% trans 'Notification Settings' %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-9 col-sm-offset-3 profile-notif-settings">
+                            <table class="notif-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans 'Trigger' %}</th>
+                                        <th class="notif-type">{% trans 'Email Notification' %}</th>
+                                        <th class="notif-type">{% trans 'Web Notification' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- ko foreach: notifTypeObservables -->
+                                    <tr>
+                                        <td data-bind="text:name"></td>
+                                        <td>
+                                            <label class="control-label widget-input-label-notif">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="control-label widget-input-label-notif">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td>{% trans 'Exporting Search Results' %}</td>
+                                        <td>
+                                            <label class="control-label widget-input-label">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
+                                            </label>
+                                        </td>
+                                        <td>
+                                            <label class="control-label widget-input-label">
+                                                <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
+                                            </label>
+                                        </td>
+                                    </tr> -->
+                                    <!-- /ko -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                </section>
-                {% endif %}
-                {% endif %}
-
-                <!-- Notification Settings -->
-                <!-- Commenting these out because they aren't relevant to FPAN/HMS yet. -AC 8-22-2021 -->
-                {% comment %}
-                <section class="profile-list">
-                    <div class="panel fpan-panel-{{user_type}}">
-                        <div class="profile-header">
-                            {% trans 'Notification Settings' %}
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-9 col-sm-offset-3 profile-notif-settings">
-                                <table class="notif-table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>{% trans 'Trigger' %}</th>
-                                            <th class="notif-type">{% trans 'Email Notification' %}</th>
-                                            <th class="notif-type">{% trans 'Web Notification' %}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- ko foreach: notifTypeObservables -->
-                                        <tr>
-                                            <td data-bind="text:name"></td>
-                                            <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': emailnotify()}, click: function(){emailnotify(!emailnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label class="control-label widget-input-label-notif">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': webnotify()}, click: function(){webnotify(!webnotify())}"><small></small></span>{% trans 'Enable' %}
-                                                </label>
-                                            </td>
-                                        </tr>
-                                        <!-- <tr>
-                                            <td>{% trans 'Exporting Search Results' %}</td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportEmailNotifs()}, click: function(){toggleSearchExportEmailNotifs(!toggleSearchExportEmailNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                            <td>
-                                                <label class="control-label widget-input-label">
-                                                    <span class="switch switch-small arches-switch" data-bind="css: {'on': toggleSearchExportWebNotifs()}, click: function(){toggleSearchExportWebNotifs(!toggleSearchExportWebNotifs())}"><small></small></span>
-                                                </label>
-                                            </td>
-                                        </tr> -->
-                                        <!-- /ko -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                {% endcomment %}
-            </div>
+                </div>
+            </section>
+            {% endcomment %}
         </div>
-        <!-- END Profile Summary -->
-
     </div>
-    <!--END  Main Editor -->
+    <!-- END Profile Summary -->
 
 <!-- SCROLL TOP BUTTON -->
 <button id="scroll-top" class="btn"><i class="fa fa-chevron-up"></i></button>
+<script>
+    // this is needed to properly set the page scroll on load
+    document.addEventListener("DOMContentLoaded", function(event) { 
+        document.getElementById("profile-container").scrollTo(0,0);
+    });
+</script>
 {% endblock main_content %}
 {% block pre_require_js %}
 {{ block.super }}
-<script>{% autoescape off %}
-    define('profile-manager-data', [], function() {
-        return {
-            'error_count': {{form.errors|length}},
-            'mobilesurveys': {{user_surveys}},
-            'identities': {{identities}},
-            'resources': {{resources}}
-        }
-    });
-{% endautoescape %}</script>
 
+<div 
+    id="profileManagerData"
+    style="display: none;"
+    profileManagerData='{
+        "error_count": {{form.errors|length}},
+        "two_factor_authentication_settings": {{two_factor_authentication_settings}},
+    }'
+></div>
 {% endblock pre_require_js %}

@@ -1,0 +1,107 @@
+{% extends "base-manager.htm" %}
+
+{% load template_tags %}
+{% load i18n %}
+
+{% block head %}
+{{ block.super }}
+<style>
+    .loading-mask {
+        display:none;
+    }
+</style>
+{% endblock %}
+
+{% block header %}
+    <div class="ep-toolbar-profile ep-toolbar-profile-{{user_type}}">
+
+        <!-- Tools Menu -->
+        {% if nav.menu %}
+        <a id="menu-control" href="" class="ep-tools ep-tool-title" data-bind="click:function() { menuActive(!menuActive()); }, clickBubble: false">
+            <div class="">{% trans "Manage" %}
+                <i class="ion-more"></i>
+            </div>
+        </a>
+            {% if main_script == 'views/resource/editor' %}
+                {% include 'navbar/resource-manage-menu.htm' %}
+            {% elif main_script == 'views/resource/new-editor' %}
+                {% include 'navbar/new-resource-manage-menu.htm' %}
+            {% elif main_script == 'views/graph/function-manager' %}
+                {% include 'navbar/function-manage-menu.htm' %}
+            {% elif main_script == 'views/mobile-survey-designer' %}
+                {% include 'navbar/mobile-survey-manage-menu.htm' %}
+            {% else %}
+                {% include 'navbar/graph-designer-menu.htm' %}
+            {% endif %}
+        {% endif %}
+
+
+        {% block graph_title %}
+        <!-- Page Title and Icon -->
+        <div class="ep-tools-title">
+            <h1 class="page-header text-overflow ep-graph-title">
+                <i class="fa {{graph.iconclass|default:nav.icon}} text-center icon-wrap" style="background: none;"></i>
+                <span>{% trans nav.title %}</span>
+            </h1>
+        </div>
+        {% endblock graph_title %}
+
+        <!-- Login -->
+        {% if nav.login %}
+            {% if user.username == 'anonymous' %}
+            <a href="{% url 'auth' %}?t=scout" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Scout Login">
+                <h5 class="hidden-xs">{% trans "Scout Login" %}</h5>
+                </div>
+            </a>
+            <a href="{% url 'auth' %}?t=landmanager" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Land Manager Login">
+
+                <h5 class="hidden-xs">{% trans "Land Manager Login" %}</h5>
+                </div>
+            </a>
+            {% else %}
+            <a href="{% url 'auth' %}?logout=true" class="ep-tools ep-tools-login ep-tools-login-{{user_type}}">
+                <div class="" data-placement="bottom" data-toggle="tooltip" data-original-title="Logout">
+                <h5 class="hidden-xs">{% trans "Logout" %}</h5>
+                </div>
+            </a>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock header %}
+
+{% block main_content %}
+
+<div style="padding: 40px; height:calc(100vh - 50px); overflow:scroll;">
+
+    <section id="scout-profile" class="scout-profile-section fpan-panel-{{user_type}}" style="padding: 40px;">
+
+        <h3>
+        {% if user.first_name %}
+        {{ user.first_name }} {{ user.scout.middle_initial|upper }}. {{ user.last_name }}
+        {% else %}
+        {{ user.username }}
+        {% endif %}
+        </h3>
+        <h5>
+        You can use the form below to make changes to your Scout Profile at any time, including updates to your region(s) and interests.
+        </h5>
+        <h5>
+            <a href="{% url 'user_profile_manager' %}">&larr; Back to Basic Profile</a>
+        </h5>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% include "hms/forms/_scout-profile.htm" %}
+
+    </section>
+
+</div>
+
+{% endblock %}

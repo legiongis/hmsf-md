@@ -8,7 +8,7 @@ from typing import Tuple
 
 from django.core.mail import EmailMultiAlternatives
 from django.contrib import messages
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, get_user_model
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import (
@@ -17,12 +17,14 @@ from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseNotFound,
+    HttpResponseForbidden,
     FileResponse,
 )
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.template.loader import render_to_string, get_template
-from django.utils.encoding import force_text
+from django.utils.decorators import method_decorator
+from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.urls import reverse
 from django.views.generic import View
@@ -31,10 +33,19 @@ from arches.app.views.api import APIBase
 from arches.app.utils.response import JSONResponse
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
+from arches.app.views.user import UserManagerView
 
+from fpan.decorators import user_is_scout_decorator
 from hms.fmsf import FMSFResource
 from hms.forms import ScoutForm, ScoutProfileForm
-from hms.models import Scout, ScoutProfile
+from hms.models import (
+    Scout,
+    ScoutProfile,
+    ManagementAreaGroup,
+    ManagementArea,
+    ManagementAgency,
+    ManagementAreaCategory,
+)
 from hms.permissions_backend import user_is_land_manager, user_is_scout
 from hms.utils import account_activation_token, create_scout_from_valid_form
 
@@ -68,10 +79,43 @@ def about(request):
     )
 
 
-@user_passes_test(user_is_scout)
-def hms_home(request):
+@method_decorator(user_is_scout_decorator, name="dispatch")
+class ScoutProfileView(UserManagerView):
+    def get(self, request):
 
-    if request.method == "POST":
+        context = self.get_context_data()
+
+        title = "User Home"
+        if request.user.is_superuser:
+            title = "Admin: " + request.user.username
+        elif user_is_land_manager(request.user):
+            title = "Land Manager: " + request.user.username
+        elif user_is_scout(request.user):
+            title = "Scout: " + request.user.username
+
+        context["nav"]["icon"] = "fa fa-user"
+        context["nav"]["title"] = title
+
+        context["scout_profile"] = None
+        context["page"] = "scout-profile"
+        context["help"] = {
+            "title": "Profile Editing",
+            "template": "profile-manager-help",
+        }
+
+        try:
+            context["scout_profile"] = ScoutProfileForm(
+                instance=request.user.scout.scoutprofile
+            )
+        except Scout.DoesNotExist:
+            pass
+        return render(
+            request,
+            "scout-profile.htm",
+            context,
+        )
+
+    def post(self, request):
         scout_profile_form = ScoutProfileForm(
             request.POST, instance=request.user.scout.scoutprofile
         )
@@ -83,25 +127,29 @@ def hms_home(request):
             return redirect(reverse("user_profile_manager"))
         else:
             messages.add_message(request, messages.ERROR, "Form was invalid.")
+            context = self.get_context_data()
+            title = "User Home"
+            if request.user.is_superuser:
+                title = "Admin: " + request.user.username
+            elif user_is_land_manager(request.user):
+                title = "Land Manager: " + request.user.username
+            elif user_is_scout(request.user):
+                title = "Scout: " + request.user.username
+
+            context["nav"]["icon"] = "fa fa-user"
+            context["nav"]["title"] = title
+
+            context["scout_profile"] = scout_profile_form
+            context["page"] = "scout-profile"
+            context["help"] = {
+                "title": "Profile Editing",
+                "template": "profile-manager-help",
+            }
             return render(
                 request,
-                "home-hms.htm",
-                {"scout_profile": scout_profile_form, "page": "home-hms"},
+                "scout-profile.htm",
+                context,
             )
-
-    else:
-        scout_profile_form = None
-        try:
-            scout_profile_form = ScoutProfileForm(
-                instance=request.user.scout.scoutprofile
-            )
-        except Scout.DoesNotExist:
-            pass
-        return render(
-            request,
-            "home-hms.htm",
-            {"scout_profile": scout_profile_form, "page": "home-hms"},
-        )
 
 
 def server_error(request, template_name="500.html"):
@@ -203,9 +251,9 @@ def activate(request):
     token = request.GET.get("token")
     if all([uidb64, token]):
         try:
-            uid = force_text(urlsafe_base64_decode(uidb64))
+            uid = force_str(urlsafe_base64_decode(uidb64))
             logger.debug(f"activate user: {uid}")
-            user = Scout.objects.get(pk=uid)
+            user = get_user_model().objects.get(pk=uid)
         except (TypeError, ValueError, OverflowError, Scout.DoesNotExist) as e:
             logger.debug(f"error during account activation: {e}")
             return redirect("/auth/?t=scout")
@@ -216,8 +264,7 @@ def activate(request):
             user.is_active = True
             user.save()
             logger.debug(f"user set to active: {user}")
-            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            return redirect(reverse("user_profile_manager"))
+            return redirect("/auth/?t=scout")
 
     return redirect("/auth/?t=scout")
 
@@ -285,7 +332,7 @@ def scouts_dropdown(request):
     if resourceid:
         with open(Path(settings.APP_ROOT, "data", "county_lookup.json"), "r") as o:
             lookup = json.load(o)
-        res = FMSFResource(resourceid)
+        res = FMSFResource.from_arches(resourceid)
         if res.siteid:
             entry = lookup.get(res.siteid[:2])
             matched_scouts = ScoutProfile.objects.filter(
@@ -303,14 +350,16 @@ def scouts_dropdown(request):
         return_scouts.append(
             {
                 "id": scout.user.pk,
-                "username": scout.user.username,
+                "username": {"en": {"value": scout.user.username, "direction": "ltr"}},
                 "display_name": display_name,
                 "site_interest_type": scout.site_interest_type,
                 "fpan_regions": [region.name for region in scout.fpan_regions2.all()],
             }
         )
 
-    return JSONResponse(sorted(return_scouts, key=lambda k: k["username"]))
+    return JSONResponse(
+        sorted(return_scouts, key=lambda k: k["username"]["en"]["value"])
+    )
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -349,6 +398,34 @@ def scout_list_download(request):
         writer.writerow(translate_row)
 
     return response
+
+
+class ManagementAreaDropdowns(View):
+    def get(self, request):
+        if not request.user or not request.user.is_authenticated:
+            return HttpResponseForbidden
+
+        g = ManagementAreaGroup.objects.all().order_by("name").values("id", "name")
+        c = ManagementAreaCategory.objects.all().order_by("name").values("id", "name")
+        a = [
+            {"id": i["code"], "name": i["name"]}
+            for i in ManagementAgency.objects.all()
+            .order_by("name")
+            .values("code", "name")
+        ]
+        lvl = [
+            {"id": i[0], "name": i[0]}
+            for i in list(ManagementArea._meta.get_field("management_level").choices)
+        ]
+
+        return JSONResponse(
+            {
+                "ma_group_opts": g,
+                "ma_category_opts": c,
+                "ma_agency_opts": a,
+                "ma_level_opts": lvl,
+            }
+        )
 
 
 ## TODO: Does this really need to inherit from APIBase?
@@ -427,7 +504,9 @@ def zipped_photos(reportid: str) -> Tuple[str, BytesIO]:
     # and use those PKs to get the node data as in:
     # `tile.data.get(str(comment_node.pk))`
 
-    photo_node = Node.objects.get(name="Photo", graph__name="Scout Report")
+    photo_node = Node.objects.get(
+        name="Photo", graph_id=settings.GRAPH_LOOKUP["sr"]["id"]
+    )
     resource_photo_tiles = Tile.objects.filter(
         nodegroup=photo_node.nodegroup,
         resourceinstance=report,
@@ -452,8 +531,9 @@ def zipped_photos(reportid: str) -> Tuple[str, BytesIO]:
     zip_buf.seek(0)
 
     fmsf_site_id = ""
+
     fmsf_site_id_node = Node.objects.get(
-        name="FMSF Site ID", graph__name="Scout Report"
+        name="FMSF Site ID", graph_id=settings.GRAPH_LOOKUP["sr"]["id"]
     )
     fmsf_site_id_tiles = Tile.objects.filter(
         nodegroup=fmsf_site_id_node.nodegroup, resourceinstance=report

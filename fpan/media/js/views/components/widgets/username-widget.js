@@ -1,9 +1,10 @@
 define([
     'knockout',
     'viewmodels/domain-widget',
-    'widget-data',
-    'plugins/knockout-select2'
-], function(ko, DomainWidgetViewModel, widgetData) {
+    'view-data',
+    'templates/views/components/widgets/select.htm',
+    'select-woo'
+], function(ko, DomainWidgetViewModel, viewData, selectWidgetTemplate) {
     /**
      * registers a select-widget component for use in forms
      * @function external:"ko.components".select-widget
@@ -19,28 +20,28 @@ define([
             params.configKeys = ['placeholder', 'defaultValue'];
 
             if (!params.node.config) {
-              params.node.config = {};
+                params.node.config = {};
             }
             if (!params.node.configKeys) {
-              params.node.configKeys = {};
+                params.node.configKeys = {};
             }
-            params.node.config.options = ko.observableArray(widgetData.dropdownLists.usernames)
+            params.node.config.options = ko.observableArray(viewData.usernameDropdownList);
 
             DomainWidgetViewModel.apply(this, [params]);
 
+            // auto-populate with signed in user if no value present.
+            // eslint-disable-next-line @typescript-eslint/no-this-alias
             var self = this;
             if (self.value() == null || self.value().length == 0) {
-              widgetData.dropdownLists.usernames.forEach( function (user) {
-                if (user.text == params.user) {
-                  self.value([user.id])
-                }
-              })
+                viewData.usernameDropdownList.forEach( function(user) {
+                    if (user.text == viewData.currentUsername) {
+                        self.value([user.id]);
+                    }
+                });
             }
 
             this.multiple = true;
         },
-        template: {
-            require: 'text!widget-templates/select'
-        }
+        template: selectWidgetTemplate
     });
 });

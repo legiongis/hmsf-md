@@ -31,3 +31,7 @@
 .main-panel {
     height: calc(100vh - 50px);
 }
+
+.resource-grid-item {
+    background-color: #ebeef0;
+}
