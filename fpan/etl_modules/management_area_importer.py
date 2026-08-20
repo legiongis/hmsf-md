@@ -9,8 +9,8 @@ from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
 from django.contrib.gis.gdal import DataSource  # type: ignore
 from django.db import connection, transaction
 from django.core.files.storage import default_storage
-from django.conf import settings
 
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import (
@@ -292,6 +292,8 @@ class ManagementAreaImporter(BaseImportModule):
             resourceinstances = ResourceInstance.objects.filter(pk__in=resids)
             for res in resourceinstances:
                 if res.graph and res.graph.name:
+                    if res.graph.name == "Arches System Settings":
+                        continue
                     joiner = SpatialJoin(res.graph.name)
                     joiner.update_resource(res)
                 else:

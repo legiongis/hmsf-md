@@ -659,7 +659,7 @@ class ManagementArea(models.Model):
                     (self.geom.wkt,),
                 )
                 rows = cursor.fetchall()
-            return [str(i[0]) for i in rows if len(i) > 0]
+            return [str(i[0]) for i in rows if len(i) > 0 and i != settings.SYSTEM_SETTINGS_RESOURCE_ID]
         else:
             return []
 
