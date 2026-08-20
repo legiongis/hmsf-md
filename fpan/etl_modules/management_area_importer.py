@@ -10,6 +10,7 @@ from django.contrib.gis.gdal import DataSource  # type: ignore
 from django.db import connection, transaction
 from django.core.files.storage import default_storage
 
+from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import (
@@ -133,7 +134,7 @@ class ManagementAreaImporter(BaseImportModule):
         for the front-end generated workflow, and the loadid is generated here.
         """
 
-        if self.loadid is None:
+        if not hasattr(self, "loadid") or self.loadid is None:
             self.loadid = str(uuid.uuid4())
 
         response = {
@@ -300,6 +301,8 @@ class ManagementAreaImporter(BaseImportModule):
             )
             for res in resourceinstances:
                 if res.graph and res.graph.name:
+                    if res.graph.name == "Arches System Settings":
+                        continue
                     joiner = SpatialJoin(res.graph.name)
                     joiner.update_resource(res, index=False)
                 else:
