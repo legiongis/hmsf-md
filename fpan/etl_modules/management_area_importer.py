@@ -130,7 +130,7 @@ class ManagementAreaImporter(BaseImportModule):
         for the front-end generated workflow, and the loadid is generated here.
         """
 
-        if self.loadid is None:
+        if not hasattr(self, "loadid") or self.loadid is None:
             self.loadid = str(uuid.uuid4())
 
         response = {
