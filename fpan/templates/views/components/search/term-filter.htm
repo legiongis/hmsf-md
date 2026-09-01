@@ -8,7 +8,7 @@
             termSearch: {terms: filter.terms, language: language, tags: filter.tags, placeholder: $root.translations.findAResource}
         "
     ></select>
-    <select data-bind="
+    <!-- <select data-bind="
         options: languages, 
         optionsValue: 'code',
         optionsText: function(item){return item.name + ' (' + item.code + ')'}, 
@@ -18,7 +18,7 @@
                 allowClear: false
         }},
         attr: {'data-label': $root.translations.language}"
-    ></select>
+    ></select> -->
 </form>
 </div>
 <!-- End Term Filter -->
