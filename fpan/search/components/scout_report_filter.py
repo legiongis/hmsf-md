@@ -86,6 +86,7 @@ class ScoutReportFilter(BaseSearchFilter):
             ## replace original query object with new query that only looks for certain scout report ids
             # 1. remove default filter in case there is one (if there is a resource type filter applied)
             search_query_object["query"].dsl["query"]["bool"]["filter"] = []
+            search_query_object["query"].dsl["query"]["bool"]["must"] = []
             # 2 add the new terms to the query
             search_query_object["query"].add_query(new_bool)
 
