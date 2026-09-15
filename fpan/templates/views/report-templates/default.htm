@@ -71,19 +71,16 @@
 
             <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
             <!-- ko if: resourceData.name == "Scout Report" -->
-            <!-- ko foreach: { data: resourceData.loadedRelatedResources().sort((a, b) => {return b.displayName.localeCompare(a.displayName)}), as: 'relatedResource' } -->
             <div class="rp-report-container-tile" style="padding-top:0px; padding-bottom:0px">
                 <div class="row rp-report-tile">
                     <dl class="dl-horizontal">
-                        <dt>
-                            <a data-bind="text: relatedResource.displayName.split(' -')[0], attr: {href: relatedResource.link}"></a></dt>
-                        <dd>
-                            <a data-bind="text: relatedResource.displayName.split(' -')[1], attr: {href: relatedResource.link}"></a>
-                        </dd>
+                        <!-- ko foreach: { data: resourceData.loadedRelatedResources().sort((a, b) => {return b.displayName.localeCompare(a.displayName)}), as: 'relatedResource' } -->
+                        <dt><a data-bind="text: relatedResource.displayName.split(' -')[0], attr: {href: relatedResource.link}"></a></dt>
+                        <dd data-bind="text: relatedResource.displayName.split(' -')[1]"></dd>
+                        <!-- /ko -->
                     </dl>
                 </div>
             </div>
-            <!-- /ko -->
 
             <!-- ko if: resourceData.paginator() && resourceData.paginator().has_next -->
             <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, false)">
