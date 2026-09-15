@@ -435,6 +435,7 @@ MANAGEMENT_LEVELS = (
     ("State", "State"),
     ("County", "County"),
     ("City", "City"),
+    ("Private", "Private"),
 )
 
 
