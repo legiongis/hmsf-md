@@ -64,25 +64,23 @@
     <!-- Debug to find out what the name of the report is so you can add to ko conditional below
     <div data-bind="text: console.log(report.graph.name)"></div> -->
     <div data-bind="visible: report.graph.name != 'Scout Report' && report.graph.name !='Arches System Settings'" class="rp-report-section relative rp-report-section-root">
-        <div class="rp-card-section fpan-related-report">
+        <div class="rp-card-section">
             <div class="rp-report-section-title">
                 <h3 class="rp-section-title">{% trans 'Reports Recorded for this Site' %}</h3>
             </div>
 
             <!-- ko foreach: { data: Object.values(report.relatedResourcesLookup()), as: 'resourceData' } -->
             <!-- ko if: resourceData.name == "Scout Report" -->
-            <!-- ko foreach: { data: resourceData.loadedRelatedResources().sort((a, b) => {return b.displayName.localeCompare(a.displayName)}), as: 'relatedResource' } -->
             <div class="rp-report-container-tile" style="padding-top:0px; padding-bottom:0px">
                 <div class="row rp-report-tile">
                     <dl class="dl-horizontal">
-                        <dt><a data-bind="text: relatedResource.displayName, attr: {href: relatedResource.link}"></a></dt>
-                        <!-- ko if: relatedResource.relationship -->
-                        <dd data-bind="text: '( ' + relatedResource.relationship + ' )'"></dd>
+                        <!-- ko foreach: { data: resourceData.loadedRelatedResources().sort((a, b) => {return b.displayName.localeCompare(a.displayName)}), as: 'relatedResource' } -->
+                        <dt><a data-bind="text: relatedResource.displayName.split(' -')[0], attr: {href: relatedResource.link}"></a></dt>
+                        <dd data-bind="text: relatedResource.displayName.split(' -')[1]"></dd>
                         <!-- /ko -->
                     </dl>
                 </div>
             </div>
-            <!-- /ko -->
 
             <!-- ko if: resourceData.paginator() && resourceData.paginator().has_next -->
             <button class="btn btn-primary" data-bind="click: $parent.report.getRelatedResources.bind($parent.report, false)">
@@ -98,13 +96,25 @@
 
             <!--ko if: resourceData.totalRelatedResources === 0 -->
             <div class="rp-report-container-tile">
-                <div class="row rp-report-tile rp-no-data">{% trans 'None yet!' %}</div>
+                <div class="row rp-report-tile rp-no-data">
+                    <dl class="dl-horizontal">
+                        <dt>{% trans 'None yet!' %}</dt>
+                    </dl>
+                </div>
             </div>
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
 
-            <a class="btn btn-primary" href="/add-resource/14578901-bd5d-11e9-822a-94659cf754d0">Create New Report</a>
+            <div class="rp-report-container-tile">
+                <div class="row rp-report-tile">
+                    <dl class="dl-horizontal">
+                        <dt>
+                            <a class="btn btn-primary" href="/add-resource/14578901-bd5d-11e9-822a-94659cf754d0">Create New Report</a>
+                        </dt>
+                    </dl>
+                </div>
+            </div>
         </div>
     </div>
 
