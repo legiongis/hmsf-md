@@ -84,11 +84,11 @@ define([
                             text: arches.translations.containsTerm(params.term),
                             value: params.term
                         });
-                        if(data.terms.length > 0){
-                            res.push({"text": arches.translations.termSearchTerm, "children": data.terms});
-                        }
                         if(data.concepts.length > 0){
                             res.push({"text": arches.translations.termSearchConcept, "children": data.concepts});
+                        }
+                        if(data.terms.length > 0){
+                            res.push({"text": arches.translations.termSearchTerm, "children": data.terms});
                         }
                         return {
                             results: res
