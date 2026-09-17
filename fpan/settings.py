@@ -1,19 +1,16 @@
 import os
-from django.utils.translation import gettext_lazy as _
 
 # when setting the imported variables explicitly, got
 # an error from django compressor (seemingly):
-
 # .../site-packages/compressor/conf.py", line 115, in configure_url
 #     if not value.endswith('/'):
 # AttributeError: 'NoneType' object has no attribute 'endswith'
-
 # seems like all settings must be available directly here?
-from arches.settings import *  # noqa: F403
+from arches.settings import *
+from django.utils.translation import gettext_lazy as _
 
 DEBUG = False
 HTTPS = False
-MODE = "PROD"
 
 ## Temporarily changing APP_NAME to "fpan" just for version 7.0 (and a few more)
 ## because it needs to match this directory name. By 7.6 it can be changed
@@ -147,7 +144,7 @@ ALLOWED_HOSTS = []
 from datetime import datetime
 
 timestamp = datetime.now().strftime("%m%d%y-%H%M%S")
-RESOURCE_IMPORT_LOG = os.path.join(LOG_DIR, "resource_import-{}.log".format(timestamp))
+RESOURCE_IMPORT_LOG = os.path.join(LOG_DIR, f"resource_import-{timestamp}.log")
 
 DEFAULT_FROM_EMAIL = "no-reply@hms.fpan.us"
 EMAIL_SUBJECT_PREFIX = "[HMS] "
@@ -167,8 +164,14 @@ FPAN_ADMINS = (
 
 LOG_LEVEL = "INFO"
 
-## make sure this stays False
+# make sure this stays False
 SESSION_SAVE_EVERY_REQUEST = False
+
+# override core arches to allow clickable password reset links from email
+SESSION_COOKIE_SAMESITE = "Lax"
+
+# auto logout after 8 hrs
+SESSION_COOKIE_AGE = 28800
 
 ARCHAEOLOGICAL_SITE_ASSIGNMENT_NODE_ID = "4d11bac0-d535-11e7-a1b3-94659cf754d0"
 
@@ -224,7 +227,7 @@ except ImportError:
     except ImportError:
         pass
 
-if MODE == "DEV":
+if DEBUG:
     import sys
 
     if len(sys.argv) > 1 and sys.argv[1] == "test":
@@ -233,10 +236,6 @@ if MODE == "DEV":
         logging.disable(logging.CRITICAL)
 
     LOG_LEVEL = "DEBUG"
-
-if MODE == "PROD":
-    SESSION_COOKIE_SAMESITE = "Strict"
-    SESSION_COOKIE_AGE = 28800  # auto logout after 8 hrs
 
 if HTTPS:
     SESSION_COOKIE_SECURE = True
