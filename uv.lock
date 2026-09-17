@@ -83,7 +83,7 @@ requires-dist = [
     { name = "celery", specifier = "==5.3.6" },
     { name = "coverage", marker = "extra == 'dev'" },
     { name = "defusedxml", specifier = "==0.7.1" },
-    { name = "django", specifier = ">=4.2.23,<5.0.0" },
+    { name = "django", specifier = "==4.2.30" },
     { name = "django-celery-results", specifier = "==2.5.1" },
     { name = "django-cors-headers", specifier = "==4.2.0" },
     { name = "django-guardian", specifier = "==2.4.0" },
