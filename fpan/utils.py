@@ -1,17 +1,16 @@
 import json
-import time
 import logging
-from typing import TYPE_CHECKING, List
+import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 
+from arches.app.models.models import Node, ResourceInstance, Value
+from arches.app.models.resource import Resource
+from arches.app.models.tile import Tile
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 
-from arches.app.models.resource import Resource
-from arches.app.models.models import ResourceInstance, Node, Value
-from arches.app.models.tile import Tile
-
-from hms.models import ManagementArea, ManagementAgency
+from hms.models import ManagementAgency, ManagementArea
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +38,7 @@ class SpatialJoin:
 
     def hydrate_county_lookup(self) -> dict:
 
-        with open(Path(settings.APP_ROOT, "data", "county_lookup.json"), "r") as o:
+        with open(Path(settings.APP_ROOT, "data", "county_lookup.json")) as o:
             lookup = json.load(o)
 
         for entry in lookup.values():
@@ -77,7 +76,7 @@ class SpatialJoin:
 
     def get_areas_for_resourceinstance(
         self, resourceinstance: ResourceInstance
-    ) -> List[ManagementArea]:
+    ) -> list[ManagementArea]:
 
         try:
             geom_tile = Tile.objects.get(

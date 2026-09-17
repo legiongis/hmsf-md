@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations
 from django.core import management
+from django.db import migrations
 
 from fpan.decorators import deprecated_migration_operation
 
@@ -16,7 +14,7 @@ def load_1919_historic_map(apps, schema_editor):
 @deprecated_migration_operation
 def remove_1919_historic_map(apps, schema_editor):
 
-    from arches.app.models.models import MapSource, MapLayer
+    from arches.app.models.models import MapLayer, MapSource
 
     MapLayer.objects.get(name="Inside Route - Key West to New Orleans | 1919").delete()
     MapSource.objects.get(name="coastal-route-map-1919").delete()

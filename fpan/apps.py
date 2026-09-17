@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
-
-from django.apps import AppConfig
-from django.conf import settings
 
 from arches.settings_utils import generate_frontend_configuration
+from django.apps import AppConfig
+from django.conf import settings
 
 
 class FpanConfig(AppConfig):

@@ -2,7 +2,7 @@ from hms.permissions_backend import (
     user_is_land_manager,
     user_is_scout,
 )
-from site_theme.models import ProfileLink, ProfileContent
+from site_theme.models import ProfileContent, ProfileLink
 
 
 def profile_content(request):

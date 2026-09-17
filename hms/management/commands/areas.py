@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime
 
 import psycopg2
@@ -100,11 +101,11 @@ class Command(BaseCommand):
                 group = ManagementAreaGroup.objects.get(name=group_name)
                 response = input(f"Add to existing group '{group_name}'? Y/n ")
                 if response.lower().startswith("n"):
-                    exit()
+                    sys.exit()
             except ManagementAreaGroup.DoesNotExist:
                 response = input(f"Create new group '{group_name}'? Y/n ")
                 if response.lower().startswith("n"):
-                    exit()
+                    sys.exit()
                 group = ManagementAreaGroup.objects.create(name=group_name)
             add_to_groups.append(group)
 
@@ -113,7 +114,7 @@ class Command(BaseCommand):
             if len(ManagementAreaCategory.objects.filter(name=category)) == 0:
                 response = input(f"Create new category '{category}'? Y/n ")
                 if response.lower().startswith("n"):
-                    exit()
+                    sys.exit()
                 cat = ManagementAreaCategory.objects.create(name=category)
             else:
                 cat = ManagementAreaCategory.objects.get(name=category)
@@ -124,7 +125,7 @@ class Command(BaseCommand):
 
         # allow all case combinations for name field. previous check in
         # load_source ensures this won't fail.
-        name_field = [i for i in dataset.fields if i.lower() == "name"][0]
+        name_field = next([i for i in dataset.fields if i.lower() == "name"])
 
         load_ct = 0
         for feature in dataset:
@@ -167,12 +168,12 @@ class Command(BaseCommand):
         except Exception as e:
             print("error loading datasource:")
             print(e)
-            exit()
+            sys.exit()
 
         # check for name field
         if "name" not in [i.lower() for i in layer.fields]:
             print("cancelling: no 'name' field present in dataset.")
-            exit()
+            sys.exit()
 
         # check SRID in first feature:
         for feature in layer:
@@ -182,7 +183,7 @@ class Command(BaseCommand):
                     "cancelling: reproject dataset to EPGS:4326 (WGS84) "
                     "before trying again."
                 )
-                exit()
+                sys.exit()
             break
 
         return layer
@@ -191,10 +192,10 @@ class Command(BaseCommand):
         ma = ManagementArea.objects.filter(load_id=load_id)
         if len(ma) == 0:
             print("No Management Areas match this load id.")
-            exit()
+            sys.exit()
         response = input(f"Remove {len(ma)} Management Areas? Y/n ")
         if response.lower().startswith("n"):
-            exit()
+            sys.exit()
         ma.delete()
 
         print("recreating materialized views")
@@ -287,7 +288,7 @@ class Command(BaseCommand):
 
                 if category:
                     cat_view_name = self.make_hms_viewname(category)
-                    if not cat_view_name == view_name:
+                    if cat_view_name != view_name:
                         continue
 
                 print(f"dropping materialized view {view_name}")

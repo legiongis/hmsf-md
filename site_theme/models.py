@@ -9,15 +9,18 @@ class ProfileLink(models.Model):
     file = models.FileField(upload_to="uploadedfiles", blank=True, null=True)
     sortorder_scout = models.IntegerField(
         default=0,
-        help_text="use 0 if you DO NOT want this link to appear on the Scout profile page",
+        help_text="use 0 if you DO NOT want this link to appear on the Scout "
+        "profile page",
     )
     sortorder_landmanager = models.IntegerField(
         default=0,
-        help_text="use 0 if you DO NOT want this link to appear on the Land Manager profile page",
+        help_text="use 0 if you DO NOT want this link to appear on the Land Manager "
+        "profile page",
     )
     sortorder_admin = models.IntegerField(
         default=0,
-        help_text="use 0 if you DO NOT want this link to appear on the Admin profile page",
+        help_text="use 0 if you DO NOT want this link to appear on the Admin "
+        "profile page",
     )
 
     def __str__(self):

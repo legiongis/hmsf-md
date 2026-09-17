@@ -1,36 +1,30 @@
-from __future__ import unicode_literals
-
 import json
-from uuid import uuid4
 import logging
-from typing_extensions import TypeAlias
-from typing import List, TYPE_CHECKING, Tuple, Iterable
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, TypeAlias
+from uuid import uuid4
+
+from arches.app.models.concept import Concept as ConceptProxy
+from arches.app.models.models import (
+    Concept,
+    Relation,
+    Value,
+)
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.gis.db import models
+from django.contrib.gis.geos import MultiPolygon
+from django.contrib.postgres.fields import ArrayField
+from django.db import connection
+from django.utils.safestring import SafeText, mark_safe
 from pygments import highlight
 from pygments.formatters.html import HtmlFormatter
 from pygments.lexers.data import JsonLexer
-
-from django.conf import settings
-from django.contrib.gis.db import models
-from django.contrib.auth.models import User
-from django.contrib.postgres.fields import ArrayField
-from django.contrib.gis.geos import MultiPolygon
-from django.utils.safestring import mark_safe, SafeText
-from django.db import connection
-
-from arches.app.models.models import (
-    Concept,
-    Value,
-    Relation,
-)
-from arches.app.models.concept import Concept as ConceptProxy
 
 from hms.permissions_backend import (
     get_rule_by_graph,
     get_user_allowed_resources_by_graph,
 )
-
-if TYPE_CHECKING:
-    pass
 
 ManagementAgencyAlias: TypeAlias = "ManagementAgency"
 FPANRegionAlias: TypeAlias = "FPANRegion"
@@ -101,18 +95,19 @@ SITE_INTEREST_CHOICES = (
     ("Other", "Other"),
 )
 
+ACCESS_MODE_CHOICES = [
+    ("USERNAME=ASSIGNEDTO", "USERNAME=ASSIGNEDTO"),
+    ("FULL", "FULL"),
+]
+
+ACCESS_MODE_HELP_SCOUT = (
+    "<strong>USERNAME=ASSIGNEDTO</strong> sites "
+    "to which the scout has been assigned<br>"
+    "<strong>FULL</strong> all sites"
+)
+
 
 class ScoutProfile(models.Model):
-    ACCESS_MODE_CHOICES = [
-        ("USERNAME=ASSIGNEDTO", "USERNAME=ASSIGNEDTO"),
-        ("FULL", "FULL"),
-    ]
-    ACCESS_MODE_HELP_SCOUT = (
-        "<strong>USERNAME=ASSIGNEDTO</strong> sites "
-        "to which the scout has been assigned<br>"
-        "<strong>FULL</strong> all sites"
-    )
-
     user = models.OneToOneField(Scout, on_delete=models.CASCADE)
     site_access_mode = models.CharField(
         max_length=20,
@@ -196,23 +191,25 @@ class ScoutProfile(models.Model):
     accessible_sites_formatted.short_description = "Accessible Sites"  # type: ignore
 
 
+ACCESS_MODE_CHOICES = [
+    ("NONE", "NONE"),
+    ("AREA", "AREA"),
+    ("AGENCY", "AGENCY"),
+    ("FULL", "FULL"),
+]
+
+ACCESS_MODE_HELP_TEXT = (
+    "<strong>NONE</strong> no access<br>"
+    "<strong>AREA</strong> sites within specified areas or grouped areas<br>"
+    "<strong>AGENCY</strong> sites managed by land manager's agency<br>"
+    "<strong>FULL</strong> all sites"
+)
+
+
 class LandManager(models.Model):
     class Meta:
         verbose_name = "Land Manager"
         verbose_name_plural = "Land Managers"
-
-    ACCESS_MODE_CHOICES = [
-        ("NONE", "NONE"),
-        ("AREA", "AREA"),
-        ("AGENCY", "AGENCY"),
-        ("FULL", "FULL"),
-    ]
-    ACCESS_MODE_HELP_TEXT = (
-        "<strong>NONE</strong> no access<br>"
-        "<strong>AREA</strong> sites within specified areas or grouped areas<br>"
-        "<strong>AGENCY</strong> sites managed by land manager's agency<br>"
-        "<strong>FULL</strong> all sites"
-    )
 
     user = models.OneToOneField(
         User, related_name="landmanager", on_delete=models.CASCADE
@@ -244,7 +241,7 @@ class LandManager(models.Model):
 
     def save(self, *args, **kwargs):
         self.username = self.user.username
-        super(LandManager, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @property
     def all_areas(self):
@@ -255,11 +252,11 @@ class LandManager(models.Model):
 
     @property
     def areas_as_multipolygon(self):
-        poly_agg = list()
+        poly_agg = []
         for area in self.all_areas:
-            # each area is a MultiPolygon so iterate the Polygons within it
-            for poly in area.geom:
-                poly_agg.append(poly)
+            # each area is a MultiPolygon so add all polygons within it
+            # to the overall aggregated list
+            poly_agg += list(area.geom)
         full_multi = MultiPolygon(poly_agg, srid=4326)
         return full_multi
 
@@ -284,7 +281,7 @@ class LandManager(models.Model):
     accessible_sites_formatted.short_description = "Accessible Sites"  # type: ignore
 
 
-def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
+def get_collection_values(collection_name: str) -> Iterable[tuple[(str, str)]]:
 
     collection = Value.objects.get(
         value=collection_name, concept__nodetype__nodetype="Collection"
@@ -313,18 +310,20 @@ def get_or_create_concept(label, parent_lbl, collection_lbl, concept_id=None):
         value=label,
         language_id="en",
     ):
-        if val.concept:
-            if Relation.objects.filter(
+        if (
+            val.concept
+            and Relation.objects.filter(
                 conceptfrom=topconcept,
                 conceptto=val.concept,
                 relationtype_id="narrower",
-            ).exists():
-                if Relation.objects.filter(
-                    conceptfrom=collection,
-                    conceptto=val.concept,
-                    relationtype_id="member",
-                ).exists():
-                    return val.concept
+            ).exists()
+            and Relation.objects.filter(
+                conceptfrom=collection,
+                conceptto=val.concept,
+                relationtype_id="member",
+            ).exists()
+        ):
+            return val.concept
 
     if not concept_id:
         concept_id = str(uuid4())
@@ -411,12 +410,12 @@ class ManagementAgency(models.Model):
                 collection_lbl="Management Agencies",
             )
 
-        return super(ManagementAgency, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.concept:
             self.concept.delete()
-        return super(ManagementAgency, self).delete(*args, **kwargs)
+        return super().delete(*args, **kwargs)
 
 
 class ManagementAreaCategory(models.Model):
@@ -502,7 +501,7 @@ class ManagementArea(models.Model):
     def concept_value_id(self):
         return get_concept_value_id(self.concept)
 
-    def get_intersecting_resource_ids(self) -> List[str]:
+    def get_intersecting_resource_ids(self) -> list[str]:
         if self.geom:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -514,7 +513,11 @@ class ManagementArea(models.Model):
                     (self.geom.wkt,),
                 )
                 rows = cursor.fetchall()
-            return [str(i[0]) for i in rows if len(i) > 0 and i != settings.SYSTEM_SETTINGS_RESOURCE_ID]
+            return [
+                str(i[0])
+                for i in rows
+                if len(i) > 0 and i != settings.SYSTEM_SETTINGS_RESOURCE_ID
+            ]
         else:
             return []
 
@@ -538,12 +541,12 @@ class ManagementArea(models.Model):
             )
             self.concept = concept
 
-        return super(ManagementArea, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.concept:
             self.concept.delete()
-        return super(ManagementArea, self).delete(*args, **kwargs)
+        return super().delete(*args, **kwargs)
 
 
 class ManagementAreaGroup(models.Model):

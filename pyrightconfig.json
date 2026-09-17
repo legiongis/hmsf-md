@@ -1,8 +1,0 @@
-{
-  "venvPath": "../",
-  "venv": "local_venv",
-  "extraPaths": [
-    "../arches",
-    "../arches-extensions"
-  ]
-}

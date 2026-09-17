@@ -1,10 +1,12 @@
-import os
-import six
 import json
+import logging
+import os
 import random
 import string
-import logging
-from typing import Iterable, Tuple
+from collections.abc import Iterable
+
+import six
+from arches.app.models.models import Relation, Value
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -13,10 +15,8 @@ from django.test import Client
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from arches.app.models.models import Value, Relation
-
 from hms.forms import ScoutForm
-from hms.models import ManagementAgency, LandManager, ManagementArea, Scout
+from hms.models import LandManager, ManagementAgency, ManagementArea, Scout
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ class TestUtils:
         """This function can be called from test cases or from anywhere in
         the app."""
 
-        with open(os.path.join(settings.TEST_DATA_DIR, "test_scouts.json"), "r") as o:
+        with open(os.path.join(settings.TEST_DATA_DIR, "test_scouts.json")) as o:
             scouts = json.load(o)
         for s in scouts:
             self.create_scout_from_json(s)
@@ -60,10 +60,10 @@ class TestUtils:
         TEST_PASSWORD = "TestAccount1!"
 
         print("making TestMatanzasSF: AREA permissions (Matanzas State Forest)")
-        u, created = User.objects.get_or_create(pk=5004, username="TestMatanzasSF")
+        u, _ = User.objects.get_or_create(pk=5004, username="TestMatanzasSF")
         u.set_password(TEST_PASSWORD)
         u.save()
-        p, created = LandManager.objects.get_or_create(user=u)
+        p, _ = LandManager.objects.get_or_create(user=u)
         p.management_agency = ManagementAgency.objects.get(code="FFS")
         p.site_access_mode = "AREA"
         p.save()
@@ -71,20 +71,20 @@ class TestUtils:
         print(f"  land manager created: {u.username}")
 
         print("making TestAdminSF: AGENCY permissions (Florida Forest Service)")
-        u, created = User.objects.get_or_create(pk=5005, username="TestAdminSF")
+        u, _ = User.objects.get_or_create(pk=5005, username="TestAdminSF")
         u.set_password(TEST_PASSWORD)
         u.save()
-        p, created = LandManager.objects.get_or_create(user=u)
+        p, _ = LandManager.objects.get_or_create(user=u)
         p.management_agency = ManagementAgency.objects.get(code="FFS")
         p.site_access_mode = "AGENCY"
         p.save()
         print(f"  land manager created: {u.username}")
 
         print("making TestFaverDykesSP: AREA permissions (Faver-Dykes State Park)")
-        u, created = User.objects.get_or_create(pk=5006, username="TestFaverDykesSP")
+        u, _ = User.objects.get_or_create(pk=5006, username="TestFaverDykesSP")
         u.set_password(TEST_PASSWORD)
         u.save()
-        p, created = LandManager.objects.get_or_create(user=u)
+        p, _ = LandManager.objects.get_or_create(user=u)
         p.management_agency = ManagementAgency.objects.get(code="FSP")
         p.site_access_mode = "AREA"
         p.save()
@@ -94,19 +94,19 @@ class TestUtils:
         print(f"  land manager created: {u.username}")
 
         print("making TestFPANOffice: permissions set to FULL")
-        u, created = User.objects.get_or_create(pk=5007, username="TestFPANOffice")
+        u, _ = User.objects.get_or_create(pk=5007, username="TestFPANOffice")
         u.set_password(TEST_PASSWORD)
         u.save()
-        p, created = LandManager.objects.get_or_create(user=u)
+        p, _ = LandManager.objects.get_or_create(user=u)
         p.site_access_mode = "FULL"
         p.save()
         print(f"  land manager created: {u.username}")
 
         print("making TestBanishedLM: permissions set to NONE)")
-        u, created = User.objects.get_or_create(pk=5008, username="TestBanishedLM")
+        u, _ = User.objects.get_or_create(pk=5008, username="TestBanishedLM")
         u.set_password(TEST_PASSWORD)
         u.save()
-        p, created = LandManager.objects.get_or_create(user=u)
+        p, _ = LandManager.objects.get_or_create(user=u)
         p.site_access_mode = "NONE"
         p.save()
         print(f"  land manager created: {u.username}")
@@ -198,7 +198,7 @@ def check_duplicate_username(newusername):
         if len(inputname) < len(newusername):
             offset = len(newusername) - len(inputname)
             inc = int(newusername[-offset:]) + 1
-        newusername = inputname + "{}".format(inc)
+        newusername = inputname + f"{inc}"
     return newusername
 
 
@@ -212,7 +212,8 @@ def generate_username(firstname, middleinitial, lastname, overwrite=False):
         name = check_duplicate_username(name)
 
     logger.debug(
-        f"username created: {firstname} {middleinitial} {lastname} --> {name} | overwrite: {overwrite}"
+        f"username created: {firstname} {middleinitial} {lastname} --> {name} | "
+        "overwrite: {overwrite}"
     )
     return name
 
@@ -225,7 +226,7 @@ def generate_password():
     )
 
 
-def get_collection_values(collection_name: str) -> Iterable[Tuple[(str, str)]]:
+def get_collection_values(collection_name: str) -> Iterable[tuple[(str, str)]]:
 
     collection = Value.objects.get(
         value=collection_name, concept__nodetype__nodetype="Collection"

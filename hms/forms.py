@@ -1,11 +1,12 @@
 from django import forms
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from django.utils.translation import gettext as _
+from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
-from .models import Scout, ScoutProfile
+from django.utils.translation import gettext as _
 
 from hms.models import FPANRegion
+
+from .models import Scout, ScoutProfile
 
 
 class ScoutForm(UserCreationForm):
@@ -128,22 +129,25 @@ class ScoutForm(UserCreationForm):
 
     def clean(self):
         """disallow new accounts with the same e-mail as existing accounts."""
-        cleaned_data = super(ScoutForm, self).clean()
+        cleaned_data = super().clean()
         print(cleaned_data)
-        if "email" in cleaned_data:
-            if User.objects.filter(email=cleaned_data["email"]).count() > 0:
-                self.add_error(
-                    "email",
-                    forms.ValidationError(
-                        mark_safe(
-                            _(
-                                "This email address has already been registered with the system. \
-                            <a href='/password_reset/'>Click here</a> to reset your password."
-                            )
-                        ),
-                        code="unique",
+        if (
+            "email" in cleaned_data
+            and User.objects.filter(email=cleaned_data["email"]).count() > 0
+        ):
+            self.add_error(
+                "email",
+                forms.ValidationError(
+                    mark_safe(
+                        _(
+                            "This email address has already been registered with the \
+                            system. <a href='/password_reset/'>Click here</a> to \
+                            reset your password."
+                        )
                     ),
-                )
+                    code="unique",
+                ),
+            )
         return cleaned_data
 
 

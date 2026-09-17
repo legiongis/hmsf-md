@@ -1,5 +1,5 @@
-from __future__ import absolute_import, unicode_literals
 import logging
+
 from celery import shared_task
 
 logger = logging.getLogger(__name__)
@@ -50,6 +50,7 @@ def run_management_area_import_as_task(
 @shared_task
 def run_full_spatial_join():
     from arches.app.models.models import ResourceInstance
+
     from fpan.utils import SpatialJoin
 
     for graph_name in [

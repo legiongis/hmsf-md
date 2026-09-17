@@ -1,15 +1,14 @@
-import os
 import csv
+import os
 import uuid
 
-from django.core.management.base import BaseCommand
-from django.contrib.gis.geos import GEOSGeometry
-
-from arches.app.utils.betterJSONSerializer import JSONSerializer
-from arches.app.models.resource import Resource
-from arches.app.models.models import Node, Value
 from arches.app.models.graph import Graph
+from arches.app.models.models import Node, Value
+from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
+from arches.app.utils.betterJSONSerializer import JSONSerializer
+from django.contrib.gis.geos import GEOSGeometry
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -51,7 +50,7 @@ class Command(BaseCommand):
         path = os.path.join(refdatadir, "FMSF-HMS-lookup-table-2020_05_28.csv")
 
         lookup = {}
-        with open(path, "r") as openf:
+        with open(path) as openf:
             reader = csv.reader(openf)
             next(reader)
             for row in reader:
@@ -59,7 +58,6 @@ class Command(BaseCommand):
                     "resource_model": row[0],
                     "siteid": row[1],
                 }
-            outdict = {row[2]: row[1] for row in reader}
 
         return lookup
 
@@ -67,7 +65,7 @@ class Command(BaseCommand):
     # by the built-in resource export from the search page
     def make_report_csv(self, resource_model, report_toptiles):
 
-        outrows = list()
+        outrows = []
         node_names = [
             "Visiting Scout ID",
             "Scout Visit Priority Evaluation",
@@ -76,7 +74,7 @@ class Command(BaseCommand):
             "Scout Visit Date",
         ]
 
-        for ct, toptile in enumerate(report_toptiles):
+        for _, toptile in enumerate(report_toptiles):
             res = Resource.objects.get(resourceinstanceid=toptile.resourceinstance_id)
             site_id = self.get_node_value(res, "FMSF ID")
             # print 80*"-"
@@ -86,23 +84,24 @@ class Command(BaseCommand):
             if len(children) == 0:
                 continue
             for c in children:
-                for k, v in c.data.items():
-                    n = Node.objects.get(nodeid=k)
-                    # print n.name
-                    if n.name not in node_names:
-                        continue
+                if c.data:
+                    for k, v in c.data.items():
+                        n = Node.objects.get(nodeid=k)
+                        # print n.name
+                        if n.name not in node_names:
+                            continue
 
-                    if n.name in report_info:
-                        report_info[n.name].append(v)
-                    else:
-                        report_info[n.name] = [v]
+                        if n.name in report_info:
+                            report_info[n.name].append(v)
+                        else:
+                            report_info[n.name] = [v]
 
             if len(report_info) == 1:
                 continue
 
             outdict = {}
             for k, v in report_info.items():
-                transformed = list()
+                transformed = []
                 for i in set(v):
                     try:
                         uuid.UUID(i)
@@ -155,7 +154,6 @@ class Command(BaseCommand):
         all_reports = Resource.objects.filter(graph__name="Scout Report")
         report_counter = {}
         for sr in all_reports:
-            reportid = str(sr.resourceinstanceid)
             resid = self.get_node_value(sr, "FMSF Site ID")
             try:
                 res = Resource.objects.get(resourceinstanceid=resid)
@@ -173,7 +171,7 @@ class Command(BaseCommand):
         }
 
         # because the get_nodes_values method does not work for geospatial nodes
-        # yet, we must predetermine the nodeids and get that data through report_toptiles
+        # yet, we must predetermine the nodeids and get that data via report_toptiles
         geo_nodes = {}
         for rm in list(outdict.keys()):
             graph = Graph.objects.get(name=rm)
@@ -212,16 +210,20 @@ class Command(BaseCommand):
                 row.append(site_type)
 
             spatial_node = geo_nodes[rn_name]
+            geom = ""
             try:
                 coord_tile = Tile.objects.get(
                     resourceinstance_id=res.resourceinstanceid,
                     nodegroup_id=spatial_node.nodegroup_id,
                 )
-                coords = coord_tile.data[str(spatial_node.nodeid)]
-                feature = coords["features"][0]
-                geom = GEOSGeometry(JSONSerializer().serialize(feature["geometry"])).wkt
+                if coord_tile.data:
+                    coords = coord_tile.data[str(spatial_node.nodeid)]
+                    feature = coords["features"][0]
+                    geom = GEOSGeometry(
+                        JSONSerializer().serialize(feature["geometry"])
+                    ).wkt
             except Tile.DoesNotExist:
-                geom = ""
+                pass
 
             # put coords at the end
             row.append(geom)

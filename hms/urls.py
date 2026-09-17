@@ -1,19 +1,19 @@
-from django.views.generic import RedirectView
 from django.urls import path, re_path
+from django.views.generic import RedirectView
 
 from hms.views import (
-    index,
-    about,
-    scout_signup,
-    scouts_dropdown,
-    scout_list_download,
-    login_patch,
+    DownloadScoutReportPhotos,
     LoginView,
+    ManagementAreaDropdowns,
     ScoutProfileView,
+    about,
     activate,
     activate_page,
-    DownloadScoutReportPhotos,
-    ManagementAreaDropdowns,
+    index,
+    login_patch,
+    scout_list_download,
+    scout_signup,
+    scouts_dropdown,
 )
 
 urlpatterns = [
