@@ -1,35 +1,33 @@
+import logging
 import os
 import uuid
-import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
 
-from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
-from django.contrib.gis.gdal import DataSource  # type: ignore
-from django.db import connection, transaction
-from django.core.files.storage import default_storage
-
-from arches.app.models.system_settings import settings
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.models import (
-    Node,
     ETLModule,
+    Node,
     ResourceInstance,
 )
 from arches.app.models.resource import Resource
 from arches.app.models.system_settings import settings
 from arches.app.utils.index_database import index_resources_using_singleprocessing
+from django.contrib.gis.gdal import DataSource  # type: ignore
+from django.contrib.gis.geos import GEOSGeometry, MultiPolygon
+from django.core.files.storage import default_storage
+from django.db import connection, transaction
 
-from hms.models import (
-    ManagementArea,
-    ManagementAreaGroup,
-    ManagementAreaCategory,
-    ManagementAgency,
-)
 from fpan.tasks import run_management_area_import_as_task
 from fpan.utils import ETLOperationResult, SpatialJoin
+from hms.models import (
+    ManagementAgency,
+    ManagementArea,
+    ManagementAreaCategory,
+    ManagementAreaGroup,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +168,7 @@ class ManagementAreaImporter(BaseImportModule):
                     for file in files:
                         response["data"]["Files"].append(file.filename)
             else:
-                logger.warn(
+                logger.warning(
                     f"uploaded content_type is not zip, is {content.content_type}"
                 )
                 response["success"] = False
@@ -211,7 +209,6 @@ class ManagementAreaImporter(BaseImportModule):
             self.reporter.message = str(e)
 
         self.reporter.log(logger)
-        return
 
     def initialize_load_event(self, load_description=""):
 
@@ -236,7 +233,6 @@ class ManagementAreaImporter(BaseImportModule):
             )
 
         self.reporter.message = f"etl started with loadid: {self.loadid}"
-        return
 
     def read_features_from_shapefile(self):
 
@@ -284,7 +280,6 @@ class ManagementAreaImporter(BaseImportModule):
             self.reporter.message = str(e)
 
         self.reporter.log(logger)
-        return
 
     def apply_spatial_join(self):
 
@@ -334,7 +329,6 @@ class ManagementAreaImporter(BaseImportModule):
             self.reporter.message = str(e)
 
         self.reporter.log(logger)
-        return
 
     def run_web_import(self, request):
 
@@ -397,7 +391,6 @@ class ManagementAreaImporter(BaseImportModule):
                 """DELETE FROM load_event WHERE loadid = %s""",
                 (loadid,),
             )
-        return
 
     def run_sequence(
         self,

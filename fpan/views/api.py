@@ -1,15 +1,17 @@
 from __future__ import annotations
+
 import logging
+
+from arches.app.models import models
+from arches.app.models.system_settings import settings
+from arches.app.views.api import APIBase
 from django.core.cache import cache
+from django.db import connection
+from django.db.utils import IntegrityError
 from django.http import (
     Http404,
     HttpResponse,
 )
-from django.db import connection
-from django.db.utils import IntegrityError
-from arches.app.models import models
-from arches.app.views.api import APIBase
-from arches.app.models.system_settings import settings
 
 from fpan.search.components.rule_filter import RuleFilter
 from hms.permissions_backend import get_rule_by_graph
@@ -28,21 +30,22 @@ class MVT(APIBase):
                 models.UserProfile.objects.create(user=request.user)
             except IntegrityError as e:
                 logger.warning(e)
-                raise Http404()
+                raise Http404() from e
         viewable_nodegroups = request.user.userprofile.viewable_nodegroups
         try:
             node = models.Node.objects.get(
                 nodeid=nodeid, nodegroup_id__in=viewable_nodegroups
             )
-        except models.Node.DoesNotExist:
-            raise Http404()
+        except models.Node.DoesNotExist as e:
+            raise Http404() from e
         config = node.config
         cache_key = f"mvt_{nodeid}_{request.user.username}_{zoom}_{x}_{y}"
         tile = cache.get(cache_key)
 
         BUST_RESOURCE_LAYER_CACHE = True
         if tile is None or BUST_RESOURCE_LAYER_CACHE is True:
-            ## disable the real postgis spatial query because it was slower (and more picky about the input geometry)
+            ## disable the real postgis spatial query because it was slower
+            # (and more picky about the input geometry)
             ## than just calling another geo query on ES and retrieving ids from
             ## that. could use another look down the road...
             # rules = SiteFilter().get_rules(request.user, str(node.graph_id))
@@ -66,8 +69,8 @@ class MVT(APIBase):
                 full_access = True
             else:
                 resids = RuleFilter().get_resources_from_rule(rule, ids_only=True)
-                # if there are not sites this user can view, return and empty tile before
-                # creating a db connection
+                # if there are not sites this user can view, return and empty tile
+                # before creating a db connection
                 if len(resids) == 0:
                     return self.EMPTY_TILE
                 # otherwise, add the list of valid ids to query params to be used below
@@ -83,10 +86,13 @@ class MVT(APIBase):
                     if full_access:
                         # run the basic cluster request and return ALL resources
                         cursor.execute(
-                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom,
+                            cid)
                             AS (
                                 SELECT m.*,
-                                ST_ClusterDBSCAN(geom, eps := %(distance)s, minpoints := %(min_points)s) over () AS cid
+                                ST_ClusterDBSCAN(geom,
+                                eps := %(distance)s, minpoints := %(min_points)s) over
+                                () AS cid
                                 FROM (
                                     SELECT tileid,
                                         resourceinstanceid,
@@ -134,19 +140,23 @@ class MVT(APIBase):
                             query_params,
                         )
                     else:
-                        # if not full access, add a WHERE clause to only return resources in the valid_resids list
+                        # if not full access, add a WHERE clause to only return
+                        # resources in the valid_resids list
                         cursor.execute(
-                            """WITH clusters(tileid, resourceinstanceid, nodeid, geom, cid)
+                            """WITH clusters(tileid, resourceinstanceid, nodeid
+                              geom, cid)
                             AS (
                                 SELECT m.*,
-                                ST_ClusterDBSCAN(geom, eps := %(distance)s, minpoints := %(min_points)s) over () AS cid
+                                ST_ClusterDBSCAN(geom, eps := %(distance)s,
+                                minpoints := %(min_points)s) over () AS cid
                                 FROM (
                                     SELECT tileid,
                                         resourceinstanceid,
                                         nodeid,
                                         geom
                                     FROM geojson_geometries
-                                    WHERE nodeid = %(nodeid)s AND resourceinstanceid IN %(valid_resids)s
+                                    WHERE nodeid = %(nodeid)s AND
+                                    resourceinstanceid IN %(valid_resids)s
                                 ) m
                             )
 
@@ -190,7 +200,8 @@ class MVT(APIBase):
                     if full_access is True:
                         # run the basic request and return ALL resources
                         cursor.execute(
-                            """SELECT ST_AsMVT(tile, %(nodeid)s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                            """SELECT ST_AsMVT(tile, %(nodeid)s, 4096, 'geom', 'id')
+                            FROM (SELECT tileid,
                                 id,
                                 resourceinstanceid,
                                 nodeid,
@@ -204,9 +215,11 @@ class MVT(APIBase):
                             query_params,
                         )
                     else:
-                        # add a WHERE clause to only return resources in the valid_resids list
+                        # add a WHERE clause to only return resources in the
+                        # valid_resids list
                         cursor.execute(
-                            """SELECT ST_AsMVT(tile, %(nodeid)s, 4096, 'geom', 'id') FROM (SELECT tileid,
+                            """SELECT ST_AsMVT(tile, %(nodeid)s, 4096, 'geom', 'id')
+                            FROM (SELECT tileid,
                                 id,
                                 resourceinstanceid,
                                 nodeid,
@@ -216,7 +229,8 @@ class MVT(APIBase):
                                 ) AS geom,
                                 1 AS total
                             FROM geojson_geometries
-                            WHERE nodeid = %(nodeid)s AND resourceinstanceid IN %(valid_resids)s) AS tile;""",
+                            WHERE nodeid = %(nodeid)s AND resourceinstanceid
+                            IN %(valid_resids)s) AS tile;""",
                             query_params,
                         )
                 tile = bytes(cursor.fetchone()[0])

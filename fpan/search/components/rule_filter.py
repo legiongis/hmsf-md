@@ -1,22 +1,21 @@
 import json
 import logging
 from pathlib import Path
-
 from typing import TYPE_CHECKING
-from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
-from arches.app.search.search_engine_factory import SearchEngineFactory
+
+from arches.app.models.models import GraphModel, Node
+from arches.app.models.system_settings import settings
+from arches.app.search.components.base import BaseSearchFilter
 from arches.app.search.elasticsearch_dsl_builder import (
     Bool,
-    Terms,
     GeoShape,
-    Nested,
     Match,
+    Nested,
     Query,
+    Terms,
 )
-from arches.app.search.components.base import BaseSearchFilter
-from arches.app.models.system_settings import settings
-from arches.app.models.models import GraphModel, Node
-
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from arches.app.utils.betterJSONSerializer import JSONDeserializer, JSONSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +44,7 @@ def save_dsl(dsl_object, file_name):
         json.dump(out_dsl, o, indent=1)
 
 
-class Rule(object):
+class Rule:
     def __init__(self, rule_type: str, **kwargs):
 
         self.type = rule_type

@@ -1,8 +1,7 @@
-from __future__ import absolute_import, unicode_literals
 import os
-from celery import Celery
-
 import platform
+
+from celery import Celery
 
 if platform.system().lower() == "windows":
     os.environ.setdefault("FORKED_BY_MULTIPROCESSING", "1")

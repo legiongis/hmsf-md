@@ -361,3 +361,7 @@ LANGUAGES = [
 SHOW_LANGUAGE_SWITCH = len(LANGUAGES) > 1
 
 LOCALE_PATHS.insert(0, os.path.join(APP_ROOT, "locale"))
+
+SILENCED_SYSTEM_CHECKS.append(
+    "arches.W001",  # Cache backend does not support rate-limiting
+)

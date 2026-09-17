@@ -1,16 +1,17 @@
-import time
-import logging
 import functools
-from django.http import Http404
-from django.conf import settings
+import logging
+import time
+
 from arches.app.models.models import ResourceInstance
 from arches.app.models.resource import Resource
+from django.conf import settings
+from django.http import Http404
 
 from fpan.search.components.rule_filter import RuleFilter
 from hms.permissions_backend import (
+    get_rule_by_graph,
     user_is_land_manager,
     user_is_scout,
-    get_rule_by_graph,
 )
 
 logger = logging.getLogger(__name__)
@@ -71,9 +72,7 @@ def can_edit_scout_report(function):
 
         allowed = True
         if ResourceInstance.objects.get(pk=resourceid).graph.name == "Scout Report":
-            if request.user.is_superuser:
-                allowed = True
-            elif (
+            if request.user.is_superuser or (
                 user_is_land_manager(request.user)
                 and request.user.landmanager.site_access_mode == "FULL"
             ):

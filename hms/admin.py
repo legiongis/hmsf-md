@@ -1,13 +1,14 @@
 from django.contrib.gis import admin
+
 from hms.models import (
-    Scout,
-    ScoutProfile,
+    FPANRegion,
     LandManager,
     ManagementAgency,
     ManagementArea,
-    ManagementAreaGroup,
     ManagementAreaCategory,
-    FPANRegion,
+    ManagementAreaGroup,
+    Scout,
+    ScoutProfile,
 )
 
 
@@ -25,8 +26,8 @@ class ScoutProfileAdmin(admin.ModelAdmin):
 
     def get_inline_instance(self, request, obj=None):
         if not obj:
-            return list()
-        return super(ScoutProfileAdmin, self).get_inline_instance(request, obj)  # pyright: ignore[reportAttributeAccessIssue]
+            return []
+        return super().get_inline_instance(request, obj)  # pyright: ignore[reportAttributeAccessIssue]
 
     def fpan_regions(self, obj):
         return ", ".join([i.name for i in obj.scoutprofile.fpan_regions2.all()])

@@ -2,7 +2,7 @@ from django.contrib.auth.models import Group
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from .models import Scout, ScoutProfile, LandManager
+from .models import LandManager, Scout, ScoutProfile
 
 
 @receiver(post_save, sender=Scout)

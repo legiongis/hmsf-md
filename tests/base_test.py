@@ -1,23 +1,24 @@
 import os
-from django.test import TestCase
+
 from arches.app.models.graph import Graph
 from arches.app.models.models import Ontology
 from arches.app.models.system_settings import settings
+from arches.app.search.mappings import (
+    delete_concepts_index,
+    delete_search_index,
+    delete_terms_index,
+    prepare_concepts_index,
+    prepare_search_index,
+    prepare_terms_index,
+)
 from arches.app.utils.betterJSONSerializer import JSONDeserializer
 from arches.app.utils.data_management.resource_graphs.importer import (
     import_graph as ResourceGraphImporter,
 )
 from arches.app.utils.data_management.resources.importer import BusinessDataImporter
-from django.db import connection
 from django.core import management
-from arches.app.search.mappings import (
-    prepare_terms_index,
-    delete_terms_index,
-    prepare_concepts_index,
-    delete_concepts_index,
-    prepare_search_index,
-    delete_search_index,
-)
+from django.db import connection
+from django.test import TestCase
 
 # these tests can be run from the command line via
 # python manage.py test tests --pattern="*.py" --settings="tests.test_settings"
@@ -30,7 +31,8 @@ OAUTH_CLIENT_SECRET = (
 CREATE_TOKEN_SQL = """
         INSERT INTO public.oauth2_provider_accesstoken(
             token, expires, scope, application_id, user_id, created, updated)
-            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018', '1-1-2018');
+            VALUES ('{token}', '1-1-2068', 'read write', 44, {user_id}, '1-1-2018',
+            '1-1-2018');
     """
 
 
@@ -46,7 +48,8 @@ def setUpTestPackage():
             client_secret,
             name, user_id, skip_authorization, created, updated)
         VALUES (
-            44,'{oauth_client_id}', 'http://localhost:8000/test', 'public', 'client-credentials',
+            44,'{oauth_client_id}', 'http://localhost:8000/test', 'public',
+            'client-credentials',
             '{oauth_client_secret}',
             'TEST APP', {user_id}, false, '1-1-2000', '1-1-2000');
     """
@@ -87,7 +90,7 @@ def tearDownModule():
 
 class HMSTestCase(TestCase):
     def __init__(self, *args, **kwargs):
-        super(HMSTestCase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if settings.DEFAULT_BOUNDS is None:
             print("in the default bounds thing")
             management.call_command("migrate")
@@ -95,14 +98,14 @@ class HMSTestCase(TestCase):
                 os.path.join(
                     "tests/fixtures/system_settings/Arches_System_Settings_Model.json"
                 ),
-                "rU",
             ) as f:
                 archesfile = JSONDeserializer().deserialize(f)
-            ResourceGraphImporter(archesfile["graph"], True)
-            BusinessDataImporter(
-                "tests/fixtures/system_settings/Arches_System_Settings_Local.json"
-            ).import_business_data()
-            settings.update_from_db()
+            if archesfile and isinstance(archesfile, dict):
+                ResourceGraphImporter(archesfile["graph"], True)
+                BusinessDataImporter(
+                    "tests/fixtures/system_settings/Arches_System_Settings_Local.json"
+                ).import_business_data()
+                settings.update_from_db()
 
     @classmethod
     def loadOntology(cls):

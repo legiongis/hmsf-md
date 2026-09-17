@@ -11,7 +11,7 @@ class SampleIndex(BaseIndex):
                 }
             }
         }
-        super(SampleIndex, self).prepare_index()
+        super().prepare_index()
 
     def get_documents_to_index(self, resourceinstance, tiles):
         return (

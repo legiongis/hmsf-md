@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations
 from django.core import management
+from django.db import migrations
 
 from fpan.decorators import deprecated_migration_operation
 
@@ -20,7 +18,7 @@ def load_slr_layers(apps, schema_editor):
 @deprecated_migration_operation
 def remove_slr_layers(apps, schema_editor):
 
-    from arches.app.models.models import MapSource, MapLayer
+    from arches.app.models.models import MapLayer, MapSource
 
     MapLayer.objects.get(name="1ft Sea Level Rise Inundation (NOAA)").delete()
     MapSource.objects.get(name="slr1-layer").delete()

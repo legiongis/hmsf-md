@@ -1,54 +1,51 @@
 import csv
-from io import BytesIO
 import json
-from pathlib import Path
 import logging
 from datetime import datetime
-from typing import Tuple
+from io import BytesIO
+from pathlib import Path
 
-from django.core.mail import EmailMultiAlternatives
+from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
+from arches.app.utils.response import JSONResponse
+from arches.app.views.api import APIBase
+from arches.app.views.user import UserManagerView
 from django.contrib import messages
-from django.contrib.auth import login, authenticate, logout, get_user_model
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMultiAlternatives
 from django.http import (
-    HttpResponseServerError,
+    FileResponse,
     Http404,
     HttpResponse,
     HttpResponseBadRequest,
-    HttpResponseNotFound,
     HttpResponseForbidden,
-    FileResponse,
+    HttpResponseNotFound,
+    HttpResponseServerError,
 )
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
 from django.template import RequestContext
-from django.template.loader import render_to_string, get_template
+from django.template.loader import get_template, render_to_string
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
-from django.urls import reverse
 from django.views.generic import View
-
-from arches.app.views.api import APIBase
-from arches.app.utils.response import JSONResponse
-from arches.app.models.resource import Resource
-from arches.app.models.system_settings import settings
-from arches.app.views.user import UserManagerView
 
 from fpan.decorators import user_is_scout_decorator
 from hms.fmsf import FMSFResource
 from hms.forms import ScoutForm, ScoutProfileForm
 from hms.models import (
+    ManagementAgency,
+    ManagementArea,
+    ManagementAreaCategory,
+    ManagementAreaGroup,
     Scout,
     ScoutProfile,
-    ManagementAreaGroup,
-    ManagementArea,
-    ManagementAgency,
-    ManagementAreaCategory,
 )
 from hms.permissions_backend import user_is_land_manager, user_is_scout
 from hms.utils import account_activation_token, create_scout_from_valid_form
-
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +57,7 @@ def index(request):
         {
             "main_script": "index",
             "active_page": "Home",
-            "app_title": "{0} | Home".format(settings.APP_NAME),
+            "app_title": f"{settings.APP_NAME} | Home",
             "page": "index",
         },
     )
@@ -73,7 +70,7 @@ def about(request):
         {
             "main_script": "about",
             "active_page": "About",
-            "app_title": "{0} | About the Database".format(settings.APP_NAME),
+            "app_title": f"{settings.APP_NAME} | About the Database",
             "page": "about",
         },
     )
@@ -274,7 +271,7 @@ def scout_signup(request):
     context = {
         "main_script": "scout-signup",
         "active_page": "Scout Signup",
-        "app_title": "{0} | Scout Signup".format(settings.APP_NAME),
+        "app_title": f"{settings.APP_NAME} | Scout Signup",
         "scout_form": None,
         "page": "scout-signup",
     }
@@ -330,7 +327,7 @@ def scouts_dropdown(request):
     ## otherwise, get region for this resource, and only return scouts
     ## who are intersted in scouting in that region
     if resourceid:
-        with open(Path(settings.APP_ROOT, "data", "county_lookup.json"), "r") as o:
+        with open(Path(settings.APP_ROOT, "data", "county_lookup.json")) as o:
             lookup = json.load(o)
         res = FMSFResource.from_arches(resourceid)
         if res.siteid:
@@ -369,7 +366,7 @@ def scout_list_download(request):
 
     # create the HttpResponse object with the appropriate CSV header.
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment; filename={}".format(csvname)
+    response["Content-Disposition"] = f"attachment; filename={csvname}"
 
     # the keys here must match those returned by the Scout().serialize() method
     field_mapping = {
@@ -394,7 +391,7 @@ def scout_list_download(request):
     writer.writeheader()
     for scout in Scout.objects.all():
         serialized = scout.serialize()
-        translate_row = {field_mapping[k]: serialized[k] for k in serialized.keys()}
+        translate_row = {field_mapping[k]: serialized[k] for k in serialized}
         writer.writerow(translate_row)
 
     return response
@@ -464,7 +461,7 @@ class DownloadScoutReportPhotos(APIBase):
         return response
 
 
-def zipped_photos(reportid: str) -> Tuple[str, BytesIO]:
+def zipped_photos(reportid: str) -> tuple[str, BytesIO]:
     """
     Returns a tuple containing:
         - zip file name
@@ -480,6 +477,7 @@ def zipped_photos(reportid: str) -> Tuple[str, BytesIO]:
         MemoryError: If files are too large to fit in memory
     """
     from zipfile import ZipFile
+
     from arches.app.models.models import File, Node
     from arches.app.models.tile import Tile
 

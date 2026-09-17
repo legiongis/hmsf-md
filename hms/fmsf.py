@@ -1,17 +1,14 @@
-from typing import Union, TYPE_CHECKING
+import copy
 import logging
+import uuid
+from typing import TYPE_CHECKING
 
 from arches.app.models.models import Node
 from arches.app.models.resource import Resource
 from arches.app.models.tile import Tile
-
-import copy
-import uuid
-
+from arches.app.utils.betterJSONSerializer import JSONSerializer
 from django.contrib.gis.gdal.feature import Feature
 from django.db import connection
-
-from arches.app.utils.betterJSONSerializer import JSONSerializer
 
 if TYPE_CHECKING:
     from fpan.etl_modules.fmsf_importer import FMSFImporter
@@ -44,8 +41,8 @@ logger = logging.getLogger(__name__)
 
 
 class FMSFResource:
-    siteid: Union[str, None]
-    resource: Union[Resource, None]
+    siteid: str | None
+    resource: Resource | None
     resourceid: str
     feature: Feature
     parent_tile_lookup: dict = {}
@@ -121,7 +118,8 @@ class FMSFResource:
                     geom = self.feature.geom
                     with connection.cursor() as cursor:
                         cursor.execute(
-                            f"SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( ST_MakeValid('{geom.wkt}')));"
+                            "SELECT ST_AsGeoJSON( ST_RemoveRepeatedPoints( "
+                            f"ST_MakeValid('{geom.wkt}')));"
                         )
                         result = cursor.fetchone()
                         if not result:
@@ -150,7 +148,7 @@ class FMSFResource:
             ]
 
         tiles = []
-        for nid in dict_by_nodegroup:
+        for nid, value in dict_by_nodegroup.items():
             ng = importer.get_nodegroup(nid)
             if ng.parentnodegroup is not None:
                 parentnodegroup_id = str(ng.parentnodegroup.pk)
@@ -186,7 +184,7 @@ class FMSFResource:
 
             tile_data = copy.deepcopy(importer.get_blank_tile(nid))
             passes_validation = True
-            for node in dict_by_nodegroup[nid]:
+            for node in value:
                 for key in node:
                     tile_data[key] = node[key]
                     if node[key]["valid"] is False:
