@@ -8,7 +8,7 @@ version = "2.0.0"
 description = "Arches implementation for the Heritage Monitoring Scouts program by the Florida Public Archaeology Network."
 readme = "README.md"
 license = {text = "GNU AGPL3"}
-requires-python = ">=3.10,<3.13"
+requires-python = ">=3.11,<3.13"
 
 dependencies = [
     "pygments==2.20.0",
@@ -37,6 +37,7 @@ dev = [
     "django-silk==5.1.0",
     "pre-commit==3.8.0",
     "black==24.4.2",
+    "ruff>=0.16.8",
 ]
 
 [tool.setuptools]
@@ -47,3 +48,21 @@ packages = [
 [tool.uv.sources]
 arches = { path = "../arches", editable = true }
 arches_extensions = { path = "../arches-extensions", editable = true }
+
+[tool.ruff.lint]
+extend-select = [
+    "DJ",       # flake8-django: Django-specific bugs
+    "E",        # pycodestyle errors
+    "F",        # Pyflakes
+    "W",        # pycodestyle warnings
+    "I",        # isort
+    "UP",       # pyupgrade
+    "B",        # flake8-bugbear
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/migrations/*.py" = ["ALL"]
+"**/settings.py" = ["E501", "F403", "F405"]
+"**/settings_test.py" = ["F403"]
+"**/tests.py" = ["S101"]
+"**/test_*.py" = ["S101"]

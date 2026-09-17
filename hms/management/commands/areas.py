@@ -1,15 +1,16 @@
 import os
-import psycopg2
 from datetime import datetime
+
+import psycopg2
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.contrib.gis.gdal import DataSource  # type: ignore
 from django.contrib.gis.geos import MultiPolygon
+from django.core.management.base import BaseCommand
 
 from hms.models import (
     ManagementArea,
-    ManagementAreaGroup,
     ManagementAreaCategory,
+    ManagementAreaGroup,
 )
 
 
