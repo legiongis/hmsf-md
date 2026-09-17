@@ -23,10 +23,10 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/7.6.20"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/7.6.26"
     },
     "dependencies": {
-        "arches": "archesproject/arches#stable/7.6.20"
+        "arches": "archesproject/arches#stable/7.6.26"
     },
     "nodeModulesPaths": {},
     "overrides": {
