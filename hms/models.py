@@ -485,12 +485,18 @@ class ManagementArea(models.Model):
     )
 
     def __str__(self):
-        if self.display_name:
-            return self.display_name
-        elif self.name:
-            return self.name
+
+        if self.name:
+            name_pk = f"{self.name} ({self.pk})"
+            if self.category:
+                if self.management_agency:
+                    return (
+                        f"{name_pk} | {self.category} | {self.management_agency.name}"
+                    )
+                return f"{name_pk} | {self.category}"
+            return name_pk
         else:
-            return super(ManagementArea, self).__str__()
+            return super().__str__()
 
     @property
     def concept_value_id(self):
