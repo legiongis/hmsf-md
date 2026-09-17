@@ -1,6 +1,6 @@
 import os
 
-from fpan.settings import ALLOWED_HOSTS, DATABASES, INSTALLED_APPS, CELERY_BROKER_URL
+from fpan.settings import ALLOWED_HOSTS, CELERY_BROKER_URL, DATABASES, INSTALLED_APPS
 
 DATABASES["default"]["USER"] = os.environ.get("PGUSERNAME", "username")
 DATABASES["default"]["PASSWORD"] = os.environ.get("PGPASSWORD", "password")
@@ -24,4 +24,3 @@ INSTALLED_APPS += ("arches_extensions",)
 ALLOWED_HOSTS += ["*"]
 
 DEBUG = True
-MODE = "DEV"
