@@ -140,7 +140,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "arches", specifier = "<8" },
+    { name = "arches", specifier = ">=7.6,<8" },
     { name = "pdoc", marker = "extra == 'dev'" },
     { name = "pydoctor", marker = "extra == 'dev'", specifier = ">=23.9.1" },
     { name = "setuptools", specifier = "<=80.9.0" },
