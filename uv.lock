@@ -833,6 +833,7 @@ dependencies = [
     { name = "django-tinymce" },
     { name = "pygments" },
     { name = "setuptools" },
+    { name = "uwsgi" },
 ]
 
 [package.dev-dependencies]
@@ -860,6 +861,7 @@ requires-dist = [
     { name = "django-tinymce", specifier = "==4.1.0" },
     { name = "pygments", specifier = "==2.20.0" },
     { name = "setuptools", specifier = "<=80.9.0" },
+    { name = "uwsgi", specifier = ">=2.0.0,<3.0.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -1796,6 +1798,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc5
 wheels = [
     { url = "https://files.pythonhosted.org/packages/33/cf/8435d5a7159e2a9c83a95896ed596f68cf798005fe107cc655b5c5c14704/urllib3-1.26.20-py2.py3-none-any.whl", hash = "sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e", size = 144225, upload-time = "2024-08-29T15:43:08.921Z" },
 ]
+
+[[package]]
+name = "uwsgi"
+version = "2.0.31"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9f/49/2f57640e889ba509fd1fae10cccec1b58972a07c2724486efba94c5ea448/uwsgi-2.0.31.tar.gz", hash = "sha256:e8f8b350ccc106ff93a65247b9136f529c14bf96b936ac5b264c6ff9d0c76257", size = 822796, upload-time = "2025-10-11T19:17:28.794Z" }
 
 [[package]]
 name = "vine"

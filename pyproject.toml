@@ -19,6 +19,7 @@ dependencies = [
     "boto3==1.24",
     "setuptools<=80.9.0",
     "arches_extensions",
+    "uwsgi>=2.0.0,<3.0.0",
 ]
 
 [project.optional-dependencies]
