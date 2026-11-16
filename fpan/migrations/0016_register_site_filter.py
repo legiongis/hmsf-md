@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 
-from django.db import migrations
 from django.core import management
+from django.db import migrations
 
 from fpan.decorators import deprecated_migration_operation
 

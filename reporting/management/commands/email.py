@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+
 from reporting.utils import send_weekly_summary
 
 
