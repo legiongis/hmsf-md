@@ -3,7 +3,7 @@
 from django.db import migrations, models
 
 from fpan.decorators import deprecated_migration_operation
-from hms.models import ScoutProfile, ManagementArea
+from hms.models import ManagementArea, ScoutProfile
 
 
 @deprecated_migration_operation

@@ -1,14 +1,13 @@
 import logging
 from typing import TYPE_CHECKING
 
-from django.conf import settings
-
-from arches.app.search.search_engine_factory import SearchEngineFactory
-from arches.app.search.elasticsearch_dsl_builder import Bool, Terms, Query
-from arches.app.search.components.base import BaseSearchFilter
-from arches.app.search.mappings import RESOURCES_INDEX
 from arches.app.models.models import Node
 from arches.app.models.tile import Tile
+from arches.app.search.components.base import BaseSearchFilter
+from arches.app.search.elasticsearch_dsl_builder import Bool, Query, Terms
+from arches.app.search.mappings import RESOURCES_INDEX
+from arches.app.search.search_engine_factory import SearchEngineFactory
+from django.conf import settings
 
 from fpan.search.components.rule_filter import save_dsl
 
@@ -86,6 +85,7 @@ class ScoutReportFilter(BaseSearchFilter):
             ## replace original query object with new query that only looks for certain scout report ids
             # 1. remove default filter in case there is one (if there is a resource type filter applied)
             search_query_object["query"].dsl["query"]["bool"]["filter"] = []
+            search_query_object["query"].dsl["query"]["bool"]["must"] = []
             # 2 add the new terms to the query
             search_query_object["query"].add_query(new_bool)
 
