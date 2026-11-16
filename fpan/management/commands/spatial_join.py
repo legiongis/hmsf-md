@@ -1,10 +1,11 @@
 from datetime import datetime
-from django.conf import settings
-from django.core.management.base import BaseCommand
-from arches.app.models.models import ResourceInstance
+
 from arches.app.models.graph import Graph
+from arches.app.models.models import ResourceInstance
 from arches.app.models.tile import Tile
 from arches.app.utils.index_database import index_resources_by_type
+from django.conf import settings
+from django.core.management.base import BaseCommand
 
 from fpan.utils import SpatialJoin
 
@@ -102,7 +103,7 @@ class Command(BaseCommand):
         joiner = SpatialJoin(graph_name)
         total = resources.count()
         for n, res in enumerate(resources, start=1):
-            print(f"{n}/{total}: {str(res.pk)} ({res.graph.name})")
+            print(f"{n}/{total}: {res.pk!s} ({res.graph.name})")
             joiner.update_resource(res, index=False)
         graph = Graph.objects.get(name=graph_name)
         index_resources_by_type([str(graph.pk)])

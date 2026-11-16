@@ -1,18 +1,18 @@
-from django.utils.decorators import method_decorator
-from arches.app.views.resource import (
-    ResourceListView,
-    ResourceEditLogView,
-    ResourceData,
-    ResourceTiles,
-    ResourceCards,
-    ResourceReportView,
-    RelatedResourcesView,
-    ResourceEditorView,
-)
 from arches.app.utils.decorators import (
     can_edit_resource_instance,
     can_read_resource_instance,
 )
+from arches.app.views.resource import (
+    RelatedResourcesView,
+    ResourceCards,
+    ResourceData,
+    ResourceEditLogView,
+    ResourceEditorView,
+    ResourceListView,
+    ResourceReportView,
+    ResourceTiles,
+)
+from django.utils.decorators import method_decorator
 
 from fpan.decorators import (
     can_access_site_or_report,

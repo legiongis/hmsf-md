@@ -1,12 +1,11 @@
+from arches.app.models.graph import Graph
 from django.core import management
 
-from arches.app.models.graph import Graph
-
 from hms.models import (
-    Scout,
+    FPANRegion,
     LandManager,
     ManagementAreaCategory,
-    FPANRegion,
+    Scout,
 )
 
 from .base_test import HMSTestCase
@@ -57,7 +56,6 @@ class LoadingTests(HMSTestCase):
         # make sure all resource models have loaded
         ct = Graph.objects.all().count()
         self.assertEqual(ct, 4)
-        return
 
 
 class ETLTests(HMSTestCase):
