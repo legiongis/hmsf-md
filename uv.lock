@@ -759,15 +759,15 @@ wheels = [
 
 [[package]]
 name = "elastic-transport"
-version = "8.19.0"
+version = "8.19.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fc/63/c61700c42f74d70a4ae11394c619cf91b837b500144166e828546f1fdd8d/elastic_transport-8.19.0.tar.gz", hash = "sha256:32afed2a70dad80511476c821b2cf823f35a82153289765f6b2e2eb8cb0de099", size = 76409, upload-time = "2026-07-06T16:57:01.664Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/d7/7db60bad91fa6e887fe1f75350342425919bf7722afa715cc578caf0891d/elastic_transport-8.19.1.tar.gz", hash = "sha256:47bf0ffd2071a2791dae2e1e764af6477aa33ff686e087c96a88512414b7b83b", size = 74767, upload-time = "2026-11-16T20:02:48.29Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/46/a6091ee84351b61bfb55cf615e538c38c1be4cfceae12f952953eb8d446c/elastic_transport-8.19.0-py3-none-any.whl", hash = "sha256:97ab35de878c7f4c7ebf8840cbc8ff1ff01d9dbc0e977e52d82715b155678b4f", size = 65085, upload-time = "2026-07-06T16:57:00.233Z" },
+    { url = "https://files.pythonhosted.org/packages/13/7f/6bd5806c41ce6fa5d2773e739102848878602fab04d02c661eaa259a601f/elastic_transport-8.19.1-py3-none-any.whl", hash = "sha256:fcd5cf86242317e2dd43cd697694cba606eee8728df878c276c8f511febdf24b", size = 65170, upload-time = "2026-11-16T20:02:46.9Z" },
 ]
 
 [[package]]
@@ -822,7 +822,7 @@ wheels = [
 
 [[package]]
 name = "hmsf-md"
-version = "2.0.0"
+version = "2.0.2"
 source = { editable = "." }
 dependencies = [
     { name = "arches" },
