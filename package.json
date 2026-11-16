@@ -1,6 +1,6 @@
 {
     "name": "fpan",
-    "version": "1.0.0",
+    "version": "2.0.2",
     "license": "AGPL-3.0-only",
     "scripts": {
         "build_development": "npm run eslint:check && npm run ts:check && cross-env NODE_OPTIONS=--max-old-space-size=2048 webpack --config ./webpack/webpack.config.dev.js",
@@ -23,10 +23,10 @@
         "type": "git"
     },
     "devDependencies": {
-        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/7.6.26"
+        "arches-dev-dependencies": "archesproject/arches-dev-dependencies#stable/7.6.28"
     },
     "dependencies": {
-        "arches": "archesproject/arches#stable/7.6.26"
+        "arches": "archesproject/arches#stable/7.6.28"
     },
     "nodeModulesPaths": {},
     "overrides": {

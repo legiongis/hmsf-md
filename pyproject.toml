@@ -4,20 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hmsf-md"
-version = "2.0.0"
+version = "2.0.2"
 description = "Arches implementation for the Heritage Monitoring Scouts program by the Florida Public Archaeology Network."
 readme = "README.md"
 license = {text = "GNU AGPL3"}
 requires-python = ">=3.11,<3.13"
 
 dependencies = [
+    "arches==7.6.28",
     "pygments==2.20.0",
     "django-grappelli==2.15.5",
     "django-tinymce==4.1.0",
     "django-storages==1.13",
     "boto3==1.24",
     "setuptools<=80.9.0",
-    "arches~=7.6",
     "arches_extensions",
 ]
 
