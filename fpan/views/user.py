@@ -1,28 +1,27 @@
-import time
 import json
 import logging
-from django.contrib.auth.models import User
-import django.contrib.auth.password_validation as validation
-from django.shortcuts import render, redirect
-from django.utils.translation import gettext as _
-from django.urls import reverse
-from arches.app.models.system_settings import settings
-from arches.app.models.models import Node, GraphModel
-from arches.app.models.tile import Tile
-from arches.app.models.resource import Resource
+import time
 
+import django.contrib.auth.password_validation as validation
+from arches.app.models.models import GraphModel, Node
+from arches.app.models.resource import Resource
+from arches.app.models.system_settings import settings
+from arches.app.models.tile import Tile
 from arches.app.utils.betterJSONSerializer import JSONSerializer
 from arches.app.utils.forms import ArchesUserProfileForm
-from arches.app.utils.response import JSONResponse
 from arches.app.utils.permission_backend import user_is_resource_reviewer
-
+from arches.app.utils.response import JSONResponse
 from arches.app.views.user import UserManagerView
+from django.contrib.auth.models import User
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from fpan.search.components.rule_filter import RuleFilter
 from hms.permissions_backend import (
+    get_rule_by_graph,
     user_is_land_manager,
     user_is_scout,
-    get_rule_by_graph,
 )
 from hms.views import scouts_dropdown
 
@@ -84,7 +83,8 @@ class FPANUserManagerView(UserManagerView):
         )
 
         logger.debug(
-            f"getting hms_details for {user.username}: {time.time() - start} seconds elapsed"
+            f"getting hms_details for {user.username}: "
+            f"{time.time() - start} seconds elapsed"
         )
 
         all_info = {
@@ -192,8 +192,8 @@ class FPANUserManagerView(UserManagerView):
                 try:
                     admin_info = settings.ADMINS[0][1] if settings.ADMINS else ""
                     message = _(
-                        "Your HMS profile was just changed.  If this was unexpected, please contact your Arches administrator at %s."
-                        % (admin_info)
+                        "Your HMS profile was just changed.  If this was unexpected, "
+                        "please contact your Arches administrator at %s." % (admin_info)
                     )
                     user.email_user(_("Your HMS profile has changed"), message)
                 except Exception as e:

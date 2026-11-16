@@ -1,24 +1,23 @@
+from arches.app.views import search
+from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib.auth.decorators import user_passes_test
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView
 from django.views.generic.base import TemplateView
-from django.urls import path, re_path, include
-from django.conf import settings
-
-from arches.app.views import search
 
 from fpan.views.api import MVT
-from fpan.views.user import FPANUserManagerView
 from fpan.views.resource import (
-    FPANResourceListView,
-    FPANResourceEditLogView,
-    FPANResourceData,
-    FPANResourceTiles,
     FPANResourceCards,
-    FPANResourceReportView,
+    FPANResourceData,
+    FPANResourceEditLogView,
     FPANResourceEditorView,
+    FPANResourceListView,
+    FPANResourceReportView,
+    FPANResourceTiles,
 )
+from fpan.views.user import FPANUserManagerView
 from hms.views import server_error
 
 handler500 = server_error
@@ -49,7 +48,8 @@ urlpatterns = [
         name="mvt",
     ),
     re_path(r"^user$", FPANUserManagerView.as_view(), name="user_profile_manager"),
-    # the following are just pass through views so HMS can apply an additional permissions-based decorator
+    # the following are just pass through views so HMS can apply an additional
+    # permissions-based decorator
     re_path(r"^resource$", FPANResourceListView.as_view(), name="resource"),
     re_path(
         r"^resource/(?P<resourceid>%s)$" % uuid_regex,

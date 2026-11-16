@@ -1,37 +1,36 @@
-import gc
-import os
 import csv
+import gc
+import logging
+import os
 import time
 import uuid
-import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
-
-from django.contrib.gis.gdal.datasource import DataSource
-from django.contrib.gis.db.models import Union as UnionGeoms
-from django.db import connection
-from django.db.utils import IntegrityError, ProgrammingError
-from django.core.files.storage import default_storage
-from django.conf import settings
 
 from arches.app.datatypes.datatypes import DataTypeFactory
 from arches.app.etl_modules.base_import_module import BaseImportModule
 from arches.app.models.concept import Concept
 from arches.app.models.models import (
+    ETLModule,
     GraphModel,
     Node,
     NodeGroup,
-    ETLModule,
     ResourceInstance,
 )
 from arches.app.models.resource import Resource
 from arches.app.utils.index_database import index_resources_by_transaction
+from django.conf import settings
+from django.contrib.gis.db.models import Union as UnionGeoms
+from django.contrib.gis.gdal.datasource import DataSource
+from django.core.files.storage import default_storage
+from django.db import connection
+from django.db.utils import IntegrityError, ProgrammingError
 
-from hms.fmsf import FMSFResource
-from hms.models import ManagementArea
 from fpan.tasks import run_fmsf_import_as_task
 from fpan.utils import ETLOperationResult, SpatialJoin
+from hms.fmsf import FMSFResource
+from hms.models import ManagementArea
 
 logger = logging.getLogger(__name__)
 
@@ -318,7 +317,7 @@ class FMSFImporter(BaseImportModule):
                         # save_path = Path(upload_dir, Path(file.filename).name)
                         # default_storage.save(save_path, File(zip_ref.open(file)))
             else:
-                logger.warn(
+                logger.warning(
                     f"uploaded content_type is not zip, is {content.content_type}"
                 )
                 response["success"] = False
@@ -335,13 +334,13 @@ class FMSFImporter(BaseImportModule):
     def _get_csv_content(self):
         try:
             # First try to read as UTF encoded file
-            with open(self.resource_csv, "r", encoding="utf-8-sig") as in_csv:
+            with open(self.resource_csv, encoding="utf-8-sig") as in_csv:
                 reader = csv.DictReader(in_csv)
                 fieldnames = reader.fieldnames
                 rows = [i for i in reader]
         except UnicodeDecodeError:
             # If that doesn't work, try ISO-8859-1 (common in windows)
-            with open(self.resource_csv, "r", encoding="ISO-8859-1") as in_csv:
+            with open(self.resource_csv, encoding="ISO-8859-1") as in_csv:
                 reader = csv.DictReader(in_csv)
                 fieldnames = reader.fieldnames
                 rows = [i for i in reader]
@@ -387,9 +386,11 @@ class FMSFImporter(BaseImportModule):
             self.concept_lookups[collectionid] = concepts
 
         # Allow some special handling of certan known typos in the FMSF
-        if node.name in self.special_label_lookups:
-            if value in self.special_label_lookups[node.name]:
-                value = self.special_label_lookups[node.name][value]
+        if (
+            node.name in self.special_label_lookups
+            and value in self.special_label_lookups[node.name]
+        ):
+            value = self.special_label_lookups[node.name][value]
 
         labelid = None
         for triple in self.concept_lookups[collectionid]:
@@ -397,8 +398,9 @@ class FMSFImporter(BaseImportModule):
                 labelid = triple[2]
                 break
         if labelid is None:
-            logger.warn(
-                f"Invalid prefLabel {value} for node {node.name} with collection {node.config['rdmCollection']}"
+            logger.warning(
+                f"Invalid prefLabel {value} for node {node.name} with collection "
+                f"{node.config['rdmCollection']}"
             )
         return labelid
 
@@ -410,7 +412,7 @@ class FMSFImporter(BaseImportModule):
                 required += [
                     i["field"]
                     for i in fieldset
-                    if i["source"] == "shp" and not i["field"] == "geom"
+                    if i["source"] == "shp" and i["field"] != "geom"
                 ]
 
             return [i for i in required if i not in layer_fields]
@@ -438,7 +440,10 @@ class FMSFImporter(BaseImportModule):
             missing = validate_csv_fields(csv_content["fieldnames"])
             if len(missing) > 0:
                 self.reporter.success = False
-                self.reporter.message = f"{self.resource_csv.name} is missing these fields: {', '.join(missing)}."
+                self.reporter.message = (
+                    f"{self.resource_csv.name} is missing these "
+                    f"fields: {', '.join(missing)}."
+                )
                 self.reporter.data["Missing CSV fields"] = missing
 
         # next check the shapefile and its fields
@@ -464,7 +469,7 @@ class FMSFImporter(BaseImportModule):
         if self.reporter.success:
             extra_structures_csv = Path(file_dir, "extra-structures.csv")
             if extra_structures_csv.is_file():
-                with open(extra_structures_csv, "r") as o:
+                with open(extra_structures_csv) as o:
                     reader = csv.reader(o)
                     headers = next(reader)
                     if headers[0] != "SiteID":
@@ -474,7 +479,6 @@ class FMSFImporter(BaseImportModule):
                         )
 
         self.reporter.log(logger)
-        return
 
     def initialize_load_event(self, load_description=""):
 
@@ -485,7 +489,9 @@ class FMSFImporter(BaseImportModule):
 
         with connection.cursor() as cursor:
             cursor.execute(
-                """INSERT INTO load_event (loadid, complete, status, load_description, etl_module_id, load_details, load_start_time, user_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                """INSERT INTO load_event (loadid, complete, status, load_description,
+                etl_module_id, load_details, load_start_time, user_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
                 (
                     self.loadid,
                     False,
@@ -499,7 +505,6 @@ class FMSFImporter(BaseImportModule):
             )
 
         self.reporter.message = f"etl started with loadid: {self.loadid}"
-        return
 
     def apply_historical_structures_filter(self, only_extra_ids=False):
 
@@ -516,7 +521,7 @@ class FMSFImporter(BaseImportModule):
         extra_ids = []
         extra_structures_csv = Path(self.file_dir, "extra-structure-ids.csv")
         if extra_structures_csv.is_file():
-            with open(extra_structures_csv, "r") as openf:
+            with open(extra_structures_csv) as openf:
                 reader = csv.reader(openf)
                 next(reader)
                 for row in reader:
@@ -621,10 +626,12 @@ class FMSFImporter(BaseImportModule):
 
         self.reporter.data["Sites already in database"] = len(self.existing_features)
         self.reporter.data["New sites in uploaded data"] = len(self.new_features)
-        self.reporter.message = f"features: new - {len(self.new_features)}, existing {len(self.existing_features)}"
+        self.reporter.message = (
+            f"features: new - {len(self.new_features)}, "
+            f"existing {len(self.existing_features)}"
+        )
 
         self.reporter.log(logger)
-        return
 
     def generate_load_data(self, truncate=None):
 
@@ -647,9 +654,7 @@ class FMSFImporter(BaseImportModule):
                     elapsed = time.time() - start
                     est = int(elapsed * 100)
                     logger.debug(f"estimated completion: {round(est / 60, 2)} min")
-                if percent == 100:
-                    logger.debug(percent)
-                elif percent % 5 == 0:
+                if percent == 100 or percent % 5 == 0:
                     logger.debug(percent)
                 current_percent = percent
 
@@ -687,13 +692,13 @@ class FMSFImporter(BaseImportModule):
         #            with open(csv_summary_file, "w") as f:
         #                writer = csv.writer(f)
         #                writer.writerow(("SITEID", "ResourceId"))
-        #                writer.writerows([(i.siteid, i.resourceid) for i in self.fmsf_resources])
+        #                writer.writerows([(i.siteid, i.resourceid) for i in \
+        # self.fmsf_resources])
         #        except Exception as e:
         #            logger.info("error trying to write csv, probably a dumb error")
         #            logger.info(e)
 
         self.reporter.log(logger)
-        return
 
     def write_data_to_load_staging(self):
 
@@ -734,7 +739,6 @@ class FMSFImporter(BaseImportModule):
             self.reporter.message = str(e)
 
         self.reporter.log(logger)
-        return
 
     def write_tiles_from_load_staging(self):
 
@@ -746,10 +750,12 @@ class FMSFImporter(BaseImportModule):
             with connection.cursor() as cursor:
                 # cursor.execute("""CALL __arches_prepare_bulk_load();""")
                 cursor.execute(
-                    """ALTER TABLE tiles disable trigger __arches_check_excess_tiles_trigger;"""
+                    """ALTER TABLE tiles disable trigger
+                    __arches_check_excess_tiles_trigger;"""
                 )
                 cursor.execute(
-                    """ALTER TABLE tiles disable trigger __arches_trg_update_spatial_attributes;"""
+                    """ALTER TABLE tiles disable
+                    trigger__arches_trg_update_spatial_attributes;"""
                 )
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -760,7 +766,8 @@ class FMSFImporter(BaseImportModule):
             if row[0][0]:
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        """UPDATE load_event SET (status, load_end_time, load_details) = (%s, %s, %s) WHERE loadid = %s""",
+                        """UPDATE load_event SET (status, load_end_time, load_details) =
+                        (%s, %s, %s) WHERE loadid = %s""",
                         (
                             "completed",
                             datetime.now(),
@@ -771,7 +778,8 @@ class FMSFImporter(BaseImportModule):
             else:
                 with connection.cursor() as cursor:
                     cursor.execute(
-                        """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
+                        """UPDATE load_event SET (status, load_end_time) = (%s, %s)
+                        WHERE loadid = %s""",
                         ("failed", datetime.now(), self.loadid),
                     )
                 self.reporter.success = False
@@ -779,7 +787,8 @@ class FMSFImporter(BaseImportModule):
         except (IntegrityError, ProgrammingError) as e:
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET (status, load_end_time) = (%s, %s) WHERE loadid = %s""",
+                    """UPDATE load_event SET (status, load_end_time) = (%s, %s)
+                    WHERE loadid = %s""",
                     ("failed", datetime.now(), self.loadid),
                 )
             self.reporter.success = False
@@ -788,14 +797,15 @@ class FMSFImporter(BaseImportModule):
             with connection.cursor() as cursor:
                 # cursor.execute("""CALL __arches_complete_bulk_load();""")
                 cursor.execute(
-                    """ALTER TABLE tiles enable trigger __arches_check_excess_tiles_trigger;"""
+                    """ALTER TABLE tiles enable trigger
+                    __arches_check_excess_tiles_trigger;"""
                 )
                 cursor.execute(
-                    """ALTER TABLE tiles enable trigger __arches_trg_update_spatial_attributes;"""
+                    """ALTER TABLE tiles enable trigger
+                    __arches_trg_update_spatial_attributes;"""
                 )
 
         self.reporter.log(logger)
-        return
 
     def run_spatial_join(self):
 
@@ -818,7 +828,6 @@ class FMSFImporter(BaseImportModule):
             self.reporter.message = "Error: self.graph or self.graph.name is None"
 
         self.reporter.log(logger)
-        return
 
     def finalize_indexing(self):
 
@@ -836,7 +845,9 @@ class FMSFImporter(BaseImportModule):
                 cursor.execute("REFRESH MATERIALIZED VIEW mv_geojson_geoms;")
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """UPDATE load_event SET (status, indexed_time, complete, successful, load_details) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
+                    """UPDATE load_event SET (status, indexed_time, complete,
+                    successful, load_details) = (%s, %s, %s, %s, %s)
+                    WHERE loadid = %s""",
                     (
                         "indexed",
                         datetime.now(),
@@ -852,7 +863,6 @@ class FMSFImporter(BaseImportModule):
             self.reporter.message = str(e)
 
         self.reporter.log(logger)
-        return
 
     @staticmethod
     def run_web_import(request):
@@ -990,7 +1000,10 @@ class FMSFImporter(BaseImportModule):
 
         # RUN THE FUNCTION TO TRANSLATE THE STAGING TABLE INTO REAL TILES
         if dry_run is True:
-            self.reporter.message = f"Dry run completed successfully with {len(self.fmsf_resources)} resources."
+            self.reporter.message = (
+                "Dry run completed successfully with "
+                f"{len(self.fmsf_resources)} resources."
+            )
             self.finalize_indexing()
             return self.reporter.serialize()
 
@@ -1017,20 +1030,22 @@ class FMSFImporter(BaseImportModule):
         """
         with connection.cursor() as cursor:
             cursor.execute(
-                """UPDATE load_event SET (status, load_details) = (%s, %s) WHERE loadid = %s""",
+                """UPDATE load_event SET (status, load_details) = (%s, %s)
+                WHERE loadid = %s""",
                 (status, self.reporter.get_load_details(), self.loadid),
             )
 
     def abort_load(self, status="failed"):
         """
-        Writes a failure/abort message to the load_event table, based on the current content
-        of the self.reporter object. Status can be overridden for cases where the abort
-        is not due to error, but just a lack of new data to load.
+        Writes a failure/abort message to the load_event table, based on the current
+        content of the self.reporter object. Status can be overridden for cases
+        where the abort is not due to error, but just a lack of new data to load.
         """
 
         with connection.cursor() as cursor:
             cursor.execute(
-                """UPDATE load_event SET (status, error_message, load_details, complete, successful) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
+                """UPDATE load_event SET (status, error_message, load_details, complete,
+                successful) = (%s, %s, %s, %s, %s) WHERE loadid = %s""",
                 (
                     status,
                     self.reporter.message,
@@ -1061,7 +1076,8 @@ class FMSFImporter(BaseImportModule):
             blank_tile = {}
             with connection.cursor() as cursor:
                 cursor.execute(
-                    """SELECT nodeid FROM nodes WHERE datatype <> 'semantic' AND nodegroupid = %s;""",
+                    """SELECT nodeid FROM nodes
+                    WHERE datatype <> 'semantic' AND nodegroupid = %s;""",
                     [nodegroupid],
                 )
                 for row in cursor.fetchall():

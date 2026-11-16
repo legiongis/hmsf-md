@@ -1,11 +1,10 @@
 import logging
-import datetime
+from datetime import UTC, datetime, timedelta
 
+from arches.app.models.resource import Resource
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-
-from arches.app.models.resource import Resource
 
 from fpan.utils import get_node_value
 from hms.fmsf import FMSFResource
@@ -26,20 +25,20 @@ weekday_lookup = {
 def get_past_week_report_counts(use_date=None):
 
     if use_date is None:
-        today = datetime.date.today()
+        today = datetime.now(tz=UTC).date()
     else:
-        today = datetime.datetime.strptime(use_date, "%Y-%m-%d").date()
-    week_ago = today - datetime.timedelta(days=7)
+        today = datetime.strptime(use_date, "%Y-%m-%d").replace(tzinfo=UTC).date()
+    week_ago = today - timedelta(days=7)
 
     count_dict = {}
     past_date = week_ago
     while past_date != today:
         count_dict[past_date] = {"ct": 0, "reports": []}
-        past_date = past_date + datetime.timedelta(days=1)
+        past_date = past_date + timedelta(days=1)
 
     all_reports = Resource.objects.filter(graph_id=settings.GRAPH_LOOKUP["sr"]["id"])
 
-    start = datetime.datetime.now()
+    start = datetime.now(tz=UTC).date()
 
     sites_with_reports_already = set()
     for report in all_reports:
@@ -68,12 +67,12 @@ def get_past_week_report_counts(use_date=None):
         else:
             sites_with_reports_already.add(fmsfid)
 
-    for k, v in count_dict.items():
+    for v in count_dict.values():
         for report in v["reports"]:
             report["new_site"] = report["fmsfid"] not in sites_with_reports_already
 
     logger.info(
-        f"report count generation completed | {datetime.datetime.now() - start} seconds"
+        f"report count generation completed | {datetime.now(tz=UTC).date() - start}s"
     )
     return count_dict
 
@@ -93,7 +92,7 @@ def send_weekly_summary(use_date=None):
             if r["new_site"] is True:
                 new_sites_visited_ct += 1
 
-    sdate = list(counts.keys())[0].strftime("%m/%d")
+    sdate = next(list(counts.keys())).strftime("%m/%d")
     edate = list(counts.keys())[-1].strftime("%m/%d")
     startend_date_str = f"{sdate} - {edate}"
 
