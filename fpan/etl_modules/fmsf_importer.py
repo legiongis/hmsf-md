@@ -754,8 +754,8 @@ class FMSFImporter(BaseImportModule):
                     __arches_check_excess_tiles_trigger;"""
                 )
                 cursor.execute(
-                    """ALTER TABLE tiles disable
-                    trigger__arches_trg_update_spatial_attributes;"""
+                    """ALTER TABLE tiles disable trigger
+                    __arches_trg_update_spatial_attributes;"""
                 )
             with connection.cursor() as cursor:
                 cursor.execute(
